@@ -344,3 +344,4 @@ pdf/
 *.txt
 *.h5
 *.npy
+*.tar.gz
