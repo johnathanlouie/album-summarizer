@@ -328,3 +328,19 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+
+# Data files
+animals/
+calvin/
+clara/
+datasetImages_warp256/
+food-101/
+imgListFiles_label/
+lamem/
+memnet/
+output/
+pdf/
+*.jpg
+*.txt
+*.h5
+*.npy

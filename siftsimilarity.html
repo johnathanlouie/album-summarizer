@@ -1,0 +1,95 @@
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+        img{max-height: 200px;}
+        td{font-size:75px;}
+	</style>
+</head>
+
+<body>
+    <input id="id1" value="0" onchange="go();">
+    <table id="tbl1"></table>
+    <input type="file" id="file1">
+    <input type="file" id="file2" onchange="s();">
+    <br>
+    <button onclick="s();">submit</button>
+    <script>
+        var a = null;
+        var fr = null;
+        var url = null;
+        var rating = null;
+        var isReady = 0;
+        var map = new Map();
+
+        function load1(e) {
+            url = e.target.result;
+            url = url.trim();
+            url = url.split("\n");
+            isReady++;
+            go();
+        }
+
+        function load2(e) {
+            rating = e.target.result;
+            rating = rating.trim();
+            // rating = rating.split("\n");
+            rating = JSON.parse(rating);
+            isReady++;
+            go();
+        }
+
+        function compare(a, b) { return b[0] - a[0]; }
+
+        function go() {
+            if (isReady === 2) {
+                $("#tbl1").empty();
+                var newArray = [];
+                for (let i = 0; i < url.length; i++) {
+                    let picId = $("#id1").val();
+                    picId = Number(picId);
+                    newArray.push([rating[picId][i], url[i], i]);
+                }
+                newArray.sort(compare);
+                for (let i of newArray) {
+                    var tr = $("<tr>").appendTo('#tbl1');
+                    $("<td>").text(i[2]).appendTo(tr);
+                    var td1 = $("<td>").appendTo(tr);
+                    $("<img>").attr("src", i[1]).appendTo(td1);
+                    $("<td>").text(i[0]).appendTo(tr);
+                }
+            }
+        }
+
+        function asd(fid, cb) {
+            a = document.getElementById(fid).files[0];
+            fr = new FileReader();
+            fr.onload = cb;
+            fr.readAsText(a);
+        }
+
+        function s() {
+            a = null;
+            fr = null;
+            url = null;
+            rating = null;
+            isReady = 0;
+            map = new Map();
+            asd("file1", load1);
+            asd("file2", load2);
+        }
+
+        function decinc(event) {
+            var newVal = Number($("#id1").val());
+            if (event.keyCode === 43) { $("#id1").val(newVal + 1); }
+            else if (event.keyCode === 45) { $("#id1").val(newVal - 1); }
+            go();
+        }
+
+        $("body").keypress(decinc);
+    </script>
+
+</body>
+
+</html>
