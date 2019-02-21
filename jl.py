@@ -5,26 +5,26 @@ import csv
 import time
 
 
-TEXT_CLASSES = 'categ.txt'
-TEXT_URL_RAW = 'url.txt'
-TEXT_URL_PROCESSED = 'url2.txt'
-TEXT_URL_ALBUM = 'url3.txt'
-TEXT_PRED = 'pred.txt'
+TEXT_CLASSES = 'gen\\categ.txt'
+TEXT_URL_RAW = 'gen\\url.txt'
+TEXT_URL_PROCESSED = 'gen\\url2.txt'
+TEXT_URL_ALBUM = 'gen\\url3.txt'
+TEXT_PRED = 'gen\\pred.txt'
 
-TEXT_CLUSTER_SIFT = 'cl1.txt'
-TEXT_CLUSTER_HISTOGRAM = 'cl2.txt'
-TEXT_CLUSTER_COMBINED = 'cl3.txt'
-TEXT_CLUSTER_COMBINED2 = 'cl4.txt'
+TEXT_CLUSTER_SIFT = 'gen\\cl1.txt'
+TEXT_CLUSTER_HISTOGRAM = 'gen\\cl2.txt'
+TEXT_CLUSTER_COMBINED = 'gen\\cl3.txt'
+TEXT_CLUSTER_COMBINED2 = 'gen\\cl4.txt'
 
 NPY_CLASSES = 'categ'
 NPY_PHOTOS = 'photos'
 NPY_PRED = 'pred'
 NPY_DESC = 'desc'
 
-H5_CLASSIFIER = 'classifier.h5'
-H5_RATER = 'rater.h5'
+H5_CLASSIFIER = 'gen\\classifier.h5'
+H5_RATER = 'gen\\rater.h5'
 
-JSON_SIMILARITYMATRIX = 'sim.json'
+JSON_SIMILARITYMATRIX = 'gen\\sim.json'
 
 
 h = int(640 * 1 / 4)
@@ -60,11 +60,11 @@ def res3(n):
 
 
 def npsave(name, data):
-    return np.save(name, data)
+    return np.save("gen\\%s" % name, data)
 
 
 def npload(name):
-    return np.load("%s.npy" % name)
+    return np.load("gen\\%s.npy" % name)
 
 
 def readtxt(filename):
