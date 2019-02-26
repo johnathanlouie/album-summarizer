@@ -335,13 +335,10 @@ calvin/
 clara/
 datasetImages_warp256/
 food-101/
+gen/
 imgListFiles_label/
 lamem/
 memnet/
 output/
 pdf/
-*.jpg
-*.txt
-*.h5
-*.npy
 *.tar.gz
