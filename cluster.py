@@ -33,7 +33,7 @@ def main():
     return
 
 
-sift.createdescfile()
-sift.main()
-histogram.main()
-main()
+# sift.createdescfile()
+# sift.main()
+# histogram.main()
+# main()
