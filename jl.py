@@ -21,6 +21,7 @@ NPY_CLASSES = 'categ'
 NPY_PHOTOS = 'photos'
 NPY_PHOTOS2 = 'photos2'
 NPY_PRED = 'pred'
+NPY_PREDRATE = 'predrate'
 NPY_DESC = 'desc'
 NPY_RATE = 'rate'
 

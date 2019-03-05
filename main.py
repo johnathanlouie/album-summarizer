@@ -20,7 +20,7 @@ def categ():
     return
 
 
-def url():
+def src_url():
     """
     Rip the relative Unix style URLs from the data file.
     Format the URLS into absolute Windows style.
@@ -35,19 +35,25 @@ def url():
     return
 
 
-def prep():
+def dst_url():
     """
     Load raw URLs.
     Convert to resized URLS.
     Write to file.
+    """
+    a = jl.readtxt(jl.TEXT_URL_RAW)
+    b = list(map(jl.absurl2, a))
+    jl.writetxt(jl.TEXT_URL_PROCESSED, b)
+    return
+
+
+def classesonehot():
+    """
     Load classes. String integers.
     Change to int type.
     Change to one hot type.
     Save to file.
     """
-    a = jl.readtxt(jl.TEXT_URL_RAW)
-    b = list(map(jl.absurl2, a))
-    jl.writetxt(jl.TEXT_URL_PROCESSED, b)
     d = jl.readtxt(jl.TEXT_CLASSES)
     d = jl.intize(d)
     oh = jl.onehot(d)
@@ -89,14 +95,35 @@ def predict():
     return
 
 
+def rateurl():
+    src_url()
+    dst_url()
+    return
+
+
+def rate_create_img_npy():
+    txt = jl.readtxt(jl.TEXT_URL_PROCESSED)
+    img = jl.readimg(txt)
+    jl.npsave(jl.NPY_PHOTOS, img)
+    return
+
+
+def rate_create_rate_npy():
+    strs = jl.getcol(1)
+    ints = jl.intize(strs)
+    jl.npsave(jl.NPY_RATE, ints)
+    return
+
+
 def main():
     """
     Prepare data files, classify, and analyze pipeline.
     """
     categ()
-    url()
+    src_url()
     url2.main()
-    prep()
+    dst_url()
+    classesonehot()
     resize.main()
     classifier.main()
     train()
@@ -106,22 +133,29 @@ def main():
 
 
 def trainrater():
-    rate = jl.getcol(1)
-    # jl.writetxt(jl.TEXT_RATE, rate)
-    # jl.npsave(jl.NPY_RATE, rate)
-    x = jl.readtxt(jl.TEXT_URL_PROCESSED)
-    for i in x:
-        print(i)
-    # x = np.asarray(x)
-    # x = jl.readimg(x)
-    # jl.npsave(jl.NPY_PHOTOS2, x)
-    # x = jl.npload(jl.NPY_PHOTOS)
-    # y = jl.npload(jl.NPY_CLASSES)
-    # model = load_model(jl.H5_RATER)
-    # model.fit(x, rate, shuffle=True, epochs=9, batch_size=15)
-    # model.save(jl.H5_RATER)
+    rateurl()
+    rate_create_img_npy()
+    rate_create_rate_npy()
+    x = jl.npload(jl.NPY_PHOTOS)
+    y = jl.npload(jl.NPY_RATE)
+    model = load_model(jl.H5_RATER)
+    model.fit(x, y, shuffle=True, epochs=5, batch_size=15)
+    model.save(jl.H5_RATER)
+    return
+
+
+def rater_predict():
+    """
+    Predict using trained rater.
+    """
+    x = jl.npload(jl.NPY_PHOTOS)
+    model = load_model(jl.H5_RATER)
+    p = model.predict(x, batch_size=15)
+    jl.npsave(jl.NPY_PREDRATE, p)
+    jl.writetxt("hi.txt", p)
     return
 
 
 # main()
 trainrater()
+rater_predict()
