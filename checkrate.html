@@ -1,0 +1,97 @@
+<img id="img1" style="max-height:300px;max-width:300px;"><br>
+<span id="span1"></span><br>
+<span id="span2"></span>
+<br>
+<br>
+<br>
+<button onclick="next()">next</button>
+<br>
+<input type="file" id="file1">
+<input type="file" id="file2">
+<input type="file" id="file3">
+<br>
+<button onclick="s()">submit</button>
+<script>
+var a = null;
+var fr = null;
+var url = null;
+var rating1 = null;
+var rating2 = null;
+var isReady = 0;
+function load1(e)
+{
+	url = e.target.result;
+	url = url.split("\n");
+	isReady++;
+	//go();
+}
+function load2(e)
+{
+	rating1 = e.target.result;
+	rating1 = rating1.split("\n");
+	isReady++;
+	//go();
+}
+function load3(e)
+{
+	rating2 = e.target.result;
+	rating2 = rating2.split("\n");
+	isReady++;
+	//go();
+}
+
+function go()
+{
+	if (isReady === 2)
+	{
+		
+	}
+}
+
+function next()
+{
+	var i = Math.random() * (url.length - 1);
+	i = Math.round(i);
+	var u = url[i];
+	var r1 = rating1[i];
+	var r2 = rating2[i];
+	document.getElementById("img1").src = u;
+	document.getElementById("span1").innerText = r1;
+	document.getElementById("span2").innerText = r2;
+}
+
+function ewr(a)
+{
+	switch (a)
+	{
+		case 1:
+			return "environment";
+		case 2:
+			return "people";
+		case 3:
+			return "object";
+		case 4:
+			return "hybrid";
+		case 5:
+			return "animal";
+		case 6:
+			return "food";
+		default:
+			return "no idea";
+	}
+}
+
+function asd(fid, cb)
+{
+	a = document.getElementById(fid).files[0];
+	fr = new FileReader();
+	fr.onload = cb;
+	fr.readAsText(a);
+}
+function s()
+{
+	asd("file1", load1);
+	asd("file2", load2);
+	asd("file3", load3);
+}
+</script>

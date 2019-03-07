@@ -1,6 +1,7 @@
 import url2
 import resize
 import classifier
+import rater
 import analyzer
 import numpy as np
 import jl
@@ -132,14 +133,18 @@ def main():
     return
 
 
-def trainrater():
+def rater_prep():
     rateurl()
     rate_create_img_npy()
     rate_create_rate_npy()
+    return
+
+
+def trainrater():
     x = jl.npload(jl.NPY_PHOTOS)
     y = jl.npload(jl.NPY_RATE)
     model = load_model(jl.H5_RATER)
-    model.fit(x, y, shuffle=True, epochs=5, batch_size=15)
+    model.fit(x, y, shuffle=True, epochs=35, batch_size=15)
     model.save(jl.H5_RATER)
     return
 
@@ -157,5 +162,8 @@ def rater_predict():
 
 
 # main()
-trainrater()
+# rater.main()
+# classifier.main()
+# rater_prep()
+# trainrater()
 rater_predict()

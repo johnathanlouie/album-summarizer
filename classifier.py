@@ -81,7 +81,7 @@ def createmodel():
     x = layers.Dense(4096, activation='relu', name='fc1')(x)
     x = layers.Dense(4096, activation='relu', name='fc2')(x)
     x = layers.Dense(6, activation='softmax', name='predictions')(x)
-    # x = layers.Dense(1, activation='relu', name='predictions')(x)
+    # x = layers.Dense(1, activation='relu', name='predictions2')(x)
     model = models.Model(img_input, x, name='vgg16')
     return model
 
