@@ -10,75 +10,66 @@
 <br>
 <button onclick="s()">submit</button>
 <script>
-var a = null;
-var fr = null;
-var url = null;
-var rating = null;
-var isReady = 0;
-function load1(e)
-{
-	url = e.target.result;
-	url = url.split("\n");
-	isReady++;
-	//go();
-}
-function load2(e)
-{
-	rating = e.target.result;
-	rating = rating.split("\n");
-	isReady++;
-	//go();
-}
-
-function go()
-{
-	if (isReady === 2)
-	{
-		
+	var a = null;
+	var fr = null;
+	var url = null;
+	var rating = null;
+	var isReady = 0;
+	function load1(e) {
+		url = e.target.result;
+		url = url.split("\n");
+		isReady++;
+		//go();
 	}
-}
-
-function next()
-{
-	var i = Math.random() * (url.length - 1);
-	i = Math.round(i);
-	var u = url[i];
-	var r = rating[i];
-	document.getElementById("img1").src = u;
-	document.getElementById("span1").innerText = ewr(Number(r));
-}
-
-function ewr(a)
-{
-	switch (a)
-	{
-		case 1:
-			return "environment";
-		case 2:
-			return "people";
-		case 3:
-			return "object";
-		case 4:
-			return "hybrid";
-		case 5:
-			return "animal";
-		case 6:
-			return "food";
-		default:
-			return "no idea";
+	function load2(e) {
+		rating = e.target.result;
+		rating = rating.split("\n");
+		isReady++;
+		//go();
 	}
-}
 
-function asd(fid, cb)
-{
-	a = document.getElementById(fid).files[0];
-	fr = new FileReader();
-	fr.onload = cb;
-	fr.readAsText(a);
-}
-function s()
-{
-	asd("file1", load1);
-	asd("file2", load2);
-}
+	function go() {
+		if (isReady === 2) {
+
+		}
+	}
+
+	function next() {
+		var i = Math.random() * (url.length - 1);
+		i = Math.round(i);
+		var u = url[i];
+		var r = rating[i];
+		document.getElementById("img1").src = u;
+		document.getElementById("span1").innerText = ewr(Number(r));
+	}
+
+	function ewr(a) {
+		switch (a) {
+			case 1:
+				return "environment";
+			case 2:
+				return "people";
+			case 3:
+				return "object";
+			case 4:
+				return "hybrid";
+			case 5:
+				return "animal";
+			case 6:
+				return "food";
+			default:
+				return "no idea";
+		}
+	}
+
+	function asd(fid, cb) {
+		a = document.getElementById(fid).files[0];
+		fr = new FileReader();
+		fr.onload = cb;
+		fr.readAsText(a);
+	}
+	function s() {
+		asd("file1", load1);
+		asd("file2", load2);
+	}
 </script>
