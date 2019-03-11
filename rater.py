@@ -4,6 +4,7 @@ import numpy as np
 from keras.engine.input_layer import Input
 from keras import models
 from keras.layers import BatchNormalization, Conv2D, Dense, Flatten, MaxPooling2D
+from keras import backend as K
 import jl
 
 
@@ -105,6 +106,10 @@ def compile2(l, o, m, name):
     return
 
 
+def rmse(y_true, y_pred):
+    return K.sqrt(K.mean(K.square(y_pred - y_true), axis=-1))
+
+
 def main():
     # loss
     loss = [
@@ -136,7 +141,7 @@ def main():
     # metrics
     acc = 'accuracy'
 
-    compile2(loss[0], sgd, acc, jl.H5_RATER)
+    compile2(rmse, sgd, acc, jl.H5_RATER)
     return
 
 
