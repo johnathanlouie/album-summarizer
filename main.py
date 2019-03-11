@@ -1,4 +1,6 @@
 import url2
+import os
+import cv2
 import resize
 import classifier
 import rater
@@ -7,6 +9,7 @@ import numpy as np
 import jl
 from keras.models import load_model
 from keras.applications.vgg16 import VGG16
+from sklearn.model_selection import train_test_split
 
 
 def categ():
@@ -112,7 +115,25 @@ def rate_create_img_npy():
 def rate_create_rate_npy():
     strs = jl.getcol(1)
     ints = jl.intize(strs)
+    ints = np.asarray(ints)
     jl.npsave(jl.NPY_RATE, ints)
+    return
+
+
+def resize_imgs(src_list, dst_list):
+    urls1 = jl.readtxt(src_list)
+    urls2 = jl.readtxt(dst_list)
+    res = (jl.w, jl.h)
+    for src, dst in zip(urls1, urls2):
+        print(src)
+        print(dst)
+        img = cv2.imread(src, cv2.IMREAD_COLOR)
+        print(img.shape)
+        img2 = cv2.resize(img, res, interpolation=cv2.INTER_CUBIC)
+        print(img2.shape)
+        jl.mkdirs(dst)
+        cv2.imwrite(dst, img2)
+    print('done')
     return
 
 
@@ -125,7 +146,7 @@ def main():
     url2.main()
     dst_url()
     classesonehot()
-    resize.main()
+    resize_imgs(jl.TEXT_URL_RAW, jl.TEXT_URL_PROCESSED)
     classifier.main()
     train()
     predict()
@@ -133,19 +154,61 @@ def main():
     return
 
 
+def rater_filter():
+    a = []
+    rate = jl.npload(jl.NPY_RATE)
+    for i in rate:
+        if i == 1 or i == 3:
+            a.append(True)
+        else:
+            a.append(False)
+    b = jl.npload(jl.NPY_PHOTOS)[a]
+    c = rate[a]
+    jl.npsave(jl.NPY_PHOTOS, b)
+    jl.npsave(jl.NPY_RATE, c)
+    return
+
+
 def rater_prep():
     rateurl()
     rate_create_img_npy()
     rate_create_rate_npy()
+    rater_filter()
+    return
+
+
+def trainrateronce(cross, datax, datay, testx, testy):
+    print("cross %d" % (cross))
+    # split =
+    trainx, validx, trainy, validy = train_test_split(datax, datay, test_size=0.1, shuffle=True)
+    model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
+    qwera = model.fit(
+        trainx,
+        trainy,
+        validation_data=(validx, validy),
+        shuffle=True,
+        epochs=100,
+        batch_size=15
+    )
+    zxcv = model.evaluate(testx, testy, batch_size=15)
+    print(zxcv[1])
+    with open('log3.txt', 'a') as f:
+        print("================cross #%d================" % (cross), file=f)
+        h = qwera.history
+        for i, (t, v) in enumerate(zip(h['loss'], h['val_loss'])):
+            print("%d %f %f" % (i, t, v), file=f)
+        print(zxcv[0], file=f)
+    model.save(jl.H5_RATER)
     return
 
 
 def trainrater():
     x = jl.npload(jl.NPY_PHOTOS)
     y = jl.npload(jl.NPY_RATE)
-    model = load_model(jl.H5_RATER)
-    model.fit(x, y, shuffle=True, epochs=35, batch_size=15)
-    model.save(jl.H5_RATER)
+    datax, testx, datay, testy = train_test_split(x, y, test_size=0.1, shuffle=True)
+    for cross in range(10):
+        rater.main()
+        trainrateronce(cross, datax, datay, testx, testy)
     return
 
 
@@ -153,17 +216,28 @@ def rater_predict():
     """
     Predict using trained rater.
     """
-    x = jl.npload(jl.NPY_PHOTOS)
+    # x = jl.npload(jl.NPY_PHOTOS)
+    x = jl.readimg(['test.jpg'])
     model = load_model(jl.H5_RATER)
     p = model.predict(x, batch_size=15)
     jl.npsave(jl.NPY_PREDRATE, p)
-    jl.writetxt("hi.txt", p)
+    jl.writetxt("hi2.txt", p)
+    return
+
+
+def wtfh():
+    y = jl.npload(jl.NPY_RATE)
+    q = [0, 0, 0, 0]
+    for i in y:
+        q[i] = q[i]+1
+    print(q)
     return
 
 
 # main()
 # rater.main()
 # classifier.main()
-# rater_prep()
-# trainrater()
-rater_predict()
+rater_prep()
+trainrater()
+# rater_predict()
+# wtfh()
