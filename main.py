@@ -1,7 +1,6 @@
 import url2
 import os
 import cv2
-import resize
 import classifier
 import rater
 import analyzer
@@ -169,36 +168,57 @@ def rater_filter():
     return
 
 
+def lamem_read(txt):
+    c = 'lamem/splits/%s.txt' % (txt)
+    a = jl.readtxt(c)
+    for i, v in enumerate(a):
+        a[i] = v.split(' ')
+    b = np.asarray(a)
+    return b
+
+
+def lamem_src_url(url):
+    a = os.path.join(os.getcwd(), 'lamem/images', url)
+    return os.path.normpath(a)
+
+
+def lamem_dst_url(url):
+    a = os.path.join(os.getcwd(), 'resize/lamem', url)
+    return os.path.normpath(a)
+
+
+def lamem_urls(urls, name):
+    src = list(map(lamem_src_url, urls))
+    dst = list(map(lamem_dst_url, urls))
+    return src, dst
+
+
+def lamem_prep():
+    train1 = 'train_1'
+    a = lamem_read(train1)
+    # src, dst = lamem_urls(a[:, 0], train1)
+    # for i in range(0, 15):
+    #     jl.writetxt('gen/%s_%d_src.txt' % (train1, i), src[i*3000:(i+1)*3000])
+    #     jl.writetxt('gen/%s_%d_dst.txt' % (train1, i), dst[i*3000:(i+1)*3000])
+    rates = a[:, 1]
+    rates = jl.floatize(rates)
+    for i in range(15):
+        jl.npsave('%s_%d_rates' % (train1, i), rates[i*3000:(i+1)*3000])
+    # for i in range(0, 15):
+    #     jl.writetxt('gen/%s_%d_src.txt' % (train1, i), src[i*3000:(i+1)*3000])
+    # resize_imgs('gen/train1src.txt', 'gen/train1dst.txt')
+    # for i in range(14, 15):
+    #     d = jl.readtxt('gen/%s_%d_dst.txt' % (train1, i))
+    #     b = jl.readimg(d)
+    #     jl.npsave('%s_%d' % (train1, i), b)
+    return
+
+
 def rater_prep():
     rateurl()
     rate_create_img_npy()
     rate_create_rate_npy()
     rater_filter()
-    return
-
-
-def trainrateronce(cross, datax, datay, testx, testy):
-    print("cross %d" % (cross))
-    # split =
-    trainx, validx, trainy, validy = train_test_split(datax, datay, test_size=0.1, shuffle=True)
-    model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
-    qwera = model.fit(
-        trainx,
-        trainy,
-        validation_data=(validx, validy),
-        shuffle=True,
-        epochs=100,
-        batch_size=15
-    )
-    zxcv = model.evaluate(testx, testy, batch_size=15)
-    print(zxcv[1])
-    with open('log3.txt', 'a') as f:
-        print("================cross #%d================" % (cross), file=f)
-        h = qwera.history
-        for i, (t, v) in enumerate(zip(h['loss'], h['val_loss'])):
-            print("%d %f %f" % (i, t, v), file=f)
-        print(zxcv[0], file=f)
-    model.save(jl.H5_RATER)
     return
 
 
@@ -208,7 +228,67 @@ def trainrater():
     datax, testx, datay, testy = train_test_split(x, y, test_size=0.1, shuffle=True)
     for cross in range(10):
         rater.main()
-        trainrateronce(cross, datax, datay, testx, testy)
+        print("cross %d" % (cross))
+        trainx, validx, trainy, validy = train_test_split(datax, datay, test_size=0.1, shuffle=True)
+        model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
+        h = model.fit(
+            trainx,
+            trainy,
+            validation_data=(validx, validy),
+            shuffle=True,
+            epochs=100,
+            batch_size=15
+        ).history
+        test_loss = model.evaluate(testx, testy, batch_size=15)[0]
+        print(test_loss)
+        with open('gen/loss.txt', 'a') as f:
+            print("================cross #%d================" % (cross), file=f)
+            for i, (t, v) in enumerate(zip(h['loss'], h['val_loss'])):
+                print("%d %f %f" % (i, t, v), file=f)
+            print(test_loss, file=f)
+    model.save(jl.H5_RATER)
+    return
+
+
+model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
+
+
+def trainrater2(zxc):
+    x_file = '%s_%d' % ('train_1', zxc)
+    y_file = '%s_%d_rates' % ('train_1', zxc)
+    print(zxc)
+    x = jl.npload(x_file)
+    print('x')
+    y = jl.npload(y_file)
+    print('y')
+    model.fit(
+        x,
+        y,
+        verbose=2,
+        # validation_data=(validx, validy),
+        shuffle=True,
+        epochs=1,
+        batch_size=15
+    )
+    model.save(jl.H5_RATER)
+    return
+
+
+def rater_valid():
+    model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
+    validx = jl.npload('train_1_13')
+    validy = jl.npload('train_1_13_rates')
+    test_loss = model.evaluate(validx, validy, batch_size=15)[0]
+    print(test_loss)
+    return
+
+
+def rater_test():
+    model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
+    testx = jl.npload('train_1_14')
+    testy = jl.npload('train_1_14_rates')
+    test_loss = model.evaluate(testx, testy, batch_size=15)[0]
+    print(test_loss)
     return
 
 
@@ -221,7 +301,7 @@ def rater_predict():
     model = load_model(jl.H5_RATER)
     p = model.predict(x, batch_size=15)
     jl.npsave(jl.NPY_PREDRATE, p)
-    jl.writetxt("hi2.txt", p)
+    jl.writetxt("singlepred.txt", p)
     return
 
 
@@ -237,7 +317,13 @@ def wtfh():
 # main()
 # rater.main()
 # classifier.main()
-rater_prep()
-trainrater()
+# lamem_prep()
+# rater_prep()
+# trainrater()
+for j in range(2):
+    for i in range(13):
+        trainrater2(i)
+# rater_valid()
+# rater_test()
 # rater_predict()
 # wtfh()

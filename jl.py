@@ -31,8 +31,10 @@ H5_RATER = 'gen\\rater.h5'
 JSON_SIMILARITYMATRIX = 'gen\\sim.json'
 
 
-h = int(640 * 1 / 4)
-w = int(960 * 1 / 4)
+# h = int(640 * 1 / 4)
+# w = int(960 * 1 / 4)
+h = 190
+w = h
 res = (h, w)
 res2 = (h, w, 3)
 
@@ -93,6 +95,7 @@ def readimg(imglist):
     size = len(imglist)
     l = np.ndarray(res3(size))
     for i, v in enumerate(imglist):
+        print(v)
         l[i] = cv2.imread(v, cv2.IMREAD_COLOR)
     return l
 
@@ -142,28 +145,23 @@ def getcol(n):
     return csv[:, n]
 
 
-def winslash(s):
-    """
-    Convert all forward slashes to backward slashes.
-    """
-    return s.replace('/', '\\')
-
-
-def absurl(url):
-    """
-    Get absolute URL from relative URL.
-    """
-    cwd = os.getcwd()
-    return "%s\\%s" % (cwd, url)
-
-
 def absurl2(url):
     """
-    Add output to URL.
+    Create a URL for resized photos.
     """
-    # cwd = os.getcwd()
-    # return "%s\\%s\\%s" % (cwd, 'output', url)
-    return url.replace('summarizer', 'summarizer\\output')
+    cwd = os.getcwd()
+    url = os.path.abspath(url)
+    url = url.replace(cwd, '')
+    url = os.path.join('resize', url)
+    url = os.path.abspath(url)
+    return url
+
+
+def mkdirs(filename):
+    """Make directories given Windows style path."""
+    name = os.path.dirname(filename)
+    os.makedirs(name, exist_ok=True)
+    return
 
 
 def readcsv():
@@ -189,9 +187,16 @@ def numberize(col):
 
 def intize(txtarray):
     """
-    Convert a list of string numbers to integers.
+    Convert a list of strings to integers.
     """
     return list(map(int, txtarray))
+
+
+def floatize(txtarray):
+    """
+    Convert a list of strings to floats.
+    """
+    return list(map(float, txtarray))
 
 
 def onehot(a):
