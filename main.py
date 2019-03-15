@@ -32,8 +32,7 @@ def src_url():
     with open(jl.TEXT_URL_RAW, 'w') as f:
         for i in jl.getcol(0):
             url = i.strip()
-            url = jl.winslash(url)
-            url = jl.absurl(url)
+            url = os.path.abspath(url)
             print(url, file=f)
     return
 
@@ -320,7 +319,7 @@ def wtfh():
 # lamem_prep()
 # rater_prep()
 # trainrater()
-for j in range(2):
+for j in range(3):
     for i in range(13):
         trainrater2(i)
 # rater_valid()
