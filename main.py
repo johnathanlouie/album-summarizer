@@ -6,10 +6,12 @@ import rater
 import analyzer
 import numpy as np
 import jl
+from cv2 import imread, resize
 from keras.models import load_model
 from keras.applications.vgg16 import VGG16
 from sklearn.model_selection import train_test_split
 import keras
+from keras.callbacks import CSVLogger, ModelCheckpoint, Callback
 
 
 def categ():
@@ -292,15 +294,17 @@ class Sequence1(keras.utils.Sequence):
         self.batch_size = batch_size
 
     def __len__(self):
-        return int(np.ceil(len(self.x) / float(self.batch_size)))
+        a = float(len(self.x)) / float(self.batch_size)
+        a = int(np.ceil(a))
+        return a
 
     def __getitem__(self, idx):
         a = idx * self.batch_size
         b = (idx + 1) * self.batch_size
         batch_x = self.x[a:b]
         batch_y = self.y[a:b]
-        xx = np.array([cv2.imread(filename) for filename in batch_x])
-        yy = np.array(batch_y)
+        xx = np.asarray([resize(imread(filename), jl.res) for filename in batch_x])
+        yy = np.asarray(batch_y)
         return xx, yy
 
 
@@ -326,16 +330,52 @@ def trainrater2(zxc):
     return
 
 
+class TerminateOnDemand(Callback):
+    """
+    Callback that terminates training when a NaN loss is encountered.
+    """
+
+    def on_epoch_end(self, epoch, logs=None):
+        with open('gen/terminate.txt', 'r') as f:
+            a = f.read()
+            if a == 'die':
+                print('Manual early terminate command found in gen/terminate.txt')
+                self.stopped_epoch = epoch
+                self.model.stop_training = True
+
+
 def rater_train3():
+    print('Loading training X')
     x = jl.npload('train1x')
+    print('Loading training Y')
     y = jl.npload('train1y')
+    print('Loading validation X')
     x1 = jl.npload('val1x')
+    print('Loading validation Y')
     y1 = jl.npload('val1y')
-    model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
-    seq1 = Sequence1(x, y, 15)
-    seq2 = Sequence1(x1, y1, 15)
-    model.fit_generator(generator=seq1, epochs=1000, verbose=1, validation_data=seq2, shuffle=False, use_multiprocessing=True)
-    model.save(jl.H5_RATER)
+    print('Loading architecture')
+    # model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
+    model = rater.main()
+    print('Training sequence')
+    seq1 = Sequence1(x, y, 10)
+    print('Validation sequence')
+    seq2 = Sequence1(x1, y1, 10)
+    print('Training starts')
+    term = TerminateOnDemand()
+    save = ModelCheckpoint(jl.H5_RATER, verbose=1, period=1)
+    csv = CSVLogger('gen/training.log', append=True)
+    model.fit_generator(
+        generator=seq1,
+        epochs=10000,
+        verbose=1,
+        validation_data=seq2,
+        shuffle=False,
+        initial_epoch=0,
+        callbacks=[save, csv, term]
+    )
+    # print('Saving model')
+    # model.save(jl.H5_RATER)
+    print('Training finished')
     return
 
 
