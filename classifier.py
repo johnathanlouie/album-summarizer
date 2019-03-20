@@ -3,8 +3,10 @@ import cv2
 import numpy as np
 from keras import layers
 from keras.engine.input_layer import Input
+from keras.applications.vgg16 import VGG16
 from keras import models
 import jl
+import pprint
 
 
 def createmodel():
@@ -96,7 +98,7 @@ def loadweights(a):
 
 
 def compile2(l, o, m, name):
-    model = createmodel()
+    model = createmodel2()
     # loadweights(model)
     model.compile(loss=l, optimizer=o, metrics=[m])
     model.save(name)
@@ -109,8 +111,17 @@ def main():
     sgd = 'sgd'
     acc = 'accuracy'
     compile2(cc, sgd, acc, jl.H5_CLASSIFIER)
-    # compile2(mae, sgd, acc, jl.H5_RATER)
     return
 
 
-# main()
+def createmodel2():
+    base = VGG16(include_top=False, input_shape=jl.res2)
+    x = layers.Flatten(name='flatten')(base.output)
+    x = layers.Dense(4096, activation='relu', name='fc1')(x)
+    x = layers.Dense(4096, activation='relu', name='fc2')(x)
+    x = layers.Dense(6, activation='softmax', name='predictions')(x)
+    model = models.Model(base.input, x, name='vgg16')
+    return model
+
+
+# main2()
