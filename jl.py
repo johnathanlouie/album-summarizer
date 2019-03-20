@@ -1,21 +1,22 @@
 import numpy as np
-import cv2
+import cv2 as cv
 import os
 import csv
 import time
+import sklearn.model_selection as sklms
 
 
-TEXT_CLASSES = 'gen\\categ.txt'
-TEXT_URL_RAW = 'gen\\url.txt'
-TEXT_URL_PROCESSED = 'gen\\url2.txt'
-TEXT_URL_ALBUM = 'gen\\url3.txt'
-TEXT_PRED = 'gen\\pred.txt'
-TEXT_RATE = 'gen\\rate.txt'
+TEXT_CLASSES = 'gen/categ.txt'
+TEXT_URL_RAW = 'gen/url.txt'
+TEXT_URL_PROCESSED = 'gen/url2.txt'
+TEXT_URL_ALBUM = 'gen/url3.txt'
+TEXT_PRED = 'gen/pred.txt'
+TEXT_RATE = 'gen/rate.txt'
 
-TEXT_CLUSTER_SIFT = 'gen\\cl1.txt'
-TEXT_CLUSTER_HISTOGRAM = 'gen\\cl2.txt'
-TEXT_CLUSTER_COMBINED = 'gen\\cl3.txt'
-TEXT_CLUSTER_COMBINED2 = 'gen\\cl4.txt'
+TEXT_CLUSTER_SIFT = 'gen/cl1.txt'
+TEXT_CLUSTER_HISTOGRAM = 'gen/cl2.txt'
+TEXT_CLUSTER_COMBINED = 'gen/cl3.txt'
+TEXT_CLUSTER_COMBINED2 = 'gen/cl4.txt'
 
 NPY_CLASSES = 'categ'
 NPY_PHOTOS = 'photos'
@@ -25,30 +26,36 @@ NPY_PREDRATE = 'predrate'
 NPY_DESC = 'desc'
 NPY_RATE = 'rate'
 
-H5_CLASSIFIER = 'gen\\classifier.h5'
-H5_RATER = 'gen\\rater.h5'
+H5_CLASSIFIER = 'gen/classifier.h5'
+H5_RATER = 'gen/rater.h5'
 
-JSON_SIMILARITYMATRIX = 'gen\\sim.json'
+JSON_SIMILARITYMATRIX = 'gen/sim.json'
 
 
 # h = int(640 * 1 / 4)
 # w = int(960 * 1 / 4)
 h = 190
 w = h
+res_resize = (w, h)
 res = (h, w)
 res2 = (h, w, 3)
 
+
+def res3(n):
+    """Returns dimensions of an array of images."""
+    return (n, h, w, 3)
+
+
 classdict = {
-    'environment': 1,
-    'people': 2,
-    'object': 3,
-    'hybrid': 4,
-    'animal': 5,
-    'food': 6
+    'environment': 0,
+    'people': 1,
+    'object': 2,
+    'hybrid': 3,
+    'animal': 4,
+    'food': 5
 }
 
 classdict2 = [
-    None,
     'environment',
     'people',
     'object',
@@ -57,21 +64,39 @@ classdict2 = [
     'food'
 ]
 
-layers = ['block1_conv1', 'block1_conv2', 'block2_conv1', 'block2_conv2', 'block3_conv1', 'block3_conv2',
-          'block3_conv3', 'block4_conv1', 'block4_conv2', 'block4_conv3', 'block5_conv1', 'block5_conv2', 'block5_conv3']
+layers = [
+    'block1_conv1',
+    'block1_conv2',
+    'block2_conv1',
+    'block2_conv2',
+    'block3_conv1',
+    'block3_conv2',
+    'block3_conv3',
+    'block4_conv1',
+    'block4_conv2',
+    'block4_conv3',
+    'block5_conv1',
+    'block5_conv2',
+    'block5_conv3'
+]
 
 
-def res3(n):
-    """Returns dimensions of an array of images."""
-    return (n, h, w, 3)
+def train_valid_test_split(x, y, test_size=0.1, valid_size=0.1, train_size=None, random_state=None, shuffle=True, stratify=None):
+    if test_size != None:
+        dx, ex, dy, ey = sklms.train_test_split(x, y, test_size=test_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
+        tx, vx, ty, vy = sklms.train_test_split(dx, dy, test_size=valid_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
+    else:
+        dx, vx, vy, vy = sklms.train_test_split(x, y, test_size=valid_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
+        tx, ex, ty, ey = sklms.train_test_split(dx, dy, test_size=test_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
+    return tx, ty, vx, vy, ex, ey
 
 
 def npsave(name, data):
-    return np.save("gen\\%s" % name, data)
+    return np.save("gen/%s" % name, data)
 
 
 def npload(name):
-    return np.load("gen\\%s.npy" % name)
+    return np.load("gen/%s.npy" % name)
 
 
 def readtxt(filename):
@@ -96,7 +121,7 @@ def readimg(imglist):
     l = np.ndarray(res3(size))
     for i, v in enumerate(imglist):
         print(v)
-        l[i] = cv2.imread(v, cv2.IMREAD_COLOR)
+        l[i] = cv.imread(v, cv.IMREAD_COLOR)
     return l
 
 
@@ -109,7 +134,7 @@ def readimg2(imglist):
     """
     l = list()
     for v in imglist:
-        l.append(cv2.imread(v, cv2.IMREAD_COLOR))
+        l.append(cv.imread(v, cv.IMREAD_COLOR))
     return l
 
 
@@ -120,7 +145,7 @@ def hsv(img):
     :param ndarray img: BGR image
     :returns ndarray: HSV image
     """
-    return cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    return cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
 
 def hsvlist(imglist):
@@ -164,6 +189,12 @@ def mkdirs(filename):
     return
 
 
+def resize_img(filename):
+    img = cv.imread(filename, cv.IMREAD_COLOR)
+    img2 = cv.resize(img, res_resize, interpolation=cv.INTER_CUBIC)
+    return img2
+
+
 def readcsv():
     """
     Read data file.
@@ -174,40 +205,43 @@ def readcsv():
     return your_list
 
 
-def numberize(col):
+def class_str_int(a):
     """
     Convert class string to integer representation.
     """
-    a = list()
-    for i in col:
-        x = str(i).strip()
-        a.append(classdict[x])
-    return a
+    return [classdict[i] for i in a]
 
 
-def intize(txtarray):
+def class_int_str(a):
     """
-    Convert a list of strings to integers.
+    Convert class string to integer representation.
     """
-    return list(map(int, txtarray))
+    return [classdict2[i] for i in a]
 
 
-def floatize(txtarray):
-    """
-    Convert a list of strings to floats.
-    """
-    return list(map(float, txtarray))
-
-
-def onehot(a):
+def class_onehot(a):
     """
     Convert integer representation to one hot representation.
     """
     size = (len(a), 6)
     b = np.zeros(size)
     for i, v in enumerate(a):
-        b[i][v-1] = 1
+        b[i][v] = 1
     return b
+
+
+def intize(txtarray):
+    """
+    Convert a list of strings to integers.
+    """
+    return [int(i) for i in txtarray]
+
+
+def floatize(txtarray):
+    """
+    Convert a list of strings to floats.
+    """
+    return [float(i) for i in txtarray]
 
 
 def writetxt(filename, array):
