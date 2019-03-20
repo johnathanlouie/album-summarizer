@@ -103,7 +103,7 @@ def compile2(l, o, m, name):
     # loadweights(model)
     model.compile(loss=l, optimizer=o, metrics=[m])
     model.save(name)
-    return
+    return model
 
 
 def rmse(y_true, y_pred):
@@ -141,8 +141,7 @@ def main():
     # metrics
     acc = 'accuracy'
 
-    compile2(rmse, sgd, acc, jl.H5_RATER)
-    return
+    return compile2(rmse, sgd, acc, jl.H5_RATER)
 
 
 # main()

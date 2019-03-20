@@ -4,8 +4,7 @@ import os
 
 
 def ordertest():
-    a = cv2.imread(
-        'C:\\Users\\Johnathan Louie\\Downloads\\summarizer\\calvin\\Calvin Lee-[01_15] Guilin pt1_files\\14346_10204632819193796_7631239845068726471_n.jpg')
+    a = cv2.imread('C:\\Users\\Johnathan Louie\\Downloads\\summarizer\\calvin\\Calvin Lee-[01_15] Guilin pt1_files\\14346_10204632819193796_7631239845068726471_n.jpg')
     print(a.shape)
     h = 640
     w = 960
@@ -39,6 +38,13 @@ def emptylist():
     return
 
 
+def osjoin():
+    a = os.path.join('c:/', 'sadf', 'asdf/asfn')
+    a = os.path.normpath(a)
+    print(a)
+    return
+
+
 def numpyaddition():
     a = np.ones((2, 3))
     b = a + 50
@@ -46,4 +52,44 @@ def numpyaddition():
     return
 
 
-numpyaddition()
+def osabspath():
+    b = r'C:\albumsummarizer\calvin\Calvin Lee-December 2014 pt1_files\10437688_10204519506761056_1744003276057380254_n.jpg'
+    a = os.path.abspath(b)
+    c = os.path.abspath(a)
+    print(c)
+    return
+
+
+def osnormpath():
+    print(os.path.normpath('/ddgdg/sdfgsdh'))
+    return
+
+
+def array1():
+    a = list(150)
+    a[123] = 0
+    print(a)
+    return
+
+
+def lenarray():
+    a = np.zeros((5, 5, 5))
+    print(a.shape)
+    print(len(a))
+    return
+
+
+def chaincompare():
+    a = 0
+    b = a is 3 or 0
+    print(b)
+    return
+
+
+def typecheck():
+    x = 0.1 != None
+    print(x)
+    return
+
+
+typecheck()
