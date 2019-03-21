@@ -12,16 +12,12 @@ import keras
 from keras.callbacks import CSVLogger, ModelCheckpoint, Callback
 
 
-def ccr_prep():
-    return
-
-
 def ccc_x(split, n):
-    return 'calclarclass%d%sx' % (n, split)
+    return 'ccc%d%sx' % (n, split)
 
 
 def ccc_y(split, n):
-    return 'calclarclass%d%sy' % (n, split)
+    return 'ccc%d%sy' % (n, split)
 
 
 def ccc_prep():
@@ -37,50 +33,12 @@ def ccc_prep():
     ey = keras.utils.to_categorical(ey, num_classes=6, dtype='int32')
     print('Saving')
     jl.npsave(ccc_x('train', 1), tx)
-    jl.npsave(ccc_x('valid', 1), vx)
-    jl.npsave(ccc_x('test', 1), ex)
     jl.npsave(ccc_y('train', 1), ty)
-    jl.npsave(ccc_y('valid', 1), vy)
+    jl.npsave(ccc_x('val', 1), vx)
+    jl.npsave(ccc_y('val', 1), vy)
+    jl.npsave(ccc_x('test', 1), ex)
     jl.npsave(ccc_y('test', 1), ey)
     print('Prep complete')
-    return
-
-
-def categ():
-    """
-    Rip classes from the data file.
-    Change each class into an integer.
-    Save as text file.
-    """
-    col = jl.getcol(2)
-    num = jl.class_str_int(col)
-    jl.writetxt(jl.TEXT_CLASSES, num)
-    return
-
-
-def src_url():
-    """
-    Rip the relative Unix style URLs from the data file.
-    Format the URLS into absolute Windows style.
-    Save as text file.
-    """
-    with open(jl.TEXT_URL_RAW, 'w') as f:
-        for i in jl.getcol(0):
-            url = i.strip()
-            url = os.path.abspath(url)
-            print(url, file=f)
-    return
-
-
-def dst_url():
-    """
-    Load raw URLs.
-    Convert to resized URLS.
-    Write to file.
-    """
-    a = jl.readtxt(jl.TEXT_URL_RAW)
-    b = [jl.absurl2(i) for i in a]
-    jl.writetxt(jl.TEXT_URL_PROCESSED, b)
     return
 
 
@@ -95,24 +53,29 @@ def vggweights():
     return
 
 
-def rateurl():
-    src_url()
-    dst_url()
-    return
+def ccr_x(split, n):
+    return 'ccr%d%sx' % (n, split)
 
 
-def rate_create_img_npy():
-    txt = jl.readtxt(jl.TEXT_URL_PROCESSED)
-    img = jl.readimg(txt)
-    jl.npsave(jl.NPY_PHOTOS, img)
-    return
+def ccr_y(split, n):
+    return 'ccr%d%sy' % (n, split)
 
 
-def rate_create_rate_npy():
-    strs = jl.getcol(1)
-    ints = jl.intize(strs)
-    ints = np.asarray(ints)
-    jl.npsave(jl.NPY_RATE, ints)
+def ccr_prep():
+    print("Reading data file")
+    x = jl.getcol(0)
+    y = jl.getcol(1)
+    y = jl.intize(y)
+    print('Generating data splits')
+    tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
+    print('Saving')
+    jl.npsave(ccr_x('train', 1), tx)
+    jl.npsave(ccr_y('train', 1), ty)
+    jl.npsave(ccr_x('val', 1), vx)
+    jl.npsave(ccr_y('val', 1), vy)
+    jl.npsave(ccr_x('test', 1), ex)
+    jl.npsave(ccr_y('test', 1), ey)
+    print('Prep complete')
     return
 
 
@@ -134,35 +97,8 @@ def resize_imgs2(src_list, dst_list):
     return
 
 
-def main():
-    """
-    Prepare data files, classify, and analyze pipeline.
-    """
-    categ()
-    src_url()
-    url2.main()
-    dst_url()
-    classesonehot()
-    resize_imgs(jl.TEXT_URL_RAW, jl.TEXT_URL_PROCESSED)
-    classifier.main()
-    # train()
-    predict()
-    analyzer.main()
-    return
-
-
-def rater_filter():
-    rate = jl.npload(jl.NPY_RATE)
-    a = [i == 1 or i == 3 for i in rate]
-    b = jl.npload(jl.NPY_PHOTOS)[a]
-    c = rate[a]
-    jl.npsave(jl.NPY_PHOTOS, b)
-    jl.npsave(jl.NPY_RATE, c)
-    return
-
-
-def lamem_read(txt):
-    filename = 'lamem/splits/%s.txt' % (txt)
+def lamem_read(name, n):
+    filename = 'lamem/splits/%s_%d.txt' % (name, n)
     b = np.asarray([line.split(' ') for line in jl.readtxt(filename)])
     x = np.asarray(b[:, 0])
     y = np.asarray([float(x) for x in b[:, 1]])
@@ -174,24 +110,20 @@ def lamem_rel_url(url):
     return os.path.normpath(a)
 
 
-def lamem_data_url(name, n):
-    return '%s_%d' % (name, n)
+def lamem_x(name, n):
+    return 'lamem%d%sx' % (name, n)
 
 
-def lamem_x_url(name, n):
-    return '%d%sx' % (name, n)
-
-
-def lamem_y_url(name, n):
-    return '%d%sy' % (name, n)
+def lamem_y(name, n):
+    return 'lamem%d%sy' % (name, n)
 
 
 def lamem_prep_txt(name, n):
-    x, y = lamem_read(lamem_data_url(name, n))
+    x, y = lamem_read(name, n)
     x = np.asarray([lamem_rel_url(url) for url in x])
     y = np.asarray(y)
-    jl.npsave(lamem_x_url(name, n), x)
-    jl.npsave(lamem_y_url(name, n), y)
+    jl.npsave(lamem_x(name, n), x)
+    jl.npsave(lamem_y(name, n), y)
     return
 
 
@@ -208,14 +140,6 @@ def lamem_prep_all():
     lamem_prep_split(3)
     lamem_prep_split(4)
     lamem_prep_split(5)
-    return
-
-
-def rater_prep():
-    rateurl()
-    rate_create_img_npy()
-    rate_create_rate_npy()
-    rater_filter()
     return
 
 
@@ -273,7 +197,7 @@ def train(modelfile, train_x, train_y, valid_x, valid_y, epochs, custom=None):
     print('Training starts')
     term = TerminateOnDemand()
     save = ModelCheckpoint(modelfile, verbose=1, period=1)
-    csv = CSVLogger('gen/training.log', append=True)
+    csv = CSVLogger('gen/training.csv', append=True)
     model.fit_generator(
         generator=seq1,
         epochs=epochs,
@@ -287,46 +211,56 @@ def train(modelfile, train_x, train_y, valid_x, valid_y, epochs, custom=None):
     return
 
 
-def rater_valid():
-    model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
-    validx = jl.npload('train_1_13')
-    validy = jl.npload('train_1_13_rates')
-    test_loss = model.evaluate(validx, validy, batch_size=15)[0]
-    print(test_loss)
+def test(modelfile, test_x, test_y, custom=None):
+    print('Loading test X')
+    x = jl.npload(test_x)
+    print('Loading test Y')
+    y = jl.npload(test_y)
+    print('Loading architecture')
+    model = load_model(modelfile, custom_objects=custom)
+    print('Testing sequence')
+    seq = Sequence1(x, y, 10)
+    print('Testing starts')
+    results = model.evaluate_generator(generator=seq, verbose=1)
+    print('Testing finished')
+    if type(results) != list:
+        results = [results]
+    for metric, scalar in zip(model.metrics_names, results):
+        print('%s: %f' % (metric, scalar))
     return
 
 
-def rater_test():
-    model = load_model(jl.H5_RATER, custom_objects={'rmse': rater.rmse})
-    testx = jl.npload('train_1_14')
-    testy = jl.npload('train_1_14_rates')
-    test_loss = model.evaluate(testx, testy, batch_size=15)[0]
-    print(test_loss)
+def predict(modelfile, test_x, test_y, custom=None):
+    print('Loading test X')
+    x = jl.npload(test_x)
+    print('Loading test Y')
+    y = jl.npload(test_y)
+    print('Loading architecture')
+    model = load_model(modelfile, custom_objects=custom)
+    print('Prediction sequence')
+    seq = Sequence1(x, y, 10)
+    print('Prediction starts')
+    results = model.predict_generator(generator=seq, verbose=1)
+    print('Prediction finished')
+    print(results.shape)
+    print(results)
     return
 
 
-def rater_predict():
-    """
-    Predict using trained rater.
-    """
-    # x = jl.npload(jl.NPY_PHOTOS)
-    x = jl.readimg(['test.jpg'])
-    model = load_model(jl.H5_RATER)
-    p = model.predict(x, batch_size=15)
-    jl.npsave(jl.NPY_PREDRATE, p)
-    jl.writetxt("singlepred.txt", p)
-    return
-
-
-# main()
-# rater.main()
+# ccc_prep()
 # classifier.main()
-# rater_prep()
-# trainrater()
-# rater_train3()
-# rater_valid()
-# rater_test()
-# rater_predict()
-# calclar_class_prep()
-train(jl.H5_CLASSIFIER, ccc_x('train', 1), ccc_y('train', 1), ccc_x('valid', 1), ccc_y('valid', 1), 10000)
-# train(jl.H5_RATER, 'train1x', 'train1y', 'val1x', 'val1y', 10000, {'rmse': rater.rmse})
+# train(jl.H5_CLASSIFIER, ccc_x('train', 1), ccc_y('train', 1), ccc_x('val', 1), ccc_y('val', 1), 10000)
+# test(jl.H5_CLASSIFIER, ccc_x('test', 1), ccc_y('test', 1))
+# predict(jl.H5_CLASSIFIER, ccc_x('test', 1), ccc_y('test', 1))
+
+# ccr_prep()
+# rater.main()
+# train(jl.H5_RATER, ccr_x('train', 1), ccr_y('train', 1), ccr_x('val', 1), ccr_y('val', 1), 10000, {'rmse': rater.rmse})
+# test(jl.H5_RATER, ccr_x('test', 1), ccr_y('test', 1))
+# predict(jl.H5_RATER, ccr_x('test', 1), ccr_y('test', 1))
+
+# lamem_prep_all()
+# rater.main()
+# train(jl.H5_RATER, lamem_x('train', 1), lamem_y('train', 1), lamem_x('val', 1), lamem_y('val', 1), 10000, {'rmse': rater.rmse})
+# test(jl.H5_RATER, lamem_x('test', 1), lamem_y('test', 1))
+# predict(jl.H5_RATER, lamem_x('test', 1), lamem_y('test', 1))
