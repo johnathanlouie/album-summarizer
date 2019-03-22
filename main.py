@@ -1,15 +1,11 @@
-import url2
 import os
 import cv2 as cv
-import classifier
-import rater
-import analyzer
 import numpy as np
 import jl
 from keras.models import load_model
-from keras.applications.vgg16 import VGG16
 import keras
 from keras.callbacks import CSVLogger, ModelCheckpoint, Callback
+import model
 
 
 def ccc_x(split, n):
@@ -39,17 +35,6 @@ def ccc_prep():
     jl.npsave(ccc_x('test', 1), ex)
     jl.npsave(ccc_y('test', 1), ey)
     print('Prep complete')
-    return
-
-
-def vggweights():
-    """
-    Save pretrained VGG16 weights by layer.
-    """
-    vg = VGG16()
-    for i in jl.layers:
-        w = vg.get_layer(i).get_weights()
-        np.save(i, w)
     return
 
 
@@ -248,19 +233,31 @@ def predict(modelfile, test_x, test_y, custom=None):
 
 
 # ccc_prep()
-# classifier.main()
-# train(jl.H5_CLASSIFIER, ccc_x('train', 1), ccc_y('train', 1), ccc_x('val', 1), ccc_y('val', 1), 10000)
-# test(jl.H5_CLASSIFIER, ccc_x('test', 1), ccc_y('test', 1))
-# predict(jl.H5_CLASSIFIER, ccc_x('test', 1), ccc_y('test', 1))
+# model.ccc()
+# train('gen/ccc.h5', ccc_x('train', 1), ccc_y('train', 1), ccc_x('val', 1), ccc_y('val', 1), 10000)
+# test('gen/ccc.h5', ccc_x('test', 1), ccc_y('test', 1))
+# predict('gen/ccc.h5', ccc_x('test', 1), ccc_y('test', 1))
+
+# ccc_prep()
+# model.ccc2()
+# train('gen/ccc2.h5', ccc_x('train', 1), ccc_y('train', 1), ccc_x('val', 1), ccc_y('val', 1), 10000)
+# test('gen/ccc2.h5', ccc_x('test', 1), ccc_y('test', 1))
+# predict('gen/ccc2.h5', ccc_x('test', 1), ccc_y('test', 1))
+
+# ccc_prep()
+# model.ccc3()
+# train('gen/ccc3.h5', ccc_x('train', 1), ccc_y('train', 1), ccc_x('val', 1), ccc_y('val', 1), 10000)
+# test('gen/ccc3.h5', ccc_x('test', 1), ccc_y('test', 1))
+# predict('gen/ccc3.h5', ccc_x('test', 1), ccc_y('test', 1))
 
 # ccr_prep()
-# rater.main()
-# train(jl.H5_RATER, ccr_x('train', 1), ccr_y('train', 1), ccr_x('val', 1), ccr_y('val', 1), 10000, {'rmse': rater.rmse})
-# test(jl.H5_RATER, ccr_x('test', 1), ccr_y('test', 1))
-# predict(jl.H5_RATER, ccr_x('test', 1), ccr_y('test', 1))
+# model.ccr()
+# train('gen/ccr.h5', ccr_x('train', 1), ccr_y('train', 1), ccr_x('val', 1), ccr_y('val', 1), 10000, {'rmse': model.rmse})
+# test('gen/ccr.h5', ccr_x('test', 1), ccr_y('test', 1))
+# predict('gen/ccr.h5', ccr_x('test', 1), ccr_y('test', 1))
 
 # lamem_prep_all()
-# rater.main()
-# train(jl.H5_RATER, lamem_x('train', 1), lamem_y('train', 1), lamem_x('val', 1), lamem_y('val', 1), 10000, {'rmse': rater.rmse})
-# test(jl.H5_RATER, lamem_x('test', 1), lamem_y('test', 1))
-# predict(jl.H5_RATER, lamem_x('test', 1), lamem_y('test', 1))
+# model.lamem()
+# train('gen/lamem.h5', lamem_x('train', 1), lamem_y('train', 1), lamem_x('val', 1), lamem_y('val', 1), 10000, {'rmse': model.rmse})
+# test('gen/lamem.h5', lamem_x('test', 1), lamem_y('test', 1))
+# predict('gen/lamem.h5', lamem_x('test', 1), lamem_y('test', 1))

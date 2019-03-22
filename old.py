@@ -259,3 +259,14 @@ def rater_filter():
     jl.npsave(jl.NPY_PHOTOS, b)
     jl.npsave(jl.NPY_RATE, c)
     return
+
+
+def vggweights():
+    """
+    Save pretrained VGG16 weights by layer.
+    """
+    vg = VGG16()
+    for i in jl.layers:
+        w = vg.get_layer(i).get_weights()
+        np.save(i, w)
+    return
