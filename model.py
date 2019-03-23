@@ -40,6 +40,15 @@ metric = [
     'sparse_top_k_categorical_accuracy'  # 5
 ]
 
+models = {
+    'vgg16': classifier.create,
+    'vgg16a': classifier.create2,
+    'vgg16b': classifier.create3,
+    'kcnn': rater.create
+}
+
+custom_rmse = {'rmse': model.rmse}
+
 
 def rmse(y_true, y_pred):
     return K.sqrt(K.mean(K.square(y_pred - y_true), axis=-1))
@@ -54,29 +63,38 @@ def loadweights(a):
     return
 
 
-def compile(model, filename, l, o, m):
+def compile(model, dataset, l, o, m):
     if type(m) != list or type(m) != dict:
         m = [m]
-    model.compile(loss=l, optimizer=o, metrics=m)
-    model.save(filename)
-    return model
+    modelx = models[model]
+    modelx.compile(loss=l, optimizer=o, metrics=m)
+    modelx.save(filename(model, dataset))
+    return modelx
+
+
+def filename(model, dataset):
+    return 'gen/%s_%s.h5' % (model, dataset)
+
+
+def filename_training(model, dataset):
+    return 'gen/%s_%s_train.h5' % (model, dataset)
 
 
 def ccc():
-    return compile(classifier.create(), 'gen/ccc.h5', loss[8], optimizer[0], metric[2])
+    return compile('vgg16', 'ccc', loss[8], optimizer[0], metric[2])
 
 
 def ccc2():
-    return compile(classifier.create2(), 'gen/ccc2.h5', loss[8], optimizer[0], metric[2])
+    return compile('vgg16a', 'ccc', loss[8], optimizer[0], metric[2])
 
 
 def ccc3():
-    return compile(classifier.create3(), 'gen/ccc3.h5', loss[8], optimizer[0], metric[2])
+    return compile('vgg16b', 'ccc', loss[8], optimizer[0], metric[2])
 
 
 def ccr():
-    return compile(rater.create(), 'gen/ccr.h5', rmse, optimizer[0], metric[0])
+    return compile('kcnn', 'ccr', rmse, optimizer[0], metric[0])
 
 
 def lamem():
-    return compile(rater.create(), 'gen/lamem.h5', rmse, optimizer[0], metric[0])
+    return compile('kcnn', 'lamem', rmse, optimizer[0], metric[0])

@@ -79,7 +79,6 @@ def create():
     x = Dense(4096, activation='relu', name='fc1')(x)
     x = Dense(4096, activation='relu', name='fc2')(x)
     x = Dense(1000, activation='softmax', name='predictions')(x)
-    # x = Dense(6, activation='softmax', name='predictions2')(x)
-    x = Dense(1, activation='relu', name='predictions3')(x)
-    model = Model(img_input, x, name='ccr')
+    x = Dense(1, activation='relu', name='predictions2')(x)
+    model = Model(img_input, x, name='kcnn')
     return model

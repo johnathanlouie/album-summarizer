@@ -8,12 +8,12 @@ from keras.callbacks import CSVLogger, ModelCheckpoint, Callback
 import model
 
 
-def ccc_x(split, n):
-    return 'ccc%d%sx' % (n, split)
+def datafile_x(dataset, phase, split):
+    return '%s%d%sx' % (dataset, split, phase)
 
 
-def ccc_y(split, n):
-    return 'ccc%d%sy' % (n, split)
+def datafile_y(dataset, phase, split):
+    return '%s%d%sy' % (dataset, split, phase)
 
 
 def ccc_prep():
@@ -28,22 +28,14 @@ def ccc_prep():
     vy = keras.utils.to_categorical(vy, num_classes=6, dtype='int32')
     ey = keras.utils.to_categorical(ey, num_classes=6, dtype='int32')
     print('Saving')
-    jl.npsave(ccc_x('train', 1), tx)
-    jl.npsave(ccc_y('train', 1), ty)
-    jl.npsave(ccc_x('val', 1), vx)
-    jl.npsave(ccc_y('val', 1), vy)
-    jl.npsave(ccc_x('test', 1), ex)
-    jl.npsave(ccc_y('test', 1), ey)
+    jl.npsave(datafile_x('ccc', 'train', 1), tx)
+    jl.npsave(datafile_y('ccc', 'train', 1), ty)
+    jl.npsave(datafile_x('ccc', 'val', 1), vx)
+    jl.npsave(datafile_y('ccc', 'val', 1), vy)
+    jl.npsave(datafile_x('ccc', 'test', 1), ex)
+    jl.npsave(datafile_y('ccc', 'test', 1), ey)
     print('Prep complete')
     return
-
-
-def ccr_x(split, n):
-    return 'ccr%d%sx' % (n, split)
-
-
-def ccr_y(split, n):
-    return 'ccr%d%sy' % (n, split)
 
 
 def ccr_prep():
@@ -54,12 +46,12 @@ def ccr_prep():
     print('Generating data splits')
     tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
     print('Saving')
-    jl.npsave(ccr_x('train', 1), tx)
-    jl.npsave(ccr_y('train', 1), ty)
-    jl.npsave(ccr_x('val', 1), vx)
-    jl.npsave(ccr_y('val', 1), vy)
-    jl.npsave(ccr_x('test', 1), ex)
-    jl.npsave(ccr_y('test', 1), ey)
+    jl.npsave(datafile_x('ccr', 'train', 1), tx)
+    jl.npsave(datafile_y('ccr', 'train', 1), ty)
+    jl.npsave(datafile_x('ccr', 'val', 1), vx)
+    jl.npsave(datafile_y('ccr', 'val', 1), vy)
+    jl.npsave(datafile_x('ccr', 'test', 1), ex)
+    jl.npsave(datafile_y('ccr', 'test', 1), ey)
     print('Prep complete')
     return
 
@@ -95,20 +87,12 @@ def lamem_rel_url(url):
     return os.path.normpath(a)
 
 
-def lamem_x(name, n):
-    return 'lamem%d%sx' % (name, n)
-
-
-def lamem_y(name, n):
-    return 'lamem%d%sy' % (name, n)
-
-
-def lamem_prep_txt(name, n):
-    x, y = lamem_read(name, n)
+def lamem_prep_txt(phase, split):
+    x, y = lamem_read(phase, split)
     x = np.asarray([lamem_rel_url(url) for url in x])
     y = np.asarray(y)
-    jl.npsave(lamem_x(name, n), x)
-    jl.npsave(lamem_y(name, n), y)
+    jl.npsave(datafile_x('lamem', phase, split), x)
+    jl.npsave(datafile_y('lamem', phase, split), y)
     return
 
 
@@ -164,100 +148,103 @@ class TerminateOnDemand(Callback):
                 self.model.stop_training = True
 
 
-def train(modelfile, train_x, train_y, valid_x, valid_y, epochs, custom=None):
+def train(model, dataset, split, initial_epoch=0, epochs=10000, custom=None):
     print('Loading training X')
-    x1 = jl.npload(train_x)
+    x1 = jl.npload(datafile_x(dataset, 'train', split))
     print('Loading training Y')
-    y1 = jl.npload(train_y)
+    y1 = jl.npload(datafile_y(dataset, 'train', split))
     print('Loading validation X')
-    x2 = jl.npload(valid_x)
+    x2 = jl.npload(datafile_x(dataset, 'val', split))
     print('Loading validation Y')
-    y2 = jl.npload(valid_y)
+    y2 = jl.npload(datafile_y(dataset, 'val', split))
     print('Loading architecture')
-    model = load_model(modelfile, custom_objects=custom)
+    train_name = model.filename_training(model, dataset)
+    best_name = model.filename(model, dataset)
+    modelx = load_model(best_name, custom_objects=custom)
     print('Training sequence')
     seq1 = Sequence1(x1, y1, 10)
     print('Validation sequence')
     seq2 = Sequence1(x2, y2, 10)
     print('Training starts')
     term = TerminateOnDemand()
-    save = ModelCheckpoint(modelfile, verbose=1, period=1)
+    save = ModelCheckpoint(train_name, verbose=1, period=1)
+    best = ModelCheckpoint(best_name, verbose=1, save_best_only=True)
     csv = CSVLogger('gen/training.csv', append=True)
-    model.fit_generator(
+    modelx.fit_generator(
         generator=seq1,
         epochs=epochs,
         verbose=1,
         validation_data=seq2,
         shuffle=False,
-        initial_epoch=0,
-        callbacks=[save, csv, term]
+        initial_epoch=initial_epoch,
+        callbacks=[best, save, csv, term]
     )
     print('Training finished')
     return
 
 
-def test(modelfile, test_x, test_y, custom=None):
+def test(model, dataset, split, custom=None):
     print('Loading test X')
-    x = jl.npload(test_x)
+    x = jl.npload(datafile_x(dataset, 'test', split))
     print('Loading test Y')
-    y = jl.npload(test_y)
+    y = jl.npload(datafile_y(dataset, 'test', split))
     print('Loading architecture')
-    model = load_model(modelfile, custom_objects=custom)
+    modelx = load_model(model.filename(model, dataset), custom_objects=custom)
     print('Testing sequence')
     seq = Sequence1(x, y, 10)
     print('Testing starts')
-    results = model.evaluate_generator(generator=seq, verbose=1)
+    results = modelx.evaluate_generator(generator=seq, verbose=1)
     print('Testing finished')
     if type(results) != list:
         results = [results]
-    for metric, scalar in zip(model.metrics_names, results):
+    for metric, scalar in zip(modelx.metrics_names, results):
         print('%s: %f' % (metric, scalar))
     return
 
 
-def predict(modelfile, test_x, test_y, custom=None):
+def predict(model, dataset, split, custom=None):
     print('Loading test X')
-    x = jl.npload(test_x)
+    x = jl.npload(datafile_x(dataset, 'test', split))
     print('Loading test Y')
-    y = jl.npload(test_y)
+    y = jl.npload(datafile_y(dataset, 'test', split))
     print('Loading architecture')
-    model = load_model(modelfile, custom_objects=custom)
+    modelx = load_model(model.filename(model, dataset), custom_objects=custom)
     print('Prediction sequence')
     seq = Sequence1(x, y, 10)
     print('Prediction starts')
-    results = model.predict_generator(generator=seq, verbose=1)
+    results = modelx.predict_generator(generator=seq, verbose=1)
     print('Prediction finished')
     print(results.shape)
     print(results)
     return
 
 
-# ccc_prep()
-# model.ccc()
-# train('gen/ccc.h5', ccc_x('train', 1), ccc_y('train', 1), ccc_x('val', 1), ccc_y('val', 1), 10000)
-# test('gen/ccc.h5', ccc_x('test', 1), ccc_y('test', 1))
-# predict('gen/ccc.h5', ccc_x('test', 1), ccc_y('test', 1))
+ccc_prep()
+model.ccc()
+train('vgg16', 'ccc', 1)
+test('vgg16', 'ccc', 1)
+predict('vgg16', 'ccc', 1)
 
-# ccc_prep()
-# model.ccc2()
-# train('gen/ccc2.h5', ccc_x('train', 1), ccc_y('train', 1), ccc_x('val', 1), ccc_y('val', 1), 10000)
-# test('gen/ccc2.h5', ccc_x('test', 1), ccc_y('test', 1))
-# predict('gen/ccc2.h5', ccc_x('test', 1), ccc_y('test', 1))
+ccc_prep()
+model.ccc2()
+train('vgg16a', 'ccc', 1)
+test('vgg16a', 'ccc', 1)
+predict('vgg16a', 'ccc', 1)
 
-# ccc_prep()
-# model.ccc3()
-# train('gen/ccc3.h5', ccc_x('train', 1), ccc_y('train', 1), ccc_x('val', 1), ccc_y('val', 1), 10000)
-# test('gen/ccc3.h5', ccc_x('test', 1), ccc_y('test', 1))
-# predict('gen/ccc3.h5', ccc_x('test', 1), ccc_y('test', 1))
+ccc_prep()
+model.ccc3()
+train('vgg16b', 'ccc', 1)
+test('vgg16b', 'ccc', 1)
+predict('vgg16b', 'ccc', 1)
 
-# ccr_prep()
-# model.ccr()
-# train('gen/ccr.h5', ccr_x('train', 1), ccr_y('train', 1), ccr_x('val', 1), ccr_y('val', 1), 10000, {'rmse': model.rmse})
-# test('gen/ccr.h5', ccr_x('test', 1), ccr_y('test', 1))
-# predict('gen/ccr.h5', ccr_x('test', 1), ccr_y('test', 1))
+ccr_prep()
+model.ccr()
+train('kcnn', 'ccr', 1, custom=model.custom_rmse)
+test('kcnn', 'ccr', 1, custom=model.custom_rmse)
+predict('kcnn', 'ccr', 1, custom=model.custom_rmse)
 
-# lamem_prep_all()
-# model.lamem()
-# train('gen/lamem.h5', lamem_x('train', 1), lamem_y('train', 1), lamem_x('val', 1), lamem_y('val', 1), 10000, {'rmse': model.rmse})
-# test('gen/lamem.h5', lamem_x('test', 1), lamem_y('test', 1))
-# predict('gen/lamem.h5', lamem_x('test', 1), lamem_y('test', 1))
+lamem_prep_all()
+model.lamem()
+train('kcnn', 'lamem', 1, custom=model.custom_rmse)
+test('kcnn', 'lamem', 1, custom=model.custom_rmse)
+predict('kcnn', 'lamem', 1, custom=model.custom_rmse)
