@@ -17,8 +17,7 @@ loss = [
     'binary_crossentropy',  # 10
     'kullback_leibler_divergence',  # 11
     'poisson',  # 12
-    'cosine_proximity',  # 13
-    rmse  # 14
+    'cosine_proximity'  # 13
 ]
 
 
@@ -56,26 +55,28 @@ def loadweights(a):
 
 
 def compile(model, filename, l, o, m):
+    if type(m) != list or type(m) != dict:
+        m = [m]
     model.compile(loss=l, optimizer=o, metrics=m)
     model.save(filename)
     return model
 
 
 def ccc():
-    return compile(classifier.create(), loss[8], optimizer[0], metric[2], 'gen/ccc.h5')
+    return compile(classifier.create(), 'gen/ccc.h5', loss[8], optimizer[0], metric[2])
 
 
 def ccc2():
-    return compile(classifier.create2(), loss[8], optimizer[0], metric[2], 'gen/ccc2.h5')
+    return compile(classifier.create2(), 'gen/ccc2.h5', loss[8], optimizer[0], metric[2])
 
 
 def ccc3():
-    return compile(classifier.create3(), loss[8], optimizer[0], metric[2], 'gen/ccc3.h5')
+    return compile(classifier.create3(), 'gen/ccc3.h5', loss[8], optimizer[0], metric[2])
 
 
 def ccr():
-    return compile(rater.create(), loss[14], optimizer[0], metric[0], 'gen/ccr.h5')
+    return compile(rater.create(), 'gen/ccr.h5', rmse, optimizer[0], metric[0])
 
 
 def lamem():
-    return compile(rater.create(), loss[14], optimizer[0], metric[0], 'gen/lamem.h5')
+    return compile(rater.create(), 'gen/lamem.h5', rmse, optimizer[0], metric[0])
