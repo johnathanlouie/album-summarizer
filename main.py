@@ -1,11 +1,15 @@
-import os
+
+import warnings
+import dill
 import cv2 as cv
 import numpy as np
 import jl
 from keras.models import load_model
 import keras
-from keras.callbacks import CSVLogger, ModelCheckpoint, Callback
+from keras.callbacks import CSVLogger, ModelCheckpoint, Callback, ReduceLROnPlateau
 import model
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 def datafile_x(dataset, phase, split):
@@ -134,10 +138,181 @@ class Sequence1(keras.utils.Sequence):
         return xx, yy
 
 
+class DataHolder():
+    def get_mcp(self):
+        mcp = ModelCheckpoint('')
+        DataHolder.copy_ModelCheckpoint(self.mcp, mcp)
+        return mcp
+
+    def get_lr(self):
+        lr = ReduceLROnPlateau()
+        DataHolder.copy_ReduceLROnPlateau(self.lr, lr)
+        return lr
+
+    @staticmethod
+    def load(filepath):
+        return dill.load(open(filepath, 'rb'))
+
+    def save(self, filepath):
+        dill.dump(self, open(filepath, "wb"))
+        return
+
+    @staticmethod
+    def as_data(epoch, mcp, lr):
+        dh = DataHolder()
+        dh.mcp = DataHolder()
+        dh.lr = DataHolder()
+        DataHolder.copy_ModelCheckpoint(mcp, dh.mcp)
+        DataHolder.copy_ReduceLROnPlateau(lr, dh.lr)
+        dh.epoch = epoch
+        return dh
+
+    @staticmethod
+    def copy_ModelCheckpoint(src, dst):
+        dst.best = src.best
+        dst.epochs_since_last_save = src.epochs_since_last_save
+        dst.filepath = src.filepath
+        dst.monitor = src.monitor
+        dst.period = src.period
+        dst.save_best_only = src.save_best_only
+        dst.save_weights_only = src.save_weights_only
+        dst.verbose = src.verbose
+        return
+
+    @staticmethod
+    def copy_ReduceLROnPlateau(src, dst):
+        dst.best = src.best
+        dst.cooldown = src.cooldown
+        dst.cooldown_counter = src.cooldown_counter
+        dst.factor = src.factor
+        dst.min_delta = src.min_delta
+        dst.min_lr = src.min_lr
+        dst.mode = src.mode
+        dst.monitor = src.monitor
+        dst.patience = src.patience
+        dst.verbose = src.verbose
+        dst.wait = src.wait
+        return
+
+
+class PickleCheckpoint(Callback):
+    """Save the model after every epoch.
+    `filepath` can contain named formatting options,
+    which will be filled with the values of `epoch` and
+    keys in `logs` (passed in `on_epoch_end`).
+    For example: if `filepath` is `weights.{epoch:02d}-{val_loss:.2f}.hdf5`,
+    then the model checkpoints will be saved with the epoch number and
+    the validation loss in the filename.
+    # Arguments
+        filepath: string, path to save the model file.
+        monitor: quantity to monitor.
+        verbose: verbosity mode, 0 or 1.
+        save_best_only: if `save_best_only=True`,
+            the latest best model according to
+            the quantity monitored will not be overwritten.
+        save_weights_only: if True, then only the model's weights will be
+            saved (`model.save_weights(filepath)`), else the full model
+            is saved (`model.save(filepath)`).
+        mode: one of {auto, min, max}.
+            If `save_best_only=True`, the decision
+            to overwrite the current save file is made
+            based on either the maximization or the
+            minimization of the monitored quantity. For `val_acc`,
+            this should be `max`, for `val_loss` this should
+            be `min`, etc. In `auto` mode, the direction is
+            automatically inferred from the name of the monitored quantity.
+        period: Interval (number of epochs) between checkpoints.
+    """
+
+    def __init__(self, filepath, mcp, lr, epoch=0, monitor='val_loss', verbose=1,
+                 save_best_only=True, save_weights_only=False,
+                 mode='auto', period=1):
+        super(PickleCheckpoint, self).__init__()
+        self.monitor = monitor
+        self.verbose = verbose
+        self.filepath = filepath
+        self.save_best_only = save_best_only
+        self.save_weights_only = save_weights_only
+        self.period = period
+        self.epochs_since_last_save = 0
+        self.mcp = mcp
+        self.lr = lr
+        self.epoch = epoch
+
+        if mode not in ['auto', 'min', 'max']:
+            warnings.warn('PickleCheckpoint mode %s is unknown, fallback to auto mode.' % (mode), RuntimeWarning)
+            mode = 'auto'
+
+        if mode == 'min':
+            self.monitor_op = np.less
+            self.best = np.Inf
+        elif mode == 'max':
+            self.monitor_op = np.greater
+            self.best = -np.Inf
+        else:
+            if 'acc' in self.monitor or self.monitor.startswith('fmeasure'):
+                self.monitor_op = np.greater
+                self.best = -np.Inf
+            else:
+                self.monitor_op = np.less
+                self.best = np.Inf
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs = logs or {}
+        self.epochs_since_last_save += 1
+        self.epoch = epoch + 1
+        if self.epochs_since_last_save >= self.period:
+            self.epochs_since_last_save = 0
+            filepath = self.filepath.format(epoch=epoch + 1, **logs)
+            if self.save_best_only:
+                current = logs.get(self.monitor)
+                if current is None:
+                    warnings.warn('Can save best Keras callback objects only with %s available, skipping.' % (self.monitor), RuntimeWarning)
+                else:
+                    if self.monitor_op(current, self.best):
+                        if self.verbose > 0:
+                            print('\nEpoch %05d: %s improved from %0.5f to %0.5f, saving Keras callback objects to %s' % (epoch + 1, self.monitor, self.best, current, filepath))
+                        self.best = current
+                        if self.save_weights_only:
+                            DataHolder.as_data(epoch+1, self.mcp, self.lr).save(filepath)
+                        else:
+                            DataHolder.as_data(epoch+1, self.mcp, self.lr).save(filepath)
+                    else:
+                        if self.verbose > 0:
+                            print('\nEpoch %05d: %s did not improve from %0.5f' % (epoch + 1, self.monitor, self.best))
+            else:
+                if self.verbose > 0:
+                    print('\nEpoch %05d: saving Keras callback objects to %s' % (epoch + 1, filepath))
+                if self.save_weights_only:
+                    DataHolder.as_data(epoch+1, self.mcp, self.lr).save(filepath)
+                else:
+                    DataHolder.as_data(epoch+1, self.mcp, self.lr).save(filepath)
+
+
+def load_pickle_checkpoint(modelname, dataset):
+    modelfilepath = model.filename(modelname, dataset)
+    mcp = ModelCheckpoint(modelfilepath, verbose=1, save_best_only=True)
+    lr = ReduceLROnPlateau(patience=5, verbose=1)
+    pickle_name = pickle_filename(modelname, dataset)
+    print(type(pickle_filename))
+    pcp = PickleCheckpoint(pickle_name, mcp, lr)
+    if os.path.exists(pickle_name):
+        dh = DataHolder.load(pickle_name)
+        mcp = dh.get_mcp()
+        lr = dh.get_lr()
+        pcp = PickleCheckpoint(pickle_name, mcp, lr, dh.epoch)
+        DataHolder.copy_ModelCheckpoint(mcp, pcp)
+    return pcp
+
+
 class TerminateOnDemand(Callback):
     """
     Callback that terminates training when a NaN loss is encountered.
     """
+
+    def on_epoch_begin(self, epoch, logs):
+        lr = keras.backend.get_value(self.model.optimizer.lr)
+        print('Learning rate: %f' % (lr))
 
     def on_epoch_end(self, epoch, logs=None):
         with open('gen/terminate.txt', 'r') as f:
@@ -148,7 +323,11 @@ class TerminateOnDemand(Callback):
                 self.model.stop_training = True
 
 
-def train(model, dataset, split, initial_epoch=0, epochs=10000, custom=None):
+def pickle_filename(model, dataset):
+    return 'gen/%s_%s.p' % (model, dataset)
+
+
+def train(modelname, dataset, split, initial_epoch=0, epochs=10000, custom=None):
     print('Loading training X')
     x1 = jl.npload(datafile_x(dataset, 'train', split))
     print('Loading training Y')
@@ -158,38 +337,47 @@ def train(model, dataset, split, initial_epoch=0, epochs=10000, custom=None):
     print('Loading validation Y')
     y2 = jl.npload(datafile_y(dataset, 'val', split))
     print('Loading architecture')
-    train_name = model.filename_training(model, dataset)
-    best_name = model.filename(model, dataset)
-    modelx = load_model(best_name, custom_objects=custom)
+    # train_name = model.filename_training(modelname, dataset)
+    mfn = model.filename(modelname, dataset)
+    modelx = load_model(mfn, custom_objects=custom)
     print('Training sequence')
     seq1 = Sequence1(x1, y1, 10)
     print('Validation sequence')
     seq2 = Sequence1(x2, y2, 10)
     print('Training starts')
     term = TerminateOnDemand()
-    save = ModelCheckpoint(train_name, verbose=1, period=1)
-    best = ModelCheckpoint(best_name, verbose=1, save_best_only=True)
+    # save = ModelCheckpoint(train_name, verbose=1, period=2)
     csv = CSVLogger('gen/training.csv', append=True)
+    sbcp = load_pickle_checkpoint(modelname, dataset)
+    best = sbcp.mcp
+    lr = sbcp.lr
     modelx.fit_generator(
         generator=seq1,
         epochs=epochs,
         verbose=1,
         validation_data=seq2,
         shuffle=False,
-        initial_epoch=initial_epoch,
-        callbacks=[best, save, csv, term]
+        initial_epoch=sbcp.epoch,
+        callbacks=[
+            lr,
+            best,
+            # save,
+            csv,
+            term,
+            sbcp
+        ]
     )
     print('Training finished')
     return
 
 
-def test(model, dataset, split, custom=None):
+def test(modelname, dataset, split, custom=None):
     print('Loading test X')
     x = jl.npload(datafile_x(dataset, 'test', split))
     print('Loading test Y')
     y = jl.npload(datafile_y(dataset, 'test', split))
     print('Loading architecture')
-    modelx = load_model(model.filename(model, dataset), custom_objects=custom)
+    modelx = load_model(model.filename(modelname, dataset), custom_objects=custom)
     print('Testing sequence')
     seq = Sequence1(x, y, 10)
     print('Testing starts')
@@ -202,49 +390,56 @@ def test(model, dataset, split, custom=None):
     return
 
 
-def predict(model, dataset, split, custom=None):
+def predict(modelname, dataset, split, custom=None):
     print('Loading test X')
     x = jl.npload(datafile_x(dataset, 'test', split))
     print('Loading test Y')
     y = jl.npload(datafile_y(dataset, 'test', split))
     print('Loading architecture')
-    modelx = load_model(model.filename(model, dataset), custom_objects=custom)
+    modelx = load_model(model.filename(modelname, dataset), custom_objects=custom)
     print('Prediction sequence')
     seq = Sequence1(x, y, 10)
     print('Prediction starts')
     results = modelx.predict_generator(generator=seq, verbose=1)
     print('Prediction finished')
-    print(results.shape)
-    print(results)
-    return
+    if len(results.shape) == 2:
+        if results.shape[1] == 1:
+            results = results.flatten()
+        else:
+            results = results.argmax(1)
+            results = jl.class_str_int(results)
+    results_file = 'gen/pred.txt'
+    jl.writetxt(results_file, results)
+    print('Saved predictions to %s' % (results_file))
+    return results
 
 
-ccc_prep()
-model.ccc()
-train('vgg16', 'ccc', 1)
-test('vgg16', 'ccc', 1)
-predict('vgg16', 'ccc', 1)
+# ccc_prep()
+# model.ccc()
+# train('vgg16', 'ccc', 1)
+# test('vgg16', 'ccc', 1)
+# predict('vgg16', 'ccc', 1)
 
-ccc_prep()
-model.ccc2()
-train('vgg16a', 'ccc', 1)
-test('vgg16a', 'ccc', 1)
-predict('vgg16a', 'ccc', 1)
+# ccc_prep()
+# model.ccc2()
+# train('vgg16a', 'ccc', 1)
+# test('vgg16a', 'ccc', 1)
+# predict('vgg16a', 'ccc', 1)
 
-ccc_prep()
-model.ccc3()
-train('vgg16b', 'ccc', 1)
-test('vgg16b', 'ccc', 1)
-predict('vgg16b', 'ccc', 1)
+# ccc_prep()
+# model.ccc3()
+# train('vgg16b', 'ccc', 1)
+# test('vgg16b', 'ccc', 1)
+# predict('vgg16b', 'ccc', 1)
 
-ccr_prep()
-model.ccr()
+# ccr_prep()
+# model.ccr()
 train('kcnn', 'ccr', 1, custom=model.custom_rmse)
-test('kcnn', 'ccr', 1, custom=model.custom_rmse)
-predict('kcnn', 'ccr', 1, custom=model.custom_rmse)
+# test('kcnn', 'ccr', 1, custom=model.custom_rmse)
+# predict('kcnn', 'ccr', 1, custom=model.custom_rmse)
 
-lamem_prep_all()
-model.lamem()
-train('kcnn', 'lamem', 1, custom=model.custom_rmse)
-test('kcnn', 'lamem', 1, custom=model.custom_rmse)
-predict('kcnn', 'lamem', 1, custom=model.custom_rmse)
+# lamem_prep_all()
+# model.lamem()
+# train('kcnn', 'lamem', 1, custom=model.custom_rmse)
+# test('kcnn', 'lamem', 1, custom=model.custom_rmse)
+# predict('kcnn', 'lamem', 1, custom=model.custom_rmse)

@@ -2,6 +2,7 @@ from keras import backend as K
 import jl
 import rater
 import classifier
+from keras.optimizers import SGD
 
 loss = [
     'mean_squared_error',  # 0
@@ -47,11 +48,12 @@ models = {
     'kcnn': rater.create
 }
 
-custom_rmse = {'rmse': model.rmse}
-
 
 def rmse(y_true, y_pred):
     return K.sqrt(K.mean(K.square(y_pred - y_true), axis=-1))
+
+
+custom_rmse = {'rmse': rmse}
 
 
 def loadweights(a):
@@ -66,7 +68,7 @@ def loadweights(a):
 def compile(model, dataset, l, o, m):
     if type(m) != list or type(m) != dict:
         m = [m]
-    modelx = models[model]
+    modelx = models[model]()
     modelx.compile(loss=l, optimizer=o, metrics=m)
     modelx.save(filename(model, dataset))
     return modelx
@@ -93,7 +95,7 @@ def ccc3():
 
 
 def ccr():
-    return compile('kcnn', 'ccr', rmse, optimizer[0], metric[0])
+    return compile('kcnn', 'ccr', rmse, SGD(lr=0.01, momentum=0.9, decay=0.0005, nesterov=True), metric[0])
 
 
 def lamem():

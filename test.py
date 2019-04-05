@@ -92,4 +92,10 @@ def typecheck():
     return
 
 
-typecheck()
+def openfile():
+    with open('hrsdg.hihh') as i:
+        print(i)
+    return
+
+
+openfile()
