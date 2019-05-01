@@ -12,52 +12,116 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
-def datafile_x(dataset, phase, split):
-    return '%s%d%sx' % (dataset, split, phase)
+class DataSetName:
+
+    def __init__(self, name, split, phase, xy):
+        self.name = name
+        self.split = split
+        self.phase = phase
+        self.xy = xy
+        return
+
+    def __str__(self):
+        return '%s.%d.%s.%s' % (self.name, self.split, self.phase, self.xy)
+
+    def __add__(self, other):
+        return str(self) + other
+
+    def __radd__(self, other):
+        return other + str(self)
+
+    def save(self, data):
+        jl.npsave(self, data)
+        return
+
+    def load(self):
+        return jl.npload(self)
 
 
-def datafile_y(dataset, phase, split):
-    return '%s%d%sy' % (dataset, split, phase)
+class DataSet:
+    TRAIN = 'train'
+    VALIDATION = 'val'
+    TEST = 'test'
+    X = 'x'
+    Y = 'y'
+
+    def __init__(self, name, split):
+        self.name = name
+        self.split = split
+
+    def xtrain(self):
+        return self.x(self.TRAIN)
+
+    def xval(self):
+        return self.x(self.VALIDATION)
+
+    def xtest(self):
+        return self.x(self.TEST)
+
+    def ytrain(self):
+        return self.y(self.TRAIN)
+
+    def yval(self):
+        return self.y(self.VALIDATION)
+
+    def ytest(self):
+        return self.y(self.TEST)
+
+    def x(self, phase):
+        return DataSetName(self.name, self.split, phase, self.X)
+
+    def y(self, phase):
+        return DataSetName(self.name, self.split, phase, self.Y)
 
 
-def ccc_prep():
-    print("Reading data file")
-    x = jl.getcol(0)
-    y = jl.getcol(2)
-    y = jl.class_str_int(y)
-    print('Generating data splits')
-    tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
-    print('Converting to one hot')
-    ty = keras.utils.to_categorical(ty, num_classes=6, dtype='int32')
-    vy = keras.utils.to_categorical(vy, num_classes=6, dtype='int32')
-    ey = keras.utils.to_categorical(ey, num_classes=6, dtype='int32')
-    print('Saving')
-    jl.npsave(datafile_x('ccc', 'train', 1), tx)
-    jl.npsave(datafile_y('ccc', 'train', 1), ty)
-    jl.npsave(datafile_x('ccc', 'val', 1), vx)
-    jl.npsave(datafile_y('ccc', 'val', 1), vy)
-    jl.npsave(datafile_x('ccc', 'test', 1), ex)
-    jl.npsave(datafile_y('ccc', 'test', 1), ey)
-    print('Prep complete')
-    return
+class Ccc():
+    name = 'ccc'
+
+    @classmethod
+    def prep(cls):
+        print("Reading data file")
+        x = jl.getcol(0)
+        y = jl.getcol(2)
+        y = jl.class_str_int(y)
+        print('Generating data splits')
+        tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
+        print('Converting to one hot')
+        ty = keras.utils.to_categorical(ty, num_classes=6, dtype='int32')
+        vy = keras.utils.to_categorical(vy, num_classes=6, dtype='int32')
+        ey = keras.utils.to_categorical(ey, num_classes=6, dtype='int32')
+        print('Saving')
+        ds = DataSet(cls.name, 1)
+        ds.xtrain().save(tx)
+        ds.xtrain().save(vx)
+        ds.xtrain().save(ex)
+        ds.ytrain().save(ty)
+        ds.ytrain().save(vy)
+        ds.ytrain().save(ey)
+        print('Prep complete')
+        return
 
 
-def ccr_prep():
-    print("Reading data file")
-    x = jl.getcol(0)
-    y = jl.getcol(1)
-    y = jl.intize(y)
-    print('Generating data splits')
-    tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
-    print('Saving')
-    jl.npsave(datafile_x('ccr', 'train', 1), tx)
-    jl.npsave(datafile_y('ccr', 'train', 1), ty)
-    jl.npsave(datafile_x('ccr', 'val', 1), vx)
-    jl.npsave(datafile_y('ccr', 'val', 1), vy)
-    jl.npsave(datafile_x('ccr', 'test', 1), ex)
-    jl.npsave(datafile_y('ccr', 'test', 1), ey)
-    print('Prep complete')
-    return
+class Ccr():
+    name = 'ccr'
+
+    @classmethod
+    def prep(cls):
+        print("Reading data file")
+        x = jl.getcol(0)
+        y = jl.getcol(1)
+        y = jl.intize(y)
+        print('Generating data splits')
+        tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
+        print('Saving')
+        ds = DataSet(cls.name, 1)
+        ds.xtrain().save(tx)
+        ds.xtrain().save(vx)
+        ds.xtrain().save(ex)
+        ds.ytrain().save(ty)
+        ds.ytrain().save(vy)
+        ds.ytrain().save(ey)
+        print('Prep complete')
+        return
 
 
 def resize_imgs(src_list, dst_list):
@@ -78,45 +142,50 @@ def resize_imgs2(src_list, dst_list):
     return
 
 
-def lamem_read(name, n):
-    filename = 'lamem/splits/%s_%d.txt' % (name, n)
-    b = np.asarray([line.split(' ') for line in jl.readtxt(filename)])
-    x = np.asarray(b[:, 0])
-    y = np.asarray([float(x) for x in b[:, 1]])
-    return x, y
+class Lamem():
+    """Dataset used for large scale image memorability."""
 
+    name = 'lamem'
+    splits = range(1, 6)
+    phases = [
+        ('train', DataSet.TRAIN),
+        ('val', DataSet.VALIDATION),
+        ('test', DataSet.TEST)
+    ]
 
-def lamem_rel_url(url):
-    a = os.path.join(os.getcwd(), 'lamem/images', url)
-    return os.path.normpath(a)
+    @staticmethod
+    def read(phase, split):
+        filename = 'lamem/splits/%s_%d.txt' % (phase, split)
+        b = np.asarray([line.split(' ') for line in jl.readtxt(filename)])
+        x = np.asarray(b[:, 0])
+        y = np.asarray([float(x) for x in b[:, 1]])
+        return x, y
 
+    @staticmethod
+    def rel_url(url):
+        a = os.path.join(os.getcwd(), 'lamem/images', url)
+        return os.path.normpath(a)
 
-def lamem_prep_txt(phase, split):
-    x, y = lamem_read(phase, split)
-    x = np.asarray([lamem_rel_url(url) for url in x])
-    y = np.asarray(y)
-    jl.npsave(datafile_x('lamem', phase, split), x)
-    jl.npsave(datafile_y('lamem', phase, split), y)
-    return
+    @classmethod
+    def prep_txt(cls, phase, split):
+        x, y = cls.read(phase[0], split)
+        x = np.asarray([cls.rel_url(url) for url in x])
+        y = np.asarray(y)
+        ds = DataSet(cls.name, split)
+        ds.x(phase[1]).save(x)
+        ds.y(phase[1]).save(y)
+        return
 
-
-def lamem_prep_split(n):
-    lamem_prep_txt('train', n)
-    lamem_prep_txt('val', n)
-    lamem_prep_txt('test', n)
-    return
-
-
-def lamem_prep_all():
-    lamem_prep_split(1)
-    lamem_prep_split(2)
-    lamem_prep_split(3)
-    lamem_prep_split(4)
-    lamem_prep_split(5)
-    return
+    @classmethod
+    def prep(cls):
+        for j in cls.phases:
+            for i in cls.splits:
+                cls.prep_txt(j, i)
+        return
 
 
 class Sequence1(keras.utils.Sequence):
+    """Generate batches of data."""
 
     def __init__(self, x_set, y_set, batch_size):
         self.x = x_set
@@ -139,6 +208,8 @@ class Sequence1(keras.utils.Sequence):
 
 
 class DataHolder():
+    """Holds the picklable state of training and callbacks."""
+
     def get_mcp(self):
         mcp = ModelCheckpoint('')
         DataHolder.copy_ModelCheckpoint(self.mcp, mcp)
@@ -289,26 +360,8 @@ class PickleCheckpoint(Callback):
                     DataHolder.as_data(epoch+1, self.mcp, self.lr).save(filepath)
 
 
-def load_pickle_checkpoint(modelname, dataset):
-    modelfilepath = model.filename(modelname, dataset)
-    mcp = ModelCheckpoint(modelfilepath, verbose=1, save_best_only=True)
-    lr = ReduceLROnPlateau(patience=5, verbose=1)
-    pickle_name = pickle_filename(modelname, dataset)
-    print(type(pickle_filename))
-    pcp = PickleCheckpoint(pickle_name, mcp, lr)
-    if os.path.exists(pickle_name):
-        dh = DataHolder.load(pickle_name)
-        mcp = dh.get_mcp()
-        lr = dh.get_lr()
-        pcp = PickleCheckpoint(pickle_name, mcp, lr, dh.epoch)
-        DataHolder.copy_ModelCheckpoint(mcp, pcp)
-    return pcp
-
-
 class TerminateOnDemand(Callback):
-    """
-    Callback that terminates training when a NaN loss is encountered.
-    """
+    """Callback that terminates training when a NaN loss is encountered."""
 
     def on_epoch_begin(self, epoch, logs):
         lr = keras.backend.get_value(self.model.optimizer.lr)
@@ -323,95 +376,144 @@ class TerminateOnDemand(Callback):
                 self.model.stop_training = True
 
 
-def pickle_filename(model, dataset):
-    return 'gen/%s_%s.p' % (model, dataset)
+class ModelName:
+    def __init__(self, architecture, version, loss, optimizer):
+        self.architecture = architecture
+        self.version = version
+        self.loss = loss
+        self.optimizer = optimizer
+        return
+
+    def __str__(self):
+        return '%s.%d.%s.%s' % (self.architecture, self.version, self.loss, self.optimizer)
+
+    def __add__(self, other):
+        return str(self) + other
+
+    def __radd__(self, other):
+        return other + str(self)
 
 
-def train(modelname, dataset, split, initial_epoch=0, epochs=10000, custom=None):
-    print('Loading training X')
-    x1 = jl.npload(datafile_x(dataset, 'train', split))
-    print('Loading training Y')
-    y1 = jl.npload(datafile_y(dataset, 'train', split))
-    print('Loading validation X')
-    x2 = jl.npload(datafile_x(dataset, 'val', split))
-    print('Loading validation Y')
-    y2 = jl.npload(datafile_y(dataset, 'val', split))
-    print('Loading architecture')
-    # train_name = model.filename_training(modelname, dataset)
-    mfn = model.filename(modelname, dataset)
-    modelx = load_model(mfn, custom_objects=custom)
-    print('Training sequence')
-    seq1 = Sequence1(x1, y1, 10)
-    print('Validation sequence')
-    seq2 = Sequence1(x2, y2, 10)
-    print('Training starts')
-    term = TerminateOnDemand()
-    # save = ModelCheckpoint(train_name, verbose=1, period=2)
-    csv = CSVLogger('gen/training.csv', append=True)
-    sbcp = load_pickle_checkpoint(modelname, dataset)
-    best = sbcp.mcp
-    lr = sbcp.lr
-    modelx.fit_generator(
-        generator=seq1,
-        epochs=epochs,
-        verbose=1,
-        validation_data=seq2,
-        shuffle=False,
-        initial_epoch=sbcp.epoch,
-        callbacks=[
-            lr,
-            best,
-            # save,
-            csv,
-            term,
-            sbcp
-        ]
-    )
-    print('Training finished')
-    return
+class DataModelName:
+    def __init__(self, model, dataset):
+        self.model = model
+        self.ds = dataset
+        return
+
+    def picklename(self):
+        return 'gen/%s.%s.p' % (self.model, self.ds)
+
+    def modelname(self):
+        return 'gen/%s.%s.h5' % (self.model, self.ds)
+
+    def trainingname(self):
+        return 'gen/%s.%s.train.h5' % (self.model, self.ds)
 
 
-def test(modelname, dataset, split, custom=None):
-    print('Loading test X')
-    x = jl.npload(datafile_x(dataset, 'test', split))
-    print('Loading test Y')
-    y = jl.npload(datafile_y(dataset, 'test', split))
-    print('Loading architecture')
-    modelx = load_model(model.filename(modelname, dataset), custom_objects=custom)
-    print('Testing sequence')
-    seq = Sequence1(x, y, 10)
-    print('Testing starts')
-    results = modelx.evaluate_generator(generator=seq, verbose=1)
-    print('Testing finished')
-    if type(results) != list:
-        results = [results]
-    for metric, scalar in zip(modelx.metrics_names, results):
-        print('%s: %f' % (metric, scalar))
-    return
+class DataModel:
+    def __init__(self, datamodelname):
+        self.dmn = datamodelname
+        return
 
+    def setmodel(self, model):
+        self.model = model
+        return
 
-def predict(modelname, dataset, split, custom=None):
-    print('Loading test X')
-    x = jl.npload(datafile_x(dataset, 'test', split))
-    print('Loading test Y')
-    y = jl.npload(datafile_y(dataset, 'test', split))
-    print('Loading architecture')
-    modelx = load_model(model.filename(modelname, dataset), custom_objects=custom)
-    print('Prediction sequence')
-    seq = Sequence1(x, y, 10)
-    print('Prediction starts')
-    results = modelx.predict_generator(generator=seq, verbose=1)
-    print('Prediction finished')
-    if len(results.shape) == 2:
-        if results.shape[1] == 1:
-            results = results.flatten()
-        else:
-            results = results.argmax(1)
-            results = jl.class_str_int(results)
-    results_file = 'gen/pred.txt'
-    jl.writetxt(results_file, results)
-    print('Saved predictions to %s' % (results_file))
-    return results
+    def loadmodel(self, custom):
+        mfn = self.dmn.modelname()
+        self.model = load_model(mfn, custom_objects=custom)
+        return
+
+    def loadpicklecheckpoint(self):
+        modelfilepath = self.dmn.modelname()
+        mcp = ModelCheckpoint(modelfilepath, verbose=1, save_best_only=True)
+        lr = ReduceLROnPlateau(patience=5, verbose=1)
+        pickle_name = self.dmn.picklename()
+        pcp = PickleCheckpoint(pickle_name, mcp, lr)
+        if os.path.exists(pickle_name):
+            dh = DataHolder.load(pickle_name)
+            mcp = dh.get_mcp()
+            lr = dh.get_lr()
+            pcp = PickleCheckpoint(pickle_name, mcp, lr, dh.epoch)
+            DataHolder.copy_ModelCheckpoint(mcp, pcp)
+        return pcp
+
+    def train(self, initial_epoch=0, epochs=10000, custom=None):
+        print('Loading training X')
+        x1 = self.dmn.ds.xtrain().load()
+        print('Loading training Y')
+        y1 = self.dmn.ds.ytrain().load()
+        print('Loading validation X')
+        x2 = self.dmn.ds.xval().load()
+        print('Loading validation Y')
+        y2 = self.dmn.ds.yval().load()
+        # train_name = model.filename_training(modelname, dataset)
+        print('Training sequence')
+        seq1 = Sequence1(x1, y1, 10)
+        print('Validation sequence')
+        seq2 = Sequence1(x2, y2, 10)
+        print('Training starts')
+        term = TerminateOnDemand()
+        # save = ModelCheckpoint(train_name, verbose=1, period=2)
+        csv = CSVLogger('gen/training.csv', append=True)
+        sbcp = self.loadpicklecheckpoint()
+        best = sbcp.mcp
+        lr = sbcp.lr
+        self.model.fit_generator(
+            generator=seq1,
+            epochs=epochs,
+            verbose=1,
+            validation_data=seq2,
+            shuffle=False,
+            initial_epoch=sbcp.epoch,
+            callbacks=[
+                lr,
+                best,
+                # save,
+                csv,
+                term,
+                sbcp
+            ]
+        )
+        print('Training finished')
+        return
+
+    def test(self, custom=None):
+        print('Loading test X')
+        x = self.dmn.ds.xtest().load()
+        print('Loading test Y')
+        y = self.dmn.ds.ytest().load()
+        print('Testing sequence')
+        seq = Sequence1(x, y, 10)
+        print('Testing starts')
+        results = self.model.evaluate_generator(generator=seq, verbose=1)
+        print('Testing finished')
+        if type(results) != list:
+            results = [results]
+        for metric, scalar in zip(self.model.metrics_names, results):
+            print('%s: %f' % (metric, scalar))
+        return
+
+    def predict(self, custom=None):
+        print('Loading test X')
+        x = self.dmn.ds.xtest().load()
+        print('Loading test Y')
+        y = self.dmn.ds.ytest().load()
+        print('Prediction sequence')
+        seq = Sequence1(x, y, 10)
+        print('Prediction starts')
+        results = self.model.predict_generator(generator=seq, verbose=1)
+        print('Prediction finished')
+        if len(results.shape) == 2:
+            if results.shape[1] == 1:
+                results = results.flatten()
+            else:
+                results = results.argmax(1)
+                results = jl.class_str_int(results)
+        results_file = 'gen/pred.txt'
+        jl.writetxt(results_file, results)
+        print('Saved predictions to %s' % (results_file))
+        return results
 
 
 # ccc_prep()
@@ -434,7 +536,7 @@ def predict(modelname, dataset, split, custom=None):
 
 # ccr_prep()
 # model.ccr()
-train('kcnn', 'ccr', 1, custom=model.custom_rmse)
+# train('kcnn', 'ccr', 1, custom=model.custom_rmse)
 # test('kcnn', 'ccr', 1, custom=model.custom_rmse)
 # predict('kcnn', 'ccr', 1, custom=model.custom_rmse)
 

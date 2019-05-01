@@ -70,16 +70,7 @@ def compile(model, dataset, l, o, m):
         m = [m]
     modelx = models[model]()
     modelx.compile(loss=l, optimizer=o, metrics=m)
-    modelx.save(filename(model, dataset))
     return modelx
-
-
-def filename(model, dataset):
-    return 'gen/%s_%s.h5' % (model, dataset)
-
-
-def filename_training(model, dataset):
-    return 'gen/%s_%s_train.h5' % (model, dataset)
 
 
 def ccc():
