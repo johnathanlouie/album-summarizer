@@ -9,76 +9,77 @@ import keras
 from keras.callbacks import CSVLogger, ModelCheckpoint, Callback, ReduceLROnPlateau
 import model
 import os
+from typing import Any, Dict, List, Tuple
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 class DataSetName:
 
-    def __init__(self, name, split, phase, xy):
+    def __init__(self, name: str, split: int, phase: str, xy: str) -> None:
         self.name = name
         self.split = split
         self.phase = phase
         self.xy = xy
         return
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '%s.%d.%s.%s' % (self.name, self.split, self.phase, self.xy)
 
-    def __add__(self, other):
+    def __add__(self, other) -> str:
         return str(self) + other
 
-    def __radd__(self, other):
+    def __radd__(self, other) -> str:
         return other + str(self)
 
-    def save(self, data):
+    def save(self, data: Any) -> None:
         jl.npsave(self, data)
         return
 
-    def load(self):
+    def load(self) -> np.ndarray:
         return jl.npload(self)
 
 
-class DataSet:
+class DataSetNameFactory:
     TRAIN = 'train'
     VALIDATION = 'val'
     TEST = 'test'
     X = 'x'
     Y = 'y'
 
-    def __init__(self, name, split):
+    def __init__(self, name: str, split: int):
         self.name = name
         self.split = split
 
-    def xtrain(self):
+    def xtrain(self) -> DataSetName:
         return self.x(self.TRAIN)
 
-    def xval(self):
+    def xval(self) -> DataSetName:
         return self.x(self.VALIDATION)
 
-    def xtest(self):
+    def xtest(self) -> DataSetName:
         return self.x(self.TEST)
 
-    def ytrain(self):
+    def ytrain(self) -> DataSetName:
         return self.y(self.TRAIN)
 
-    def yval(self):
+    def yval(self) -> DataSetName:
         return self.y(self.VALIDATION)
 
-    def ytest(self):
+    def ytest(self) -> DataSetName:
         return self.y(self.TEST)
 
-    def x(self, phase):
+    def x(self, phase: str) -> DataSetName:
         return DataSetName(self.name, self.split, phase, self.X)
 
-    def y(self, phase):
+    def y(self, phase: str) -> DataSetName:
         return DataSetName(self.name, self.split, phase, self.Y)
 
 
-class Ccc():
+class Ccc:
     name = 'ccc'
 
     @classmethod
-    def prep(cls):
+    def prep(cls) -> None:
         print("Reading data file")
         x = jl.getcol(0)
         y = jl.getcol(2)
@@ -90,7 +91,7 @@ class Ccc():
         vy = keras.utils.to_categorical(vy, num_classes=6, dtype='int32')
         ey = keras.utils.to_categorical(ey, num_classes=6, dtype='int32')
         print('Saving')
-        ds = DataSet(cls.name, 1)
+        ds = DataSetNameFactory(cls.name, 1)
         ds.xtrain().save(tx)
         ds.xtrain().save(vx)
         ds.xtrain().save(ex)
@@ -101,11 +102,11 @@ class Ccc():
         return
 
 
-class Ccr():
+class Ccr:
     name = 'ccr'
 
     @classmethod
-    def prep(cls):
+    def prep(cls) -> None:
         print("Reading data file")
         x = jl.getcol(0)
         y = jl.getcol(1)
@@ -113,7 +114,7 @@ class Ccr():
         print('Generating data splits')
         tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
         print('Saving')
-        ds = DataSet(cls.name, 1)
+        ds = DataSetNameFactory(cls.name, 1)
         ds.xtrain().save(tx)
         ds.xtrain().save(vx)
         ds.xtrain().save(ex)
@@ -124,14 +125,14 @@ class Ccr():
         return
 
 
-def resize_imgs(src_list, dst_list):
+def resize_imgs(src_list, dst_list) -> None:
     urls1 = jl.readtxt(src_list)
     urls2 = jl.readtxt(dst_list)
     resize_imgs2(urls1, urls2)
     return
 
 
-def resize_imgs2(src_list, dst_list):
+def resize_imgs2(src_list, dst_list) -> None:
     for src, dst in zip(src_list, dst_list):
         print(src)
         print(dst)
@@ -142,15 +143,15 @@ def resize_imgs2(src_list, dst_list):
     return
 
 
-class Lamem():
+class Lamem:
     """Dataset used for large scale image memorability."""
 
     name = 'lamem'
     splits = range(1, 6)
     phases = [
-        ('train', DataSet.TRAIN),
-        ('val', DataSet.VALIDATION),
-        ('test', DataSet.TEST)
+        ('train', DataSetNameFactory.TRAIN),
+        ('val', DataSetNameFactory.VALIDATION),
+        ('test', DataSetNameFactory.TEST)
     ]
 
     @staticmethod
@@ -167,17 +168,17 @@ class Lamem():
         return os.path.normpath(a)
 
     @classmethod
-    def prep_txt(cls, phase, split):
+    def prep_txt(cls, phase, split) -> None:
         x, y = cls.read(phase[0], split)
         x = np.asarray([cls.rel_url(url) for url in x])
         y = np.asarray(y)
-        ds = DataSet(cls.name, split)
+        ds = DataSetNameFactory(cls.name, split)
         ds.x(phase[1]).save(x)
         ds.y(phase[1]).save(y)
         return
 
     @classmethod
-    def prep(cls):
+    def prep(cls) -> None:
         for j in cls.phases:
             for i in cls.splits:
                 cls.prep_txt(j, i)
@@ -207,7 +208,7 @@ class Sequence1(keras.utils.Sequence):
         return xx, yy
 
 
-class DataHolder():
+class DataHolder:
     """Holds the picklable state of training and callbacks."""
 
     def get_mcp(self):
@@ -224,7 +225,7 @@ class DataHolder():
     def load(filepath):
         return dill.load(open(filepath, 'rb'))
 
-    def save(self, filepath):
+    def save(self, filepath) -> None:
         dill.dump(self, open(filepath, "wb"))
         return
 
@@ -239,7 +240,7 @@ class DataHolder():
         return dh
 
     @staticmethod
-    def copy_ModelCheckpoint(src, dst):
+    def copy_ModelCheckpoint(src, dst) -> None:
         dst.best = src.best
         dst.epochs_since_last_save = src.epochs_since_last_save
         dst.filepath = src.filepath
@@ -251,7 +252,7 @@ class DataHolder():
         return
 
     @staticmethod
-    def copy_ReduceLROnPlateau(src, dst):
+    def copy_ReduceLROnPlateau(src, dst) -> None:
         dst.best = src.best
         dst.cooldown = src.cooldown
         dst.cooldown_counter = src.cooldown_counter
@@ -328,7 +329,7 @@ class PickleCheckpoint(Callback):
                 self.monitor_op = np.less
                 self.best = np.Inf
 
-    def on_epoch_end(self, epoch, logs=None):
+    def on_epoch_end(self, epoch, logs=None) -> None:
         logs = logs or {}
         self.epochs_since_last_save += 1
         self.epoch = epoch + 1
@@ -363,11 +364,11 @@ class PickleCheckpoint(Callback):
 class TerminateOnDemand(Callback):
     """Callback that terminates training when a NaN loss is encountered."""
 
-    def on_epoch_begin(self, epoch, logs):
+    def on_epoch_begin(self, epoch, logs) -> None:
         lr = keras.backend.get_value(self.model.optimizer.lr)
         print('Learning rate: %f' % (lr))
 
-    def on_epoch_end(self, epoch, logs=None):
+    def on_epoch_end(self, epoch, logs=None) -> None:
         with open('gen/terminate.txt', 'r') as f:
             a = f.read()
             if a == 'die':
@@ -415,11 +416,11 @@ class DataModel:
         self.dmn = datamodelname
         return
 
-    def setmodel(self, model):
+    def setmodel(self, model) -> None:
         self.model = model
         return
 
-    def loadmodel(self, custom):
+    def loadmodel(self, custom) -> None:
         mfn = self.dmn.modelname()
         self.model = load_model(mfn, custom_objects=custom)
         return
@@ -438,7 +439,7 @@ class DataModel:
             DataHolder.copy_ModelCheckpoint(mcp, pcp)
         return pcp
 
-    def train(self, initial_epoch=0, epochs=10000, custom=None):
+    def train(self, initial_epoch=0, epochs=10000) -> None:
         print('Loading training X')
         x1 = self.dmn.ds.xtrain().load()
         print('Loading training Y')
@@ -478,7 +479,7 @@ class DataModel:
         print('Training finished')
         return
 
-    def test(self, custom=None):
+    def test(self) -> None:
         print('Loading test X')
         x = self.dmn.ds.xtest().load()
         print('Loading test Y')
@@ -494,7 +495,7 @@ class DataModel:
             print('%s: %f' % (metric, scalar))
         return
 
-    def predict(self, custom=None):
+    def predict(self):
         print('Loading test X')
         x = self.dmn.ds.xtest().load()
         print('Loading test Y')
