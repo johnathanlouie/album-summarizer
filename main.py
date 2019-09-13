@@ -1,4 +1,3 @@
-
 import warnings
 import dill
 import cv2 as cv
@@ -11,118 +10,6 @@ import model
 import os
 from typing import Any, Dict, List, Tuple
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
-
-class DataSetName:
-
-    def __init__(self, name: str, split: int, phase: str, xy: str) -> None:
-        self.name = name
-        self.split = split
-        self.phase = phase
-        self.xy = xy
-        return
-
-    def __str__(self) -> str:
-        return '%s.%d.%s.%s' % (self.name, self.split, self.phase, self.xy)
-
-    def __add__(self, other) -> str:
-        return str(self) + other
-
-    def __radd__(self, other) -> str:
-        return other + str(self)
-
-    def save(self, data: Any) -> None:
-        jl.npsave(self, data)
-        return
-
-    def load(self) -> np.ndarray:
-        return jl.npload(self)
-
-
-class DataSetNameFactory:
-    TRAIN = 'train'
-    VALIDATION = 'val'
-    TEST = 'test'
-    X = 'x'
-    Y = 'y'
-
-    def __init__(self, name: str, split: int):
-        self.name = name
-        self.split = split
-
-    def xtrain(self) -> DataSetName:
-        return self.x(self.TRAIN)
-
-    def xval(self) -> DataSetName:
-        return self.x(self.VALIDATION)
-
-    def xtest(self) -> DataSetName:
-        return self.x(self.TEST)
-
-    def ytrain(self) -> DataSetName:
-        return self.y(self.TRAIN)
-
-    def yval(self) -> DataSetName:
-        return self.y(self.VALIDATION)
-
-    def ytest(self) -> DataSetName:
-        return self.y(self.TEST)
-
-    def x(self, phase: str) -> DataSetName:
-        return DataSetName(self.name, self.split, phase, self.X)
-
-    def y(self, phase: str) -> DataSetName:
-        return DataSetName(self.name, self.split, phase, self.Y)
-
-
-class Ccc:
-    name = 'ccc'
-
-    @classmethod
-    def prep(cls) -> None:
-        print("Reading data file")
-        x = jl.getcol(0)
-        y = jl.getcol(2)
-        y = jl.class_str_int(y)
-        print('Generating data splits')
-        tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
-        print('Converting to one hot')
-        ty = keras.utils.to_categorical(ty, num_classes=6, dtype='int32')
-        vy = keras.utils.to_categorical(vy, num_classes=6, dtype='int32')
-        ey = keras.utils.to_categorical(ey, num_classes=6, dtype='int32')
-        print('Saving')
-        ds = DataSetNameFactory(cls.name, 1)
-        ds.xtrain().save(tx)
-        ds.xtrain().save(vx)
-        ds.xtrain().save(ex)
-        ds.ytrain().save(ty)
-        ds.ytrain().save(vy)
-        ds.ytrain().save(ey)
-        print('Prep complete')
-        return
-
-
-class Ccr:
-    name = 'ccr'
-
-    @classmethod
-    def prep(cls) -> None:
-        print("Reading data file")
-        x = jl.getcol(0)
-        y = jl.getcol(1)
-        y = jl.intize(y)
-        print('Generating data splits')
-        tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
-        print('Saving')
-        ds = DataSetNameFactory(cls.name, 1)
-        ds.xtrain().save(tx)
-        ds.xtrain().save(vx)
-        ds.xtrain().save(ex)
-        ds.ytrain().save(ty)
-        ds.ytrain().save(vy)
-        ds.ytrain().save(ey)
-        print('Prep complete')
-        return
 
 
 def resize_imgs(src_list, dst_list) -> None:
@@ -141,48 +28,6 @@ def resize_imgs2(src_list, dst_list) -> None:
         cv.imwrite(dst, img2)
     print('done')
     return
-
-
-class Lamem:
-    """Dataset used for large scale image memorability."""
-
-    name = 'lamem'
-    splits = range(1, 6)
-    phases = [
-        ('train', DataSetNameFactory.TRAIN),
-        ('val', DataSetNameFactory.VALIDATION),
-        ('test', DataSetNameFactory.TEST)
-    ]
-
-    @staticmethod
-    def read(phase, split):
-        filename = 'lamem/splits/%s_%d.txt' % (phase, split)
-        b = np.asarray([line.split(' ') for line in jl.readtxt(filename)])
-        x = np.asarray(b[:, 0])
-        y = np.asarray([float(x) for x in b[:, 1]])
-        return x, y
-
-    @staticmethod
-    def rel_url(url):
-        a = os.path.join(os.getcwd(), 'lamem/images', url)
-        return os.path.normpath(a)
-
-    @classmethod
-    def prep_txt(cls, phase, split) -> None:
-        x, y = cls.read(phase[0], split)
-        x = np.asarray([cls.rel_url(url) for url in x])
-        y = np.asarray(y)
-        ds = DataSetNameFactory(cls.name, split)
-        ds.x(phase[1]).save(x)
-        ds.y(phase[1]).save(y)
-        return
-
-    @classmethod
-    def prep(cls) -> None:
-        for j in cls.phases:
-            for i in cls.splits:
-                cls.prep_txt(j, i)
-        return
 
 
 class Sequence1(keras.utils.Sequence):
@@ -213,12 +58,12 @@ class DataHolder:
 
     def get_mcp(self):
         mcp = ModelCheckpoint('')
-        DataHolder.copy_ModelCheckpoint(self.mcp, mcp)
+        DataHolder._copy_mcp(self.mcp, mcp)
         return mcp
 
     def get_lr(self):
         lr = ReduceLROnPlateau()
-        DataHolder.copy_ReduceLROnPlateau(self.lr, lr)
+        DataHolder._copy_lr(self.lr, lr)
         return lr
 
     @staticmethod
@@ -234,13 +79,13 @@ class DataHolder:
         dh = DataHolder()
         dh.mcp = DataHolder()
         dh.lr = DataHolder()
-        DataHolder.copy_ModelCheckpoint(mcp, dh.mcp)
-        DataHolder.copy_ReduceLROnPlateau(lr, dh.lr)
+        DataHolder._copy_mcp(mcp, dh.mcp)
+        DataHolder._copy_lr(lr, dh.lr)
         dh.epoch = epoch
         return dh
 
     @staticmethod
-    def copy_ModelCheckpoint(src, dst) -> None:
+    def _copy_mcp(src, dst) -> None:
         dst.best = src.best
         dst.epochs_since_last_save = src.epochs_since_last_save
         dst.filepath = src.filepath
@@ -252,7 +97,7 @@ class DataHolder:
         return
 
     @staticmethod
-    def copy_ReduceLROnPlateau(src, dst) -> None:
+    def _copy_lr(src, dst) -> None:
         dst.best = src.best
         dst.cooldown = src.cooldown
         dst.cooldown_counter = src.cooldown_counter
@@ -397,18 +242,18 @@ class ModelName:
 
 class DataModelName:
     def __init__(self, model, dataset):
-        self.model = model
-        self.ds = dataset
+        self._model_name = model
+        self._ds = dataset
         return
 
-    def picklename(self):
-        return 'gen/%s.%s.p' % (self.model, self.ds)
+    def pickle(self):
+        return 'gen/%s.%s.p' % (self._model_name, self._ds)
 
-    def modelname(self):
-        return 'gen/%s.%s.h5' % (self.model, self.ds)
+    def model(self):
+        return 'gen/%s.%s.h5' % (self._model_name, self._ds)
 
-    def trainingname(self):
-        return 'gen/%s.%s.train.h5' % (self.model, self.ds)
+    def training(self):
+        return 'gen/%s.%s.train.h5' % (self._model_name, self._ds)
 
 
 class DataModel:
@@ -436,7 +281,7 @@ class DataModel:
             mcp = dh.get_mcp()
             lr = dh.get_lr()
             pcp = PickleCheckpoint(pickle_name, mcp, lr, dh.epoch)
-            DataHolder.copy_ModelCheckpoint(mcp, pcp)
+            DataHolder._copy_mcp(mcp, pcp)
         return pcp
 
     def train(self, initial_epoch=0, epochs=10000) -> None:
