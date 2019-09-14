@@ -1,3 +1,4 @@
+from typing import Any, Dict, List, Tuple
 import numpy as np
 import cv2 as cv
 import os
@@ -5,6 +6,7 @@ import csv
 import time
 import sklearn.model_selection as sklms
 
+CSV_CCDATA = 'data.csv'
 
 TEXT_CLASSES = 'gen/categ.txt'
 TEXT_URL_RAW = 'gen/url.txt'
@@ -158,18 +160,6 @@ def hsvlist(imglist):
     return list(map(hsv, imglist))
 
 
-def getcol(n):
-    """
-    Get column from data file.
-
-    :param int n: Index (zero based) of column to extract.
-    :returns ndarray: column of data
-    """
-    csv = readcsv()
-    csv = np.asarray(csv)
-    return csv[:, n]
-
-
 def absurl2(url):
     """
     Create a URL for resized photos.
@@ -195,14 +185,32 @@ def resize_img(filename):
     return img2
 
 
-def readcsv():
-    """
-    Read data file.
-    """
-    with open('data.csv', 'r') as f:
-        reader = csv.reader(f)
-        your_list = list(reader)
-    return your_list
+class Csv(object):
+    def __init__(self, url: str):
+        self._url = url
+
+    def as_list(self) -> List[List[Any]]:
+        """
+        Reads CSV file to a list.
+        """
+        with open(self._url, 'r') as f:
+            reader = csv.reader(f)
+            your_list = list(reader)
+        return your_list
+
+    def get_col(self, n: int) -> np.ndarray[str]:
+        """
+        Get column from data file.
+
+        :param int n: Index (zero based) of column to extract.
+        :returns ndarray: column of data
+        """
+        csv = self.as_list()
+        csv = np.asarray(csv)
+        return csv[:, n]
+
+    def get_col_int(self, n: int) -> np.ndarray[int]:
+        return intize(self.get_col(n))
 
 
 def class_str_int(a):
