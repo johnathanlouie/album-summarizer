@@ -185,34 +185,6 @@ def resize_img(filename):
     return img2
 
 
-class Csv(object):
-    def __init__(self, url: str):
-        self._url = url
-
-    def as_list(self) -> List[List[Any]]:
-        """
-        Reads CSV file to a list.
-        """
-        with open(self._url, 'r') as f:
-            reader = csv.reader(f)
-            your_list = list(reader)
-        return your_list
-
-    def get_col(self, n: int) -> np.ndarray[str]:
-        """
-        Get column from data file.
-
-        :param int n: Index (zero based) of column to extract.
-        :returns ndarray: column of data
-        """
-        csv = self.as_list()
-        csv = np.asarray(csv)
-        return csv[:, n]
-
-    def get_col_int(self, n: int) -> np.ndarray[int]:
-        return intize(self.get_col(n))
-
-
 def class_str_int(a):
     """
     Convert class string to integer representation.
@@ -282,3 +254,31 @@ class Stopwatch:
     def print(self):
         minutes, sec = divmod(self.elapsed(), 60)
         print('time: %d:%02d' % (minutes, sec))
+
+
+class Csv(object):
+    def __init__(self, url: str):
+        self._url = url
+
+    def as_list(self) -> List[List[str]]:
+        """
+        Reads CSV file to a list.
+        """
+        with open(self._url, 'r') as f:
+            reader = csv.reader(f)
+            your_list = list(reader)
+        return your_list
+
+    def get_col(self, n: int) -> List[str]:
+        """
+        Get column from data file.
+
+        :param int n: Index (zero based) of column to extract.
+        :returns ndarray: column of data
+        """
+        csv = self.as_list()
+        csv = np.asarray(csv)
+        return csv[:, n].tolist()
+
+    def get_col_int(self, n: int) -> List[int]:
+        return intize(self.get_col(n))
