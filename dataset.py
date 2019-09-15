@@ -117,6 +117,22 @@ class Ccr:
         return
 
 
+class LamemDataFile(object):
+    def __init__(self, url: str):
+        self._url = url
+
+    def read(self) -> List[List[str]]:
+        return [line.split(' ') for line in jl.readtxt(self._url)]
+
+    def list_x(self) -> List[str]:
+        b = np.asarray(self.read())
+        return b[:, 0].tolist()
+
+    def list_y(self) -> List[float]:
+        b = np.asarray(self.read())
+        return [float(x) for x in b[:, 1]]
+
+
 class Lamem:
     """Dataset used for large scale image memorability."""
 
