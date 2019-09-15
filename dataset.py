@@ -118,17 +118,30 @@ class Ccr:
 
 
 class LamemDataFile(object):
+    """
+    Represents one of the data files found in the splits directory of the LaMem project.
+    """
+
     def __init__(self, url: str):
         self._url = url
 
     def read(self) -> List[List[str]]:
+        """
+        Gets the data as a 2D list of strings.
+        """
         return [line.split(' ') for line in jl.readtxt(self._url)]
 
     def list_x(self) -> List[str]:
+        """
+        Gets the x column for deep learning.
+        """
         b = np.asarray(self.read())
         return b[:, 0].tolist()
 
     def list_y(self) -> List[float]:
+        """
+        Gets the y column for deep learning.
+        """
         b = np.asarray(self.read())
         return [float(x) for x in b[:, 1]]
 
