@@ -257,6 +257,10 @@ class Stopwatch:
 
 
 class Csv(object):
+    """
+    Represents a comma separated value file.
+    """
+
     def __init__(self, url: str):
         self._url = url
 
@@ -271,14 +275,14 @@ class Csv(object):
 
     def get_col(self, n: int) -> List[str]:
         """
-        Get column from data file.
-
-        :param int n: Index (zero based) of column to extract.
-        :returns ndarray: column of data
+        Gets a column from the CSV file. All elements are strings.
         """
         csv = self.as_list()
         csv = np.asarray(csv)
         return csv[:, n].tolist()
 
     def get_col_int(self, n: int) -> List[int]:
+        """
+        Gets a column from the CSV file. All elements are integers.
+        """
         return intize(self.get_col(n))
