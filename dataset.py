@@ -60,40 +60,69 @@ class DataSetXY(object):
         return jl.npload(self)
 
 
-class DataSetSplitFactory:
-    TRAIN = 'train'
-    VALIDATION = 'val'
-    TEST = 'test'
-    X = 'x'
-    Y = 'y'
+class DataSetPhase(object):
+    """
+    Represents a training, test, or validation phase for deep learning.
+    """
 
-    def __init__(self, name: str, split: int):
+    def __init__(self, name: str, split: int, phase: Phase) -> None:
         self.name = name
         self.split = split
+        self.phase = phase
+        return
 
-    def xtrain(self) -> DataSetSplit:
-        return self.x(self.TRAIN)
+    def _get_xy(self, xy: XY) -> DataSetXY:
+        """
+        Gets an input x or an output y from this phase.
+        """
+        return DataSetXY(self.name, self.split, self.phase, xy)
 
-    def xval(self) -> DataSetSplit:
-        return self.x(self.VALIDATION)
+    def x(self) -> DataSetXY:
+        """
+        Gets the input x from this phase.
+        """
+        return self._get_xy(XY.X)
 
-    def xtest(self) -> DataSetSplit:
-        return self.x(self.TEST)
+    def y(self) -> DataSetXY:
+        """
+        Gets the input y from this phase.
+        """
+        return self._get_xy(XY.Y)
 
-    def ytrain(self) -> DataSetSplit:
-        return self.y(self.TRAIN)
 
-    def yval(self) -> DataSetSplit:
-        return self.y(self.VALIDATION)
+class DataSetSplit(object):
+    """
+    Represents a split of a dataset for cross-validation.
+    """
 
-    def ytest(self) -> DataSetSplit:
-        return self.y(self.TEST)
+    def __init__(self, name: str, split: int) -> None:
+        self.name = name
+        self.split = split
+        return
 
-    def x(self, phase: str) -> DataSetSplit:
-        return DataSetSplit(self.name, self.split, phase, self.X)
+    def _get_phase(self, phase: Phase) -> DataSetPhase:
+        """
+        Gets a phase from this split.
+        """
+        return DataSetPhase(self.name, self.split, phase)
 
-    def y(self, phase: str) -> DataSetSplit:
-        return DataSetSplit(self.name, self.split, phase, self.Y)
+    def train(self) -> DataSetPhase:
+        """
+        Gets the training phase from this split.
+        """
+        return self._get_phase(Phase.TRAIN)
+
+    def test(self) -> DataSetPhase:
+        """
+        Gets the testing phase from this split.
+        """
+        return self._get_phase(Phase.TEST)
+
+    def validatation(self) -> DataSetPhase:
+        """
+        Gets the validation phase from this split.
+        """
+        return self._get_phase(Phase.VALIDATION)
 
 
 class Ccc:
