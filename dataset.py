@@ -8,6 +8,17 @@ import numpy as np
 import jl
 
 
+class XY(Enum):
+    X = 'x'
+    Y = 'y'
+
+
+class Phase(Enum):
+    TRAIN = 'train'
+    VALIDATION = 'val'
+    TEST = 'test'
+
+
 class DataSetSplit:
 
     def __init__(self, name: str, split: int, phase: str, xy: str) -> None:
