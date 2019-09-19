@@ -1,8 +1,11 @@
-import numpy as np
-import jl
-import keras
 import os
+from enum import Enum
 from typing import Any, Dict, List, Tuple
+
+import keras
+import numpy as np
+
+import jl
 
 
 class DataSetSplit:
