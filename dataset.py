@@ -9,19 +9,28 @@ import jl
 
 
 class XY(Enum):
+    """
+    Used in the dataset classes.
+    """
     X = 'x'
     Y = 'y'
 
 
 class Phase(Enum):
+    """
+    Used in the dataset classes.
+    """
     TRAIN = 'train'
     VALIDATION = 'val'
     TEST = 'test'
 
 
-class DataSetSplit:
+class DataSetXY(object):
+    """
+    Stores or loads an input x or an output y array for deep learning.
+    """
 
-    def __init__(self, name: str, split: int, phase: str, xy: str) -> None:
+    def __init__(self, name: str, split: int, phase: Phase, xy: XY) -> None:
         self.name = name
         self.split = split
         self.phase = phase
@@ -37,11 +46,17 @@ class DataSetSplit:
     def __radd__(self, other) -> str:
         return other + str(self)
 
-    def save(self, data: Any) -> None:
+    def save(self, data: np.ndarray) -> None:
+        """
+        Saves a NumPy array as a file.
+        """
         jl.npsave(self, data)
         return
 
     def load(self) -> np.ndarray:
+        """
+        Loads a NumPy array from a file.
+        """
         return jl.npload(self)
 
 
