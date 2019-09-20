@@ -125,6 +125,25 @@ class DataSetSplit(object):
         return self._get_phase(Phase.VALIDATION)
 
 
+class DataSet(object):
+    """
+    Interface for datasets. Mainly used for hints.
+    """
+    name = ''
+
+    def prepare(self) -> None:
+        """
+        Reads and convert the dataset data files into NumPy arrays for Keras.
+        """
+        pass
+
+    def split(self, num: int) -> DataSetSplit:
+        """
+        Gets the training, testing, and validation split for Keras.
+        """
+        pass
+
+
 class Ccc:
     name = 'ccc'
 
