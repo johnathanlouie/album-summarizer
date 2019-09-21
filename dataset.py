@@ -129,6 +129,7 @@ class DataSet(object):
     """
     Interface for datasets. Mainly used for hints.
     """
+
     name = ''
 
     def prepare(self) -> None:
@@ -199,7 +200,7 @@ class LamemDataFile(object):
     Represents one of the data files found in the splits directory of the LaMem project.
     """
 
-    def __init__(self, url: str):
+    def __init__(self, url: str) -> None:
         self._url = url
 
     def read(self) -> List[List[str]]:
@@ -223,43 +224,54 @@ class LamemDataFile(object):
         return [float(x) for x in b[:, 1]]
 
 
-class Lamem:
-    """Dataset used for large scale image memorability."""
+class Lamem(DataSet):
+    """
+    Dataset used for large scale image memorability.
+    """
 
     name = 'lamem'
-    splits = range(1, 6)
-    phases = [
-        ('train', DataSetSplitFactory.TRAIN),
-        ('val', DataSetSplitFactory.VALIDATION),
-        ('test', DataSetSplitFactory.TEST)
-    ]
+    _splits = range(1, 6)
+    _phases = ['train', 'test', 'val']
 
-    @staticmethod
-    def read(phase, split):
-        filename = 'lamem/splits/%s_%d.txt' % (phase, split)
-        b = np.asarray([line.split(' ') for line in jl.readtxt(filename)])
-        x = np.asarray(b[:, 0])
-        y = np.asarray([float(x) for x in b[:, 1]])
-        return x, y
+    def _data_file_url(self, split: int, phase: str) -> str:
+        """
+        Returns the url of a data file.
+        """
+        return 'lamem/splits/%s_%d.txt' % (phase, split)
 
-    @staticmethod
-    def rel_url(url):
+    def _relative_url(self, url: str) -> str:
+        """
+        Returns the relative url of the image from the filename.
+        """
         a = os.path.join(os.getcwd(), 'lamem/images', url)
         return os.path.normpath(a)
 
-    @classmethod
-    def prep_txt(cls, phase, split) -> None:
-        x, y = cls.read(phase[0], split)
-        x = np.asarray([cls.rel_url(url) for url in x])
-        y = np.asarray(y)
-        ds = DataSetSplitFactory(cls.name, split)
-        ds.x(phase[1]).save(x)
-        ds.y(phase[1]).save(y)
+    def _prep_data_file(self, split: int, phase: str) -> None:
+        """
+        Produce 1 input and 1 output NumPy file from the data file.
+        """
+        url = self._data_file_url(split, phase)
+        datafile = LamemDataFile(url)
+        x = np.asarray(datafile.list_x())
+        y = np.asarray(datafile.list_x())
+        ds = DataSetSplit(self.name, split - 1)
+        if phase == self._phases[0]:
+            dp = ds.train()
+        elif phase == self._phases[1]:
+            dp = ds.test()
+        elif phase == self._phases[2]:
+            dp = ds.validatation()
+        else:
+            raise Exception()
+        dp.x().save(x)
+        dp.y().save(y)
         return
 
-    @classmethod
-    def prep(cls) -> None:
-        for j in cls.phases:
-            for i in cls.splits:
-                cls.prep_txt(j, i)
+    def prepare(self) -> None:
+        """
+        Produce NumPy files from the dataset data files.
+        """
+        for i in self._splits:
+            for j in self._phases:
+                self._prep_data_file(i, j)
         return
