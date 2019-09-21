@@ -145,6 +145,78 @@ class DataSet(object):
         pass
 
 
+class CcDataFile(object):
+    """
+    Represents the data file for the CC dataset.
+    Knows the internals of the data file.
+    Does not know anything outside of the file itself, such as the paths of the data file and images.
+    """
+
+    categories = {
+        'environment': 0,
+        'people': 1,
+        'object': 2,
+        'hybrid': 3,
+        'animal': 4,
+        'food': 5
+    }
+
+    def __init__(self, url: str) -> None:
+        self._csv = jl.Csv(url)
+        return
+
+    def _to_category_int(self, e: str) -> int:
+        """
+        Converts categories from string to integer representation.
+        """
+        return self.categories[e]
+
+    def to_category_int(self, a: List[str]) -> List[int]:
+        """
+        Converts categories from string to integer representation.
+        """
+        return [self._to_category_int(i) for i in a]
+
+    def _to_category_str(self, e: int) -> str:
+        """
+        Converts categories from integer to string representation.
+        """
+        for k, v in self.categories.items():
+            if e == v:
+                return k
+        raise Exception()
+
+    def to_category_str(self, a: List[int]) -> List[str]:
+        """
+        Converts categories from integer to string representation.
+        """
+        return [self._to_category_str(i) for i in a]
+
+    def url(self) -> List[str]:
+        """
+        Gets the urls of the input images.
+        """
+        return self._csv.get_col(0)
+
+    def rating(self) -> List[int]:
+        """
+        Gets the user ratings of the images.
+        """
+        return self._csv.get_col_int(1)
+
+    def category(self) -> List[str]:
+        """
+        Gets the categories of the images as strings.
+        """
+        return self._csv.get_col(2)
+
+    def category_as_int(self) -> List[int]:
+        """
+        Gets the categories of the images as integers.
+        """
+        return self.to_category_int(self.category())
+
+
 class Ccc:
     name = 'ccc'
 

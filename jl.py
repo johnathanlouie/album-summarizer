@@ -48,24 +48,6 @@ def res3(n):
     return (n, h, w, 3)
 
 
-classdict = {
-    'environment': 0,
-    'people': 1,
-    'object': 2,
-    'hybrid': 3,
-    'animal': 4,
-    'food': 5
-}
-
-classdict2 = [
-    'environment',
-    'people',
-    'object',
-    'hybrid',
-    'animal',
-    'food'
-]
-
 layers = [
     'block1_conv1',
     'block1_conv2',
@@ -183,20 +165,6 @@ def resize_img(filename):
     img = cv.imread(filename, cv.IMREAD_COLOR)
     img2 = cv.resize(img, res_resize, interpolation=cv.INTER_CUBIC)
     return img2
-
-
-def class_str_int(a):
-    """
-    Convert class string to integer representation.
-    """
-    return [classdict[i] for i in a]
-
-
-def class_int_str(a):
-    """
-    Convert class string to integer representation.
-    """
-    return [classdict2[i] for i in a]
 
 
 def class_onehot(a):
