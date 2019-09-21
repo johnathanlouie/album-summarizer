@@ -142,7 +142,7 @@ class DataSet(object):
         """
         Gets the training, testing, and validation split for Keras.
         """
-        pass
+        return DataSetSplit(self.name, num)
 
 
 class CcDataFile(object):
@@ -304,12 +304,6 @@ class Lamem(DataSet):
     name = 'lamem'
     _splits = range(1, 6)
     _phases = ['train', 'test', 'val']
-
-    def split(self, num: int) -> DataSetSplit:
-        """
-        Gets the training, testing, and validation split for Keras.
-        """
-        return DataSetSplit(self.name, num)
 
     def _data_file_url(self, split: int, phase: str) -> str:
         """
