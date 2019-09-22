@@ -144,6 +144,28 @@ class DataSet(object):
         """
         return DataSetSplit(self.name, num)
 
+    def create_split(self, x: np.ndarray, y: np.ndarray, index: int) -> None:
+        """
+        Randomly generates a split.
+        """
+        tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
+        print('Converting to one hot')
+        ty = keras.utils.to_categorical(ty, num_classes=6, dtype='int32')
+        vy = keras.utils.to_categorical(vy, num_classes=6, dtype='int32')
+        ey = keras.utils.to_categorical(ey, num_classes=6, dtype='int32')
+        print('Saving')
+        ds = self.split(index)
+        dtrain = ds.train()
+        dtest = ds.test()
+        dval = ds.validatation()
+        dtrain.x().save(tx)
+        dtrain.y().save(ty)
+        dtest.x().save(ex)
+        dtest.y().save(ey)
+        dval.x().save(vx)
+        dval.y().save(vy)
+        return
+
 
 class CcDataFile(object):
     """
@@ -224,28 +246,6 @@ class Ccc(DataSet):
 
     name = 'ccc'
 
-    def _prepare_split(self, x: np.ndarray, y: np.ndarray, num: int) -> None:
-        """
-        Randomly generates a split.
-        """
-        tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
-        print('Converting to one hot')
-        ty = keras.utils.to_categorical(ty, num_classes=6, dtype='int32')
-        vy = keras.utils.to_categorical(vy, num_classes=6, dtype='int32')
-        ey = keras.utils.to_categorical(ey, num_classes=6, dtype='int32')
-        print('Saving')
-        ds = self.split(num)
-        dtrain = ds.train()
-        dtest = ds.test()
-        dval = ds.validatation()
-        dtrain.x().save(tx)
-        dtrain.y().save(ty)
-        dtest.x().save(ex)
-        dtest.y().save(ey)
-        dval.x().save(vx)
-        dval.y().save(vy)
-        return
-
     def prepare(self) -> None:
         """
         Reads the data file and produces some splits.
@@ -256,7 +256,7 @@ class Ccc(DataSet):
         y = np.asarray(data_file.category_as_int())
         print('Generating data splits')
         for i in range(5):
-            self._prepare_split(x, y, i)
+            self.create_split(x, y, i)
         print('Prep complete')
         return
 
