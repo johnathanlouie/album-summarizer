@@ -217,29 +217,46 @@ class CcDataFile(object):
         return self.to_category_int(self.category())
 
 
-class Ccc:
+class Ccc(DataSet):
+    """
+    The image classification subset of the CC dataset.
+    """
+
     name = 'ccc'
 
-    @classmethod
-    def prep(cls) -> None:
-        print("Reading data file")
-        x = jl.getcol(0)
-        y = jl.getcol(2)
-        y = jl.class_str_int(y)
-        print('Generating data splits')
+    def _prepare_split(self, x: np.ndarray, y: np.ndarray, num: int) -> None:
+        """
+        Randomly generates a split.
+        """
         tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
         print('Converting to one hot')
         ty = keras.utils.to_categorical(ty, num_classes=6, dtype='int32')
         vy = keras.utils.to_categorical(vy, num_classes=6, dtype='int32')
         ey = keras.utils.to_categorical(ey, num_classes=6, dtype='int32')
         print('Saving')
-        ds = DataSetSplitFactory(cls.name, 1)
-        ds.xtrain().save(tx)
-        ds.xtrain().save(vx)
-        ds.xtrain().save(ex)
-        ds.ytrain().save(ty)
-        ds.ytrain().save(vy)
-        ds.ytrain().save(ey)
+        ds = self.split(num)
+        dtrain = ds.train()
+        dtest = ds.test()
+        dval = ds.validatation()
+        dtrain.x().save(tx)
+        dtrain.y().save(ty)
+        dtest.x().save(ex)
+        dtest.y().save(ey)
+        dval.x().save(vx)
+        dval.y().save(vy)
+        return
+
+    def prepare(self) -> None:
+        """
+        Reads the data file and produces some splits.
+        """
+        print("Reading data file")
+        data_file = CcDataFile(jl.CSV_CCDATA)
+        x = np.asarray(data_file.url())
+        y = np.asarray(data_file.category_as_int())
+        print('Generating data splits')
+        for i in range(5):
+            self._prepare_split(x, y, i)
         print('Prep complete')
         return
 
