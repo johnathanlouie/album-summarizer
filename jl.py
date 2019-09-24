@@ -231,16 +231,34 @@ class ListFile(object):
         return
 
 
-class Stopwatch:
+class Stopwatch(object):
+    """
+    Keeps track of time elapsed.
+    """
+
     def __init__(self):
-        self.start = time.time()
+        self._start = time.time()
 
-    def elapsed(self):
-        return time.time() - self.start
+    def elapsed(self) -> float:
+        """
+        Returns the time since instance creation in seconds.
+        """
+        return time.time() - self._start
 
-    def print(self):
+    def print(self) -> None:
+        """
+        Prints the time elapsed in minutes and seconds.
+        """
         minutes, sec = divmod(self.elapsed(), 60)
         print('time: %d:%02d' % (minutes, sec))
+        return
+
+    def reset(self) -> None:
+        """
+        Resets the elapsed time.
+        """
+        self._start = time.time()
+        return
 
 
 class Csv(object):
