@@ -83,17 +83,6 @@ def npload(name):
     return np.load("gen/%s.npy" % name)
 
 
-def readtxt(filename):
-    """
-    Load a newline separated value file.
-    """
-    with open(filename, 'r') as f:
-        a = f.read()
-        a = a.split('\n')
-        a = list(filter(len, a))
-    return a
-
-
 def readimg(imglist):
     """
     Load an array of images.
@@ -192,24 +181,54 @@ def floatize(txtarray):
     return [float(i) for i in txtarray]
 
 
-def writetxt(filename, array):
+class ListFile(object):
     """
-    Save in newline separated value format.
+    Represents a text file. Each line represents an item.
     """
-    with open(filename, 'w') as f:
-        for i in array:
-            print(i, file=f)
-    return
 
+    def __init__(self, url: str) -> None:
+        self._url = url
+        return
 
-def appendtxt(filename, array):
-    """
-    Append to newline separated value format.
-    """
-    with open(filename, 'a') as f:
-        for i in array:
-            print(i, file=f)
-    return
+    def read(self) -> List[str]:
+        """
+        Loads a newline separated value file as strings.
+        """
+        with open(self._url, 'r') as f:
+            a = f.read()
+            a = a.split('\n')
+            a = list(filter(len, a))
+        return a
+
+    def read_as_int(self) -> List[int]:
+        """
+        Load a newline separated value file as integers.
+        """
+        return intize(self.read())
+
+    def read_as_floats(self) -> List[float]:
+        """
+        Loads a newline separated value file as floating point numbers.
+        """
+        return floatize(self.read())
+
+    def write(self, array: List[Any]) -> None:
+        """
+        Saves in newline separated value format.
+        """
+        with open(self._url, 'w') as f:
+            for i in array:
+                print(i, file=f)
+        return
+
+    def append(self, array: List[Any]) -> None:
+        """
+        Appends to newline separated value format.
+        """
+        with open(self._url, 'a') as f:
+            for i in array:
+                print(i, file=f)
+        return
 
 
 class Stopwatch:
