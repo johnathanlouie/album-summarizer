@@ -8,7 +8,7 @@ import keras
 from keras.callbacks import CSVLogger, ModelCheckpoint, Callback, ReduceLROnPlateau
 import model
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
@@ -51,6 +51,40 @@ class Sequence1(keras.utils.Sequence):
         xx = np.asarray([jl.resize_img(filename) for filename in batch_x])
         yy = np.asarray(batch_y)
         return xx, yy
+
+
+class LrData(object):
+    """
+    """
+
+    def __init__(self, lr: ReduceLROnPlateau) -> None:
+        self._copy(lr, self)
+        return
+
+    @staticmethod
+    def _copy(src: Union[LrData, ReduceLROnPlateau], dst: Union[LrData, ReduceLROnPlateau]) -> None:
+        """
+        """
+        dst.best = src.best
+        dst.cooldown = src.cooldown
+        dst.cooldown_counter = src.cooldown_counter
+        dst.factor = src.factor
+        dst.min_delta = src.min_delta
+        dst.min_lr = src.min_lr
+        dst.mode = src.mode
+        dst.monitor = src.monitor
+        dst.patience = src.patience
+        dst.verbose = src.verbose
+        dst.wait = src.wait
+        return
+
+    def get(self) -> ReduceLROnPlateau:
+        """
+        Gets a copy of ReduceLROnPlateau based on this instance data.
+        """
+        other = ReduceLROnPlateau()
+        self._copy(self, other)
+        return other
 
 
 class DataHolder:
