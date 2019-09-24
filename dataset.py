@@ -162,6 +162,12 @@ class DataSet(object):
         dval.y().save(vy)
         return
 
+    def one_hot(self, y: np.ndarray, num_classes: int) -> np.ndarray:
+        """
+        Returns the one hot representation from an array of integers.
+        """
+        return keras.utils.to_categorical(y, num_classes=num_classes, dtype='int32')
+
 
 class CcDataFile(object):
     """
@@ -251,7 +257,7 @@ class Ccc(DataSet):
         x = np.asarray(data_file.url())
         y = np.asarray(data_file.category_as_int())
         print('Converting to one hot')
-        y = keras.utils.to_categorical(y, num_classes=6, dtype='int32')
+        y = self.one_hot(y, 6)
         print('Generating data splits')
         for i in range(5):
             self.create_split(x, y, i)
