@@ -4,7 +4,6 @@ import cv2 as cv
 import os
 import csv
 import time
-import sklearn.model_selection as sklms
 
 CSV_CCDATA = 'data.csv'
 
@@ -63,16 +62,6 @@ layers = [
     'block5_conv2',
     'block5_conv3'
 ]
-
-
-def train_valid_test_split(x, y, test_size=0.1, valid_size=0.1, train_size=None, random_state=None, shuffle=True, stratify=None):
-    if test_size != None:
-        dx, ex, dy, ey = sklms.train_test_split(x, y, test_size=test_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
-        tx, vx, ty, vy = sklms.train_test_split(dx, dy, test_size=valid_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
-    else:
-        dx, vx, vy, vy = sklms.train_test_split(x, y, test_size=valid_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
-        tx, ex, ty, ey = sklms.train_test_split(dx, dy, test_size=test_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
-    return tx, ty, vx, vy, ex, ey
 
 
 def npsave(name, data):

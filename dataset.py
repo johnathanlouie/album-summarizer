@@ -1,9 +1,10 @@
 import os
 from enum import Enum
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import keras
 import numpy as np
+import sklearn.model_selection as sklms
 
 import jl
 
@@ -144,11 +145,33 @@ class DataSet(object):
         """
         return DataSetSplit(self.name, num)
 
+    def train_valid_test_split(
+        self,
+        x: Union[np.ndarray, List[Any]],
+        y: Union[np.ndarray, List[Any]],
+        test_size: Union[float, int, None] = 0.1,
+        valid_size: Union[float, int, None] = 0.1,
+        train_size: Union[float, int, None] = None,
+        random_state: Union[int, None] = None,
+        shuffle: bool = True,
+        stratify: Union[np.ndarray, List[Any], None] = None
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Divides up the dataset into phases.
+        """
+        if test_size != None:
+            dx, ex, dy, ey = sklms.train_test_split(x, y, test_size=test_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
+            tx, vx, ty, vy = sklms.train_test_split(dx, dy, test_size=valid_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
+        else:
+            dx, vx, vy, vy = sklms.train_test_split(x, y, test_size=valid_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
+            tx, ex, ty, ey = sklms.train_test_split(dx, dy, test_size=test_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
+        return tx, ty, vx, vy, ex, ey
+
     def create_split(self, x: np.ndarray, y: np.ndarray, index: int) -> None:
         """
         Randomly generates a split.
         """
-        tx, ty, vx, vy, ex, ey = jl.train_valid_test_split(x, y, test_size=0.1, valid_size=0.1)
+        tx, ty, vx, vy, ex, ey = self.train_valid_test_split(x, y)
         print('Saving')
         ds = self.split(index)
         dtrain = ds.train()
