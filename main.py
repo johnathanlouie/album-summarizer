@@ -89,6 +89,39 @@ class LrData(object):
         return other
 
 
+class McpData(object):
+    """
+    A picklable class that contains the data fields from ModelCheckpoint.
+    """
+
+    def __init__(self, lr: ModelCheckpoint) -> None:
+        self._copy(lr, self)
+        return
+
+    @staticmethod
+    def _copy(src: Union[LrData, ModelCheckpoint], dst: Union[LrData, ModelCheckpoint]) -> None:
+        """
+        Copies the data from one type to another.
+        """
+        dst.best = src.best
+        dst.epochs_since_last_save = src.epochs_since_last_save
+        dst.filepath = src.filepath
+        dst.monitor = src.monitor
+        dst.period = src.period
+        dst.save_best_only = src.save_best_only
+        dst.save_weights_only = src.save_weights_only
+        dst.verbose = src.verbose
+        return
+
+    def get(self) -> ModelCheckpoint:
+        """
+        Gets a copy of ModelCheckpoint based on this instance data.
+        """
+        other = ModelCheckpoint('')
+        self._copy(self, other)
+        return other
+
+
 class DataHolder:
     """Holds the picklable state of training and callbacks."""
 
