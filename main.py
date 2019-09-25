@@ -1,3 +1,4 @@
+from __future__ import annotations
 import warnings
 import dill
 import cv2 as cv
@@ -8,6 +9,7 @@ import keras
 from keras.callbacks import CSVLogger, ModelCheckpoint, Callback, ReduceLROnPlateau
 import model
 import os
+from dataset import DataSetSplit
 from typing import Any, Dict, List, Tuple, Union
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -94,8 +96,8 @@ class McpData(object):
     A picklable class that contains the data fields from ModelCheckpoint.
     """
 
-    def __init__(self, lr: ModelCheckpoint) -> None:
-        self._copy(lr, self)
+    def __init__(self, mcp: ModelCheckpoint) -> None:
+        self._copy(mcp, self)
         return
 
     @staticmethod
@@ -122,62 +124,43 @@ class McpData(object):
         return other
 
 
-class DataHolder:
-    """Holds the picklable state of training and callbacks."""
+class DataHolder(object):
+    """
+    Holds the picklable state of training and callbacks.
+    """
 
-    def get_mcp(self):
-        mcp = ModelCheckpoint('')
-        DataHolder._copy_mcp(self.mcp, mcp)
-        return mcp
-
-    def get_lr(self):
-        lr = ReduceLROnPlateau()
-        DataHolder._copy_lr(self.lr, lr)
-        return lr
-
-    @staticmethod
-    def load(filepath):
-        return dill.load(open(filepath, 'rb'))
-
-    def save(self, filepath) -> None:
-        dill.dump(self, open(filepath, "wb"))
+    def __init__(self, url: str, current_epoch: int, total_epoch: int, lr: ReduceLROnPlateau, mcp: ModelCheckpoint) -> None:
+        self._url = url
+        self.current_epoch = current_epoch
+        self.total_epoch = total_epoch
+        self._lr = LrData(lr)
+        self._mcp = McpData(mcp)
         return
 
-    @staticmethod
-    def as_data(epoch, mcp, lr):
-        dh = DataHolder()
-        dh.mcp = DataHolder()
-        dh.lr = DataHolder()
-        DataHolder._copy_mcp(mcp, dh.mcp)
-        DataHolder._copy_lr(lr, dh.lr)
-        dh.epoch = epoch
-        return dh
+    def get_mcp(self) -> ModelCheckpoint:
+        """
+        Returns the saved ModelCheckpoint instance.
+        """
+        return self._mcp.get()
+
+    def get_lr(self) -> ReduceLROnPlateau:
+        """
+        Returns the saved ReduceLROnPlateau instance.
+        """
+        return self._lr.get()
 
     @staticmethod
-    def _copy_mcp(src, dst) -> None:
-        dst.best = src.best
-        dst.epochs_since_last_save = src.epochs_since_last_save
-        dst.filepath = src.filepath
-        dst.monitor = src.monitor
-        dst.period = src.period
-        dst.save_best_only = src.save_best_only
-        dst.save_weights_only = src.save_weights_only
-        dst.verbose = src.verbose
-        return
+    def load(url) -> DataHolder:
+        """
+        Loads a saved instance from a binary file.
+        """
+        return dill.load(open(url, 'rb'))
 
-    @staticmethod
-    def _copy_lr(src, dst) -> None:
-        dst.best = src.best
-        dst.cooldown = src.cooldown
-        dst.cooldown_counter = src.cooldown_counter
-        dst.factor = src.factor
-        dst.min_delta = src.min_delta
-        dst.min_lr = src.min_lr
-        dst.mode = src.mode
-        dst.monitor = src.monitor
-        dst.patience = src.patience
-        dst.verbose = src.verbose
-        dst.wait = src.wait
+    def save(self) -> None:
+        """
+        Saves this instance to a binary file.
+        """
+        dill.dump(self, open(self._url, "wb"))
         return
 
 
