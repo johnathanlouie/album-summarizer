@@ -55,6 +55,7 @@ class Sequence1(keras.utils.Sequence):
 
 class LrData(object):
     """
+    A picklable class that contains the data fields from ReduceLROnPlateau.
     """
 
     def __init__(self, lr: ReduceLROnPlateau) -> None:
@@ -64,6 +65,7 @@ class LrData(object):
     @staticmethod
     def _copy(src: Union[LrData, ReduceLROnPlateau], dst: Union[LrData, ReduceLROnPlateau]) -> None:
         """
+        Copies the data from one type to another.
         """
         dst.best = src.best
         dst.cooldown = src.cooldown
