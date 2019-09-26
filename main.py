@@ -98,6 +98,7 @@ class McpData(object):
 
     def __init__(self, mcp: ModelCheckpoint) -> None:
         self._copy(mcp, self)
+        self.monitor_op = mcp.monitor_op.__name__
         return
 
     @staticmethod
@@ -121,6 +122,12 @@ class McpData(object):
         """
         other = ModelCheckpoint('')
         self._copy(self, other)
+        if self.monitor_op == 'greater':
+            other.monitor_op = np.greater
+        elif self.monitor_op == 'less':
+            other.monitor_op = np.less
+        else:
+            raise Exception('monitor_op field missing')
         return other
 
 
