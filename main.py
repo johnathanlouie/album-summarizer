@@ -163,6 +163,13 @@ class DataHolder(object):
         dill.dump(self, open(self._url, "wb"))
         return
 
+    @staticmethod
+    def url(dataset: str, split: int, current_epoch: int, total_epoch: int) -> str:
+        """
+        Returns the filepath of the dill file for the training status.
+        """
+        return "%s.%d.%d-%d.dill" % (dataset, split, current_epoch, total_epoch)
+
 
 class PickleCheckpoint(Callback):
     """Save the model after every epoch.
