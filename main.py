@@ -179,7 +179,8 @@ class DataHolder(object):
 
 
 class PickleCheckpoint(Callback):
-    """Save the model after every epoch.
+    """
+    Save the model after every epoch.
     `filepath` can contain named formatting options,
     which will be filled with the values of `epoch` and
     keys in `logs` (passed in `on_epoch_end`).
@@ -207,43 +208,20 @@ class PickleCheckpoint(Callback):
         period: Interval (number of epochs) between checkpoints.
     """
 
-    def __init__(self, filepath, mcp, lr, epoch=0, monitor='val_loss', verbose=1,
-                 save_best_only=True, save_weights_only=False,
-                 mode='auto', period=1):
+    def __init__(self, mcp: ModelCheckpoint, lr: ReduceLROnPlateau, dataset: str, split: int, total_epoch: int = 2**64) -> None:
         super(PickleCheckpoint, self).__init__()
-        self.monitor = monitor
-        self.verbose = verbose
-        self.filepath = filepath
-        self.save_best_only = save_best_only
-        self.save_weights_only = save_weights_only
-        self.period = period
-        self.epochs_since_last_save = 0
-        self.mcp = mcp
-        self.lr = lr
-        self.epoch = epoch
-
-        if mode not in ['auto', 'min', 'max']:
-            warnings.warn('PickleCheckpoint mode %s is unknown, fallback to auto mode.' % (mode), RuntimeWarning)
-            mode = 'auto'
-
-        if mode == 'min':
-            self.monitor_op = np.less
-            self.best = np.Inf
-        elif mode == 'max':
-            self.monitor_op = np.greater
-            self.best = -np.Inf
-        else:
-            if 'acc' in self.monitor or self.monitor.startswith('fmeasure'):
-                self.monitor_op = np.greater
-                self.best = -np.Inf
-            else:
-                self.monitor_op = np.less
-                self.best = np.Inf
+        self._mcp = mcp
+        self._copy_mcp(mcp)
+        self._lr = lr
+        self._total_epoch = total_epoch
+        self._dataset = dataset
+        self._split = split
 
     def on_epoch_end(self, epoch, logs=None) -> None:
         logs = logs or {}
         self.epochs_since_last_save += 1
-        self.epoch = epoch + 1
+        current_epoch = epoch + 1
+        url = DataHolder.url(self._dataset, self._split, current_epoch, self._total_epoch)
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
             filepath = self.filepath.format(epoch=epoch + 1, **logs)
@@ -256,20 +234,37 @@ class PickleCheckpoint(Callback):
                         if self.verbose > 0:
                             print('\nEpoch %05d: %s improved from %0.5f to %0.5f, saving Keras callback objects to %s' % (epoch + 1, self.monitor, self.best, current, filepath))
                         self.best = current
+                        dh = DataHolder(url, current_epoch, self._total_epoch, self._lr, self._mcp)
                         if self.save_weights_only:
-                            DataHolder.as_data(epoch+1, self.mcp, self.lr).save(filepath)
+                            dh.save()
                         else:
-                            DataHolder.as_data(epoch+1, self.mcp, self.lr).save(filepath)
+                            dh.save()
                     else:
                         if self.verbose > 0:
                             print('\nEpoch %05d: %s did not improve from %0.5f' % (epoch + 1, self.monitor, self.best))
             else:
                 if self.verbose > 0:
                     print('\nEpoch %05d: saving Keras callback objects to %s' % (epoch + 1, filepath))
+                dh = DataHolder(url, current_epoch, self._total_epoch, self._lr, self._mcp)
                 if self.save_weights_only:
-                    DataHolder.as_data(epoch+1, self.mcp, self.lr).save(filepath)
+                    dh.save()
                 else:
-                    DataHolder.as_data(epoch+1, self.mcp, self.lr).save(filepath)
+                    dh.save()
+
+    def _copy_mcp(self, mcp: ModelCheckpoint) -> None:
+        """
+        Copies a ModelCheckpoint instance.
+        """
+        self.best = mcp.best
+        self.epochs_since_last_save = mcp.epochs_since_last_save
+        self.filepath = mcp.filepath
+        self.monitor = mcp.monitor
+        self.period = mcp.period
+        self.save_best_only = mcp.save_best_only
+        self.save_weights_only = mcp.save_weights_only
+        self.verbose = mcp.verbose
+        self.monitor_op = mcp.monitor_op
+        return
 
 
 class TerminateOnDemand(Callback):
