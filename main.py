@@ -13,10 +13,15 @@ from dataset import DataSetSplit
 from typing import Any, Dict, List, Tuple, Union
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+Url = str
 
-def resize_imgs(src_list, dst_list) -> None:
-    urls1 = jl.readtxt(src_list)
-    urls2 = jl.readtxt(dst_list)
+
+def resize_imgs(src: Url, dst: Url) -> None:
+    """
+    Resizes the images based on the list of URLs found in the source file and outputs to the list of URLs found in the destination file.
+    """
+    urls1 = jl.ListFile(src).read()
+    urls2 = jl.ListFile(dst).read()
     resize_imgs2(urls1, urls2)
     return
 
