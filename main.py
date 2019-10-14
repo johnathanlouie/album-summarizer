@@ -26,7 +26,10 @@ def resize_imgs(src: Url, dst: Url) -> None:
     return
 
 
-def resize_imgs2(src_list, dst_list) -> None:
+def resize_imgs2(src_list: List[Url], dst_list: List[Url]) -> None:
+    """
+    Resizes a list of images.
+    """
     for src, dst in zip(src_list, dst_list):
         print(src)
         print(dst)
