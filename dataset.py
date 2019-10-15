@@ -3,10 +3,10 @@ from enum import Enum
 from typing import Any, Dict, List, Tuple, Union
 
 import keras
-import numpy as np
 import sklearn.model_selection as sklms
+from numpy import asarray, ndarray
 
-import jl
+from jl import CSV_CCDATA, ArrayLike, Csv, ListFile, Url, npload, npsave
 
 
 class XY(Enum):
@@ -47,18 +47,18 @@ class DataSetXY(object):
     def __radd__(self, other) -> str:
         return other + str(self)
 
-    def save(self, data: np.ndarray) -> None:
+    def save(self, data: ndarray) -> None:
         """
         Saves a NumPy array as a file.
         """
-        jl.npsave(self, data)
+        npsave(self, data)
         return
 
-    def load(self) -> np.ndarray:
+    def load(self) -> ndarray:
         """
         Loads a NumPy array from a file.
         """
-        return jl.npload(self)
+        return npload(self)
 
 
 class DataSetPhase(object):
@@ -147,15 +147,15 @@ class DataSet(object):
 
     def train_valid_test_split(
         self,
-        x: Union[np.ndarray, List[Any]],
-        y: Union[np.ndarray, List[Any]],
+        x: ArrayLike,
+        y: ArrayLike,
         test_size: Union[float, int, None] = 0.1,
         valid_size: Union[float, int, None] = 0.1,
         train_size: Union[float, int, None] = None,
         random_state: Union[int, None] = None,
         shuffle: bool = True,
-        stratify: Union[np.ndarray, List[Any], None] = None
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        stratify: Union[ArrayLike, None] = None
+    ) -> Tuple[ndarray, ndarray, ndarray, ndarray, ndarray, ndarray]:
         """
         Divides up the dataset into phases.
         """
@@ -167,7 +167,7 @@ class DataSet(object):
             tx, ex, ty, ey = sklms.train_test_split(dx, dy, test_size=test_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
         return tx, ty, vx, vy, ex, ey
 
-    def create_split(self, x: np.ndarray, y: np.ndarray, index: int) -> None:
+    def create_split(self, x: ndarray, y: ndarray, index: int) -> None:
         """
         Randomly generates a split.
         """
@@ -185,7 +185,7 @@ class DataSet(object):
         dval.y().save(vy)
         return
 
-    def one_hot(self, y: np.ndarray, num_classes: int) -> np.ndarray:
+    def one_hot(self, y: ndarray, num_classes: int) -> ndarray:
         """
         Returns the one hot representation from an array of integers.
         """
@@ -208,8 +208,8 @@ class CcDataFile(object):
         'food': 5
     }
 
-    def __init__(self, url: str) -> None:
-        self._csv = jl.Csv(url)
+    def __init__(self, url: Url) -> None:
+        self._csv = Csv(url)
         return
 
     def _to_category_int(self, e: str) -> int:
@@ -239,7 +239,7 @@ class CcDataFile(object):
         """
         return [self._to_category_str(i) for i in a]
 
-    def url(self) -> List[str]:
+    def url(self) -> List[Url]:
         """
         Gets the urls of the input images.
         """
@@ -276,9 +276,9 @@ class Ccc(DataSet):
         Reads the data file and produces some splits.
         """
         print("Reading data file")
-        data_file = CcDataFile(jl.CSV_CCDATA)
-        x = np.asarray(data_file.url())
-        y = np.asarray(data_file.category_as_int())
+        data_file = CcDataFile(CSV_CCDATA)
+        x = asarray(data_file.url())
+        y = asarray(data_file.category_as_int())
         print('Converting to one hot')
         y = self.one_hot(y, 6)
         print('Generating data splits')
@@ -300,9 +300,9 @@ class Ccr(DataSet):
         Create NumPy files for the randomly generated splits.
         """
         print("Reading data file")
-        data_file = CcDataFile(jl.CSV_CCDATA)
-        x = np.asarray(data_file.url())
-        y = np.asarray(data_file.rating())
+        data_file = CcDataFile(CSV_CCDATA)
+        x = asarray(data_file.url())
+        y = asarray(data_file.rating())
         print('Generating data splits')
         for i in range(5):
             self.create_split(x, y, i)
@@ -315,27 +315,27 @@ class LamemDataFile(object):
     Represents one of the data files found in the splits directory of the LaMem project.
     """
 
-    def __init__(self, url: str) -> None:
+    def __init__(self, url: Url) -> None:
         self._url = url
 
     def read(self) -> List[List[str]]:
         """
         Gets the data as a 2D list of strings.
         """
-        return [line.split(' ') for line in jl.readtxt(self._url)]
+        return [line.split(' ') for line in ListFile(self._url).read()]
 
     def list_x(self) -> List[str]:
         """
         Gets the x column for deep learning.
         """
-        b = np.asarray(self.read())
+        b = asarray(self.read())
         return b[:, 0].tolist()
 
     def list_y(self) -> List[float]:
         """
         Gets the y column for deep learning.
         """
-        b = np.asarray(self.read())
+        b = asarray(self.read())
         return [float(x) for x in b[:, 1]]
 
 
@@ -354,7 +354,7 @@ class Lamem(DataSet):
         """
         return 'lamem/splits/%s_%d.txt' % (phase, split)
 
-    def _relative_url(self, url: str) -> str:
+    def _relative_url(self, url: Url) -> str:
         """
         Returns the relative url of the image from the filename.
         """
@@ -367,8 +367,8 @@ class Lamem(DataSet):
         """
         url = self._data_file_url(split, phase)
         datafile = LamemDataFile(url)
-        x = np.asarray(datafile.list_x())
-        y = np.asarray(datafile.list_x())
+        x = asarray(datafile.list_x())
+        y = asarray(datafile.list_x())
         ds = self.split(split - 1)
         if phase == self._phases[0]:
             dp = ds.train()

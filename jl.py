@@ -1,13 +1,15 @@
-from typing import Any, Dict, List, Tuple, Union
-import numpy as np
-import cv2 as cv
-import os
 import csv
+import os
 import time
+from typing import Any, Dict, List, Tuple, Union
+
+from numpy import asarray, load, ndarray, save, zeros
+
+import cv2 as cv
 
 Url = str
-ArrayLike = Union[np.ndarray, List[Any]]
-Image = np.ndarray
+ArrayLike = Union[ndarray, List[Any]]
+Image = ndarray
 
 CSV_CCDATA = 'data.csv'
 
@@ -74,17 +76,17 @@ def npsave(name: str, data: ArrayLike) -> None:
     """
     Saves to a binary NumPy file.
     """
-    return np.save("gen/%s" % name, data)
+    return save("gen/%s" % name, data)
 
 
 def npload(name: str) -> ArrayLike:
     """
     Loads an array-like object from a binary NumPy file.
     """
-    return np.load("gen/%s.npy" % name)
+    return load("gen/%s.npy" % name)
 
 
-def readimg(imglist: List[Url]) -> np.ndarray:
+def readimg(imglist: List[Url]) -> ndarray:
     """
     Loads an array of images.
 
@@ -92,7 +94,7 @@ def readimg(imglist: List[Url]) -> np.ndarray:
     :returns ndarray: Array of images.
     """
     size = len(imglist)
-    l = np.ndarray(res3(size))
+    l = ndarray(res3(size))
     for i, v in enumerate(imglist):
         print(v)
         l[i] = cv.imread(v, cv.IMREAD_COLOR)
@@ -162,12 +164,12 @@ def resize_img(filename: Url) -> Image:
     return img2
 
 
-def class_onehot(a: List[int]) -> np.ndarray:
+def class_onehot(a: List[int]) -> ndarray:
     """
     Converts integer representation to one hot representation.
     """
     size = (len(a), 6)
-    b = np.zeros(size)
+    b = zeros(size)
     for i, v in enumerate(a):
         b[i][v] = 1
     return b
@@ -289,7 +291,7 @@ class Csv(object):
         Gets a column from the CSV file. All elements are strings.
         """
         csv = self.as_list()
-        csv = np.asarray(csv)
+        csv = asarray(csv)
         return csv[:, n].tolist()
 
     def get_col_int(self, n: int) -> List[int]:
