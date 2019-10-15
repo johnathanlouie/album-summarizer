@@ -1,9 +1,13 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 import numpy as np
 import cv2 as cv
 import os
 import csv
 import time
+
+Url = str
+ArrayLike = Union[np.ndarray, List[Any]]
+Image = np.ndarray
 
 CSV_CCDATA = 'data.csv'
 
@@ -42,8 +46,10 @@ res = (h, w)
 res2 = (h, w, 3)
 
 
-def res3(n):
-    """Returns dimensions of an array of images."""
+def res3(n: int):
+    """
+    Returns dimensions of an array of images.
+    """
     return (n, h, w, 3)
 
 
@@ -64,17 +70,23 @@ layers = [
 ]
 
 
-def npsave(name, data):
+def npsave(name: str, data: ArrayLike) -> None:
+    """
+    Saves to a binary NumPy file.
+    """
     return np.save("gen/%s" % name, data)
 
 
-def npload(name):
+def npload(name: str) -> ArrayLike:
+    """
+    Loads an array-like object from a binary NumPy file.
+    """
     return np.load("gen/%s.npy" % name)
 
 
-def readimg(imglist):
+def readimg(imglist: List[Url]) -> np.ndarray:
     """
-    Load an array of images.
+    Loads an array of images.
 
     :param list<str> imglist: List of URLs of images.
     :returns ndarray: Array of images.
@@ -87,9 +99,9 @@ def readimg(imglist):
     return l
 
 
-def readimg2(imglist):
+def readimg2(imglist: List[Url]) -> List[Image]:
     """
-    Load a list of images.
+    Loads a list of images.
 
     :param list<str> imglist: List of URLs of images.
     :returns list<ndarray>: List of images.
@@ -100,9 +112,9 @@ def readimg2(imglist):
     return l
 
 
-def hsv(img):
+def hsv(img: Image) -> Image:
     """
-    Convert an image from BGR to HSV.
+    Converts an image from BGR to HSV.
 
     :param ndarray img: BGR image
     :returns ndarray: HSV image
@@ -110,9 +122,9 @@ def hsv(img):
     return cv.cvtColor(img, cv.COLOR_BGR2HSV)
 
 
-def hsvlist(imglist):
+def hsvlist(imglist: List[Image]) -> List[Image]:
     """
-    Convert a list of images from BGR to HSV.
+    Converts a list of images from BGR to HSV.
 
     :param list<ndarray> imglist: list of BGR images
     :returns list<ndarray>: list of HSV images
@@ -120,9 +132,9 @@ def hsvlist(imglist):
     return list(map(hsv, imglist))
 
 
-def absurl2(url):
+def absurl2(url: Url) -> Url:
     """
-    Create a URL for resized photos.
+    Creates a URL for resized photos.
     """
     cwd = os.getcwd()
     url = os.path.abspath(url)
@@ -132,22 +144,27 @@ def absurl2(url):
     return url
 
 
-def mkdirs(filename):
-    """Make directories given Windows style path."""
+def mkdirs(filename: Url) -> None:
+    """
+    Makes directories given Windows style path.
+    """
     name = os.path.dirname(filename)
     os.makedirs(name, exist_ok=True)
     return
 
 
-def resize_img(filename):
+def resize_img(filename: Url) -> Image:
+    """
+    Returns a resized image.
+    """
     img = cv.imread(filename, cv.IMREAD_COLOR)
     img2 = cv.resize(img, res_resize, interpolation=cv.INTER_CUBIC)
     return img2
 
 
-def class_onehot(a):
+def class_onehot(a: List[int]) -> np.ndarray:
     """
-    Convert integer representation to one hot representation.
+    Converts integer representation to one hot representation.
     """
     size = (len(a), 6)
     b = np.zeros(size)
@@ -156,16 +173,16 @@ def class_onehot(a):
     return b
 
 
-def intize(txtarray):
+def intize(txtarray: List[str]) -> List[int]:
     """
-    Convert a list of strings to integers.
+    Converts a list of strings to integers.
     """
     return [int(i) for i in txtarray]
 
 
-def floatize(txtarray):
+def floatize(txtarray: List[str]) -> List[float]:
     """
-    Convert a list of strings to floats.
+    Converts a list of strings to floats.
     """
     return [float(i) for i in txtarray]
 
@@ -175,7 +192,7 @@ class ListFile(object):
     Represents a text file. Each line represents an item.
     """
 
-    def __init__(self, url: str) -> None:
+    def __init__(self, url: Url) -> None:
         self._url = url
         return
 
@@ -191,7 +208,7 @@ class ListFile(object):
 
     def read_as_int(self) -> List[int]:
         """
-        Load a newline separated value file as integers.
+        Loads a newline separated value file as integers.
         """
         return intize(self.read())
 
@@ -255,7 +272,7 @@ class Csv(object):
     Represents a comma separated value file.
     """
 
-    def __init__(self, url: str):
+    def __init__(self, url: Url):
         self._url = url
 
     def as_list(self) -> List[List[str]]:
