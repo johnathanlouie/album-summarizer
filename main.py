@@ -1,27 +1,29 @@
 from __future__ import annotations
-import warnings
-import dill
-import cv2 as cv
-import numpy as np
-import jl
-from keras.models import load_model
-import keras
-from keras.callbacks import CSVLogger, ModelCheckpoint, Callback, ReduceLROnPlateau
-import model
-import os
-from dataset import DataSetSplit
-from typing import Any, Dict, List, Tuple, Union
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-Url = str
+import os
+import warnings
+from typing import Any, Dict, List, Tuple, Union
+
+import dill
+import keras
+import numpy as np
+from keras.callbacks import Callback, CSVLogger, ModelCheckpoint, ReduceLROnPlateau
+from keras.models import load_model
+
+import cv2 as cv
+import model
+from dataset import DataSetSplit
+from jl import ListFile, Url, class_str_int, mkdirs, resize_img
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 def resize_imgs(src: Url, dst: Url) -> None:
     """
     Resizes the images based on the list of URLs found in the source file and outputs to the list of URLs found in the destination file.
     """
-    urls1 = jl.ListFile(src).read()
-    urls2 = jl.ListFile(dst).read()
+    urls1 = ListFile(src).read()
+    urls2 = ListFile(dst).read()
     resize_imgs2(urls1, urls2)
     return
 
@@ -33,8 +35,8 @@ def resize_imgs2(src_list: List[Url], dst_list: List[Url]) -> None:
     for src, dst in zip(src_list, dst_list):
         print(src)
         print(dst)
-        img2 = jl.resize_img(src)
-        jl.mkdirs(dst)
+        img2 = resize_img(src)
+        mkdirs(dst)
         cv.imwrite(dst, img2)
     print('done')
     return
@@ -58,7 +60,7 @@ class Sequence1(keras.utils.Sequence):
         b = (idx + 1) * self.batch_size
         batch_x = self.x[a:b]
         batch_y = self.y[a:b]
-        xx = np.asarray([jl.resize_img(filename) for filename in batch_x])
+        xx = np.asarray([resize_img(filename) for filename in batch_x])
         yy = np.asarray(batch_y)
         return xx, yy
 
@@ -424,9 +426,9 @@ class DataModel:
                 results = results.flatten()
             else:
                 results = results.argmax(1)
-                results = jl.class_str_int(results)
+                results = class_str_int(results)
         results_file = 'gen/pred.txt'
-        jl.writetxt(results_file, results)
+        ListFile(results_file).write(results)
         print('Saved predictions to %s' % (results_file))
         return results
 
