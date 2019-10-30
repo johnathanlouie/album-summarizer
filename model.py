@@ -3,43 +3,9 @@ import jl
 import rater
 import classifier
 from keras.optimizers import SGD
+from keras.models import Model
+from typing import Any, Dict, List, Tuple, Union, Callable
 
-loss = [
-    'mean_squared_error',  # 0
-    'mean_absolute_error',  # 1
-    'mean_absolute_percentage_error',  # 2
-    'mean_squared_logarithmic_error',  # 3
-    'squared_hinge',  # 4
-    'hinge',  # 5
-    'categorical_hinge',  # 6
-    'logcosh',  # 7
-    'categorical_crossentropy',  # 8
-    'sparse_categorical_crossentropy',  # 9
-    'binary_crossentropy',  # 10
-    'kullback_leibler_divergence',  # 11
-    'poisson',  # 12
-    'cosine_proximity'  # 13
-]
-
-
-optimizer = [
-    'sgd',  # 0
-    'RMSprop',  # 1
-    'Adagrad',  # 2
-    'Adadelta',  # 3
-    'Adam',  # 4
-    'Adamax',  # 5
-    'Nadam'  # 6
-]
-
-metric = [
-    'accuracy',  # 0
-    'binary_accuracy',  # 1
-    'categorical_accuracy',  # 2
-    'sparse_categorical_accuracy',  # 3
-    'top_k_categorical_accuracy',  # 4
-    'sparse_top_k_categorical_accuracy'  # 5
-]
 
 models = {
     'vgg16': classifier.create,
@@ -65,14 +31,6 @@ def loadweights(a):
     return
 
 
-def compile(model, dataset, l, o, m):
-    if type(m) != list or type(m) != dict:
-        m = [m]
-    modelx = models[model]()
-    modelx.compile(loss=l, optimizer=o, metrics=m)
-    return modelx
-
-
 def ccc():
     return compile('vgg16', 'ccc', loss[8], optimizer[0], metric[2])
 
@@ -91,3 +49,101 @@ def ccr():
 
 def lamem():
     return compile('kcnn', 'lamem', rmse, optimizer[0], metric[0])
+
+
+class ModelFactory(object):
+    """
+    Abstract factory class for keras.models.Model.
+    """
+
+    name = ''
+    version = -1
+
+    def create(self) -> Model:
+        """
+        Abstract method for ModelFactory.
+        """
+        raise NotImplementedError
+
+
+class CompileOption(object):
+    """
+    Options for the Architecture class.
+    """
+
+    def __init__(self, name: str, value: Union[Callable, str]) -> None:
+        self.name = name
+        self.value = value
+
+
+LOSS = [
+    CompileOption('mse', 'mean_squared_error'),  # 0
+    CompileOption('mae', 'mean_absolute_error'),  # 1
+    CompileOption('mape', 'mean_absolute_percentage_error'),  # 2
+    CompileOption('msle', 'mean_squared_logarithmic_error'),  # 3
+    CompileOption('sh', 'squared_hinge'),  # 4
+    CompileOption('h', 'hinge'),  # 5
+    CompileOption('ch', 'categorical_hinge'),  # 6
+    CompileOption('lch', 'logcosh'),  # 7
+    CompileOption('cce', 'categorical_crossentropy'),  # 8
+    CompileOption('scce', 'sparse_categorical_crossentropy'),  # 9
+    CompileOption('bce', 'binary_crossentropy'),  # 10
+    CompileOption('kld', 'kullback_leibler_divergence'),  # 11
+    CompileOption('p', 'poisson'),  # 12
+    CompileOption('cp', 'cosine_proximity'),  # 13
+    CompileOption('rmse', rmse)  # 14
+]
+
+OPTIMIZER = [
+    CompileOption('sgd', 'sgd'),  # 0
+    CompileOption('rmsp', 'RMSprop'),  # 1
+    CompileOption('ag', 'Adagrad'),  # 2
+    CompileOption('ad', 'Adadelta'),  # 3
+    CompileOption('ame', 'Adam'),  # 4
+    CompileOption('am', 'Adamax'),  # 5
+    CompileOption('na', 'Nadam')  # 6
+]
+
+METRIC = [
+    CompileOption('a', 'accuracy'),  # 0
+    CompileOption('ba', 'binary_accuracy'),  # 1
+    CompileOption('ca', 'categorical_accuracy'),  # 2
+    CompileOption('sca', 'sparse_categorical_accuracy'),  # 3
+    CompileOption('tkca', 'top_k_categorical_accuracy'),  # 4
+    CompileOption('stkca', 'sparse_top_k_categorical_accuracy')  # 5
+]
+
+
+class Architecture(object):
+    """
+    Creates a compiled keras.models.Model object with options and creates the argument for the custom_objects parameter for the keras.models.load_model function.
+    """
+
+    def __init__(self, model: ModelFactory, loss: CompileOption, optimizer: CompileOption, metric: CompileOption) -> None:
+        self._model = model
+        self._loss = loss
+        self._optimizer = optimizer
+        self._metric = metric
+
+    def compile(self) -> Model:
+        """
+        Creates a compiled keras.models.Model object.
+        """
+        # if type(m) != list or type(m) != dict:
+        #     m = [m]
+        model = self._model.create()
+        model.compile(loss=self._loss.value, optimizer=self._optimizer.value, metrics=[self._metric.value])
+        return model
+
+    def custom(self) -> Dict[str, Callable]:
+        """
+        Creates the argument for the custom_objects parameter for the keras.models.load_model function.
+        """
+        d = dict()
+        if type(self._loss.value) != str:
+            d['self._loss.value'] = self._loss.value
+        if type(self._optimizer.value) != str:
+            d['self._optimizer.value'] = self._optimizer.value
+        if type(self._metric.value) != str:
+            d['self._metric.value'] = self._metric.value
+        return d
