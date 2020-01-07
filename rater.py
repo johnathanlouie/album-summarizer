@@ -94,5 +94,5 @@ class Smi13(ModelFactory):
         x = Dense(4096, activation='relu', name='fc2')(x)
         x = Dense(1000, activation='softmax', name='predictions')(x)
         x = Dense(1, activation='relu', name='predictions2')(x)
-        model = Model(img_input, x, name='kcnn')
+        model = Model(img_input, x, name='smi13')
         return model
