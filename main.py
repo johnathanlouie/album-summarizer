@@ -13,9 +13,11 @@ from keras.callbacks import (Callback, CSVLogger, ModelCheckpoint,
 from keras.models import load_model
 
 import cv2 as cv
+from cc import Ccr
 from dataset import DataSet, DataSetSplit
 from jl import ListFile, Url, mkdirs, resize_img
-from model import Architecture
+from model import LOSS, METRIC, OPTIMIZER, Architecture
+from rater import Smi13
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -220,7 +222,7 @@ class PickleCheckpoint(Callback):
         period: Interval (number of epochs) between checkpoints.
     """
 
-    def __init__(self, mcp: ModelCheckpoint, lr: ReduceLROnPlateau, archisplit: str,  total_epoch: int = 2**64) -> None:
+    def __init__(self, mcp: ModelCheckpoint, lr: ReduceLROnPlateau, archisplit: str, total_epoch: int = 2**64) -> None:
         super(PickleCheckpoint, self).__init__()
         self._mcp = mcp
         self._copy_mcp(mcp)
@@ -266,15 +268,42 @@ class PickleCheckpoint(Callback):
         """
         Copies a ModelCheckpoint instance.
         """
-        self.best = mcp.best
-        self.epochs_since_last_save = mcp.epochs_since_last_save
-        self.filepath = mcp.filepath
-        self.monitor = mcp.monitor
-        self.period = mcp.period
-        self.save_best_only = mcp.save_best_only
-        self.save_weights_only = mcp.save_weights_only
-        self.verbose = mcp.verbose
-        self.monitor_op = mcp.monitor_op
+        try:
+            self.best = mcp.best
+        except AttributeError:
+            pass
+        try:
+            self.epochs_since_last_save = mcp.epochs_since_last_save
+        except AttributeError:
+            pass
+        try:
+            self.filepath = mcp.filepath
+        except AttributeError:
+            pass
+        try:
+            self.monitor = mcp.monitor
+        except AttributeError:
+            pass
+        try:
+            self.period = mcp.period
+        except AttributeError:
+            pass
+        try:
+            self.save_best_only = mcp.save_best_only
+        except AttributeError:
+            pass
+        try:
+            self.save_weights_only = mcp.save_weights_only
+        except AttributeError:
+            pass
+        try:
+            self.verbose = mcp.verbose
+        except AttributeError:
+            pass
+        try:
+            self.monitor_op = mcp.monitor_op
+        except AttributeError:
+            pass
         return
 
 
@@ -377,7 +406,7 @@ class ArchitectureSplit(object):
             verbose=1,
             validation_data=seq2,
             shuffle=False,
-            initial_epoch=self._mcp.epoch,
+            initial_epoch=self._current_epoch,
             callbacks=[
                 self._lr,
                 self._mcp,
@@ -456,12 +485,17 @@ class ArchitectureSplit(object):
         Creates and saves the model file and other training state files.
         Initial settings are found here.
         """
+        print('No saved files found.')
+        print('Creating new model.')
         self._architecture.compile().save(self._model_url())
+        print('Saved model.')
+        print('Creating new training status.')
         mcp = ModelCheckpoint(self._model_url(), verbose=1, save_best_only=True)
         lr = ReduceLROnPlateau(patience=5, verbose=1)
         dh_url = DataHolder.url(self.name())
         dh = DataHolder(dh_url, 0, 1000, lr, mcp)
         dh.save()
+        print('Saved DataHolder.')
         return
 
     def _load(self) -> None:
@@ -471,6 +505,7 @@ class ArchitectureSplit(object):
         self._model = load_model(self._model_url(), self._architecture.custom())
         dh_url = DataHolder.url(self.name())
         dh = DataHolder.load(dh_url)
+        self._current_epoch = dh.current_epoch
         self._lr = dh.get_lr()
         self._mcp = dh.get_mcp
         self._pcp = PickleCheckpoint(self._mcp, self._lr, self.name())
@@ -497,6 +532,7 @@ class ArchitectureSplit(object):
         """
         Starts the training process from the beginning.
         """
+        print('Resetting training data.')
         self._delete()
         self._create()
         self._load()
@@ -521,6 +557,14 @@ class ArchitectureSet(object):
         """
         return ArchitectureSplit(self._architecture, self._dataset.split(num))
 
+
+ccr = Ccr()
+# ccr.prepare()
+smi13_1 = Architecture(Smi13(), LOSS[14], OPTIMIZER[0], METRIC[0])
+ccr1 = ArchitectureSet(smi13_1, ccr)
+ccr1_1 = ccr1.split(1)
+# ccr1_1.reset()
+ccr1_1.train()
 
 # ccc_prep()
 # model.ccc()
