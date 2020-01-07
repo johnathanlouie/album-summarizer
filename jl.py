@@ -299,3 +299,27 @@ class Csv(object):
         Gets a column from the CSV file. All elements are integers.
         """
         return intize(self.get_col(n))
+
+
+def resize_imgs(src: Url, dst: Url) -> None:
+    """
+    Resizes the images based on the list of URLs found in the source file and outputs to the list of URLs found in the destination file.
+    """
+    urls1 = ListFile(src).read()
+    urls2 = ListFile(dst).read()
+    resize_imgs2(urls1, urls2)
+    return
+
+
+def resize_imgs2(src_list: List[Url], dst_list: List[Url]) -> None:
+    """
+    Resizes a list of images.
+    """
+    for src, dst in zip(src_list, dst_list):
+        print(src)
+        print(dst)
+        img2 = resize_img(src)
+        mkdirs(dst)
+        cv.imwrite(dst, img2)
+    print('done')
+    return
