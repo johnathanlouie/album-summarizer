@@ -515,6 +515,12 @@ class ArchitectureSet(object):
         self._dataset = dataset
         return
 
+    def split(self, num: int) -> ArchitectureSplit:
+        """
+        Get a specific split.
+        """
+        return ArchitectureSplit(self._architecture, self._dataset.split(num))
+
 
 # ccc_prep()
 # model.ccc()
