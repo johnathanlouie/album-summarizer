@@ -22,26 +22,6 @@ def loadweights(a):
     return
 
 
-# def ccc():
-#     return compile('vgg16', 'ccc', loss[8], optimizer[0], metric[2])
-
-
-# def ccc2():
-#     return compile('vgg16a', 'ccc', loss[8], optimizer[0], metric[2])
-
-
-# def ccc3():
-#     return compile('vgg16b', 'ccc', loss[8], optimizer[0], metric[2])
-
-
-# def ccr():
-#     return compile('kcnn', 'ccr', rmse, SGD(lr=0.01, momentum=0.9, decay=0.0005, nesterov=True), metric[0])
-
-
-# def lamem():
-#     return compile('kcnn', 'lamem', rmse, optimizer[0], metric[0])
-
-
 class ModelFactory(object):
     """
     Abstract factory class for keras.models.Model.
