@@ -136,7 +136,7 @@ class DataSet(object):
         """
         Reads and convert the dataset data files into NumPy arrays for Keras.
         """
-        pass
+        raise NotImplementedError
 
     def split(self, num: int) -> DataSetSplit:
         """
