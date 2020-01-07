@@ -14,7 +14,7 @@ from keras.models import load_model
 
 import cv2 as cv
 from dataset import DataSetSplit
-from jl import ListFile, Url, class_str_int, mkdirs, resize_img
+from jl import ListFile, Url, mkdirs, resize_img
 from model import Architecture
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -445,7 +445,7 @@ class ArchitectureSplit(object):
                 results = results.flatten()
             else:
                 results = results.argmax(1)
-                results = class_str_int(results)
+                # results = class_str_int(results)
         results_file = 'gen/pred.txt'
         ListFile(results_file).write(results)
         print('Saved predictions to %s' % (results_file))
