@@ -2,18 +2,20 @@ from __future__ import annotations
 
 import os
 import warnings
+from os.path import isfile
 from typing import Any, Dict, List, Tuple, Union
 
 import dill
 import keras
 import numpy as np
-from keras.callbacks import Callback, CSVLogger, ModelCheckpoint, ReduceLROnPlateau
+from keras.callbacks import (Callback, CSVLogger, ModelCheckpoint,
+                             ReduceLROnPlateau)
 from keras.models import load_model
 
 import cv2 as cv
-import model
 from dataset import DataSetSplit
 from jl import ListFile, Url, class_str_int, mkdirs, resize_img
+from model import Architecture
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -181,11 +183,11 @@ class DataHolder(object):
         return
 
     @staticmethod
-    def url(dataset: str, split: int, current_epoch: int, total_epoch: int) -> str:
+    def url(archisplit: str, current_epoch: int, total_epoch: int) -> str:
         """
         Returns the filepath of the dill file for the training status.
         """
-        return "gen/%s.%d.%d-%d.dill" % (dataset, split, current_epoch, total_epoch)
+        return "gen/%s.%d-%d.dill" % (archisplit, current_epoch, total_epoch)
 
 
 class PickleCheckpoint(Callback):
