@@ -13,7 +13,7 @@ from keras.callbacks import (Callback, CSVLogger, ModelCheckpoint,
 from keras.models import load_model
 
 import cv2 as cv
-from dataset import DataSetSplit
+from dataset import DataSet, DataSetSplit
 from jl import ListFile, Url, mkdirs, resize_img
 from model import Architecture
 
@@ -500,6 +500,19 @@ class ArchitectureSplit(object):
         self._delete()
         self._create()
         self._load()
+        return
+
+
+class ArchitectureSet(object):
+    """
+    A combination of a DataSet object and Architecture object.
+    It oversees the cross-validation process, which is training and testing over multiple splits.
+    Each split is handled by an ArchitectureSplit object produced by this class.
+    """
+
+    def __init__(self, architecture: Architecture, dataset: DataSet) -> None:
+        self._architecture = architecture
+        self._dataset = dataset
         return
 
 
