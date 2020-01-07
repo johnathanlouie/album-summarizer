@@ -151,3 +151,9 @@ class Architecture(object):
         if type(self._metric.value) != str:
             d['self._metric.value'] = self._metric.value
         return d
+
+    def name(self) -> str:
+        """
+        Returns a unique identifier for the combination of model and compile options.
+        """
+        return "%s.%s.%s.%s" % (self._model.name, self._loss.name, self._optimizer.name, self._metric.name)
