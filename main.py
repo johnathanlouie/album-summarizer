@@ -183,11 +183,11 @@ class DataHolder(object):
         return
 
     @staticmethod
-    def url(archisplit: str, current_epoch: int, total_epoch: int) -> str:
+    def url(archisplit: str) -> str:
         """
         Returns the filepath of the dill file for the training status.
         """
-        return "gen/%s.%d-%d.dill" % (archisplit, current_epoch, total_epoch)
+        return "gen/%s.dill" % (archisplit)
 
 
 class PickleCheckpoint(Callback):
