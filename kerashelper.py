@@ -5,8 +5,8 @@ from keras.callbacks import Callback, ModelCheckpoint, ReduceLROnPlateau
 from keras.utils import Sequence
 from numpy import asarray, ceil
 
+from dataholder import DataHolder
 from jl import resize_img
-from main import DataHolder
 
 
 class Sequence1(Sequence):

@@ -3,9 +3,10 @@ from os.path import isfile
 from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
 
+from dataholder import DataHolder
 from dataset import DataSet, DataSetSplit
 from jl import ListFile
-from main import DataHolder, PickleCheckpoint, Sequence1, TerminateOnDemand
+from kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
 from model import Architecture
 
 

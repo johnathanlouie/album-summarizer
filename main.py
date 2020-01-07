@@ -1,24 +1,5 @@
-from __future__ import annotations
-
-import os
-from os.path import isfile
-from typing import Any, Dict, List, Tuple, Union
-
-import dill
-import keras
-import numpy as np
-from keras.callbacks import (Callback, CSVLogger, ModelCheckpoint,
-                             ReduceLROnPlateau)
-from keras.models import load_model
-
-import cv2 as cv
-from cc import Ccr
-from dataset import DataSet, DataSetSplit
-from jl import ListFile, Url, mkdirs, resize_img
-from model import LOSS, METRIC, OPTIMIZER, Architecture
-from rater import Smi13
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+from os import environ
+environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
 # ccr = Ccr()
