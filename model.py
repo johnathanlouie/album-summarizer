@@ -5,22 +5,12 @@ from keras.models import Model
 
 import jl
 
-models = {
-    'vgg16': classifier.create,
-    'vgg16a': classifier.create2,
-    'vgg16b': classifier.create3,
-    'kcnn': rater.create
-}
-
 
 def rmse(y_true, y_pred):
     """
     Root mean square error loss function.
     """
     return K.sqrt(K.mean(K.square(y_pred - y_true), axis=-1))
-
-
-custom_rmse = {'rmse': rmse}
 
 
 def loadweights(a):
@@ -32,24 +22,24 @@ def loadweights(a):
     return
 
 
-def ccc():
-    return compile('vgg16', 'ccc', loss[8], optimizer[0], metric[2])
+# def ccc():
+#     return compile('vgg16', 'ccc', loss[8], optimizer[0], metric[2])
 
 
-def ccc2():
-    return compile('vgg16a', 'ccc', loss[8], optimizer[0], metric[2])
+# def ccc2():
+#     return compile('vgg16a', 'ccc', loss[8], optimizer[0], metric[2])
 
 
-def ccc3():
-    return compile('vgg16b', 'ccc', loss[8], optimizer[0], metric[2])
+# def ccc3():
+#     return compile('vgg16b', 'ccc', loss[8], optimizer[0], metric[2])
 
 
-def ccr():
-    return compile('kcnn', 'ccr', rmse, SGD(lr=0.01, momentum=0.9, decay=0.0005, nesterov=True), metric[0])
+# def ccr():
+#     return compile('kcnn', 'ccr', rmse, SGD(lr=0.01, momentum=0.9, decay=0.0005, nesterov=True), metric[0])
 
 
-def lamem():
-    return compile('kcnn', 'lamem', rmse, optimizer[0], metric[0])
+# def lamem():
+#     return compile('kcnn', 'lamem', rmse, optimizer[0], metric[0])
 
 
 class ModelFactory(object):
@@ -142,11 +132,11 @@ class Architecture(object):
         """
         d = dict()
         if type(self._loss.value) != str:
-            d['self._loss.value'] = self._loss.value
+            d[self._loss.value.__name__] = self._loss.value
         if type(self._optimizer.value) != str:
-            d['self._optimizer.value'] = self._optimizer.value
+            d[self._optimizer.value.__name__] = self._optimizer.value
         if type(self._metric.value) != str:
-            d['self._metric.value'] = self._metric.value
+            d[self._metric.value.__name__] = self._metric.value
         return d
 
     def name(self) -> str:
