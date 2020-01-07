@@ -122,3 +122,28 @@ class Ccr(DataSet):
             self.create_split(x, y, i)
         print('Prep complete')
         return
+
+
+class CcrCategorical(DataSet):
+    """
+    The aesthetic rating subset of the CC dataset using categories instead of a number.
+    """
+
+    name = 'ccr-categ'
+
+    def prepare(self) -> None:
+        """
+        Create NumPy files for the randomly generated splits.
+        """
+        print("Reading data file")
+        data_file = CcDataFile(CSV_CCDATA)
+        x = asarray(data_file.url())
+        y = data_file.rating()
+        y = [i-1 for i in y]
+        y = asarray(y)
+        y = self.one_hot(y, 3)
+        print('Generating data splits')
+        for i in range(5):
+            self.create_split(x, y, i)
+        print('Prep complete')
+        return
