@@ -220,20 +220,19 @@ class PickleCheckpoint(Callback):
         period: Interval (number of epochs) between checkpoints.
     """
 
-    def __init__(self, mcp: ModelCheckpoint, lr: ReduceLROnPlateau, dataset: str, split: int, total_epoch: int = 2**64) -> None:
+    def __init__(self, mcp: ModelCheckpoint, lr: ReduceLROnPlateau, archisplit: str,  total_epoch: int = 2**64) -> None:
         super(PickleCheckpoint, self).__init__()
         self._mcp = mcp
         self._copy_mcp(mcp)
         self._lr = lr
         self._total_epoch = total_epoch
-        self._dataset = dataset
-        self._split = split
+        self._archisplit = archisplit
 
     def on_epoch_end(self, epoch, logs=None) -> None:
         logs = logs or {}
         self.epochs_since_last_save += 1
         current_epoch = epoch + 1
-        url = DataHolder.url(self._dataset, self._split, current_epoch, self._total_epoch)
+        url = DataHolder.url(self._archisplit)
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
             filepath = self.filepath.format(epoch=epoch + 1, **logs)
