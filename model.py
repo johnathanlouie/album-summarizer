@@ -2,11 +2,8 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 
 from keras import backend as K
 from keras.models import Model
-from keras.optimizers import SGD
 
-import classifier
 import jl
-import rater
 
 models = {
     'vgg16': classifier.create,
