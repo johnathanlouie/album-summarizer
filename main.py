@@ -507,7 +507,7 @@ class ArchitectureSplit(object):
         dh = DataHolder.load(dh_url)
         self._current_epoch = dh.current_epoch
         self._lr = dh.get_lr()
-        self._mcp = dh.get_mcp
+        self._mcp = dh.get_mcp()
         self._pcp = PickleCheckpoint(self._mcp, self._lr, self.name())
         return
 
