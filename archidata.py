@@ -34,6 +34,12 @@ class ArchitectureSplit(object):
         """
         return "gen/%s.h5" % (self.name())
 
+    def _best_model_url(self) -> str:
+        """
+        Returns the URL of the model save file.
+        """
+        return "gen/%s.best.h5" % (self.name())
+
     def train(self) -> None:
         """
         Trains the model.
@@ -63,6 +69,7 @@ class ArchitectureSplit(object):
             callbacks=[
                 self._lr,
                 self._mcp,
+                self._mcpb,
                 self._pcp,
                 csv,
                 term
@@ -143,10 +150,11 @@ class ArchitectureSplit(object):
         self._architecture.compile().save(self._model_url())
         print('Saved model.')
         print('Creating new training status.')
-        mcp = ModelCheckpoint(self._model_url(), verbose=1, save_best_only=True)
+        mcp = ModelCheckpoint(self._model_url(), verbose=1)
+        mcpb = ModelCheckpoint(self._best_model_url(), verbose=1, save_best_only=True)
         lr = ReduceLROnPlateau(patience=5, verbose=1)
         dh_url = DataHolder.url(self.name())
-        dh = DataHolder(dh_url, 0, 1000, lr, mcp)
+        dh = DataHolder(dh_url, 0, 1000, lr, mcp, mcpb)
         dh.save()
         print('Saved DataHolder.')
         return
@@ -161,7 +169,8 @@ class ArchitectureSplit(object):
         self._current_epoch = dh.current_epoch
         self._lr = dh.get_lr()
         self._mcp = dh.get_mcp()
-        self._pcp = PickleCheckpoint(self._mcp, self._lr, self.name())
+        self._mcpb = dh.get_mcpb()
+        self._pcp = PickleCheckpoint(self._mcp, self._mcpb, self._lr, self.name())
         return
 
     def _delete(self) -> None:

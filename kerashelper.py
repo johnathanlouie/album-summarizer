@@ -64,10 +64,11 @@ class PickleCheckpoint(Callback):
         period: Interval (number of epochs) between checkpoints.
     """
 
-    def __init__(self, mcp: ModelCheckpoint, lr: ReduceLROnPlateau, archisplit: str, total_epoch: int = 2**64) -> None:
+    def __init__(self, mcp: ModelCheckpoint, mcpb: ModelCheckpoint, lr: ReduceLROnPlateau, archisplit: str, total_epoch: int = 2**64) -> None:
         super(PickleCheckpoint, self).__init__()
         self._mcp = mcp
         self._copy_mcp(mcp)
+        self._mcpb = mcpb
         self._lr = lr
         self._total_epoch = total_epoch
         self._archisplit = archisplit
@@ -89,7 +90,7 @@ class PickleCheckpoint(Callback):
                         if self.verbose > 0:
                             print('\nEpoch %05d: %s improved from %0.5f to %0.5f, saving Keras callback objects to %s' % (epoch + 1, self.monitor, self.best, current, filepath))
                         self.best = current
-                        dh = DataHolder(url, current_epoch, self._total_epoch, self._lr, self._mcp)
+                        dh = DataHolder(url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
                         if self.save_weights_only:
                             dh.save()
                         else:
@@ -100,7 +101,7 @@ class PickleCheckpoint(Callback):
             else:
                 if self.verbose > 0:
                     print('\nEpoch %05d: saving Keras callback objects to %s' % (epoch + 1, filepath))
-                dh = DataHolder(url, current_epoch, self._total_epoch, self._lr, self._mcp)
+                dh = DataHolder(url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
                 if self.save_weights_only:
                     dh.save()
                 else:
