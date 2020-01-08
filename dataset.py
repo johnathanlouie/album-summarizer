@@ -38,7 +38,7 @@ class DataSetXY(object):
         return
 
     def __str__(self) -> str:
-        return '%s.%d.%s.%s' % (self.name, self.split, self.phase, self.xy.value)
+        return '%s.%d.%s.%s' % (self.name, self.split, self.phase.value, self.xy.value)
 
     def __add__(self, other) -> str:
         return str(self) + other
