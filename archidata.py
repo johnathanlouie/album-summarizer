@@ -61,7 +61,7 @@ class ArchitectureSplit(object):
         csv = CSVLogger('gen/training.csv', append=True)
         self._model.fit_generator(
             generator=seq1,
-            epochs=1000,
+            epochs=self._max_epoch,
             verbose=1,
             validation_data=seq2,
             shuffle=False,
@@ -154,8 +154,7 @@ class ArchitectureSplit(object):
         mcpb = ModelCheckpoint(self._best_model_url(), verbose=1, save_best_only=True)
         lr = ReduceLROnPlateau(patience=5, verbose=1)
         dh_url = DataHolder.url(self.name())
-        dh = DataHolder(dh_url, 0, 1000, lr, mcp, mcpb)
-        dh.save()
+        DataHolder(dh_url, 0, 1000, lr, mcp, mcpb).save()
         print('Saved DataHolder.')
         return
 
@@ -167,6 +166,7 @@ class ArchitectureSplit(object):
         dh_url = DataHolder.url(self.name())
         dh = DataHolder.load(dh_url)
         self._current_epoch = dh.current_epoch
+        self._max_epoch = dh.total_epoch
         self._lr = dh.get_lr()
         self._mcp = dh.get_mcp()
         self._mcpb = dh.get_mcpb()
