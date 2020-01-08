@@ -330,16 +330,6 @@ ASALocalRun/
 .mfractor/
 
 # Data files
-animals/
-calvin/
-clara/
-datasetImages_warp256/
-food-101/
+data/
 gen/
-imgListFiles_label/
-lamem/
-memnet/
-output/
-pdf/
-*.tar.gz
 /nbproject/private/

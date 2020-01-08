@@ -13,7 +13,7 @@ Url = str
 ArrayLike = Union[ndarray, List[Any]]
 Image = ndarray
 
-CSV_CCDATA = 'data.csv'
+CSV_CCDATA = 'data/cc/data.csv'
 
 TEXT_CLASSES = 'gen/categ.txt'
 TEXT_URL_RAW = 'gen/url.txt'

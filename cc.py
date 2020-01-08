@@ -1,6 +1,8 @@
+from os import getcwd
+from os.path import join, normpath
 from typing import List
 
-from numpy import asarray
+from numpy import asarray, ndarray
 
 from dataset import DataSet
 from jl import CSV_CCDATA, Csv, Url
@@ -78,72 +80,95 @@ class CcDataFile(object):
         return self.to_category_int(self.category())
 
 
-class Ccc(DataSet):
+class Cc(DataSet):
+    """
+    An abstract base class for the CC dataset.
+    """
+
+    name = 'cc'
+
+    def _relative_url(self, url: Url) -> str:
+        """
+        Returns the relative url of the image from the filename.
+        """
+        a = join(getcwd(), 'data', 'cc', url)
+        return normpath(a)
+
+    def _x(self) -> ndarray:
+        """
+        Returns an array of URLs to the images.
+        """
+        data_file = CcDataFile(CSV_CCDATA)
+        x = data_file.url()
+        x = [self._relative_url(i) for i in x]
+        return asarray(x)
+
+    def _y(self) -> ndarray:
+        """
+        Returns the Y. To be implemented by subclass.
+        """
+        raise NotImplementedError
+
+    def prepare(self) -> None:
+        """
+        Reads the data file and produces some splits.
+        """
+        x = self._x()
+        y = self._y()
+        print('Generating data splits')
+        for i in range(5):
+            self.create_split(x, y, i)
+        print('Prep complete')
+        return
+
+
+class Ccc(Cc):
     """
     The image classification subset of the CC dataset.
     """
 
     name = 'ccc'
 
-    def prepare(self) -> None:
+    def _y(self) -> ndarray:
         """
-        Reads the data file and produces some splits.
+        Returns the Y. To be implemented by subclass.
         """
-        print("Reading data file")
         data_file = CcDataFile(CSV_CCDATA)
-        x = asarray(data_file.url())
         y = asarray(data_file.category_as_int())
-        print('Converting to one hot')
         y = self.one_hot(y, 6)
-        print('Generating data splits')
-        for i in range(5):
-            self.create_split(x, y, i)
-        print('Prep complete')
-        return
+        return y
 
 
-class Ccr(DataSet):
+class Ccr(Cc):
     """
     The aesthetic rating subset of the CC dataset.
     """
 
     name = 'ccr'
 
-    def prepare(self) -> None:
+    def _y(self) -> ndarray:
         """
-        Create NumPy files for the randomly generated splits.
+        Returns the Y. To be implemented by subclass.
         """
-        print("Reading data file")
         data_file = CcDataFile(CSV_CCDATA)
-        x = asarray(data_file.url())
         y = asarray(data_file.rating())
-        print('Generating data splits')
-        for i in range(5):
-            self.create_split(x, y, i)
-        print('Prep complete')
-        return
+        return y
 
 
-class CcrCategorical(DataSet):
+class CcrCategorical(Cc):
     """
     The aesthetic rating subset of the CC dataset using categories instead of a number.
     """
 
     name = 'ccr-categ'
 
-    def prepare(self) -> None:
+    def _y(self) -> ndarray:
         """
-        Create NumPy files for the randomly generated splits.
+        Returns the Y. To be implemented by subclass.
         """
-        print("Reading data file")
         data_file = CcDataFile(CSV_CCDATA)
-        x = asarray(data_file.url())
         y = data_file.rating()
         y = [i-1 for i in y]
         y = asarray(y)
         y = self.one_hot(y, 3)
-        print('Generating data splits')
-        for i in range(5):
-            self.create_split(x, y, i)
-        print('Prep complete')
-        return
+        return y

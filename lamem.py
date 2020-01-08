@@ -49,13 +49,13 @@ class Lamem(DataSet):
         """
         Returns the url of a data file.
         """
-        return 'lamem/splits/%s_%d.txt' % (phase, split)
+        return 'data/lamem/splits/%s_%d.txt' % (phase, split)
 
     def _relative_url(self, url: Url) -> str:
         """
         Returns the relative url of the image from the filename.
         """
-        a = os.path.join(os.getcwd(), 'lamem/images', url)
+        a = os.path.join(os.getcwd(), 'data/lamem/images', url)
         return os.path.normpath(a)
 
     def _prep_data_file(self, split: int, phase: str) -> None:
