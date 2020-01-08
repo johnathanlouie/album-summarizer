@@ -73,7 +73,8 @@ OPTIMIZER = [
     CompileOption('ad', 'Adadelta'),  # 3
     CompileOption('ame', 'Adam'),  # 4
     CompileOption('am', 'Adamax'),  # 5
-    CompileOption('na', 'Nadam')  # 6
+    CompileOption('na', 'Nadam'),  # 6
+    CompileOption('sgd1', SGD(lr=0.01, momentum=0.9, decay=0.0005, nesterov=True))  # 7
 ]
 
 METRIC = [
