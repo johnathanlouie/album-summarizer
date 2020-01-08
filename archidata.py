@@ -173,7 +173,7 @@ class ArchitectureSplit(object):
         self._lr = dh.get_lr()
         self._mcp = dh.get_mcp()
         self._mcpb = dh.get_mcpb()
-        self._pcp = PickleCheckpoint(self._mcp, self._mcpb, self._lr, self.name())
+        self._pcp = PickleCheckpoint(self._mcp, self._mcpb, self._lr, self.name(), dh.total_epoch)
         return
 
     def _delete(self) -> None:
