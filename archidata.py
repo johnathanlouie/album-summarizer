@@ -5,7 +5,7 @@ from keras.models import load_model
 
 from dataholder import DataHolder
 from dataset import DataSet, DataSetSplit
-from jl import ListFile
+from jl import ListFile, mkdirs
 from kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
 from model import Architecture
 
@@ -25,20 +25,22 @@ class ArchitectureSplit(object):
     def name(self) -> str:
         """
         Returns the unique identifier of this combination of architecture, dataset, and compile options.
+        Used for URLs.
         """
-        return "%s.%s.%d" % (self._architecture.name(), self._split.name, self._split.split)
+        x = self._architecture.name()
+        return "%s.%s.%s.%s/%d" % (x.model, self._split.name, x.loss, x.optimizer, self._split.split)
 
     def _model_url(self) -> str:
         """
         Returns the URL of the model save file.
         """
-        return "gen/%s.h5" % (self.name())
+        return "gen/%s/model.h5" % (self.name())
 
     def _best_model_url(self) -> str:
         """
         Returns the URL of the model save file.
         """
-        return "gen/%s.best.h5" % (self.name())
+        return "gen/%s/best.h5" % (self.name())
 
     def train(self) -> None:
         """
@@ -147,6 +149,7 @@ class ArchitectureSplit(object):
         """
         print('No saved files found.')
         print('Creating new model.')
+        mkdirs(self._model_url())
         self._architecture.compile().save(self._model_url())
         print('Saved model.')
         print('Creating new training status.')

@@ -134,4 +134,4 @@ class DataHolder(object):
         """
         Returns the filepath of the dill file for the training status.
         """
-        return "gen/%s.dill" % (archisplit)
+        return "gen/%s/train.dill" % (archisplit)
