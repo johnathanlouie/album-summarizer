@@ -76,7 +76,9 @@ def npsave(name: str, data: ArrayLike) -> None:
     """
     Saves to a binary NumPy file.
     """
-    return save("gen/%s" % name, data)
+    url = "gen/%s" % name
+    mkdirs(url)
+    return save(url, data)
 
 
 def npload(name: str) -> ArrayLike:
