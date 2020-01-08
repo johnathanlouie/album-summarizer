@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 
 from keras import backend as K
 from keras.models import Model
+from keras.optimizers import SGD, Optimizer
 
 import jl
 
@@ -42,7 +43,7 @@ class CompileOption(object):
     Options for the Architecture class.
     """
 
-    def __init__(self, name: str, value: Union[Callable, str]) -> None:
+    def __init__(self, name: str, value: Union[Callable, str, Optimizer]) -> None:
         self.name = name
         self.value = value
 
@@ -106,16 +107,25 @@ class Architecture(object):
         model.compile(loss=self._loss.value, optimizer=self._optimizer.value, metrics=[self._metric.value])
         return model
 
+    @staticmethod
+    def _is_custom(x: Any) -> bool:
+        if isinstance(x, Optimizer) or type(x) == str:
+            return False
+        elif callable(x):
+            return True
+        else:
+            raise TypeError
+
     def custom(self) -> Dict[str, Callable]:
         """
         Creates the argument for the custom_objects parameter for the keras.models.load_model function.
         """
         d = dict()
-        if type(self._loss.value) != str:
+        if self._is_custom(self._loss.value):
             d[self._loss.value.__name__] = self._loss.value
-        if type(self._optimizer.value) != str:
+        if self._is_custom(self._optimizer.value):
             d[self._optimizer.value.__name__] = self._optimizer.value
-        if type(self._metric.value) != str:
+        if self._is_custom(self._metric.value):
             d[self._metric.value.__name__] = self._metric.value
         return d
 
