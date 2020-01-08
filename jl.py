@@ -78,7 +78,7 @@ def npsave(name: str, data: ArrayLike) -> None:
     """
     Saves to a binary NumPy file.
     """
-    url = "gen/%s" % name
+    url = "out/%s" % name
     mkdirs(url)
     return save(url, data)
 
@@ -87,7 +87,7 @@ def npload(name: str) -> ArrayLike:
     """
     Loads an array-like object from a binary NumPy file.
     """
-    return load("gen/%s.npy" % name)
+    return load("out/%s.npy" % name)
 
 
 def readimg(imglist: List[Url]) -> ndarray:

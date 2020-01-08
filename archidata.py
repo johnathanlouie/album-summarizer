@@ -34,13 +34,13 @@ class ArchitectureSplit(object):
         """
         Returns the URL of the model save file.
         """
-        return "gen/%s/model.h5" % (self.name())
+        return "out/%s/model.h5" % (self.name())
 
     def _best_model_url(self) -> str:
         """
         Returns the URL of the model save file.
         """
-        return "gen/%s/best.h5" % (self.name())
+        return "out/%s/best.h5" % (self.name())
 
     def train(self) -> None:
         """
@@ -60,7 +60,7 @@ class ArchitectureSplit(object):
         seq2 = Sequence1(x2, y2, 10)
         print('Training starts')
         term = TerminateOnDemand()
-        csv = CSVLogger('gen/training.csv', append=True)
+        csv = CSVLogger('out/training.csv', append=True)
         self._model.fit_generator(
             generator=seq1,
             epochs=self._max_epoch,
@@ -137,7 +137,7 @@ class ArchitectureSplit(object):
             else:
                 results = results.argmax(1)
                 # results = class_str_int(results)
-        results_file = 'gen/pred.txt'
+        results_file = 'out/pred.txt'
         ListFile(results_file).write(results)
         print('Saved predictions to %s' % (results_file))
         return results

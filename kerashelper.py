@@ -160,9 +160,9 @@ class TerminateOnDemand(Callback):
         print('Learning rate: %f' % (lr))
 
     def on_epoch_end(self, epoch, logs=None) -> None:
-        with open('gen/terminate.txt', 'r') as f:
+        with open('out/terminate.txt', 'r') as f:
             a = f.read()
             if a == 'die':
-                print('Manual early terminate command found in gen/terminate.txt')
+                print('Manual early terminate command found in out/terminate.txt')
                 self.stopped_epoch = epoch
                 self.model.stop_training = True

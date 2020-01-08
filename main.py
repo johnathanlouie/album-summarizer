@@ -21,9 +21,9 @@ def create(mf: ModelFactory, ds: DataSet, split: int, l: int, o: int, m: int) ->
 vgg = Vgg16A()
 vgg1 = Vgg16B()
 vgg2 = Vgg16C()
-smi13 = Smi13()
-smi131 = Smi13_1()
-smi132 = Smi13_2()
+smi = Smi13()
+smi1 = Smi13_1()
+smi2 = Smi13_2()
 
 # DATASETS
 ccr = Ccr()
@@ -32,20 +32,20 @@ ccrc = CcrCategorical()
 lamem = Lamem()
 
 # PREPARE DATASETS
-# ccr.prepare()
 # ccc.prepare()
+# ccr.prepare()
 # ccrc.prepare()
-# lamem.prepare()
+lamem.prepare()
 
 # ARCHITECTURE-DATASET COMBOS
 # archisplit = create(vgg, ccc, 1, 8, 0, 2)
 # archisplit = create(vgg1, ccc, 1, 8, 0, 2)
 # archisplit = create(vgg2, ccc, 1, 8, 0, 2)
-archisplit = create(smi13, ccr, 1, 14, 7, 0)
-# archisplit = create(smi13, lamem, 1, 14, 0, 0)
-# archisplit = create(smi13, lamem, 1, 14, 0, 0)
-# archisplit = create(smi13, ccr, 1, 14, 0, 0)
+# archisplit = create(smi, ccr, 1, 14, 0, 0)
+# archisplit = create(smi, ccr, 1, 14, 7, 0)
+# archisplit = create(smi1, ccrc, 1, 14, 0, 0)
+archisplit = create(smi, lamem, 1, 14, 0, 0)
 
 # RUN
-archisplit.reset()
+# archisplit.reset()
 archisplit.train()
