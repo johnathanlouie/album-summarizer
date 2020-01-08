@@ -1,11 +1,13 @@
 import csv
 import os
 import time
+from os.path import isfile
 from typing import Any, Dict, List, Tuple, Union
 
 from numpy import asarray, load, ndarray, save, zeros
 
 import cv2 as cv
+
 
 Url = str
 ArrayLike = Union[ndarray, List[Any]]
@@ -161,6 +163,8 @@ def resize_img(filename: Url) -> Image:
     """
     Returns a resized image.
     """
+    if not isfile(filename):
+        raise FileNotFoundError
     img = cv.imread(filename, cv.IMREAD_COLOR)
     img2 = cv.resize(img, res_resize, interpolation=cv.INTER_CUBIC)
     return img2
