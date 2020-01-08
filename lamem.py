@@ -64,8 +64,9 @@ class Lamem(DataSet):
         """
         url = self._data_file_url(split, phase)
         datafile = LamemDataFile(url)
-        x = asarray(datafile.list_x())
-        y = asarray(datafile.list_x())
+        x = [self._relative_url(i) for i in datafile.list_x()]
+        x = asarray(x)
+        y = asarray(datafile.list_y())
         ds = self.split(split - 1)
         if phase == self._phases[0]:
             dp = ds.train()
