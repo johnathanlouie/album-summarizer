@@ -87,6 +87,18 @@ METRIC = [
 ]
 
 
+class ArchitectureName(object):
+    """
+    Passes information to the ArchitectureSplit class for making URLs.
+    """
+
+    def __init__(self, model: str, loss: str, optimizer: str, metric: str):
+        self.model = model
+        self.loss = loss
+        self.optimizer = optimizer
+        self.metric = metric
+
+
 class Architecture(object):
     """
     Creates a compiled keras.models.Model object with options and creates the argument for the custom_objects parameter for the keras.models.load_model function.
@@ -130,8 +142,8 @@ class Architecture(object):
             d[self._metric.value.__name__] = self._metric.value
         return d
 
-    def name(self) -> str:
+    def name(self) -> ArchitectureName:
         """
-        Returns a unique identifier for the combination of model and compile options.
+        Returns an object containing the combination of model and compile options.
         """
-        return "%s.%s.%s.%s" % (self._model.name, self._loss.name, self._optimizer.name, self._metric.name)
+        return ArchitectureName(self._model.name, self._loss.name, self._optimizer.name, self._metric.name)
