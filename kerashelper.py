@@ -63,7 +63,7 @@ class PickleCheckpoint(Callback):
                 else:
                     if self.monitor_op(current, self.best):
                         if self.verbose > 0:
-                            print('\nEpoch %05d: %s improved from %0.5f to %0.5f, saving Keras callback objects to %s' % (epoch + 1, self.monitor, self.best, current, filepath))
+                            print('\nEpoch %05d: %s improved from %0.5f to %0.5f, saving training state to %s' % (epoch + 1, self.monitor, self.best, current, self._url))
                         self.best = current
                         dh = DataHolder(self._url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
                         if self.save_weights_only:
@@ -75,7 +75,7 @@ class PickleCheckpoint(Callback):
                             print('\nEpoch %05d: %s did not improve from %0.5f' % (epoch + 1, self.monitor, self.best))
             else:
                 if self.verbose > 0:
-                    print('\nEpoch %05d: saving Keras callback objects to %s' % (epoch + 1, filepath))
+                    print('\nEpoch %05d: saving training state to %s' % (epoch + 1, self._url))
                 dh = DataHolder(self._url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
                 if self.save_weights_only:
                     dh.save()
