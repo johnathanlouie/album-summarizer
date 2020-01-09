@@ -47,5 +47,5 @@ lamem.prepare()
 archisplit = create(smi, lamem, 1, 14, 0, 0)
 
 # RUN
-# archisplit.reset()
+# archisplit.create(100, 5)
 archisplit.train()

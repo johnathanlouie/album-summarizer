@@ -64,7 +64,7 @@ class PickleCheckpoint(Callback):
         period: Interval (number of epochs) between checkpoints.
     """
 
-    def __init__(self, mcp: ModelCheckpoint, mcpb: ModelCheckpoint, lr: ReduceLROnPlateau, archisplit: str, total_epoch: int = 2**64) -> None:
+    def __init__(self, mcp: ModelCheckpoint, mcpb: ModelCheckpoint, lr: ReduceLROnPlateau, archisplit: str, total_epoch: int) -> None:
         super(PickleCheckpoint, self).__init__()
         self._mcp = mcp
         self._copy_mcp(mcp)

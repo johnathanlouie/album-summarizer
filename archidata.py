@@ -20,7 +20,6 @@ class ArchitectureSplit(object):
     def __init__(self, architecture: Architecture, split: DataSetSplit) -> None:
         self._architecture = architecture
         self._split = split
-        self._continue()
 
     def name(self) -> str:
         """
@@ -46,6 +45,7 @@ class ArchitectureSplit(object):
         """
         Trains the model.
         """
+        self._load_train_model()
         print('Loading training X')
         x1 = self._split.train().x().load()
         print('Loading training Y')
@@ -84,6 +84,7 @@ class ArchitectureSplit(object):
         """
         Tests the model using the validation set.
         """
+        self._load_test_model()
         print('Loading validation X')
         x = self._split.validatation().x().load()
         print('Loading validation Y')
@@ -103,6 +104,7 @@ class ArchitectureSplit(object):
         """
         Tests the model using the test set.
         """
+        self._load_test_model()
         print('Loading test X')
         x = self._split.test().x().load()
         print('Loading test Y')
@@ -122,6 +124,7 @@ class ArchitectureSplit(object):
         """
         Predicts using the trained model.
         """
+        self._load_test_model()
         print('Loading test X')
         x = self._split.test().x().load()
         print('Loading test Y')
@@ -142,7 +145,7 @@ class ArchitectureSplit(object):
         print('Saved predictions to %s' % (results_file))
         return results
 
-    def _create(self) -> None:
+    def create(self, epochs: int = 2**64, patience: int = 5) -> None:
         """
         Creates and saves the model file and other training state files.
         Initial settings are found here.
@@ -155,9 +158,9 @@ class ArchitectureSplit(object):
         print('Creating new training status.')
         mcp = ModelCheckpoint(self._model_url(), verbose=1)
         mcpb = ModelCheckpoint(self._best_model_url(), verbose=1, save_best_only=True)
-        lr = ReduceLROnPlateau(patience=5, verbose=1)
+        lr = ReduceLROnPlateau(patience=patience, verbose=1)
         dh_url = DataHolder.url(self.name())
-        DataHolder(dh_url, 0, 1000, lr, mcp, mcpb).save()
+        DataHolder(dh_url, 0, epochs, lr, mcp, mcpb).save()
         print('Saved DataHolder.')
         return
 
@@ -192,32 +195,11 @@ class ArchitectureSplit(object):
         self._best_model = load_model(self._best_model_url(), self._architecture.custom())
         return
 
-    def _delete(self) -> None:
+    def delete(self) -> None:
         """
         Deletes the model file and other training state files.
-        Not implemented since _load overwrites.
         """
-        return
-
-    def _continue(self) -> None:
-        """
-        Loads the saved files if they exist.
-        Create and load them if they do not exist.
-        """
-        if not isfile(self._model_url()):
-            self._create()
-        self._load_train_model()
-        return
-
-    def reset(self) -> None:
-        """
-        Starts the training process from the beginning.
-        """
-        print('Resetting training data.')
-        self._delete()
-        self._create()
-        self._load()
-        return
+        raise NotImplementedError
 
 
 class ArchitectureSet(object):
