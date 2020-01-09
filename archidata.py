@@ -161,12 +161,18 @@ class ArchitectureSplit(object):
         print('Saved DataHolder.')
         return
 
-    def _load(self) -> None:
+    def _load_train_model(self) -> None:
         """
-        Loads the model file and other training state files.
+        Loads the training model file and other training state files.
         """
-        self._model = load_model(self._model_url(), self._architecture.custom())
+        if not isfile(self._model_url()):
+            print('Missing training model file.')
+            raise SystemExit
         dh_url = DataHolder.url(self.name())
+        if not isfile(dh_url):
+            print('Missing training model file.')
+            raise SystemExit
+        self._model = load_model(self._model_url(), self._architecture.custom())
         dh = DataHolder.load(dh_url)
         self._current_epoch = dh.current_epoch
         self._max_epoch = dh.total_epoch
@@ -174,6 +180,16 @@ class ArchitectureSplit(object):
         self._mcp = dh.get_mcp()
         self._mcpb = dh.get_mcpb()
         self._pcp = PickleCheckpoint(self._mcp, self._mcpb, self._lr, self.name(), dh.total_epoch)
+        return
+
+    def _load_test_model(self) -> None:
+        """
+        Loads the best model file.
+        """
+        if not isfile(self._best_model_url()):
+            print('Missing training model file.')
+            raise SystemExit
+        self._best_model = load_model(self._best_model_url(), self._architecture.custom())
         return
 
     def _delete(self) -> None:
@@ -190,7 +206,7 @@ class ArchitectureSplit(object):
         """
         if not isfile(self._model_url()):
             self._create()
-        self._load()
+        self._load_train_model()
         return
 
     def reset(self) -> None:
