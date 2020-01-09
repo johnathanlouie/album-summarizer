@@ -6,7 +6,7 @@ from keras.utils import Sequence
 from numpy import asarray, ceil
 
 from dataholder import DataHolder
-from jl import resize_img
+from jl import Url, resize_img
 
 
 class Sequence1(Sequence):
@@ -39,21 +39,20 @@ class PickleCheckpoint(Callback):
     It saves the training state whenever ModelCheckpoint saves the training model.
     """
 
-    def __init__(self, mcp: ModelCheckpoint, mcpb: ModelCheckpoint, lr: ReduceLROnPlateau, archisplit: str, total_epoch: int) -> None:
+    def __init__(self, mcp: ModelCheckpoint, mcpb: ModelCheckpoint, lr: ReduceLROnPlateau, url: Url, total_epoch: int) -> None:
         super(PickleCheckpoint, self).__init__()
         self._mcp = mcp
         self._copy_mcp(mcp)
         self._mcpb = mcpb
         self._lr = lr
         self._total_epoch = total_epoch
-        self._archisplit = archisplit
+        self._url = url
         return
 
     def on_epoch_end(self, epoch, logs=None) -> None:
         logs = logs or {}
         self.epochs_since_last_save += 1
         current_epoch = epoch + 1
-        url = DataHolder.url(self._archisplit)
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
             filepath = self.filepath.format(epoch=epoch + 1, **logs)
@@ -66,7 +65,7 @@ class PickleCheckpoint(Callback):
                         if self.verbose > 0:
                             print('\nEpoch %05d: %s improved from %0.5f to %0.5f, saving Keras callback objects to %s' % (epoch + 1, self.monitor, self.best, current, filepath))
                         self.best = current
-                        dh = DataHolder(url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
+                        dh = DataHolder(self._url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
                         if self.save_weights_only:
                             dh.save()
                         else:
@@ -77,7 +76,7 @@ class PickleCheckpoint(Callback):
             else:
                 if self.verbose > 0:
                     print('\nEpoch %05d: saving Keras callback objects to %s' % (epoch + 1, filepath))
-                dh = DataHolder(url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
+                dh = DataHolder(self._url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
                 if self.save_weights_only:
                     dh.save()
                 else:
