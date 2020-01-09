@@ -128,10 +128,3 @@ class DataHolder(object):
         """
         dump(self, open(self._url, "wb"))
         return
-
-    @staticmethod
-    def url(archisplit: str) -> str:
-        """
-        Returns the filepath of the dill file for the training status.
-        """
-        return "out/%s/train.dill" % (archisplit)

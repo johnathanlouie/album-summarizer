@@ -5,9 +5,61 @@ from keras.models import load_model
 
 from dataholder import DataHolder
 from dataset import DataSet, DataSetSplit
-from jl import ListFile, mkdirs
+from jl import ListFile, Url, mkdirs
 from kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
-from model import Architecture
+from model import Architecture, ArchitectureName
+
+
+class ArchitectureSplitName(object):
+    """
+    Naming object for the files used by the ArchitectureSplit class.
+    """
+
+    def __init__(self, architecture: ArchitectureName, split: DataSetSplit) -> None:
+        self.model = architecture.model
+        self.dataset = split.dataset
+        self.loss = architecture.loss
+        self.optimizer = architecture.optimizer
+        self.split = split.split
+        return
+
+    def _path(self) -> Url:
+        """
+        Returns the path up to each file.
+        Example:
+        out/model.dataset.loss.optimizer/split/saved.file
+        """
+        return "out/%s.%s.%s.%s/%d" % (self.model, self.dataset, self.loss, self.optimizer, self.split)
+
+    def train(self) -> Url:
+        """
+        Returns the URL of the training model file.
+        """
+        return "%s/model.h5" % self._path()
+
+    def test(self) -> Url:
+        """
+        Returns the URL of the testing model file.
+        """
+        return "%s/best.h5" % self._path()
+
+    def data_holder(self) -> Url:
+        """
+        Returns the URL of the dill file.
+        """
+        return "%s/train.dill" % self._path()
+
+    def csv(self) -> Url:
+        """
+        Returns the URL of the training log.
+        """
+        return "%s/log.csv" % self._path()
+
+    def predictions(self) -> Url:
+        """
+        Returns the URL of the predictions file.
+        """
+        return "%s/pred.txt" % self._path()
 
 
 class ArchitectureSplit(object):
@@ -21,25 +73,11 @@ class ArchitectureSplit(object):
         self._architecture = architecture
         self._split = split
 
-    def name(self) -> str:
+    def name(self) -> ArchitectureSplitName:
         """
-        Returns the unique identifier of this combination of architecture, dataset, and compile options.
-        Used for URLs.
+        Returns the naming object for this combination of architecture, dataset, and compile options.
         """
-        x = self._architecture.name()
-        return "%s.%s.%s.%s/%d" % (x.model, self._split.name, x.loss, x.optimizer, self._split.split)
-
-    def _model_url(self) -> str:
-        """
-        Returns the URL of the model save file.
-        """
-        return "out/%s/model.h5" % (self.name())
-
-    def _best_model_url(self) -> str:
-        """
-        Returns the URL of the model save file.
-        """
-        return "out/%s/best.h5" % (self.name())
+        return ArchitectureSplitName(self._architecture.name(), self._split)
 
     def train(self) -> None:
         """
@@ -60,7 +98,7 @@ class ArchitectureSplit(object):
         seq2 = Sequence1(x2, y2, 10)
         print('Training starts')
         term = TerminateOnDemand()
-        csv = CSVLogger('out/training.csv', append=True)
+        csv = CSVLogger(self.name().csv(), append=True)
         self._model.fit_generator(
             generator=seq1,
             epochs=self._max_epoch,
@@ -140,9 +178,9 @@ class ArchitectureSplit(object):
             else:
                 results = results.argmax(1)
                 # results = class_str_int(results)
-        results_file = 'out/pred.txt'
-        ListFile(results_file).write(results)
-        print('Saved predictions to %s' % (results_file))
+        url = self.name().predictions()
+        ListFile(url).write(results)
+        print('Saved predictions to %s' % (url))
         return results
 
     def create(self, epochs: int = 2**64, patience: int = 5) -> None:
@@ -152,15 +190,15 @@ class ArchitectureSplit(object):
         """
         print('No saved files found.')
         print('Creating new model.')
-        mkdirs(self._model_url())
-        self._architecture.compile().save(self._model_url())
+        url = self.name()
+        mkdirs(url.train())
+        self._architecture.compile().save(url.train())
         print('Saved model.')
         print('Creating new training status.')
-        mcp = ModelCheckpoint(self._model_url(), verbose=1)
-        mcpb = ModelCheckpoint(self._best_model_url(), verbose=1, save_best_only=True)
+        mcp = ModelCheckpoint(url.train(), verbose=1)
+        mcpb = ModelCheckpoint(url.test(), verbose=1, save_best_only=True)
         lr = ReduceLROnPlateau(patience=patience, verbose=1)
-        dh_url = DataHolder.url(self.name())
-        DataHolder(dh_url, 0, epochs, lr, mcp, mcpb).save()
+        DataHolder(url.data_holder(), 0, epochs, lr, mcp, mcpb).save()
         print('Saved DataHolder.')
         return
 
@@ -168,14 +206,15 @@ class ArchitectureSplit(object):
         """
         Loads the training model file and other training state files.
         """
-        if not isfile(self._model_url()):
+        url = self.name()
+        if not isfile(url.train()):
             print('Missing training model file.')
             raise SystemExit
-        dh_url = DataHolder.url(self.name())
+        dh_url = url.data_holder()
         if not isfile(dh_url):
             print('Missing training model file.')
             raise SystemExit
-        self._model = load_model(self._model_url(), self._architecture.custom())
+        self._model = load_model(url.train(), self._architecture.custom())
         dh = DataHolder.load(dh_url)
         self._current_epoch = dh.current_epoch
         self._max_epoch = dh.total_epoch
@@ -189,10 +228,11 @@ class ArchitectureSplit(object):
         """
         Loads the best model file.
         """
-        if not isfile(self._best_model_url()):
+        url = self.name().test()
+        if not isfile(url):
             print('Missing training model file.')
             raise SystemExit
-        self._best_model = load_model(self._best_model_url(), self._architecture.custom())
+        self._best_model = load_model(url, self._architecture.custom())
         return
 
     def delete(self) -> None:

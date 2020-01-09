@@ -95,8 +95,8 @@ class DataSetSplit(object):
     Represents a split of a dataset for cross-validation.
     """
 
-    def __init__(self, name: str, split: int) -> None:
-        self.name = name
+    def __init__(self, dataset: str, split: int) -> None:
+        self.dataset = dataset
         self.split = split
         return
 
@@ -104,7 +104,7 @@ class DataSetSplit(object):
         """
         Gets a phase from this split.
         """
-        return DataSetPhase(self.name, self.split, phase)
+        return DataSetPhase(self.dataset, self.split, phase)
 
     def train(self) -> DataSetPhase:
         """
