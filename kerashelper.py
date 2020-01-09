@@ -129,17 +129,15 @@ class PickleCheckpoint(Callback):
 
 class TerminateOnDemand(Callback):
     """
-    Callback that terminates training when a NaN loss is encountered.
+    Callback that terminates training when the die command is given.
     """
 
-    def on_epoch_begin(self, epoch, logs) -> None:
-        lr = get_value(self.model.optimizer.lr)
-        print('Learning rate: %f' % (lr))
+    _URL = 'out/terminate.txt'
 
     def on_epoch_end(self, epoch, logs=None) -> None:
-        with open('out/terminate.txt', 'r') as f:
+        with open(self._URL, 'r') as f:
             a = f.read()
             if a == 'die':
-                print('Manual early terminate command found in out/terminate.txt')
+                print("Manual early terminate command found in %s" % self._URL)
                 self.stopped_epoch = epoch
                 self.model.stop_training = True
