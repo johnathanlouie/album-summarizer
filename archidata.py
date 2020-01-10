@@ -125,10 +125,10 @@ class ArchitectureSplit(object):
         """
         self._load_test_model()
         seq = Sequence1(x, y, 10)
-        results = self._model.evaluate_generator(generator=seq, verbose=1)
+        results = self._best_model.evaluate_generator(generator=seq, verbose=1)
         if type(results) != list:
             results = [results]
-        for metric, scalar in zip(self._model.metrics_names, results):
+        for metric, scalar in zip(self._best_model.metrics_names, results):
             print('%s: %f' % (metric, scalar))
         return
 
@@ -168,7 +168,7 @@ class ArchitectureSplit(object):
         print('Prediction sequence')
         seq = Sequence1(x, y, 10)
         print('Prediction starts')
-        results = self._model.predict_generator(generator=seq, verbose=1)
+        results = self._best_model.predict_generator(generator=seq, verbose=1)
         print('Prediction finished')
         if len(results.shape) == 2:
             if results.shape[1] == 1:
@@ -179,7 +179,7 @@ class ArchitectureSplit(object):
         url = self.name().predictions()
         ListFile(url).write(results)
         print('Saved predictions to %s' % (url))
-        return results
+        return
 
     def create(self, epochs: int = 2**64, patience: int = 5) -> None:
         """
