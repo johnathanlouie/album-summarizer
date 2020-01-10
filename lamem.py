@@ -42,8 +42,8 @@ class Lamem(DataSet):
     Dataset used for large scale image memorability.
     """
 
-    name = 'lamem'
-    _splits = range(1, 6)
+    NAME = 'lamem'
+    SPLITS = 5
     _phases = ['train', 'test', 'val']
 
     def _data_file_url(self, split: int, phase: str) -> str:
@@ -85,7 +85,7 @@ class Lamem(DataSet):
         """
         Produce NumPy files from the dataset data files.
         """
-        for i in self._splits:
+        for i in range(1, self.SPLITS+1):
             for j in self._phases:
                 self._prep_data_file(i, j)
         return

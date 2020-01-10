@@ -130,7 +130,8 @@ class DataSet(object):
     Interface for datasets. Mainly used for hints.
     """
 
-    name = ''
+    NAME = ''
+    SPLITS = 0
 
     def prepare(self) -> None:
         """
@@ -142,7 +143,7 @@ class DataSet(object):
         """
         Gets the training, testing, and validation split for Keras.
         """
-        return DataSetSplit(self.name, num)
+        return DataSetSplit(self.NAME, num)
 
     def train_valid_test_split(
         self,
