@@ -1,4 +1,5 @@
-import os
+from os import getcwd
+from os.path import join, normpath
 from typing import List
 
 from numpy import asarray
@@ -55,8 +56,8 @@ class Lamem(DataSet):
         """
         Returns the relative url of the image from the filename.
         """
-        a = os.path.join(os.getcwd(), 'data/lamem/images', url)
-        return os.path.normpath(a)
+        a = join(getcwd(), 'data/lamem/images', url)
+        return normpath(a)
 
     def _prep_data_file(self, split: int, phase: str) -> None:
         """
@@ -73,7 +74,7 @@ class Lamem(DataSet):
         elif phase == self._phases[1]:
             dp = ds.test()
         elif phase == self._phases[2]:
-            dp = ds.validatation()
+            dp = ds.validation()
         else:
             raise Exception()
         dp.x().save(x)
