@@ -124,9 +124,9 @@ class ArchitectureSplit(object):
         """
         self._load_test_model()
         print('Loading validation X')
-        x = self._split.validatation().x().load()
+        x = self._split.validation().x().load()
         print('Loading validation Y')
-        y = self._split.validatation().y().load()
+        y = self._split.validation().y().load()
         print('Validation sequence')
         seq = Sequence1(x, y, 10)
         print('Validation starts')

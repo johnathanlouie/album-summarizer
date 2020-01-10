@@ -118,7 +118,7 @@ class DataSetSplit(object):
         """
         return self._get_phase(Phase.TEST)
 
-    def validatation(self) -> DataSetPhase:
+    def validation(self) -> DataSetPhase:
         """
         Gets the validation phase from this split.
         """
@@ -175,7 +175,7 @@ class DataSet(object):
         ds = self.split(index)
         dtrain = ds.train()
         dtest = ds.test()
-        dval = ds.validatation()
+        dval = ds.validation()
         dtrain.x().save(tx)
         dtrain.y().save(ty)
         dtest.x().save(ex)
