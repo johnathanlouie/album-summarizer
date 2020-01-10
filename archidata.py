@@ -2,6 +2,7 @@ from os.path import isfile
 
 from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
+from numpy import ndarray
 
 from dataholder import DataHolder
 from dataset import DataSet, DataSetSplit
@@ -118,6 +119,19 @@ class ArchitectureSplit(object):
         print('Training finished')
         return
 
+    def _test(self, x: ndarray, y: ndarray) -> None:
+        """
+        Tests the model using the given x and y.
+        """
+        self._load_test_model()
+        seq = Sequence1(x, y, 10)
+        results = self._model.evaluate_generator(generator=seq, verbose=1)
+        if type(results) != list:
+            results = [results]
+        for metric, scalar in zip(self._model.metrics_names, results):
+            print('%s: %f' % (metric, scalar))
+        return
+
     def validate(self) -> None:
         """
         Tests the model using the validation set.
@@ -127,15 +141,7 @@ class ArchitectureSplit(object):
         x = self._split.validation().x().load()
         print('Loading validation Y')
         y = self._split.validation().y().load()
-        print('Validation sequence')
-        seq = Sequence1(x, y, 10)
-        print('Validation starts')
-        results = self._model.evaluate_generator(generator=seq, verbose=1)
-        print('Validation finished')
-        if type(results) != list:
-            results = [results]
-        for metric, scalar in zip(self._model.metrics_names, results):
-            print('%s: %f' % (metric, scalar))
+        self._test(x, y)
         return
 
     def test(self) -> None:
@@ -147,15 +153,7 @@ class ArchitectureSplit(object):
         x = self._split.test().x().load()
         print('Loading test Y')
         y = self._split.test().y().load()
-        print('Testing sequence')
-        seq = Sequence1(x, y, 10)
-        print('Testing starts')
-        results = self._model.evaluate_generator(generator=seq, verbose=1)
-        print('Testing finished')
-        if type(results) != list:
-            results = [results]
-        for metric, scalar in zip(self._model.metrics_names, results):
-            print('%s: %f' % (metric, scalar))
+        self._test(x, y)
         return
 
     def predict(self) -> None:
