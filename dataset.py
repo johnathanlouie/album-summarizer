@@ -1,9 +1,9 @@
 from enum import Enum
 from typing import List, Optional, Tuple, Union
 
-import keras
-import sklearn.model_selection as sklms
+from keras.utils import to_categorical
 from numpy import ndarray
+from sklearn.model_selection import train_test_split
 
 from jl import ArrayLike, Number, npload, npsave
 
@@ -159,11 +159,11 @@ class DataSet(object):
         Divides up the dataset into phases.
         """
         if test_size != None:
-            dx, ex, dy, ey = sklms.train_test_split(x, y, test_size=test_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
-            tx, vx, ty, vy = sklms.train_test_split(dx, dy, test_size=valid_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
+            dx, ex, dy, ey = train_test_split(x, y, test_size=test_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
+            tx, vx, ty, vy = train_test_split(dx, dy, test_size=valid_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
         else:
-            dx, vx, vy, vy = sklms.train_test_split(x, y, test_size=valid_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
-            tx, ex, ty, ey = sklms.train_test_split(dx, dy, test_size=test_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
+            dx, vx, vy, vy = train_test_split(x, y, test_size=valid_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
+            tx, ex, ty, ey = train_test_split(dx, dy, test_size=test_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
         return tx, ty, vx, vy, ex, ey
 
     def create_split(self, x: ndarray, y: ndarray, index: int) -> None:
@@ -188,7 +188,7 @@ class DataSet(object):
         """
         Returns the one hot representation from an array of integers.
         """
-        return keras.utils.to_categorical(y, num_classes=num_classes, dtype='int32')
+        return to_categorical(y, num_classes=num_classes, dtype='int32')
 
     def class_names(self, results: List[int]) -> List[Union[str, int]]:
         """
