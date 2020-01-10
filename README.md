@@ -8,3 +8,8 @@ Note: Only Keras 2.3.0+ supports Tensorflow 2.0+. Use Tensorflow 1.15 if an olde
 - scikit-learn
 - NumPy
 - Dill
+
+## Python Developer Packages
+Note: End Users do not need to install these.
+- Pylint
+- autopep8
