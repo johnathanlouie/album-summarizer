@@ -1,11 +1,11 @@
 from enum import Enum
-from typing import Tuple, Union
+from typing import Optional, Tuple
 
 import keras
 import sklearn.model_selection as sklms
 from numpy import ndarray
 
-from jl import ArrayLike, npload, npsave
+from jl import ArrayLike, Number, npload, npsave
 
 
 class XY(Enum):
@@ -148,12 +148,12 @@ class DataSet(object):
         self,
         x: ArrayLike,
         y: ArrayLike,
-        test_size: Union[float, int, None] = 0.1,
-        valid_size: Union[float, int, None] = 0.1,
-        train_size: Union[float, int, None] = None,
-        random_state: Union[int, None] = None,
+        test_size: Optional[Number] = 0.1,
+        valid_size: Optional[Number] = 0.1,
+        train_size: Optional[Number] = None,
+        random_state: Optional[int] = None,
         shuffle: bool = True,
-        stratify: Union[ArrayLike, None] = None
+        stratify: Optional[ArrayLike] = None
     ) -> Tuple[ndarray, ndarray, ndarray, ndarray, ndarray, ndarray]:
         """
         Divides up the dataset into phases.
