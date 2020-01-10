@@ -1,6 +1,6 @@
 from os import getcwd
 from os.path import join, normpath
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from numpy import asarray, ndarray
 
@@ -164,7 +164,7 @@ class CcrCategorical(Cc):
     The aesthetic rating subset of the CC dataset using categories instead of a number.
     """
 
-    name = 'ccr-categ'
+    name = 'ccrc'
 
     def _y(self) -> ndarray:
         """
@@ -172,7 +172,13 @@ class CcrCategorical(Cc):
         """
         data_file = CcDataFile()
         y = data_file.rating()
-        y = [i-1 for i in y]
+        y = [i - 1 for i in y]
         y = asarray(y)
         y = self.one_hot(y, 3)
         return y
+
+    def class_names(self, results: List[int]) -> List[Union[str, int]]:
+        """
+        Returns correct rating.
+        """
+        return [i + 1 for i in results]

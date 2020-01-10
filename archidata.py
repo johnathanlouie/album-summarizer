@@ -1,4 +1,5 @@
 from os.path import isfile
+from typing import Callable, List, Union
 
 from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
@@ -70,9 +71,10 @@ class ArchitectureSplit(object):
     Trains, validates, tests, and predicts.
     """
 
-    def __init__(self, architecture: Architecture, split: DataSetSplit) -> None:
+    def __init__(self, architecture: Architecture, split: DataSetSplit, class_names: Callable[[List[int]], List[Union[str, int]]]) -> None:
         self._architecture = architecture
         self._split = split
+        self._class_names = class_names
 
     def name(self) -> ArchitectureSplitName:
         """
@@ -170,12 +172,14 @@ class ArchitectureSplit(object):
         print('Prediction starts')
         results = self._best_model.predict_generator(generator=seq, verbose=1)
         print('Prediction finished')
-        if len(results.shape) == 2:
-            if results.shape[1] == 1:
+        if results.ndim == 2:
+            if results.shape[1] == 1:  # if results are scalars
                 results = results.flatten()
-            else:
-                results = results.argmax(1)
-                # results = class_str_int(results)
+            else:  # otherwise results are class percentages
+                results = results.argmax(1)  # index of max percentage is answer
+                results = self._class_names(results)
+        else:
+            raise Exception
         url = self.name().predictions()
         ListFile(url).write(results)
         print('Saved predictions to %s' % (url))
@@ -256,4 +260,4 @@ class ArchitectureSet(object):
         """
         Get a specific split.
         """
-        return ArchitectureSplit(self._architecture, self._dataset.split(num))
+        return ArchitectureSplit(self._architecture, self._dataset.split(num), self._dataset.class_names)

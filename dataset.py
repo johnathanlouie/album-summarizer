@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 import keras
 import sklearn.model_selection as sklms
@@ -189,3 +189,9 @@ class DataSet(object):
         Returns the one hot representation from an array of integers.
         """
         return keras.utils.to_categorical(y, num_classes=num_classes, dtype='int32')
+
+    def class_names(self, results: List[int]) -> List[Union[str, int]]:
+        """
+        Returns the human readable name of the classes.
+        """
+        raise NotImplementedError
