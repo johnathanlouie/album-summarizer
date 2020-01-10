@@ -41,8 +41,8 @@ class PickleCheckpoint(Callback):
 
     def __init__(self, mcp: ModelCheckpoint, mcpb: ModelCheckpoint, lr: ReduceLROnPlateau, url: Url, total_epoch: int) -> None:
         super(PickleCheckpoint, self).__init__()
+        self._init(mcp)
         self._mcp = mcp
-        self._copy_mcp(mcp)
         self._mcpb = mcpb
         self._lr = lr
         self._total_epoch = total_epoch
@@ -82,9 +82,9 @@ class PickleCheckpoint(Callback):
                     dh.save()
         return
 
-    def _copy_mcp(self, mcp: ModelCheckpoint) -> None:
+    def _init(self, mcp: ModelCheckpoint) -> None:
         """
-        Copies a ModelCheckpoint instance.
+        Initializes this instance by copying a ModelCheckpoint instance.
         """
         try:
             self.best = mcp.best
