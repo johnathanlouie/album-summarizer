@@ -53,6 +53,7 @@ class PickleCheckpoint(Callback):
         logs = logs or {}
         self.epochs_since_last_save += 1
         current_epoch = epoch + 1
+        dh = DataHolder(self._url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
             # filepath = self.filepath.format(epoch=epoch + 1, **logs)
@@ -65,7 +66,6 @@ class PickleCheckpoint(Callback):
                         if self.verbose > 0:
                             print('\nEpoch %05d: %s improved from %0.5f to %0.5f, saving training state to %s' % (epoch + 1, self.monitor, self.best, current, self._url))
                         self.best = current
-                        dh = DataHolder(self._url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
                         if self.save_weights_only:
                             dh.save()
                         else:
@@ -76,7 +76,6 @@ class PickleCheckpoint(Callback):
             else:
                 if self.verbose > 0:
                     print('\nEpoch %05d: saving training state to %s' % (epoch + 1, self._url))
-                dh = DataHolder(self._url, current_epoch, self._total_epoch, self._lr, self._mcp, self._mcpb)
                 if self.save_weights_only:
                     dh.save()
                 else:
