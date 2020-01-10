@@ -1,19 +1,21 @@
 from os import getcwd
 from os.path import join, normpath
-from typing import List
+from typing import List, Optional
 
 from numpy import asarray, ndarray
 
 from dataset import DataSet
-from jl import CSV_CCDATA, Csv, Url
+from jl import Csv, Url
 
 
 class CcDataFile(object):
     """
     Represents the data file for the CC dataset.
-    Knows the internals of the data file.
-    Does not know anything outside of the file itself, such as the paths of the data file and images.
+    Knows the URL and internals of the data file.
+    Does not know the paths of the images.
     """
+
+    URL = 'data/cc/data.csv'
 
     categories = {
         'environment': 0,
@@ -24,7 +26,9 @@ class CcDataFile(object):
         'food': 5
     }
 
-    def __init__(self, url: Url) -> None:
+    def __init__(self, url: Optional[Url] = None) -> None:
+        if url == None:
+            url = self.URL
         self._csv = Csv(url)
         return
 
@@ -98,7 +102,7 @@ class Cc(DataSet):
         """
         Returns an array of URLs to the images.
         """
-        data_file = CcDataFile(CSV_CCDATA)
+        data_file = CcDataFile()
         x = data_file.url()
         x = [self._relative_url(i) for i in x]
         return asarray(x)
@@ -133,7 +137,7 @@ class Ccc(Cc):
         """
         Returns the Y. To be implemented by subclass.
         """
-        data_file = CcDataFile(CSV_CCDATA)
+        data_file = CcDataFile()
         y = asarray(data_file.category_as_int())
         y = self.one_hot(y, 6)
         return y
@@ -150,7 +154,7 @@ class Ccr(Cc):
         """
         Returns the Y. To be implemented by subclass.
         """
-        data_file = CcDataFile(CSV_CCDATA)
+        data_file = CcDataFile()
         y = asarray(data_file.rating())
         return y
 
@@ -166,7 +170,7 @@ class CcrCategorical(Cc):
         """
         Returns the Y. To be implemented by subclass.
         """
-        data_file = CcDataFile(CSV_CCDATA)
+        data_file = CcDataFile()
         y = data_file.rating()
         y = [i-1 for i in y]
         y = asarray(y)
