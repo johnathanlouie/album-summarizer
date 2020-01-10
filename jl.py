@@ -9,9 +9,11 @@ from numpy import asarray, load, ndarray, save, zeros
 import cv2 as cv
 
 
+"""Type aliases"""
 Url = str
 ArrayLike = Union[ndarray, List[Any]]
 Image = ndarray
+Number = Union[int, float]
 
 CSV_CCDATA = 'data/cc/data.csv'
 
