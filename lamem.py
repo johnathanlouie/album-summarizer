@@ -1,6 +1,6 @@
 from os import getcwd
 from os.path import join, normpath
-from typing import List
+from typing import List, Union
 
 from numpy import asarray
 
@@ -89,3 +89,9 @@ class Lamem(DataSet):
             for j in self._phases:
                 self._prep_data_file(i, j)
         return
+
+    def class_names(self, results: List[int]) -> List[Union[str, int]]:
+        """
+        Does not have classes.
+        """
+        raise NotImplementedError

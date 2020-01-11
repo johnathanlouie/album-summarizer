@@ -193,6 +193,7 @@ class DataSet(object):
 
     def class_names(self, results: List[int]) -> List[Union[str, int]]:
         """
+        Abstract method.
         Returns the human readable name of the classes.
         """
         raise NotImplementedError

@@ -143,6 +143,13 @@ class Ccc(Cc):
         y = self.one_hot(y, 6)
         return y
 
+    def class_names(self, results: List[int]) -> List[Union[str, int]]:
+        """
+        Returns the human readable name of the classes.
+        """
+        df = CcDataFile()
+        return df.to_category_str(results)
+
 
 class Ccr(Cc):
     """
@@ -158,6 +165,12 @@ class Ccr(Cc):
         data_file = CcDataFile()
         y = asarray(data_file.rating())
         return y
+
+    def class_names(self, results: List[int]) -> List[Union[str, int]]:
+        """
+        Does not have classes.
+        """
+        raise NotImplementedError
 
 
 class CcrCategorical(Cc):
