@@ -75,6 +75,14 @@ class ArchitectureSplit(object):
         self._architecture = architecture
         self._split = split
         self._class_names = class_names
+        self._model = None
+        self._current_epoch = None
+        self._max_epoch = None
+        self._lr = None
+        self._mcp = None
+        self._mcpb = None
+        self._pcp = None
+        self._best_model = None
 
     def name(self) -> ArchitectureSplitName:
         """
@@ -82,11 +90,40 @@ class ArchitectureSplit(object):
         """
         return ArchitectureSplitName(self._architecture.name(), self._split)
 
+    def _is_train_loaded(self) -> bool:
+        """
+        Returns true if all items are loaded.
+        """
+        if self._model == None:
+            return False
+        if self._current_epoch == None:
+            return False
+        if self._max_epoch == None:
+            return False
+        if self._lr == None:
+            return False
+        if self._mcp == None:
+            return False
+        if self._mcpb == None:
+            return False
+        if self._pcp == None:
+            return False
+        return True
+
+    def _is_test_loaded(self) -> bool:
+        """
+        Returns true if the test model is loaded.
+        """
+        if self._best_model == None:
+            return False
+        return True
+
     def train(self) -> None:
         """
         Trains the model.
         """
-        self._load_train_model()
+        if not self._is_train_loaded():
+            return
         print('Loading training X')
         x1 = self._split.train().x().load()
         print('Loading training Y')
@@ -125,7 +162,8 @@ class ArchitectureSplit(object):
         """
         Tests the model using the given x and y.
         """
-        self._load_test_model()
+        if not self._is_test_loaded():
+            return
         seq = Sequence1(x, y, 10)
         results = self._best_model.evaluate_generator(generator=seq, verbose=1)
         if type(results) != list:
@@ -138,7 +176,8 @@ class ArchitectureSplit(object):
         """
         Tests the model using the validation set.
         """
-        self._load_test_model()
+        if not self._is_test_loaded():
+            return
         print('Loading validation X')
         x = self._split.validation().x().load()
         print('Loading validation Y')
@@ -150,7 +189,8 @@ class ArchitectureSplit(object):
         """
         Tests the model using the test set.
         """
-        self._load_test_model()
+        if not self._is_test_loaded():
+            return
         print('Loading test X')
         x = self._split.test().x().load()
         print('Loading test Y')
@@ -162,7 +202,8 @@ class ArchitectureSplit(object):
         """
         Predicts using the trained model.
         """
-        self._load_test_model()
+        if not self._is_test_loaded():
+            return
         print('Loading test X')
         x = self._split.test().x().load()
         print('Loading test Y')
@@ -194,7 +235,9 @@ class ArchitectureSplit(object):
         print('Creating new model.')
         url = self.name()
         mkdirs(url.train())
-        self._architecture.compile().save(url.train())
+        model = self._architecture.compile()
+        model.save(url.train())
+        model.save(url.test())
         print('Saved model.')
         print('Creating new training status.')
         mcp = ModelCheckpoint(url.train(), verbose=1)
@@ -204,36 +247,46 @@ class ArchitectureSplit(object):
         print('Saved DataHolder.')
         return
 
-    def _load_train_model(self) -> None:
+    def _is_saved(self) -> bool:
         """
-        Loads the training model file and other training state files.
+        Returns true if all the saved files exist.
         """
         url = self.name()
         if not isfile(url.train()):
             print('Missing training model file.')
-            raise SystemExit
-        dh_url = url.data_holder()
-        if not isfile(dh_url):
+            return False
+        if not isfile(url.test()):
             print('Missing training model file.')
-            raise SystemExit
+            return False
+        if not isfile(url.data_holder()):
+            print('Missing training model file.')
+            return False
+        return True
+
+    def load_train_model(self) -> None:
+        """
+        Loads the training model file and other training state files.
+        """
+        if not self._is_saved():
+            return
+        url = self.name()
         self._model = load_model(url.train(), self._architecture.custom())
-        dh = DataHolder.load(dh_url)
+        dh = DataHolder.load(url.data_holder())
         self._current_epoch = dh.current_epoch
         self._max_epoch = dh.total_epoch
         self._lr = dh.get_lr()
         self._mcp = dh.get_mcp()
         self._mcpb = dh.get_mcpb()
-        self._pcp = PickleCheckpoint(self._mcp, self._mcpb, self._lr, dh_url, dh.total_epoch)
+        self._pcp = PickleCheckpoint(self._mcp, self._mcpb, self._lr, url.data_holder(), dh.total_epoch)
         return
 
-    def _load_test_model(self) -> None:
+    def load_test_model(self) -> None:
         """
         Loads the best model file.
         """
+        if not self._is_saved():
+            return
         url = self.name().test()
-        if not isfile(url):
-            print('Missing training model file.')
-            raise SystemExit
         self._best_model = load_model(url, self._architecture.custom())
         return
 
@@ -242,6 +295,50 @@ class ArchitectureSplit(object):
         Deletes the model file and other training state files.
         """
         raise NotImplementedError
+
+    def train2(self, epochs: int = 2**64, patience: int = 5) -> None:
+        """
+        Convenience method to create if there are no saved files, load if not yet loaded, and then train.
+        """
+        if not self._is_saved():
+            self.create(epochs, patience)
+        if not self._is_train_loaded():
+            self.load_train_model()
+        self.train()
+        return
+
+    def validate2(self, epochs: int = 2**64, patience: int = 5) -> None:
+        """
+        Convenience method to create if there are no saved files, load if not yet loaded, and then test against the validation set.
+        """
+        if not self._is_saved():
+            self.create(epochs, patience)
+        if not self._is_test_loaded():
+            self.load_test_model()
+        self.validate()
+        return
+
+    def test2(self, epochs: int = 2**64, patience: int = 5) -> None:
+        """
+        Convenience method to create if there are no saved files, load if not yet loaded, and then test against the test set.
+        """
+        if not self._is_saved():
+            self.create(epochs, patience)
+        if not self._is_test_loaded():
+            self.load_test_model()
+        self.test()
+        return
+
+    def predict2(self, epochs: int = 2**64, patience: int = 5) -> None:
+        """
+        Convenience method to create if there are no saved files, load if not yet loaded, and then predict using the test set.
+        """
+        if not self._is_saved():
+            self.create(epochs, patience)
+        if not self._is_test_loaded():
+            self.load_test_model()
+        self.predict()
+        return
 
 
 class ArchitectureSet(object):
@@ -261,3 +358,9 @@ class ArchitectureSet(object):
         Get a specific split.
         """
         return ArchitectureSplit(self._architecture, self._dataset.split(num), self._dataset.class_names)
+
+    def train_all(self, epochs: int = 2**64, patience: int = 5) -> None:
+        splits = [self.split(i) for i in self._dataset.SPLITS]
+        for split in splits:
+            split.train2(epochs, patience)
+        return

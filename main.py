@@ -8,13 +8,21 @@ from model import LOSS, METRIC, OPTIMIZER, Architecture, ModelFactory
 from rater import Smi13, Smi13_1, Smi13_2
 
 
-def create(mf: ModelFactory, ds: DataSet, split: int, l: int, o: int, m: int) -> ArchitectureSplit:
+def create_split(mf: ModelFactory, ds: DataSet, split: int, l: int, o: int, m: int) -> ArchitectureSplit:
     """
     Compiles the dataset, architecture, and options into a split.
     """
     a = Architecture(mf, LOSS[l], OPTIMIZER[o], METRIC[m])
     aset = ArchitectureSet(a, ds)
     return aset.split(split)
+
+
+def create_set(mf: ModelFactory, ds: DataSet, l: int, o: int, m: int) -> None:
+    """
+    Compiles the dataset, architecture, and options into a architecture set.
+    """
+    a = Architecture(mf, LOSS[l], OPTIMIZER[o], METRIC[m])
+    return ArchitectureSet(a, ds)
 
 
 # MODEL FACTORIES
@@ -31,21 +39,23 @@ ccc = Ccc()
 ccrc = CcrCategorical()
 lamem = Lamem()
 
+# ARCHITECTURE-DATASET COMBOS
+MACHINES = [
+    create_set(vgg, ccc, 8, 0, 2),  # 0
+    create_set(vgg1, ccc, 8, 0, 2),  # 1
+    create_set(vgg2, ccc, 8, 0, 2),  # 2
+    create_set(smi, ccr, 14, 0, 0),  # 3
+    create_set(smi, ccr, 14, 7, 0),  # 4
+    create_set(smi1, ccrc, 14, 0, 0),  # 5
+    create_set(smi, lamem, 14, 0, 0)  # 6
+]
+
 # PREPARE DATASETS
 # ccc.prepare()
 # ccr.prepare()
 # ccrc.prepare()
-lamem.prepare()
-
-# ARCHITECTURE-DATASET COMBOS
-# archisplit = create(vgg, ccc, 1, 8, 0, 2)
-# archisplit = create(vgg1, ccc, 1, 8, 0, 2)
-# archisplit = create(vgg2, ccc, 1, 8, 0, 2)
-# archisplit = create(smi, ccr, 1, 14, 0, 0)
-# archisplit = create(smi, ccr, 1, 14, 7, 0)
-# archisplit = create(smi1, ccrc, 1, 14, 0, 0)
-archisplit = create(smi, lamem, 1, 14, 0, 0)
+# lamem.prepare()
 
 # RUN
-# archisplit.create(100, 5)
-archisplit.train()
+for m in MACHINES:
+    m.train_all(100, 5)
