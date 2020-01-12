@@ -85,7 +85,7 @@ class Lamem(DataSet):
         """
         Produce NumPy files from the dataset data files.
         """
-        for i in range(1, self.SPLITS+1):
+        for i in range(1, self.SPLITS + 1):
             for j in self._phases:
                 self._prep_data_file(i, j)
         return
