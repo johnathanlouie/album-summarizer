@@ -40,15 +40,13 @@ ccrc = CcrCategorical()
 lamem = Lamem()
 
 # ARCHITECTURE-DATASET COMBOS
-MACHINES = [
-    create_set(vgg, ccc, 8, 0, 2),  # 0
-    create_set(vgg1, ccc, 8, 0, 2),  # 1
-    create_set(vgg2, ccc, 8, 0, 2),  # 2
-    create_set(smi, ccr, 14, 0, 0),  # 3
-    create_set(smi, ccr, 14, 7, 0),  # 4
-    create_set(smi1, ccrc, 14, 0, 0),  # 5
-    create_set(smi, lamem, 14, 0, 0)  # 6
-]
+# create_set(vgg, ccc, 8, 0, 2)
+# create_set(vgg1, ccc, 8, 0, 2)
+# create_set(vgg2, ccc, 8, 0, 2)
+# create_set(smi, ccr, 14, 0, 0)
+# create_set(smi, ccr, 14, 7, 0)
+# create_set(smi1, ccrc, 14, 0, 0)
+# create_set(smi, lamem, 14, 0, 0)
 
 # PREPARE DATASETS
 # ccc.prepare()
@@ -57,5 +55,14 @@ MACHINES = [
 # lamem.prepare()
 
 # RUN
-for m in MACHINES:
-    m.train_all(100, 5)
+# create_split(vgg2, ccc, 0, 8, 0, 2).train2(100, 5)
+# create_split(vgg2, ccc, 1, 8, 0, 2).train2(100, 5)
+# create_split(vgg2, ccc, 2, 8, 0, 2).train2(100, 5)
+# create_split(vgg2, ccc, 3, 8, 0, 2).train2(100, 5)
+# create_split(vgg2, ccc, 4, 8, 0, 2).train2(100, 5)
+
+# create_split(smi1, ccrc, 0, 14, 0, 0)
+# create_split(smi1, ccrc, 1, 14, 0, 0)
+# create_split(smi1, ccrc, 2, 14, 0, 0)
+# create_split(smi1, ccrc, 3, 14, 0, 0)
+# create_split(smi1, ccrc, 4, 14, 0, 0)
