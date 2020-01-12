@@ -360,7 +360,7 @@ class ArchitectureSet(object):
         return ArchitectureSplit(self._architecture, self._dataset.split(num), self._dataset.class_names)
 
     def train_all(self, epochs: int = 2**64, patience: int = 5) -> None:
-        splits = [self.split(i) for i in range(self._dataset.SPLITS)]
-        for split in splits:
-            split.train2(epochs, patience)
+        for i in range(self._dataset.SPLITS):
+            print("Split %d/%d" % (i, self._dataset.SPLITS - 1))
+            self.split(i).train2(epochs, patience)
         return
