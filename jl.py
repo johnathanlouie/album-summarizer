@@ -340,3 +340,18 @@ def list_files(directory: Url) -> List[Url]:
         for f in filenames:
             a.append(abspath(join(path, f)))
     return a
+
+
+def jpeg_filter(url: Url) -> bool:
+    """
+    Returns true if a URL is a JPEG.
+    """
+    url = url.lower()
+    return url.endswith('.jpg') or url.endswith('.jpeg')
+
+
+def jpeg_only(urls: List[Url]) -> List[Url]:
+    """
+    Filters out all non-JPEG files and returns a new list.
+    """
+    return list(filter(jpeg_filter, urls))
