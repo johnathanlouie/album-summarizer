@@ -1,6 +1,6 @@
 from csv import reader
 from os import getcwd, makedirs, walk
-from os.path import abspath, dirname, isfile, join
+from os.path import abspath, dirname, isdir, isfile, join
 from time import time
 from typing import Any, Dict, List, Tuple, Union
 
@@ -342,16 +342,28 @@ def list_files(directory: Url) -> List[Url]:
     return a
 
 
-def jpeg_filter(url: Url) -> bool:
+class ImageDirectory(object):
     """
-    Returns true if a URL is a JPEG.
+    Represents a directory and its subdirectories containing image files.
     """
-    url = url.lower()
-    return url.endswith('.jpg') or url.endswith('.jpeg')
 
+    def __init__(self, url: Url) -> None:
+        if not isdir(url):
+            raise NotADirectoryError
+        self._url = url
 
-def jpeg_only(urls: List[Url]) -> List[Url]:
-    """
-    Filters out all non-JPEG files and returns a new list.
-    """
-    return list(filter(jpeg_filter, urls))
+    @staticmethod
+    def jpeg_filter(url: Url) -> bool:
+        """
+        Returns true if a URL is a JPEG.
+        """
+        url = url.lower()
+        return url.endswith('.jpg') or url.endswith('.jpeg')
+
+    def jpeg(self) -> List[Url]:
+        """
+        Returns a list of JPEG files from this directory.
+        """
+        files = list_files(self._url)
+        images = list(filter(self.jpeg_filter, files))
+        return images
