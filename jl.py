@@ -1,7 +1,8 @@
 import csv
 import os
 import time
-from os.path import isfile
+from os import getcwd, makedirs, walk
+from os.path import abspath, dirname, isfile, join
 from typing import Any, Dict, List, Tuple, Union
 
 from numpy import asarray, load, ndarray, save, zeros
@@ -329,3 +330,14 @@ def resize_imgs2(src_list: List[Url], dst_list: List[Url]) -> None:
         cv.imwrite(dst, img2)
     print('done')
     return
+
+
+def list_files(directory: Url) -> List[Url]:
+    """
+    Returns the URLs of all the files in the directory and its subdirectories.
+    """
+    a = list()
+    for path, _, filenames in walk(directory):
+        for f in filenames:
+            a.append(abspath(join(path, f)))
+    return a
