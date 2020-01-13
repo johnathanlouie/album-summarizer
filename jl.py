@@ -1,8 +1,7 @@
-import csv
-import os
-import time
+from csv import reader
 from os import getcwd, makedirs, walk
 from os.path import abspath, dirname, isfile, join
+from time import time
 from typing import Any, Dict, List, Tuple, Union
 
 from numpy import asarray, load, ndarray, save, zeros
@@ -143,11 +142,11 @@ def absurl2(url: Url) -> Url:
     """
     Creates a URL for resized photos.
     """
-    cwd = os.getcwd()
-    url = os.path.abspath(url)
+    cwd = getcwd()
+    url = abspath(url)
     url = url.replace(cwd, '')
-    url = os.path.join('resize', url)
-    url = os.path.abspath(url)
+    url = join('resize', url)
+    url = abspath(url)
     return url
 
 
@@ -155,8 +154,8 @@ def mkdirs(filename: Url) -> None:
     """
     Makes directories given Windows style path.
     """
-    name = os.path.dirname(filename)
-    os.makedirs(name, exist_ok=True)
+    name = dirname(filename)
+    makedirs(name, exist_ok=True)
     return
 
 
@@ -252,13 +251,13 @@ class Stopwatch(object):
     """
 
     def __init__(self):
-        self._start = time.time()
+        self._start = time()
 
     def elapsed(self) -> float:
         """
         Returns the time since instance creation in seconds.
         """
-        return time.time() - self._start
+        return time() - self._start
 
     def print(self) -> None:
         """
@@ -272,7 +271,7 @@ class Stopwatch(object):
         """
         Resets the elapsed time.
         """
-        self._start = time.time()
+        self._start = time()
         return
 
 
@@ -289,8 +288,8 @@ class Csv(object):
         Reads CSV file to a list.
         """
         with open(self._url, 'r') as f:
-            reader = csv.reader(f)
-            your_list = list(reader)
+            r = reader(f)
+            your_list = list(r)
         return your_list
 
     def get_col(self, n: int) -> List[str]:
