@@ -136,7 +136,7 @@ class Ccc(Cc):
 
     def _y(self) -> ndarray:
         """
-        Returns the Y. To be implemented by subclass.
+        Returns the Y as one hot arrays.
         """
         data_file = CcDataFile()
         y = asarray(data_file.category_as_int())
@@ -160,7 +160,7 @@ class Ccr(Cc):
 
     def _y(self) -> ndarray:
         """
-        Returns the Y. To be implemented by subclass.
+        Returns the Y as integers.
         """
         data_file = CcDataFile()
         y = asarray(data_file.rating())
@@ -182,7 +182,7 @@ class CcrCategorical(Cc):
 
     def _y(self) -> ndarray:
         """
-        Returns the Y. To be implemented by subclass.
+        Returns the Y as one hot arrays.
         """
         data_file = CcDataFile()
         y = data_file.rating()
