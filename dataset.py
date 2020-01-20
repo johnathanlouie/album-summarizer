@@ -5,7 +5,7 @@ from keras.utils import to_categorical
 from numpy import ndarray
 from sklearn.model_selection import train_test_split
 
-from jl import ArrayLike, Number, npload, npsave
+from jl import ArrayLike, Number, npexists, npload, npsave
 
 
 class XY(Enum):
@@ -59,6 +59,12 @@ class DataSetXY(object):
         """
         return npload(self)
 
+    def exists(self) -> bool:
+        """
+        Returns true if the file exists.
+        """
+        return npexists(self)
+
 
 class DataSetPhase(object):
     """
@@ -88,6 +94,16 @@ class DataSetPhase(object):
         Gets the input y from this phase.
         """
         return self._get_xy(XY.Y)
+
+    def exists(self) -> bool:
+        """
+        Returns true if all files exist.
+        """
+        if not self.x().exists():
+            return False
+        if not self.y().exists():
+            return False
+        return True
 
 
 class DataSetSplit(object):
@@ -123,6 +139,18 @@ class DataSetSplit(object):
         Gets the validation phase from this split.
         """
         return self._get_phase(Phase.VALIDATION)
+
+    def exists(self) -> bool:
+        """
+        Returns true if all files exist.
+        """
+        if not self.train().exists():
+            return False
+        if not self.test().exists():
+            return False
+        if not self.validation().exists():
+            return False
+        return True
 
 
 class DataSet(object):
@@ -197,3 +225,12 @@ class DataSet(object):
         Returns the human readable name of the classes.
         """
         raise NotImplementedError
+
+    def exists(self) -> bool:
+        """
+        Returns true if the dataset was already prepared.
+        """
+        for i in range(self.SPLITS):
+            if not self.split(i).exists():
+                return False
+        return True

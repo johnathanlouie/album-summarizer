@@ -91,6 +91,13 @@ def npload(name: str) -> ArrayLike:
     return load("out/%s.npy" % name)
 
 
+def npexists(name: str) -> bool:
+    """
+    Returns true if the file exists.
+    """
+    return isfile("out/%s.npy" % name)
+
+
 def readimg(imglist: List[Url]) -> ndarray:
     """
     Loads an array of images.
