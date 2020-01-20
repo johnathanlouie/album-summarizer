@@ -1,8 +1,9 @@
 from csv import reader
 from os import getcwd, makedirs, walk
 from os.path import abspath, dirname, isdir, isfile, join
+from random import sample
 from time import time
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from numpy import asarray, load, ndarray, save, zeros
 
@@ -342,6 +343,14 @@ def list_files(directory: Url) -> List[Url]:
     return a
 
 
+def random_sample(population: List[Any], k: Optional[int] = None) -> List[Any]:
+    if k == None:
+        return population
+    if k > len(population) or k < 0:
+        raise ValueError
+    return sample(population, k)
+
+
 class ImageDirectory(object):
     """
     Represents a directory and its subdirectories containing image files.
@@ -360,10 +369,11 @@ class ImageDirectory(object):
         url = url.lower()
         return url.endswith('.jpg') or url.endswith('.jpeg')
 
-    def jpeg(self) -> List[Url]:
+    def jpeg(self, k: Optional[int] = None) -> List[Url]:
         """
         Returns a list of JPEG files from this directory.
         """
         files = list_files(self._url)
         images = list(filter(self.jpeg_filter, files))
+        images = random_sample(images, k)
         return images
