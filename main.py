@@ -1,3 +1,5 @@
+from argparse import ArgumentParser, Namespace
+
 import aaa
 from archidata import ArchitectureSet, ArchitectureSplit
 from cc import Ccc, Ccr, CcrCategorical
@@ -17,7 +19,7 @@ def create_split(mf: ModelFactory, ds: DataSet, split: int, l: int, o: int, m: i
     return aset.split(split)
 
 
-def create_set(mf: ModelFactory, ds: DataSet, l: int, o: int, m: int) -> None:
+def create_set(mf: ModelFactory, ds: DataSet, l: int, o: int, m: int) -> ArchitectureSet:
     """
     Compiles the dataset, architecture, and options into a architecture set.
     """
@@ -25,13 +27,40 @@ def create_set(mf: ModelFactory, ds: DataSet, l: int, o: int, m: int) -> None:
     return ArchitectureSet(a, ds)
 
 
-# MODEL FACTORIES
-vgg = Vgg16A()
-vgg1 = Vgg16B()
-vgg2 = Vgg16C()
-smi = Smi13()
-smi1 = Smi13_1()
-smi2 = Smi13_2()
+ARCHITECTURES = {
+    'vgg': Vgg16A(),
+    'vgg1': Vgg16B(),
+    'vgg2': Vgg16C(),
+    'smi': Smi13(),
+    'smi1': Smi13_1(),
+    'smi2': Smi13_2()
+}
+
+DATASETS = {
+    'ccr': Ccr(),
+    'ccc': Ccc(),
+    'ccrc': CcrCategorical(),
+    'lamem': Lamem()
+}
+
+
+def proc_args() -> Namespace:
+    """
+    Parses program arguments.
+    """
+    parser = ArgumentParser(description='Deep learning section of the album summarizer.')
+    parser.add_argument('mode', help='', choices=['train', 'predict'])
+    parser.add_argument('architecture', help='', choices=ARCHITECTURES.keys())
+    parser.add_argument('dataset', help='', choices=DATASETS.keys())
+    parser.add_argument('split', help='', type=int)
+    parser.add_argument('loss', help='', type=int)
+    parser.add_argument('optimizer', help='', type=int)
+    parser.add_argument('metric', help='', type=int)
+    parser.add_argument('-e', '--epochs', help='', type=int, default=100)
+    parser.add_argument('-p', '--patience', help='', type=int, default=5)
+    args = parser.parse_args()
+    return args
+
 
 # DATASETS
 ccr = Ccr()
@@ -39,30 +68,42 @@ ccc = Ccc()
 ccrc = CcrCategorical()
 lamem = Lamem()
 
-# ARCHITECTURE-DATASET COMBOS
-# create_set(vgg, ccc, 8, 0, 2)
-# create_set(vgg1, ccc, 8, 0, 2)
-# create_set(vgg2, ccc, 8, 0, 2)
-# create_set(smi, ccr, 14, 0, 0)
-# create_set(smi, ccr, 14, 7, 0)
-# create_set(smi1, ccrc, 14, 0, 0)
-# create_set(smi, lamem, 14, 0, 0)
-
 # PREPARE DATASETS
 # ccc.prepare()
 # ccr.prepare()
 # ccrc.prepare()
 # lamem.prepare()
 
-# RUN
-# create_split(vgg2, ccc, 0, 8, 0, 2).train2(100, 5)
-# create_split(vgg2, ccc, 1, 8, 0, 2).train2(100, 5)
-# create_split(vgg2, ccc, 2, 8, 0, 2).train2(100, 5)
-# create_split(vgg2, ccc, 3, 8, 0, 2).train2(100, 5)
-# create_split(vgg2, ccc, 4, 8, 0, 2).train2(100, 5)
 
-# create_split(smi1, ccrc, 0, 14, 0, 0)
-# create_split(smi1, ccrc, 1, 14, 0, 0)
-# create_split(smi1, ccrc, 2, 14, 0, 0)
-# create_split(smi1, ccrc, 3, 14, 0, 0)
-# create_split(smi1, ccrc, 4, 14, 0, 0)
+def main() -> None:
+    """
+    Starts the program.
+    """
+    args = proc_args()
+    mode = args.mode
+    architecture = ARCHITECTURES[args.architecture]
+    dataset = DATASETS[args.dataset]
+    epochs = args.epochs
+    patience = args.patience
+    x = create_split(
+        architecture,
+        dataset,
+        args.split,
+        args.loss,
+        args.optimizer,
+        args.metric
+    )
+    if mode == 'train':
+        x.train2(epochs, patience)
+    elif mode == 'validate':
+        x.validate2(epochs, patience)
+    elif mode == 'test':
+        x.test2(epochs, patience)
+    elif mode == 'predict':
+        x.predict2(epochs, patience)
+    else:
+        raise Exception
+    return
+
+
+main()
