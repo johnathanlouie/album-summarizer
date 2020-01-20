@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, Namespace
 
 import aaa
+from anifood import CccafDataSet
 from archidata import ArchitectureSet, ArchitectureSplit
 from cc import Ccc, Ccr, CcrCategorical
 from classifier import Vgg16A, Vgg16B, Vgg16C
@@ -40,7 +41,8 @@ DATASETS = {
     'ccr': Ccr(),
     'ccc': Ccc(),
     'ccrc': CcrCategorical(),
-    'lamem': Lamem()
+    'lamem': Lamem(),
+    'cccaf': CccafDataSet()
 }
 
 
@@ -63,16 +65,18 @@ def proc_args() -> Namespace:
 
 
 # DATASETS
-ccr = Ccr()
-ccc = Ccc()
-ccrc = CcrCategorical()
-lamem = Lamem()
+# ccr = Ccr()
+# ccc = Ccc()
+# ccrc = CcrCategorical()
+# lamem = Lamem()
+# cccaf = CccafDataSet()
 
 # PREPARE DATASETS
 # ccc.prepare()
 # ccr.prepare()
 # ccrc.prepare()
 # lamem.prepare()
+# cccaf.prepare()
 
 
 def main() -> None:
