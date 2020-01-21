@@ -16,27 +16,24 @@ ArrayLike = Union[ndarray, List[Any]]
 Image = ndarray
 Number = Union[int, float]
 
-TEXT_CLASSES = 'gen/categ.txt'
-TEXT_PRED = 'gen/pred.txt'
-TEXT_RATE = 'gen/rate.txt'
+TEXT_CLASSES = 'out/categ.txt'
+TEXT_PRED = 'out/pred.txt'
+TEXT_RATE = 'out/rate.txt'
 
-TEXT_CLUSTER_SIFT = 'gen/cl1.txt'
-TEXT_CLUSTER_HISTOGRAM = 'gen/cl2.txt'
-TEXT_CLUSTER_COMBINED = 'gen/cl3.txt'
-TEXT_CLUSTER_COMBINED2 = 'gen/cl4.txt'
+TEXT_CLUSTER_SIFT = 'out/cl1.txt'
+TEXT_CLUSTER_HISTOGRAM = 'out/cl2.txt'
+TEXT_CLUSTER_COMBINED = 'out/cl3.txt'
+TEXT_CLUSTER_COMBINED2 = 'out/cl4.txt'
 
-NPY_CLASSES = 'categ'
-NPY_PHOTOS = 'photos'
-NPY_PHOTOS2 = 'photos2'
-NPY_PRED = 'pred'
-NPY_PREDRATE = 'predrate'
+NPY_CLASSES = 'out/categ'
+NPY_PHOTOS = 'out/photos'
+NPY_PHOTOS2 = 'out/photos2'
+NPY_PRED = 'out/pred'
+NPY_PREDRATE = 'out/predrate'
 NPY_DESC = 'out/desc'
-NPY_RATE = 'rate'
+NPY_RATE = 'out/rate'
 
-H5_CLASSIFIER = 'gen/classifier.h5'
-H5_RATER = 'gen/rater.h5'
-
-JSON_SIMILARITYMATRIX = 'gen/sim.json'
+JSON_SIMILARITYMATRIX = 'out/sim.json'
 
 
 # h = int(640 * 1 / 4)
