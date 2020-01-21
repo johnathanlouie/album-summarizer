@@ -1,7 +1,5 @@
-import jl
-import numpy as np
-import sift
-import histogram
+from jl import (TEXT_CLUSTER_COMBINED, TEXT_CLUSTER_HISTOGRAM,
+                TEXT_CLUSTER_SIFT, ListFile)
 
 
 def numberz(big, lil, radix):
@@ -24,12 +22,10 @@ def combine(a, b):
 
 
 def main():
-    a = jl.readtxt(jl.TEXT_CLUSTER_SIFT)
-    b = jl.readtxt(jl.TEXT_CLUSTER_HISTOGRAM)
-    a = jl.intize(a)
-    b = jl.intize(b)
+    a = ListFile(TEXT_CLUSTER_SIFT).read_as_int()
+    b = ListFile(TEXT_CLUSTER_HISTOGRAM).read_as_int()
     c = combine(a, b)
-    jl.writetxt(jl.TEXT_CLUSTER_COMBINED, c)
+    ListFile(TEXT_CLUSTER_COMBINED).write(c)
     return
 
 
