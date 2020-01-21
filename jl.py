@@ -17,9 +17,6 @@ Image = ndarray
 Number = Union[int, float]
 
 TEXT_CLASSES = 'gen/categ.txt'
-TEXT_URL_RAW = 'gen/url.txt'
-TEXT_URL_PROCESSED = 'gen/url2.txt'
-TEXT_URL_ALBUM = 'gen/url3.txt'
 TEXT_PRED = 'gen/pred.txt'
 TEXT_RATE = 'gen/rate.txt'
 
@@ -33,7 +30,7 @@ NPY_PHOTOS = 'photos'
 NPY_PHOTOS2 = 'photos2'
 NPY_PRED = 'pred'
 NPY_PREDRATE = 'predrate'
-NPY_DESC = 'desc'
+NPY_DESC = 'out/desc'
 NPY_RATE = 'rate'
 
 H5_CLASSIFIER = 'gen/classifier.h5'
