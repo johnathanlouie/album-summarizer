@@ -7,26 +7,33 @@ from sklearn.preprocessing import normalize
 
 import cv2 as cv
 from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_COMBINED2,
-                TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, TEXT_URL_ALBUM,
-                ListFile, intize, npload, npsave, readimg2)
+                TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, Image,
+                ImageDirectory, ListFile, Url, intize, npload, npsave,
+                readimg2)
 
 
 set_printoptions(threshold=nan)
 
 
 def match(a, b):
+    """
+    """
     matcher = cv.BFMatcher_create()
     matches = matcher.knnMatch(a, b, 2)
     return matches
 
 
 def match2(a, b):
+    """
+    """
     matcher = cv.BFMatcher_create()
     matches = matcher.match(a, b)
     return matches
 
 
 def ratio_test(matches):
+    """
+    """
     good = []
     for m, n in matches:
         if m.distance < .75 * n.distance:
@@ -35,6 +42,8 @@ def ratio_test(matches):
 
 
 def ratio_test2(matches):
+    """
+    """
     good = []
     for m in matches:
         if m.distance <= .6:
@@ -43,6 +52,8 @@ def ratio_test2(matches):
 
 
 def ratio_test3(matches):
+    """
+    """
     sim = 0
     for m in matches:
         if m.distance <= .75:
@@ -51,6 +62,8 @@ def ratio_test3(matches):
 
 
 def get_descriptors(imgs):
+    """
+    """
     sift = cv.xfeatures2d.SIFT_create(300)
     a = list()
     for i, v in enumerate(imgs):
@@ -62,16 +75,22 @@ def get_descriptors(imgs):
 
 
 def norm(descs):
+    """
+    """
     return list(map(normalize, descs))
 
 
 def histogram2(labels):
+    """
+    """
     num = amax(labels) + 1
     hist, _ = histogram(labels, num)
     return hist
 
 
 def predict(model, descs):
+    """
+    """
     a = list()
     for i, v in enumerate(descs):
         p = 'pred %d of %d' % (i + 1, len(descs))
@@ -83,6 +102,8 @@ def predict(model, descs):
 
 
 def similarity(a, b):
+    """
+    """
     # x = ratio_test(match(a, b))
     x2 = ratio_test2(match2(a, b))
     # x2 = ratio_test3(match2(a, b))
@@ -91,6 +112,8 @@ def similarity(a, b):
 
 
 def sim_matrix(listofdesc):
+    """
+    """
     a = zeros((len(listofdesc), len(listofdesc)))
     for i, x in enumerate(listofdesc):
         for j, y in enumerate(listofdesc):
@@ -100,6 +123,8 @@ def sim_matrix(listofdesc):
 
 
 def normalize_row(row):
+    """
+    """
     # row2 = np.square(row)
     maxi = amax(row)
     # sec = np.partition(row, -2)[-2]
@@ -114,6 +139,8 @@ def normalize_row(row):
 
 
 def invert_labels(labels):
+    """
+    """
     l = list()
     num = max(labels) + 1
     for _ in range(num):
@@ -124,6 +151,8 @@ def invert_labels(labels):
 
 
 def cluster(desc):
+    """
+    """
     d = norm(desc)
     e = sim_matrix(d)
     q = apply_along_axis(normalize_row, 1, e)
@@ -131,15 +160,20 @@ def cluster(desc):
     return f.labels_
 
 
-def create_desc_file():
-    a = ListFile(TEXT_URL_ALBUM).read()
-    b = readimg2(a)
-    c = get_descriptors(b)
-    npsave(NPY_DESC, c)
+def create_desc_file(url: Url) -> None:
+    """
+    Creates and saves the descriptors of an array of images.
+    """
+    image_urls = ImageDirectory(url).jpeg()
+    images = readimg2(image_urls)
+    descriptors = get_descriptors(images)
+    npsave(NPY_DESC, descriptors)
     return
 
 
-def save_sim_mat():
+def save_sim_mat() -> None:
+    """
+    """
     desc = npload(NPY_DESC)
     d = norm(desc)
     e = sim_matrix(d)
@@ -148,10 +182,9 @@ def save_sim_mat():
     return
 
 
-def main2():
-    # urls = jl.readtxt('url3.txt')
-    # images = jl.readimg2(urls)
-    # descs = get_descriptors(images)
+def main2() -> None:
+    """
+    """
     descs = npload(NPY_DESC)
     labels = ListFile(TEXT_CLUSTER_HISTOGRAM).read_as_int()
     invertedlabels = invert_labels(labels)
@@ -168,20 +201,19 @@ def main2():
     return
 
 
-def main():
-    # a = jl.readtxt('url3.txt')
-    # b = jl.readimg2(a)
-    # c = get_descriptors(b)
-    c = npload(NPY_DESC)
-    f = cluster(c)
-    ListFile(TEXT_CLUSTER_SIFT).write(f)
+def create_cluster() -> None:
+    """
+    Clusters images from SIFT descriptors.
+    Saves them in a list file.
+    """
+    descriptors = npload(NPY_DESC)
+    clusters = cluster(descriptors)
+    ListFile(TEXT_CLUSTER_SIFT).write(clusters)
     return
 
 
-# create_desc_file()
-# main()
+url = 'data/cc/calvin/Calvin Lee-[01_15] Guilin pt1_files'
+create_desc_file(url)
+# create_cluster()
 # main2()
 # save_sim_mat()
-
-# url = 'C:\\Users\\Johnathan Louie\\Downloads\\summarizer\\calvin\\Calvin Lee-[01_15] Guilin pt1_files\\1979657_10204632820873838_1998872105038206053_n.jpg'
-# url2 = 'C:\\Users\\Johnathan Louie\\Downloads\\summarizer\\calvin\\Calvin Lee-[01_15] Guilin pt1_files\\10494820_10204632795473203_4096435618123510312_n.jpg'
