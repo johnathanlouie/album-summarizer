@@ -1,7 +1,7 @@
 from json import dump
 from typing import List
 
-from numpy import (amax, apply_along_axis, histogram, ndarray,
+from numpy import (amax, apply_along_axis, asarray, histogram, ndarray,
                    set_printoptions, zeros)
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
@@ -74,7 +74,8 @@ def get_descriptors(imgs: List[Image], features: int = 300) -> List[ndarray]:
         print(p)
         _, descriptors = sift.detectAndCompute(image=img, mask=None)
         a.append(descriptors)
-    return a
+    a2 = asarray(a)
+    return a2
 
 
 def norm(descs):
@@ -171,6 +172,7 @@ def create_desc_file(url: Url) -> None:
     images = readimg2(image_urls)
     descriptors = get_descriptors(images)
     npsave(NPY_DESC, descriptors)
+    print("Saved descriptors.")
     return
 
 
@@ -209,14 +211,17 @@ def create_cluster() -> None:
     Clusters images from SIFT descriptors.
     Saves them in a list file.
     """
+    print('Loading descriptors....')
     descriptors = npload(NPY_DESC)
+    print('Loaded descriptors.')
     clusters = cluster(descriptors)
     ListFile(TEXT_CLUSTER_SIFT).write(clusters)
+    print('Saved clusters.')
     return
 
 
 url = 'data/cc/calvin/Calvin Lee-[01_15] Guilin pt1_files'
 create_desc_file(url)
-# create_cluster()
+create_cluster()
 # main2()
 # save_sim_mat()
