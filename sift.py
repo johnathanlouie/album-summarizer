@@ -26,7 +26,7 @@ def match2(a, b):
     return matches
 
 
-def ratioTest(matches):
+def ratio_test(matches):
     good = []
     for m, n in matches:
         if m.distance < .75 * n.distance:
@@ -34,7 +34,7 @@ def ratioTest(matches):
     return good
 
 
-def ratioTest2(matches):
+def ratio_test2(matches):
     good = []
     for m in matches:
         if m.distance <= .6:
@@ -42,7 +42,7 @@ def ratioTest2(matches):
     return good
 
 
-def ratioTest3(matches):
+def ratio_test3(matches):
     sim = 0
     for m in matches:
         if m.distance <= .75:
@@ -50,7 +50,7 @@ def ratioTest3(matches):
     return sim
 
 
-def getdescriptors(imgs):
+def get_descriptors(imgs):
     sift = cv.xfeatures2d.SIFT_create(300)
     a = list()
     for i, v in enumerate(imgs):
@@ -83,14 +83,14 @@ def predict(model, descs):
 
 
 def similarity(a, b):
-    # x = ratioTest(match(a, b))
-    x2 = ratioTest2(match2(a, b))
-    # x2 = ratioTest3(match2(a, b))
+    # x = ratio_test(match(a, b))
+    x2 = ratio_test2(match2(a, b))
+    # x2 = ratio_test3(match2(a, b))
     return len(x2)
     # return x2
 
 
-def simmatrix(listofdesc):
+def sim_matrix(listofdesc):
     a = zeros((len(listofdesc), len(listofdesc)))
     for i, x in enumerate(listofdesc):
         for j, y in enumerate(listofdesc):
@@ -99,7 +99,7 @@ def simmatrix(listofdesc):
     return a
 
 
-def normalizerow(row):
+def normalize_row(row):
     # row2 = np.square(row)
     maxi = amax(row)
     # sec = np.partition(row, -2)[-2]
@@ -113,7 +113,7 @@ def normalizerow(row):
     return row / maxi
 
 
-def invertlabels(labels):
+def invert_labels(labels):
     l = list()
     num = max(labels) + 1
     for _ in range(num):
@@ -125,24 +125,24 @@ def invertlabels(labels):
 
 def cluster(desc):
     d = norm(desc)
-    e = simmatrix(d)
-    q = apply_along_axis(normalizerow, 1, e)
+    e = sim_matrix(d)
+    q = apply_along_axis(normalize_row, 1, e)
     f = AffinityPropagation().fit(q)
     return f.labels_
 
 
-def createdescfile():
+def create_desc_file():
     a = ListFile(TEXT_URL_ALBUM).read()
     b = readimg2(a)
-    c = getdescriptors(b)
+    c = get_descriptors(b)
     npsave(NPY_DESC, c)
     return
 
 
-def savesimmat():
+def save_sim_mat():
     desc = npload(NPY_DESC)
     d = norm(desc)
-    e = simmatrix(d)
+    e = sim_matrix(d)
     with open(JSON_SIMILARITYMATRIX, 'w') as file1:
         dump(e.tolist(), file1)
     return
@@ -151,10 +151,10 @@ def savesimmat():
 def main2():
     # urls = jl.readtxt('url3.txt')
     # images = jl.readimg2(urls)
-    # descs = getdescriptors(images)
+    # descs = get_descriptors(images)
     descs = npload(NPY_DESC)
     labels = ListFile(TEXT_CLUSTER_HISTOGRAM).read_as_int()
-    invertedlabels = invertlabels(labels)
+    invertedlabels = invert_labels(labels)
     lastid = 0
     newcluster = [-1] * len(labels)
     for indices in invertedlabels:
@@ -171,17 +171,17 @@ def main2():
 def main():
     # a = jl.readtxt('url3.txt')
     # b = jl.readimg2(a)
-    # c = getdescriptors(b)
+    # c = get_descriptors(b)
     c = npload(NPY_DESC)
     f = cluster(c)
     ListFile(TEXT_CLUSTER_SIFT).write(f)
     return
 
 
-# createdescfile()
+# create_desc_file()
 # main()
 # main2()
-# savesimmat()
+# save_sim_mat()
 
 # url = 'C:\\Users\\Johnathan Louie\\Downloads\\summarizer\\calvin\\Calvin Lee-[01_15] Guilin pt1_files\\1979657_10204632820873838_1998872105038206053_n.jpg'
 # url2 = 'C:\\Users\\Johnathan Louie\\Downloads\\summarizer\\calvin\\Calvin Lee-[01_15] Guilin pt1_files\\10494820_10204632795473203_4096435618123510312_n.jpg'
