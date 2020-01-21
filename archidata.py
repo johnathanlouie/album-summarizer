@@ -3,11 +3,11 @@ from typing import Callable, List, Union
 
 from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
-from numpy import ndarray
+from numpy import asarray, ndarray
 
 from dataholder import DataHolder
 from dataset import DataSet, DataSetSplit
-from jl import ListFile, Url, mkdirs
+from jl import ImageDirectory, ListFile, Url, mkdirs
 from kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
 from model import Architecture, ArchitectureName
 
@@ -198,18 +198,16 @@ class ArchitectureSplit(object):
         self._test(x, y)
         return
 
-    def predict(self) -> None:
+    def predict(self, directory: Url) -> None:
         """
         Predicts using the trained model.
         """
         if not self._is_test_loaded():
             return
         print('Loading test X')
-        x = self._split.test().x().load()
-        print('Loading test Y')
-        y = self._split.test().y().load()
+        x = asarray(ImageDirectory(directory).jpeg())
         print('Prediction sequence')
-        seq = Sequence1(x, y, 10)
+        seq = Sequence1(x, x, 10)
         print('Prediction starts')
         results = self._best_model.predict_generator(generator=seq, verbose=1)
         print('Prediction finished')
@@ -329,7 +327,7 @@ class ArchitectureSplit(object):
         self.test()
         return
 
-    def predict2(self, epochs: int = 2**64, patience: int = 5) -> None:
+    def predict2(self, directory: Url, epochs: int = 2**64, patience: int = 5) -> None:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then predict using the test set.
         """
@@ -337,7 +335,7 @@ class ArchitectureSplit(object):
             self.create(epochs, patience)
         if not self._is_test_loaded():
             self.load_test_model()
-        self.predict()
+        self.predict(directory)
         return
 
 
