@@ -191,8 +191,19 @@ class CcrCategorical(Cc):
         y = self.one_hot(y, 3)
         return y
 
-    def class_names(self, results: List[int]) -> List[Union[str, int]]:
+    def _rate(self, one: float, two: float, three: float) -> float:
+        """
+        Calculates the predicted rating from percentages.
+        """
+        total = one + two + three
+        x1 = 1 * one
+        x2 = 2 * two
+        x3 = 3 * three
+        rate = (x1 + x2 + x3) / total
+        return rate
+
+    def class_names(self, results: ndarray) -> List[float]:
         """
         Returns correct rating.
         """
-        return [i + 1 for i in results]
+        return [self._rate(i[0], i[1], i[2]) for i in results]
