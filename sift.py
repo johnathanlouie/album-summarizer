@@ -1,13 +1,17 @@
-import cv2 as cv
-import numpy as np
+from json import dump
+
+from numpy import (amax, apply_along_axis, histogram, nan, set_printoptions,
+                   zeros)
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
-import jl
-import time
-import json
+
+import cv2 as cv
+from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_COMBINED2,
+                TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, TEXT_URL_ALBUM,
+                ListFile, intize, npload, npsave, readimg2)
 
 
-np.set_printoptions(threshold=np.nan)
+set_printoptions(threshold=nan)
 
 
 def match(a, b):
@@ -61,9 +65,9 @@ def norm(descs):
     return list(map(normalize, descs))
 
 
-def histogram(labels):
-    num = np.amax(labels) + 1
-    hist, _ = np.histogram(labels, num)
+def histogram2(labels):
+    num = amax(labels) + 1
+    hist, _ = histogram(labels, num)
     return hist
 
 
@@ -73,7 +77,7 @@ def predict(model, descs):
         p = 'pred %d of %d' % (i + 1, len(descs))
         print(p)
         b = model.predict(v)
-        c = histogram(b)
+        c = histogram2(b)
         a.append(c)
     return a
 
@@ -87,7 +91,7 @@ def similarity(a, b):
 
 
 def simmatrix(listofdesc):
-    a = np.zeros((len(listofdesc), len(listofdesc)))
+    a = zeros((len(listofdesc), len(listofdesc)))
     for i, x in enumerate(listofdesc):
         for j, y in enumerate(listofdesc):
             sim = similarity(x, y)
@@ -97,7 +101,7 @@ def simmatrix(listofdesc):
 
 def normalizerow(row):
     # row2 = np.square(row)
-    maxi = np.amax(row)
+    maxi = amax(row)
     # sec = np.partition(row, -2)[-2]
     # if sec <= 120:
     # row = row / sec * 300
@@ -120,31 +124,27 @@ def invertlabels(labels):
 
 
 def cluster(desc):
-    start_time = time.time()
     d = norm(desc)
     e = simmatrix(d)
-    q = np.apply_along_axis(normalizerow, 1, e)
+    q = apply_along_axis(normalizerow, 1, e)
     f = AffinityPropagation().fit(q)
-    elapsed_time = time.time() - start_time
-    minutes, sec = divmod(elapsed_time, 60)
-    print('time: %d:%02d' % (minutes, sec))
     return f.labels_
 
 
 def createdescfile():
-    a = jl.readtxt(jl.TEXT_URL_ALBUM)
-    b = jl.readimg2(a)
+    a = ListFile(TEXT_URL_ALBUM).read()
+    b = readimg2(a)
     c = getdescriptors(b)
-    jl.npsave(jl.NPY_DESC, c)
+    npsave(NPY_DESC, c)
     return
 
 
 def savesimmat():
-    desc = jl.npload(jl.NPY_DESC)
+    desc = npload(NPY_DESC)
     d = norm(desc)
     e = simmatrix(d)
-    with open(jl.JSON_SIMILARITYMATRIX, 'w') as file1:
-        json.dump(e.tolist(), file1)
+    with open(JSON_SIMILARITYMATRIX, 'w') as file1:
+        dump(e.tolist(), file1)
     return
 
 
@@ -152,20 +152,19 @@ def main2():
     # urls = jl.readtxt('url3.txt')
     # images = jl.readimg2(urls)
     # descs = getdescriptors(images)
-    descs = jl.npload(jl.NPY_DESC)
-    labels = jl.readtxt(jl.TEXT_CLUSTER_HISTOGRAM)
-    labels = jl.intize(labels)
+    descs = npload(NPY_DESC)
+    labels = ListFile(TEXT_CLUSTER_HISTOGRAM).read_as_int()
     invertedlabels = invertlabels(labels)
     lastid = 0
     newcluster = [-1] * len(labels)
     for indices in invertedlabels:
         subdescs = [descs[i] for i in indices]
         sublabels = cluster(subdescs)
-        lastid = np.amax(sublabels) + 100 + lastid
+        lastid = amax(sublabels) + 100 + lastid
         sublabels = sublabels + lastid
         for x, y in zip(indices, sublabels):
             newcluster[x] = y
-    jl.writetxt(jl.TEXT_CLUSTER_COMBINED2, newcluster)
+    ListFile(TEXT_CLUSTER_COMBINED2).write(newcluster)
     return
 
 
@@ -173,9 +172,9 @@ def main():
     # a = jl.readtxt('url3.txt')
     # b = jl.readimg2(a)
     # c = getdescriptors(b)
-    c = jl.npload(jl.NPY_DESC)
+    c = npload(NPY_DESC)
     f = cluster(c)
-    jl.writetxt(jl.TEXT_CLUSTER_SIFT, f)
+    ListFile(TEXT_CLUSTER_SIFT).write(f)
     return
 
 
