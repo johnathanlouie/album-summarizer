@@ -115,10 +115,17 @@ def similarity(a, b):
     # return x2
 
 
+def empty_matrix(size: int) -> ndarray:
+    """
+    Returns a square matrix filled with zeros.
+    """
+    return zeros((size, size))
+
+
 def sim_matrix(listofdesc):
     """
     """
-    a = zeros((len(listofdesc), len(listofdesc)))
+    a = empty_matrix(len(listofdesc))
     for i, x in enumerate(listofdesc):
         for j, y in enumerate(listofdesc):
             sim = similarity(x, y)
