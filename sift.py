@@ -1,7 +1,8 @@
 from json import dump
+from typing import List
 
-from numpy import (amax, apply_along_axis, histogram, nan, set_printoptions,
-                   zeros)
+from numpy import (amax, apply_along_axis, histogram, ndarray,
+                   set_printoptions, zeros)
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
 
@@ -12,7 +13,7 @@ from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_COMBINED2,
                 readimg2)
 
 
-set_printoptions(threshold=nan)
+set_printoptions(threshold=10000000000)
 
 
 def match(a, b):
@@ -61,16 +62,18 @@ def ratio_test3(matches):
     return sim
 
 
-def get_descriptors(imgs):
+def get_descriptors(imgs: List[Image], features: int = 300) -> List[ndarray]:
     """
+    Returns SIFT descriptors from images.
+    More features helps distinguishing images but adds more bad descriptors.
     """
-    sift = cv.xfeatures2d.SIFT_create(300)
+    sift = cv.xfeatures2d.SIFT_create(nfeatures=features)
     a = list()
-    for i, v in enumerate(imgs):
-        p = 'desc %d of %d' % (i+1, len(imgs))
+    for i, img in enumerate(imgs):
+        p = 'Descriptors %3d / %3d' % (i + 1, len(imgs))
         print(p)
-        _, des = sift.detectAndCompute(v, None)
-        a.append(des)
+        _, descriptors = sift.detectAndCompute(image=img, mask=None)
+        a.append(descriptors)
     return a
 
 
