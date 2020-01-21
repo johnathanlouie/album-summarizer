@@ -215,7 +215,7 @@ class ArchitectureSplit(object):
             if results.shape[1] == 1:  # if results are scalars
                 results = results.flatten()
             else:  # otherwise results are class percentages
-                results = results.argmax(1)  # index of max percentage is answer
+                # results = results.argmax(1)  # index of max percentage is answer
                 results = self._class_names(results)
         else:
             raise Exception
