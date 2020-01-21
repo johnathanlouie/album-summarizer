@@ -82,7 +82,7 @@ def npload(name: str) -> ArrayLike:
     """
     Loads an array-like object from a binary NumPy file.
     """
-    return load("out/%s.npy" % name)
+    return load("out/%s.npy" % name, allow_pickle=True)
 
 
 def npexists(name: str) -> bool:
