@@ -229,10 +229,3 @@ def create_cluster() -> None:
     ListFile(TEXT_CLUSTER_SIFT).write(clusters)
     print('Saved clusters.')
     return
-
-
-# url = 'data/cc/calvin/Calvin Lee-[01_15] Guilin pt1_files'
-# create_desc_file(url)
-# create_cluster()
-# main2()
-# save_sim_mat()
