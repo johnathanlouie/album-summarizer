@@ -9,11 +9,12 @@ from sklearn.preprocessing import normalize
 import cv2 as cv
 from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_COMBINED2,
                 TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, Image,
-                ImageDirectory, ListFile, Url, intize, npload, npsave,
-                readimg2)
+                ImageDirectory, ListFile, Url, npload, npsave, readimg2)
 
 
 set_printoptions(threshold=10000000000)
+Descriptors = ndarray
+Matrix = ndarray
 
 
 def match(a, b):
@@ -62,7 +63,7 @@ def ratio_test3(matches):
     return sim
 
 
-def get_descriptors(imgs: List[Image], features: int = 300) -> List[ndarray]:
+def get_descriptors(imgs: List[Image], features: int = 300) -> List[Descriptors]:
     """
     Returns SIFT descriptors from images.
     More features helps distinguishing images but adds more bad descriptors.
@@ -78,10 +79,11 @@ def get_descriptors(imgs: List[Image], features: int = 300) -> List[ndarray]:
     return a2
 
 
-def norm(descs):
+def norm(descriptors: List[Descriptors]) -> List[Descriptors]:
     """
+    Scales input vectors individually to unit norm (vector length).
     """
-    return list(map(normalize, descs))
+    return list(map(normalize, descriptors))
 
 
 def histogram2(labels):
@@ -108,33 +110,59 @@ def predict(model, descs):
 def similarity(a, b):
     """
     """
-    # x = ratio_test(match(a, b))
-    x2 = ratio_test2(match2(a, b))
-    # x2 = ratio_test3(match2(a, b))
-    return len(x2)
-    # return x2
+    m = match(a, b)
+    x = ratio_test(m)
+    return len(x)
 
 
-def empty_matrix(size: int) -> ndarray:
+def similarity2(a, b):
+    """
+    """
+    m = match2(a, b)
+    x = ratio_test2(m)
+    return len(x)
+
+
+def similarity3(a, b):
+    """
+    """
+    m = match2(a, b)
+    x = ratio_test3(m)
+    return len(x)
+
+
+def empty_matrix(size: int) -> Matrix:
     """
     Returns a square matrix filled with zeros.
     """
-    return zeros((size, size))
+    dim = (size, size)
+    return zeros(dim)
 
 
-def sim_matrix(listofdesc):
+def sim_matrix(descriptors: List[Descriptors]) -> Matrix:
     """
+    Prepares a similarity matrix.
+    Each XY entry is a numerical value of how similar X is to Y.
     """
-    a = empty_matrix(len(listofdesc))
-    for i, x in enumerate(listofdesc):
-        for j, y in enumerate(listofdesc):
-            sim = similarity(x, y)
-            a[i, j] = sim
-    return a
+    matrix = empty_matrix(len(descriptors))
+    for x, d1 in enumerate(descriptors):
+        for y, d2 in enumerate(descriptors):
+            matrix[x, y] = similarity2(d1, d2)
+    return matrix
+
+
+def scale_row(row: ndarray) -> ndarray:
+    """
+    Scales a 1D array between 0 and 1.
+    """
+    max_ = amax(row)
+    row2 = row / max_
+    return row2
 
 
 def normalize_row(row):
     """
+    Old version of scale_row.
     """
     # row2 = np.square(row)
     maxi = amax(row)
@@ -161,25 +189,27 @@ def invert_labels(labels):
     return l
 
 
-def cluster(desc):
+def cluster(descriptors: List[Descriptors]) -> List[int]:
     """
+    Groups images together by how similar their descriptors are.
+    Returns a cluster ID for each set of descriptors.
     """
-    print('Normalizing....')
-    d = norm(desc)
+    print('Normalizing descriptors to unit vectors....')
+    d = norm(descriptors)
     print('Similarity matrix....')
-    e = sim_matrix(d)
-    print('Second normalization....')
-    q = apply_along_axis(normalize_row, 1, e)
-    print('Clustering....')
-    f = AffinityPropagation().fit(q)
-    return f.labels_
+    sm = sim_matrix(d)
+    print('Scaling each row of the similarity matrix....')
+    sm2 = apply_along_axis(scale_row, 1, sm)
+    print('Clustering by affinity propagation....')
+    ap = AffinityPropagation().fit(sm2)
+    return ap.labels_.tolist()
 
 
-def create_descriptors(url: Url) -> None:
+def create_descriptors(directory: Url) -> None:
     """
     Creates and saves the descriptors of an array of images.
     """
-    image_urls = ImageDirectory(url).jpeg()
+    image_urls = ImageDirectory(directory).jpeg()
     images = readimg2(image_urls)
     descriptors = get_descriptors(images)
     npsave(NPY_DESC, descriptors)
