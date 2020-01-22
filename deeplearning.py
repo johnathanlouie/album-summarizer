@@ -36,7 +36,7 @@ class DeepLearningFactory(object):
         Compiles the dataset, architecture, and options into a architecture set.
         """
         a = Architecture(cls.ARCHITECTURES[mf], LOSS[l], OPTIMIZER[o], METRIC[m])
-        return ArchitectureSet(a, ds)
+        return ArchitectureSet(a, cls.DATASETS[ds])
 
     @classmethod
     def create_split(cls, mf: str, ds: str, split: int, l: int, o: int, m: int) -> ArchitectureSplit:
