@@ -1,11 +1,12 @@
-from sift import create_desc_file, create_cluster
 from argparse import ArgumentParser, Namespace
-from main import create_split
-from jl import Url, mkdirs, ImageDirectory, ListFile, TEXT_CLUSTER_SIFT
-import cv2
-from rater import Smi13_1
-from cc import CcrCategorical
 from typing import List
+
+import cv2
+from cc import CcrCategorical
+from deeplearning import DeepLearningFactory
+from jl import TEXT_CLUSTER_SIFT, ImageDirectory, ListFile, Url, mkdirs
+from rater import Smi13_1
+from sift import create_cluster, create_desc_file
 
 
 def copy_img(image: Url, destination: Url) -> None:
@@ -73,7 +74,7 @@ class ClusterRank(object):
             self._best[c].update_if_better(i, r)
         return
 
-    def copy_images(self)->None:
+    def copy_images(self) -> None:
         """
         Makes a copy of each image in this summarized collection to a new location.
         """
@@ -88,7 +89,7 @@ def main():
     url = args.directory
     create_desc_file(url)
     create_cluster()
-    s = create_split(Smi13_1(), CcrCategorical(), 0, 14, 0, 0)
+    s = DeepLearningFactory.create_split('smi1', 'ccrc', 0, 14, 0, 0)
     s.predict2(url)
     print('Loading clusters....')
     clusters = ListFile(TEXT_CLUSTER_SIFT).read_as_int()
