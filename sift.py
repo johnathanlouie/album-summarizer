@@ -164,9 +164,13 @@ def invert_labels(labels):
 def cluster(desc):
     """
     """
+    print('Normalizing....')
     d = norm(desc)
+    print('Similarity matrix....')
     e = sim_matrix(d)
+    print('Second normalization....')
     q = apply_along_axis(normalize_row, 1, e)
+    print('Clustering....')
     f = AffinityPropagation().fit(q)
     return f.labels_
 
@@ -227,8 +231,8 @@ def create_cluster() -> None:
     return
 
 
-url = 'data/cc/calvin/Calvin Lee-[01_15] Guilin pt1_files'
-create_desc_file(url)
-create_cluster()
+# url = 'data/cc/calvin/Calvin Lee-[01_15] Guilin pt1_files'
+# create_desc_file(url)
+# create_cluster()
 # main2()
 # save_sim_mat()
