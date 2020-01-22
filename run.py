@@ -55,7 +55,9 @@ def main():
     create_desc_file(url)
     create_cluster()
     clusters = ListFile(TEXT_CLUSTER_SIFT).read_as_int()
-    best = [ImageRating()] * cluster_number(clusters)
+    best = [ImageRating() for _ in range(cluster_number(clusters))]
+    for i, v in enumerate(best):
+        print(i, v.rating, v.image)
     s = create_split(Smi13_1(), CcrCategorical(), 0, 14, 0, 0)
     s.predict2(url)
     print('Loading rates....')
@@ -63,7 +65,11 @@ def main():
     images = ImageDirectory(url).jpeg()
     print('Ranking results....')
     for c, r, i in zip(clusters, rates, images):
-        if r > best[c].rating:
+        # print("Cluster %2d\t%.6f\t%s" % (c, r, i))
+        # print(best[c].rating)
+        # print(best[c].image)
+        if best[c].rating < r:
+            print('Replaced best.')
             best[c].image = i
             best[c].rating = r
     print('Making summarized album at out/summarized....')
