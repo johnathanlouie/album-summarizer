@@ -175,7 +175,7 @@ def cluster(desc):
     return f.labels_
 
 
-def create_desc_file(url: Url) -> None:
+def create_descriptors(url: Url) -> None:
     """
     Creates and saves the descriptors of an array of images.
     """
