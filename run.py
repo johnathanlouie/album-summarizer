@@ -1,11 +1,10 @@
 from argparse import ArgumentParser, Namespace
 from typing import List
 
+import aaa
 import cv2
-from cc import CcrCategorical
 from deeplearning import DeepLearningFactory
 from jl import TEXT_CLUSTER_SIFT, ImageDirectory, ListFile, Url, mkdirs
-from rater import Smi13_1
 from sift import create_cluster, create_desc_file
 
 
