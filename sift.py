@@ -1,14 +1,13 @@
 from json import dump
 from typing import List
 
-from numpy import (amax, apply_along_axis, asarray, histogram, ndarray,
-                   set_printoptions, zeros)
+from numpy import (amax, apply_along_axis, asarray, ndarray, set_printoptions,
+                   zeros)
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
 
 import cv2
-from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_COMBINED2,
-                TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, Image,
+from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_SIFT, Image,
                 ImageDirectory, ListFile, Number, Url, npload, npsave,
                 readimg2)
 
@@ -81,27 +80,6 @@ def norm(descriptors: List[Descriptors]) -> List[Descriptors]:
     Scales input vectors individually to unit norm (vector length).
     """
     return list(map(normalize, descriptors))
-
-
-def histogram2(labels):
-    """
-    """
-    num = amax(labels) + 1
-    hist, _ = histogram(labels, num)
-    return hist
-
-
-def predict(model, descs):
-    """
-    """
-    a = list()
-    for i, v in enumerate(descs):
-        p = 'pred %d of %d' % (i + 1, len(descs))
-        print(p)
-        b = model.predict(v)
-        c = histogram2(b)
-        a.append(c)
-    return a
 
 
 def similarity(a: Descriptors, b: Descriptors) -> Number:
@@ -189,18 +167,6 @@ def normalize_row(row: ndarray) -> ndarray:
     return row / maxi
 
 
-def invert_labels(labels):
-    """
-    """
-    l = list()
-    num = max(labels) + 1
-    for _ in range(num):
-        l.append(list())
-    for i, v in enumerate(labels):
-        l[v].append(i)
-    return l
-
-
 def cluster(descriptors: List[Descriptors]) -> List[int]:
     """
     Groups images together by how similar their descriptors are.
@@ -231,31 +197,13 @@ def create_descriptors(directory: Url) -> None:
 
 def save_sim_mat() -> None:
     """
+    Saves the similarity matrix as a JSON file.
     """
-    desc = npload(NPY_DESC)
-    d = norm(desc)
-    e = sim_matrix(d)
-    with open(JSON_SIMILARITYMATRIX, 'w') as file1:
-        dump(e.tolist(), file1)
-    return
-
-
-def main2() -> None:
-    """
-    """
-    descs = npload(NPY_DESC)
-    labels = ListFile(TEXT_CLUSTER_HISTOGRAM).read_as_int()
-    invertedlabels = invert_labels(labels)
-    lastid = 0
-    newcluster = [-1] * len(labels)
-    for indices in invertedlabels:
-        subdescs = [descs[i] for i in indices]
-        sublabels = cluster(subdescs)
-        lastid = amax(sublabels) + 100 + lastid
-        sublabels = sublabels + lastid
-        for x, y in zip(indices, sublabels):
-            newcluster[x] = y
-    ListFile(TEXT_CLUSTER_COMBINED2).write(newcluster)
+    d1 = npload(NPY_DESC)
+    d2 = norm(d1)
+    sm = sim_matrix(d2)
+    with open(JSON_SIMILARITYMATRIX, 'w') as f:
+        dump(sm.tolist(), f)
     return
 
 
