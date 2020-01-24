@@ -6,10 +6,11 @@ from numpy import (amax, apply_along_axis, asarray, histogram, ndarray,
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
 
-import cv2 as cv
+import cv2
 from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_COMBINED2,
                 TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, Image,
-                ImageDirectory, ListFile, Url, npload, npsave, readimg2)
+                ImageDirectory, ListFile, Number, Url, npload, npsave,
+                readimg2)
 
 
 set_printoptions(threshold=10000000000)
@@ -17,24 +18,29 @@ Descriptors = ndarray
 Matrix = ndarray
 
 
-def match(a, b):
+def match(a: Descriptors, b: Descriptors) -> List[List[cv2.DMatch]]:
     """
+    For each descriptor in the first set, this matcher finds the closest descriptor in the second set by trying each one.
+    Finds the k best matches for each descriptor from a query set.
     """
-    matcher = cv.BFMatcher_create()
-    matches = matcher.knnMatch(a, b, 2)
+    matcher = cv2.BFMatcher_create()
+    matches = matcher.knnMatch(queryDescriptors=a, trainDescriptors=b, k=2)
     return matches
 
 
-def match2(a, b):
+def match2(a: Descriptors, b: Descriptors) -> List[cv2.DMatch]:
     """
+    For each descriptor in the first set, this matcher finds the closest descriptor in the second set by trying each one.
+    Finds the best match for each descriptor from a query set.
     """
-    matcher = cv.BFMatcher_create()
-    matches = matcher.match(a, b)
+    matcher = cv2.BFMatcher_create()
+    matches = matcher.match(queryDescriptors=a, trainDescriptors=b)
     return matches
 
 
-def ratio_test(matches):
+def ratio_test(matches: List[List[cv2.DMatch]]) -> List[cv2.DMatch]:
     """
+    Filters out false matches by David Lowe's ratio test.
     """
     good = []
     for m, n in matches:
@@ -43,8 +49,9 @@ def ratio_test(matches):
     return good
 
 
-def ratio_test2(matches):
+def ratio_test2(matches: List[cv2.DMatch]) -> List[cv2.DMatch]:
     """
+    Filters out false matches by my variation of David Lowe's ratio test.
     """
     good = []
     for m in matches:
@@ -53,22 +60,12 @@ def ratio_test2(matches):
     return good
 
 
-def ratio_test3(matches):
-    """
-    """
-    sim = 0
-    for m in matches:
-        if m.distance <= .75:
-            sim = sim + 1 - m.distance
-    return sim
-
-
 def get_descriptors(imgs: List[Image], features: int = 300) -> List[Descriptors]:
     """
     Returns SIFT descriptors from images.
     More features helps distinguishing images but adds more bad descriptors.
     """
-    sift = cv.xfeatures2d.SIFT_create(nfeatures=features)
+    sift = cv2.xfeatures2d.SIFT_create(nfeatures=features)
     a = list()
     for i, img in enumerate(imgs):
         p = 'Descriptors %3d / %3d' % (i + 1, len(imgs))
@@ -107,28 +104,43 @@ def predict(model, descs):
     return a
 
 
-def similarity(a, b):
+def similarity(a: Descriptors, b: Descriptors) -> Number:
     """
+    Returns a measure of how similar two images (sets of descriptors) are.
+    Uses K nearest neighbor to match key points between images.
+    Filters out false matches by Lowe's ratio test.
+    The number of true matches are returned.
     """
     m = match(a, b)
     x = ratio_test(m)
     return len(x)
 
 
-def similarity2(a, b):
+def similarity2(a: Descriptors, b: Descriptors) -> Number:
     """
+    Returns a measure of how similar two images (sets of descriptors) are.
+    Uses brute force matching to match key points between images.
+    Filters out false matches by a ratio test.
+    The number of true matches are returned.
     """
     m = match2(a, b)
     x = ratio_test2(m)
     return len(x)
 
 
-def similarity3(a, b):
+def similarity3(a: Descriptors, b: Descriptors) -> Number:
     """
+    Returns a measure of how similar two images (sets of descriptors) are.
+    Uses brute force matching to match key points between images.
+    Returns the sum of the closeness between true matches.
     """
-    m = match2(a, b)
-    x = ratio_test3(m)
-    return len(x)
+    matches = match2(a, b)
+    sim = 0
+    for m in matches:
+        if m.distance <= .75:
+            closeness = 1 - m.distance
+            sim = sim + closeness
+    return sim
 
 
 def empty_matrix(size: int) -> Matrix:
@@ -160,7 +172,7 @@ def scale_row(row: ndarray) -> ndarray:
     return row2
 
 
-def normalize_row(row):
+def normalize_row(row: ndarray) -> ndarray:
     """
     Old version of scale_row.
     """
