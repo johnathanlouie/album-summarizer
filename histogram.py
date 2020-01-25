@@ -4,8 +4,8 @@ from numpy import concatenate, ndarray, reshape, vstack
 from sklearn.cluster import MeanShift
 
 import cv2
-from jl import (TEXT_CLUSTER_HISTOGRAM, Image, ImageDirectory, ListFile,
-                Stopwatch, Url, hsv, hsvlist, read_image, readimg2)
+from jl import (TEXT_CLUSTER_HISTOGRAM, ImageDirectory, ListFile, ProgressBar,
+                Url, hsv, read_image)
 
 
 Histogram = ndarray
@@ -71,19 +71,19 @@ class HsvHistogram(object):
         return histogram / pixels
 
 
-def scaled_hsv_histogram(image: Url) -> Histogram:
-    """
-    Returns a scaled histogram of the HSV space of an image.
-    """
-    hh = HsvHistogram(image)
-    return HsvHistogram.scale(hh.hsv(), hh.size())
-
-
 def cluster(images: List[Url], bandwidth: float) -> List[int]:
     """
     """
-    c = [scaled_hsv_histogram(i) for i in images]
+    c = list()
+    pb = ProgressBar(len(images))
+    print('Creating histograms....')
+    for i in images:
+        hh = HsvHistogram(i)
+        histogram = HsvHistogram.scale(hh.hsv(), hh.size())
+        c.append(histogram)
+        pb.update()
     d = vstack(c)
+    print('Clustering....')
     ms = MeanShift(bandwidth)
     ms.fit(d)
     results = ms.labels_.tolist()
@@ -95,9 +95,8 @@ def main(directory: Url) -> None:
     """
     print('Reading image directory....')
     images = ImageDirectory(directory).jpeg()
-    print('Clustering....')
     c = cluster(images, .09)
-    print('Saving....')
+    print('Saving results....')
     ListFile(TEXT_CLUSTER_HISTOGRAM).write(c)
     return
 
