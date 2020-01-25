@@ -5,39 +5,84 @@ from sklearn.cluster import MeanShift
 
 import cv2
 from jl import (TEXT_CLUSTER_HISTOGRAM, Image, ImageDirectory, ListFile,
-                Stopwatch, Url, hsvlist, readimg2)
+                Stopwatch, Url, hsv, hsvlist, read_image, readimg2)
 
 
-def calchist(img: Image, channel: int, range: int) -> ndarray:
-    """
-    """
-    histogram = cv2.calcHist(images=[img], channels=[channel], mask=None, histSize=[range], ranges=[0, range])
-    histogram2 = reshape(histogram, (histogram.size))
-    return histogram2
+Histogram = ndarray
 
 
-def scale_histogram(histogram: ndarray, height: int, width: int) -> ndarray:
+class HsvHistogram(object):
     """
+    hue-saturation-value
     """
-    pixels = height * width
-    return histogram / pixels
+
+    def __init__(self, image: Url) -> None:
+        self._url = image
+        self._image = hsv(read_image(image))
+        return
+
+    def _histogram(self, channel: int, range: int) -> Histogram:
+        """
+        Returns the histogram from one of the HSV channels.
+        """
+        histogram = cv2.calcHist(images=[self._image], channels=[channel], mask=None, histSize=[range], ranges=[0, range])
+        histogram2 = reshape(histogram, (histogram.size))
+        return histogram2
+
+    def hue(self) -> Histogram:
+        """
+        Returns the histogram from the hue channel.
+        """
+        return self._histogram(0, 180)
+
+    def saturation(self) -> Histogram:
+        """
+        Returns the histogram from the saturation channel.
+        """
+        return self._histogram(1, 256)
+
+    def value(self) -> Histogram:
+        """
+        Returns the histogram from the value channel.
+        """
+        return self._histogram(2, 256)
+
+    def hsv(self) -> Histogram:
+        """
+        Returns the combined histogram from all HSV channels.
+        """
+        h1 = self.hue()
+        h2 = self.saturation()
+        h3 = self.value()
+        h = concatenate((h1, h2, h3))
+        return h
+
+    def size(self) -> int:
+        """
+        Returns the size of the image in numbers of pixels.
+        """
+        height, width, _ = self._image.shape
+        return height * width
+
+    @staticmethod
+    def scale(histogram: Histogram, pixels: int) -> Histogram:
+        """
+        """
+        return histogram / pixels
 
 
-def cluster(images: List[Image], bandwidth: float) -> List[int]:
+def scaled_hsv_histogram(image: Url) -> Histogram:
+    """
+    Returns a scaled histogram of the HSV space of an image.
+    """
+    hh = HsvHistogram(image)
+    return HsvHistogram.scale(hh.hsv(), hh.size())
+
+
+def cluster(images: List[Url], bandwidth: float) -> List[int]:
     """
     """
-    c = list()
-    for i in images:
-        h, w, _ = i.shape
-        x1 = calchist(i, 0, 180)
-        x2 = calchist(i, 1, 256)
-        x3 = calchist(i, 2, 256)
-        c1 = scale_histogram(x1, h, w)
-        c2 = scale_histogram(x2, h, w)
-        c3 = scale_histogram(x3, h, w)
-        c4 = concatenate((c1, c2, c3))
-        c.append(c4)
-        # c.append(c1)
+    c = [scaled_hsv_histogram(i) for i in images]
     d = vstack(c)
     ms = MeanShift(bandwidth)
     ms.fit(d)
@@ -49,13 +94,9 @@ def main(directory: Url) -> None:
     """
     """
     print('Reading image directory....')
-    image_urls = ImageDirectory(directory).jpeg()
-    print('Loading images....')
-    images = readimg2(image_urls)
-    print('Converting images to hue-saturation-value representation....')
-    images2 = hsvlist(images)
+    images = ImageDirectory(directory).jpeg()
     print('Clustering....')
-    c = cluster(images2, .09)
+    c = cluster(images, .09)
     print('Saving....')
     ListFile(TEXT_CLUSTER_HISTOGRAM).write(c)
     return
