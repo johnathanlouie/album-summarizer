@@ -92,32 +92,28 @@ def npexists(name: str) -> bool:
     return isfile("out/%s.npy" % name)
 
 
-def readimg(imglist: List[Url]) -> ndarray:
+def read_image(url: Url) -> Image:
+    return cv.imread(url, cv.IMREAD_COLOR)
+
+
+def readimg(urls: List[Url]) -> ndarray:
     """
     Loads an array of images.
-
-    :param list<str> imglist: List of URLs of images.
-    :returns ndarray: Array of images.
+    Images must be uniformly sized.
     """
-    size = len(imglist)
-    l = ndarray(res3(size))
-    for i, v in enumerate(imglist):
-        print(v)
-        l[i] = cv.imread(v, cv.IMREAD_COLOR)
+    count = len(urls)
+    l = ndarray(res3(count))
+    for i, url in enumerate(urls):
+        print(url)
+        l[i] = read_image(url)
     return l
 
 
-def readimg2(imglist: List[Url]) -> List[Image]:
+def readimg2(urls: List[Url]) -> List[Image]:
     """
     Loads a list of images.
-
-    :param list<str> imglist: List of URLs of images.
-    :returns list<ndarray>: List of images.
     """
-    l = list()
-    for v in imglist:
-        l.append(cv.imread(v, cv.IMREAD_COLOR))
-    return l
+    return [read_image(i) for i in urls]
 
 
 def hsv(img: Image) -> Image:
