@@ -374,3 +374,36 @@ class ImageDirectory(object):
         images = list(filter(self.jpeg_filter, files))
         images = random_sample(images, k)
         return images
+
+
+class ProgressBar(object):
+    """
+    A progress bar for loops.
+    """
+
+    def __init__(self, count: int) -> None:
+        self._iteration = 0
+        self._total = count
+        self._print(0, count)
+        return
+
+    @staticmethod
+    def _print(iteration, total, prefix='Progress:', suffix='Complete', decimals=1, length=100, fill='\u2588', print_end='\r') -> None:
+        """
+        Prints the progress bar.
+        """
+        percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+        filledLength = int(length * iteration // total)
+        bar = fill * filledLength + '-' * (length - filledLength)
+        print("\r%s |%s| %s%% %s" % (prefix, bar, percent, suffix), end=print_end)
+        if iteration == total:
+            print()
+        return
+
+    def update(self) -> None:
+        """
+        Updates the progress bar and then prints.
+        """
+        self._iteration = self._iteration + 1
+        self._print(self._iteration, self._total)
+        return
