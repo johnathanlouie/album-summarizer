@@ -179,8 +179,8 @@ def cluster(descriptors: List[Descriptors]) -> List[int]:
     print('Scaling each row of the similarity matrix....')
     sm2 = apply_along_axis(scale_row, 1, sm)
     print('Clustering by affinity propagation....')
-    ap = AffinityPropagation().fit(sm2)
-    return ap.labels_.tolist()
+    results = AffinityPropagation().fit_predict(sm2).tolist()
+    return results
 
 
 def create_descriptors(directory: Url) -> None:

@@ -83,10 +83,8 @@ def cluster(images: List[Url], bandwidth: float) -> List[int]:
         c.append(histogram)
         pb.update()
     d = vstack(c)
-    print('Clustering....')
-    ms = MeanShift(bandwidth)
-    ms.fit(d)
-    results = ms.labels_.tolist()
+    print('Clustering by mean shift....')
+    results = MeanShift(bandwidth).fit_predict(d).tolist()
     return results
 
 
