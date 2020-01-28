@@ -8,8 +8,8 @@ from sklearn.preprocessing import normalize
 
 import cv2
 from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_SIFT, Image,
-                ImageDirectory, ListFile, Number, Url, npload, npsave,
-                readimg2)
+                ImageDirectory, ListFile, Number, ProgressBar, Url, npload,
+                npsave, readimg2)
 
 
 set_printoptions(threshold=10000000000)
@@ -24,11 +24,11 @@ def get_descriptors(imgs: List[Image], features: int = 300) -> List[Descriptors]
     """
     sift = cv2.xfeatures2d.SIFT_create(nfeatures=features)
     a = list()
-    for i, img in enumerate(imgs):
-        p = 'Descriptors %3d / %3d' % (i + 1, len(imgs))
-        print(p)
+    pb = ProgressBar(len(imgs))
+    for img in imgs:
         _, descriptors = sift.detectAndCompute(image=img, mask=None)
         a.append(descriptors)
+        pb.update()
     a2 = asarray(a)
     return a2
 
@@ -79,6 +79,7 @@ def create_descriptors(directory: Url) -> None:
     """
     image_urls = ImageDirectory(directory).jpeg()
     images = readimg2(image_urls)
+    print("Creating descriptors from images....")
     descriptors = get_descriptors(images)
     npsave(NPY_DESC, descriptors)
     print("Saved descriptors.")
@@ -212,10 +213,13 @@ class SimilarityMatrix(object):
     """
 
     def __init__(self, descriptors: List[Descriptors], algorithm: Similarity) -> None:
-        matrix = self.empty_matrix(len(descriptors))
+        num = len(descriptors)
+        matrix = self.empty_matrix(num)
+        pb = ProgressBar(num * num)
         for x, d1 in enumerate(descriptors):
             for y, d2 in enumerate(descriptors):
                 matrix[x, y] = algorithm.compute(d1, d2)
+                pb.update()
         self.matrix = matrix
         return
 
