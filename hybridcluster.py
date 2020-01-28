@@ -1,41 +1,30 @@
+from typing import List
+
 from numpy import amax, histogram
 
+from cluster import ImageCluster
+from histogram import HistogramCluster
 from jl import (NPY_DESC, TEXT_CLUSTER_COMBINED, TEXT_CLUSTER_COMBINED2,
-                TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, ListFile, npload)
-from sift import cluster
+                TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, ListFile, Url,
+                npload)
+from sift import SiftCluster
 
 
-def numberz(big, lil, radix):
-    return big * radix + lil
+class HybridCluster(ImageCluster):
+    """
+    """
 
+    def run(self, directory: Url) -> List[int]:
+        """
+        """
+        sift = SiftCluster().run(directory)
+        histogram = HistogramCluster().run(directory)
+        radix = max(sift) + 1
+        return [self.combine(s, h, radix) for s, h in zip(sift, histogram)]
 
-def numberz2(a, b, c):
-    return a * 1000 + b
-
-
-def numberz3(a, b):
-    return "%d,%d" % (a, b)
-
-
-def combine(a, b):
-    c = list()
-    for i, j in zip(a, b):
-        c.append(numberz3(i, j))
-    return c
-
-
-def main():
-    a = ListFile(TEXT_CLUSTER_SIFT).read_as_int()
-    b = ListFile(TEXT_CLUSTER_HISTOGRAM).read_as_int()
-    c = combine(a, b)
-    ListFile(TEXT_CLUSTER_COMBINED).write(c)
-    return
-
-
-# sift.createdescfile()
-# sift.main()
-# histogram.main()
-# main()
+    @staticmethod
+    def combine(big, lil, radix):
+        return big * radix + lil
 
 
 def histogram2(labels):
