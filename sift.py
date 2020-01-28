@@ -1,15 +1,14 @@
 from json import dump
 from typing import List
 
-from numpy import (amax, apply_along_axis, asarray, ndarray, set_printoptions,
-                   zeros)
+from numpy import amax, apply_along_axis, ndarray, set_printoptions, zeros
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
 
 import cv2
-from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_SIFT, Image,
-                ImageDirectory, ListFile, Number, ProgressBar, Url, npload,
-                npsave, read_image, readimg2)
+from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_SIFT,
+                ImageDirectory, ListFile, Number, ProgressBar, Url, npsave,
+                read_image)
 
 
 set_printoptions(threshold=10000000000)
