@@ -245,4 +245,7 @@ class SimilarityMatrix(object):
         return row2
 
     def scale(self):
+        """
+        Scales the similarity matrix row by row.
+        """
         self.matrix = apply_along_axis(self.scale_row, 1, self.matrix)
