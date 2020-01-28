@@ -17,48 +17,6 @@ Descriptors = ndarray
 Matrix = ndarray
 
 
-def match(a: Descriptors, b: Descriptors) -> List[List[cv2.DMatch]]:
-    """
-    For each descriptor in the first set, this matcher finds the closest descriptor in the second set by trying each one.
-    Finds the k best matches for each descriptor from a query set.
-    """
-    matcher = cv2.BFMatcher_create()
-    matches = matcher.knnMatch(queryDescriptors=a, trainDescriptors=b, k=2)
-    return matches
-
-
-def match2(a: Descriptors, b: Descriptors) -> List[cv2.DMatch]:
-    """
-    For each descriptor in the first set, this matcher finds the closest descriptor in the second set by trying each one.
-    Finds the best match for each descriptor from a query set.
-    """
-    matcher = cv2.BFMatcher_create()
-    matches = matcher.match(queryDescriptors=a, trainDescriptors=b)
-    return matches
-
-
-def ratio_test(matches: List[List[cv2.DMatch]]) -> List[cv2.DMatch]:
-    """
-    Filters out false matches by David Lowe's ratio test.
-    """
-    good = []
-    for m, n in matches:
-        if m.distance < .75 * n.distance:
-            good.append(m)
-    return good
-
-
-def ratio_test2(matches: List[cv2.DMatch]) -> List[cv2.DMatch]:
-    """
-    Filters out false matches by my variation of David Lowe's ratio test.
-    """
-    good = []
-    for m in matches:
-        if m.distance <= .6:
-            good.append(m)
-    return good
-
-
 def get_descriptors(imgs: List[Image], features: int = 300) -> List[Descriptors]:
     """
     Returns SIFT descriptors from images.
@@ -82,77 +40,9 @@ def norm(descriptors: List[Descriptors]) -> List[Descriptors]:
     return list(map(normalize, descriptors))
 
 
-def similarity(a: Descriptors, b: Descriptors) -> Number:
-    """
-    Returns a measure of how similar two images (sets of descriptors) are.
-    Uses K nearest neighbor to match key points between images.
-    Filters out false matches by Lowe's ratio test.
-    The number of true matches are returned.
-    """
-    m = match(a, b)
-    x = ratio_test(m)
-    return len(x)
-
-
-def similarity2(a: Descriptors, b: Descriptors) -> Number:
-    """
-    Returns a measure of how similar two images (sets of descriptors) are.
-    Uses brute force matching to match key points between images.
-    Filters out false matches by a ratio test.
-    The number of true matches are returned.
-    """
-    m = match2(a, b)
-    x = ratio_test2(m)
-    return len(x)
-
-
-def similarity3(a: Descriptors, b: Descriptors) -> Number:
-    """
-    Returns a measure of how similar two images (sets of descriptors) are.
-    Uses brute force matching to match key points between images.
-    Returns the sum of the closeness between true matches.
-    """
-    matches = match2(a, b)
-    sim = 0
-    for m in matches:
-        if m.distance <= .75:
-            closeness = 1 - m.distance
-            sim = sim + closeness
-    return sim
-
-
-def empty_matrix(size: int) -> Matrix:
-    """
-    Returns a square matrix filled with zeros.
-    """
-    dim = (size, size)
-    return zeros(dim)
-
-
-def sim_matrix(descriptors: List[Descriptors]) -> Matrix:
-    """
-    Prepares a similarity matrix.
-    Each XY entry is a numerical value of how similar X is to Y.
-    """
-    matrix = empty_matrix(len(descriptors))
-    for x, d1 in enumerate(descriptors):
-        for y, d2 in enumerate(descriptors):
-            matrix[x, y] = similarity2(d1, d2)
-    return matrix
-
-
-def scale_row(row: ndarray) -> ndarray:
-    """
-    Scales a 1D array between 0 and 1.
-    """
-    max_ = amax(row)
-    row2 = row / max_
-    return row2
-
-
 def normalize_row(row: ndarray) -> ndarray:
     """
-    Old version of scale_row.
+    Old version of SimilarityMatrix.scale_row.
     """
     # row2 = np.square(row)
     maxi = amax(row)
@@ -175,11 +65,11 @@ def cluster(descriptors: List[Descriptors]) -> List[int]:
     print('Normalizing descriptors to unit vectors....')
     d = norm(descriptors)
     print('Similarity matrix....')
-    sm = sim_matrix(d)
+    sm = SimilarityMatrix(d, Similarity2())
     print('Scaling each row of the similarity matrix....')
-    sm2 = apply_along_axis(scale_row, 1, sm)
+    sm.scale()
     print('Clustering by affinity propagation....')
-    results = AffinityPropagation().fit_predict(sm2).tolist()
+    results = AffinityPropagation().fit_predict(sm.matrix).tolist()
     return results
 
 
@@ -195,18 +85,6 @@ def create_descriptors(directory: Url) -> None:
     return
 
 
-def save_sim_mat() -> None:
-    """
-    Saves the similarity matrix as a JSON file.
-    """
-    d1 = npload(NPY_DESC)
-    d2 = norm(d1)
-    sm = sim_matrix(d2)
-    with open(JSON_SIMILARITYMATRIX, 'w') as f:
-        dump(sm.tolist(), f)
-    return
-
-
 def create_cluster() -> None:
     """
     Clusters images from SIFT descriptors.
@@ -219,3 +97,152 @@ def create_cluster() -> None:
     ListFile(TEXT_CLUSTER_SIFT).write(clusters)
     print('Saved clusters.')
     return
+
+
+class Similarity(object):
+    """
+    Abstract class for computing similarity between images.
+    """
+
+    def compute(self, a: Descriptors, b: Descriptors) -> Number:
+        """
+        Returns a measure of how similar two images (sets of descriptors) are.
+        To be implemented by subclasses.
+        """
+        raise NotImplementedError
+
+
+class Similarity1(Similarity):
+    """
+    Uses K nearest neighbor to match key points between images.
+    Filters out false matches by Lowe's ratio test.
+    The number of true matches are returned.
+    """
+
+    @staticmethod
+    def match(a: Descriptors, b: Descriptors) -> List[List[cv2.DMatch]]:
+        """
+        For each descriptor in the first set, this matcher finds the closest descriptor in the second set by trying each one.
+        Finds the k best matches for each descriptor from a query set.
+        """
+        matcher = cv2.BFMatcher_create()
+        matches = matcher.knnMatch(queryDescriptors=a, trainDescriptors=b, k=2)
+        return matches
+
+    @staticmethod
+    def ratio_test(matches: List[List[cv2.DMatch]]) -> List[cv2.DMatch]:
+        """
+        Filters out false matches by David Lowe's ratio test.
+        """
+        good = []
+        for m, n in matches:
+            if m.distance < .75 * n.distance:
+                good.append(m)
+        return good
+
+    def compute(self, a: Descriptors, b: Descriptors) -> Number:
+        """
+        Returns a measure of how similar two images (sets of descriptors) are.
+        """
+        m = self.match(a, b)
+        x = self.ratio_test(m)
+        return len(x)
+
+
+class Similarity2(Similarity):
+    """
+    Uses brute force matching to match key points between images.
+    Filters out false matches by a ratio test.
+    The number of true matches are returned.
+    """
+
+    @staticmethod
+    def match(a: Descriptors, b: Descriptors) -> List[cv2.DMatch]:
+        """
+        For each descriptor in the first set, this matcher finds the closest descriptor in the second set by trying each one.
+        Finds the best match for each descriptor from a query set.
+        """
+        matcher = cv2.BFMatcher_create()
+        matches = matcher.match(queryDescriptors=a, trainDescriptors=b)
+        return matches
+
+    @staticmethod
+    def ratio_test(matches: List[cv2.DMatch]) -> List[cv2.DMatch]:
+        """
+        Filters out false matches by my variation of David Lowe's ratio test.
+        """
+        good = []
+        for m in matches:
+            if m.distance <= .6:
+                good.append(m)
+        return good
+
+    def compute(self, a: Descriptors, b: Descriptors) -> Number:
+        """
+        Returns a measure of how similar two images (sets of descriptors) are.
+        """
+        m = self.match(a, b)
+        x = self.ratio_test(m)
+        return len(x)
+
+
+class Similarity3(Similarity2):
+    """
+    Uses brute force matching to match key points between images.
+    Returns the sum of the closeness between true matches.
+    """
+
+    def compute(self, a: Descriptors, b: Descriptors) -> Number:
+        """
+        Returns a measure of how similar two images (sets of descriptors) are.
+        """
+        matches = self.match(a, b)
+        sim = 0
+        for m in matches:
+            if m.distance <= .75:
+                closeness = 1 - m.distance
+                sim = sim + closeness
+        return sim
+
+
+class SimilarityMatrix(object):
+    """
+    A square array.
+    Each XY entry is a numerical value of how similar X is to Y.
+    """
+
+    def __init__(self, descriptors: List[Descriptors], algorithm: Similarity) -> None:
+        matrix = self.empty_matrix(len(descriptors))
+        for x, d1 in enumerate(descriptors):
+            for y, d2 in enumerate(descriptors):
+                matrix[x, y] = algorithm.compute(d1, d2)
+        self.matrix = matrix
+        return
+
+    @staticmethod
+    def empty_matrix(size: int) -> Matrix:
+        """
+        Returns a square matrix filled with zeros.
+        """
+        dim = (size, size)
+        return zeros(dim)
+
+    def save_as_json(self, url: Url = JSON_SIMILARITYMATRIX) -> None:
+        """
+        Saves the similarity matrix as a JSON file.
+        """
+        with open(url, 'w') as f:
+            dump(self.matrix.tolist(), f)
+        return
+
+    @staticmethod
+    def scale_row(row: ndarray) -> ndarray:
+        """
+        Scales a 1D array between 0 and 1.
+        """
+        max_ = amax(row)
+        row2 = row / max_
+        return row2
+
+    def scale(self):
+        self.matrix = apply_along_axis(self.scale_row, 1, self.matrix)
