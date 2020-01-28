@@ -48,34 +48,6 @@ def cluster(descriptors: List[Descriptors]) -> List[int]:
     return results
 
 
-def create_descriptors(directory: Url) -> None:
-    """
-    Creates and saves the descriptors of an array of images.
-    """
-    images = ImageDirectory(directory).jpeg()
-    print("Creating descriptors from images....")
-    sds = SiftDescriptorSet(images)
-    print('Normalizing descriptors to unit vectors....')
-    sds.unit_normalize()
-    sds.save()
-    print("Saved descriptors.")
-    return
-
-
-def create_cluster() -> None:
-    """
-    Clusters images from SIFT descriptors.
-    Saves them in a list file.
-    """
-    print('Loading descriptors....')
-    descriptors = npload(NPY_DESC)
-    print('Loaded descriptors.')
-    clusters = cluster(descriptors)
-    ListFile(TEXT_CLUSTER_SIFT).write(clusters)
-    print('Saved clusters.')
-    return
-
-
 class Similarity(object):
     """
     Abstract class for computing similarity between images.
@@ -261,3 +233,20 @@ class SiftDescriptorSet(object):
         """
         npsave(url, self.descriptors)
         return
+
+
+def sift_cluster(directory: Url) -> None:
+    """
+    Creates descriptors of images.
+    Clusters images from SIFT descriptors.
+    Saves them in a list file.
+    """
+    images = ImageDirectory(directory).jpeg()
+    print("Creating descriptors from images....")
+    sds = SiftDescriptorSet(images)
+    print('Normalizing descriptors to unit vectors....')
+    sds.unit_normalize()
+    clusters = cluster(sds.descriptors)
+    ListFile(TEXT_CLUSTER_SIFT).write(clusters)
+    print('Saved clusters.')
+    return

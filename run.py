@@ -5,7 +5,7 @@ import aaa
 import cv2
 from deeplearning import DeepLearningFactory
 from jl import TEXT_CLUSTER_SIFT, ImageDirectory, ListFile, Url, mkdirs
-from sift import create_cluster, create_descriptors
+from sift import sift_cluster
 
 
 def copy_img(image: Url, destination: Url) -> None:
@@ -86,8 +86,7 @@ class ClusterRank(object):
 def main():
     args = proc_args()
     url = args.directory
-    create_descriptors(url)
-    create_cluster()
+    sift_cluster(url)
     s = DeepLearningFactory.create_split('smi1', 'ccrc', 0, 14, 0, 0)
     s.predict2(url)
     print('Loading clusters....')
