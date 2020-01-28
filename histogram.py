@@ -4,8 +4,8 @@ from numpy import concatenate, ndarray, reshape, vstack
 from sklearn.cluster import MeanShift
 
 import cv2
-from jl import (TEXT_CLUSTER_HISTOGRAM, ImageDirectory, ListFile, ProgressBar,
-                Url, hsv, read_image)
+from cluster import ImageCluster
+from jl import ImageDirectory, ProgressBar, Url, hsv, read_image
 
 
 Histogram = ndarray
@@ -71,32 +71,30 @@ class HsvHistogram(object):
         return histogram / pixels
 
 
-def cluster(images: List[Url], bandwidth: float) -> List[int]:
+class HistogramCluster(ImageCluster):
     """
     """
-    c = list()
-    pb = ProgressBar(len(images))
-    print('Creating histograms....')
-    for i in images:
-        hh = HsvHistogram(i)
-        histogram = HsvHistogram.scale(hh.hsv(), hh.size())
-        c.append(histogram)
-        pb.update()
-    d = vstack(c)
-    print('Clustering by mean shift....')
-    results = MeanShift(bandwidth).fit_predict(d).tolist()
-    return results
 
+    def run(self, directory: Url) -> List[int]:
+        """
+        """
+        print('Reading image directory....')
+        images = ImageDirectory(directory).jpeg()
+        return self.cluster(images)
 
-def main(directory: Url) -> None:
-    """
-    """
-    print('Reading image directory....')
-    images = ImageDirectory(directory).jpeg()
-    c = cluster(images, .09)
-    print('Saving results....')
-    ListFile(TEXT_CLUSTER_HISTOGRAM).write(c)
-    return
-
-
-# main()
+    @staticmethod
+    def cluster(images: List[Url], bandwidth: float = .09) -> List[int]:
+        """
+        """
+        c = list()
+        pb = ProgressBar(len(images))
+        print('Creating histograms....')
+        for i in images:
+            hh = HsvHistogram(i)
+            histogram = HsvHistogram.scale(hh.hsv(), hh.size())
+            c.append(histogram)
+            pb.update()
+        d = vstack(c)
+        print('Clustering by mean shift....')
+        results = MeanShift(bandwidth).fit_predict(d).tolist()
+        return results
