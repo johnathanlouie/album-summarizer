@@ -17,23 +17,6 @@ Descriptors = ndarray
 Matrix = ndarray
 
 
-def normalize_row(row: ndarray) -> ndarray:
-    """
-    Old version of SimilarityMatrix.scale_row.
-    """
-    # row2 = np.square(row)
-    maxi = amax(row)
-    # sec = np.partition(row, -2)[-2]
-    # if sec <= 120:
-    # row = row / sec * 300
-    # row[row >= 300] = 0
-    # asd = row / maxi
-    # print(asd)
-    # return row / sec
-    # return np.sqrt(row)
-    return row / maxi
-
-
 def cluster(descriptors: List[Descriptors]) -> List[int]:
     """
     Groups images together by how similar their descriptors are.
