@@ -34,11 +34,7 @@ def cluster_number(a: List[int]) -> int:
     """
     Returns the number of clusters in the clusters text file.
     """
-    max_ = -1
-    for i in a:
-        if i > max_:
-            max_ = i
-    return max_ + 1
+    return max(a) + 1
 
 
 class ImageRating(object):
