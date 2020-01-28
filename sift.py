@@ -9,35 +9,12 @@ from sklearn.preprocessing import normalize
 import cv2
 from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_SIFT, Image,
                 ImageDirectory, ListFile, Number, ProgressBar, Url, npload,
-                npsave, readimg2)
+                npsave, read_image, readimg2)
 
 
 set_printoptions(threshold=10000000000)
 Descriptors = ndarray
 Matrix = ndarray
-
-
-def get_descriptors(imgs: List[Image], features: int = 300) -> List[Descriptors]:
-    """
-    Returns SIFT descriptors from images.
-    More features helps distinguishing images but adds more bad descriptors.
-    """
-    sift = cv2.xfeatures2d.SIFT_create(nfeatures=features)
-    a = list()
-    pb = ProgressBar(len(imgs))
-    for img in imgs:
-        _, descriptors = sift.detectAndCompute(image=img, mask=None)
-        a.append(descriptors)
-        pb.update()
-    a2 = asarray(a)
-    return a2
-
-
-def norm(descriptors: List[Descriptors]) -> List[Descriptors]:
-    """
-    Scales input vectors individually to unit norm (vector length).
-    """
-    return list(map(normalize, descriptors))
 
 
 def normalize_row(row: ndarray) -> ndarray:
@@ -62,10 +39,8 @@ def cluster(descriptors: List[Descriptors]) -> List[int]:
     Groups images together by how similar their descriptors are.
     Returns a cluster ID for each set of descriptors.
     """
-    print('Normalizing descriptors to unit vectors....')
-    d = norm(descriptors)
     print('Similarity matrix....')
-    sm = SimilarityMatrix(d, Similarity2())
+    sm = SimilarityMatrix(descriptors, Similarity2())
     print('Scaling each row of the similarity matrix....')
     sm.scale()
     print('Clustering by affinity propagation....')
@@ -77,11 +52,12 @@ def create_descriptors(directory: Url) -> None:
     """
     Creates and saves the descriptors of an array of images.
     """
-    image_urls = ImageDirectory(directory).jpeg()
-    images = readimg2(image_urls)
+    images = ImageDirectory(directory).jpeg()
     print("Creating descriptors from images....")
-    descriptors = get_descriptors(images)
-    npsave(NPY_DESC, descriptors)
+    sds = SiftDescriptorSet(images)
+    print('Normalizing descriptors to unit vectors....')
+    sds.unit_normalize()
+    sds.save()
     print("Saved descriptors.")
     return
 
@@ -253,3 +229,35 @@ class SimilarityMatrix(object):
         Scales the similarity matrix row by row.
         """
         self.matrix = apply_along_axis(self.scale_row, 1, self.matrix)
+
+
+class SiftDescriptorSet(object):
+    """
+    Returns SIFT descriptors from images.
+    More features helps distinguishing images but adds more bad descriptors.
+    """
+
+    def __init__(self, images: List[Url], features: int = 300) -> None:
+        sift = cv2.xfeatures2d.SIFT_create(nfeatures=features)
+        a = list()
+        pb = ProgressBar(len(images))
+        for url in images:
+            image = read_image(url)
+            _, descriptors = sift.detectAndCompute(image=image, mask=None)
+            a.append(descriptors)
+            pb.update()
+        self.descriptors = a
+
+    def unit_normalize(self) -> None:
+        """
+        Scales input vectors individually to unit norm (vector length).
+        """
+        self.descriptors = list(map(normalize, self.descriptors))
+        return
+
+    def save(self, url: Url = NPY_DESC) -> None:
+        """
+        Saves descriptors to a NumPy file.
+        """
+        npsave(url, self.descriptors)
+        return
