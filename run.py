@@ -4,7 +4,8 @@ from typing import List
 import aaa
 import cv2
 from deeplearning import DeepLearningFactory
-from jl import TEXT_CLUSTER_SIFT, ImageDirectory, ListFile, Url, mkdirs
+from jl import (TEXT_CLUSTER_SIFT, ImageDirectory, ListFile, ProgressBar, Url,
+                mkdirs)
 from sift import sift_cluster
 
 
@@ -77,9 +78,10 @@ class ClusterRank(object):
         """
         Makes a copy of each image in this summarized collection to a new location.
         """
+        pb = ProgressBar(len(self._best))
         for cluster, image_rating in enumerate(self._best):
-            print("Image %2d / %d" % (cluster + 1, len(self._best)))
             copy_img(image_rating.image, cluster)
+            pb.update()
         return
 
 
