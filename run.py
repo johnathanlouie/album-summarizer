@@ -4,9 +4,8 @@ from typing import List
 import aaa
 import cv2
 from deeplearning import DeepLearningFactory
-from jl import (TEXT_CLUSTER_SIFT, ImageDirectory, ListFile, ProgressBar, Url,
-                mkdirs)
-from sift import sift_cluster
+from jl import ImageDirectory, ListFile, ProgressBar, Url, mkdirs
+from sift import SiftCluster
 
 
 def copy_img(image: Url, destination: Url) -> None:
@@ -84,11 +83,9 @@ class ClusterRank(object):
 def main():
     args = proc_args()
     url = args.directory
-    sift_cluster(url)
+    clusters = SiftCluster().run(url)
     s = DeepLearningFactory.create_split('smi1', 'ccrc', 0, 14, 0, 0)
     s.predict2(url)
-    print('Loading clusters....')
-    clusters = ListFile(TEXT_CLUSTER_SIFT).read_as_int()
     print('Loading rates....')
     rates = ListFile(s.name().predictions()).read_as_floats()
     print('Loading images....')

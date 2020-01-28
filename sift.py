@@ -6,28 +6,14 @@ from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
 
 import cv2
-from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, TEXT_CLUSTER_SIFT,
-                ImageDirectory, ListFile, Number, ProgressBar, Url, npsave,
-                read_image)
+from cluster import ImageCluster
+from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, ImageDirectory, Number,
+                ProgressBar, Url, npsave, read_image)
 
 
 set_printoptions(threshold=10000000000)
 Descriptors = ndarray
 Matrix = ndarray
-
-
-def cluster(descriptors: List[Descriptors]) -> List[int]:
-    """
-    Groups images together by how similar their descriptors are.
-    Returns a cluster ID for each set of descriptors.
-    """
-    print('Similarity matrix....')
-    sm = SimilarityMatrix(descriptors, Similarity2())
-    print('Scaling each row of the similarity matrix....')
-    sm.scale()
-    print('Clustering by affinity propagation....')
-    results = AffinityPropagation().fit_predict(sm.matrix).tolist()
-    return results
 
 
 class Similarity(object):
@@ -217,18 +203,26 @@ class SiftDescriptorSet(object):
         return
 
 
-def sift_cluster(directory: Url) -> None:
+class SiftCluster(ImageCluster):
     """
-    Creates descriptors of images.
     Clusters images from SIFT descriptors.
-    Saves them in a list file.
     """
-    images = ImageDirectory(directory).jpeg()
-    print("Creating descriptors from images....")
-    sds = SiftDescriptorSet(images)
-    print('Normalizing descriptors to unit vectors....')
-    sds.unit_normalize()
-    clusters = cluster(sds.descriptors)
-    ListFile(TEXT_CLUSTER_SIFT).write(clusters)
-    print('Saved clusters.')
-    return
+
+    def run(self, directory: Url) -> List[int]:
+        """
+        Creates descriptors of images.
+        Groups images together by how similar their descriptors are.
+        Returns a cluster ID for each set of descriptors.
+        """
+        images = ImageDirectory(directory).jpeg()
+        print("Creating descriptors from images....")
+        sds = SiftDescriptorSet(images)
+        print('Normalizing descriptors to unit vectors....')
+        sds.unit_normalize()
+        print('Similarity matrix....')
+        sm = SimilarityMatrix(sds.descriptors, Similarity2())
+        print('Scaling each row of the similarity matrix....')
+        sm.scale()
+        print('Clustering by affinity propagation....')
+        cluster = AffinityPropagation().fit_predict(sm.matrix).tolist()
+        return cluster
