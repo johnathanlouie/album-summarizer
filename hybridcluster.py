@@ -2,11 +2,11 @@ from typing import List
 
 from numpy import amax, histogram
 
-from cluster import ImageCluster
+from cluster import ClusterResults, ImageCluster
 from histogram import HistogramCluster
 from jl import (NPY_DESC, TEXT_CLUSTER_COMBINED, TEXT_CLUSTER_COMBINED2,
-                TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, ListFile, Url,
-                npload)
+                TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, ImageDirectory,
+                ListFile, Url, npload)
 from sift import SiftCluster
 
 
@@ -14,66 +14,41 @@ class HybridCluster(ImageCluster):
     """
     """
 
-    def run(self, directory: Url) -> List[int]:
+    def run(self, images: List[Url]) -> ClusterResults:
         """
+        Clusters images.
         """
-        sift = SiftCluster().run(directory)
-        histogram = HistogramCluster().run(directory)
-        radix = max(sift) + 1
-        return [self.combine(s, h, radix) for s, h in zip(sift, histogram)]
+        results1 = SiftCluster().run(images)
+        results2 = HistogramCluster().run(images)
+        labels1 = results1.labels()
+        labels2 = results2.labels()
+        radix = results1.k()
+        cluster = [self.combine(s, h, radix) for s, h in zip(labels1, labels2)]
+        return ClusterResults(images, cluster)
 
     @staticmethod
-    def combine(big, lil, radix):
-        return big * radix + lil
+    def combine(label1: int, label2: int, k1: int) -> int:
+        """
+        Returns a new cluster label by combining two cluster labels.
+        """
+        return label1 * k1 + label2
 
 
-def histogram2(labels):
+class HybridCluster2(HybridCluster):
     """
     """
-    num = amax(labels) + 1
-    hist, _ = histogram(labels, num)
-    return hist
 
-
-def predict(model, descs):
-    """
-    """
-    a = list()
-    for i, v in enumerate(descs):
-        p = 'pred %d of %d' % (i + 1, len(descs))
-        print(p)
-        b = model.predict(v)
-        c = histogram2(b)
-        a.append(c)
-    return a
-
-
-def invert_labels(labels):
-    """
-    """
-    l = list()
-    num = max(labels) + 1
-    for _ in range(num):
-        l.append(list())
-    for i, v in enumerate(labels):
-        l[v].append(i)
-    return l
-
-
-def main2() -> None:
-    """
-    """
-    descs = npload(NPY_DESC)
-    labels = ListFile(TEXT_CLUSTER_HISTOGRAM).read_as_int()
-    invertedlabels = invert_labels(labels)
-    lastid = 0
-    newcluster = [-1] * len(labels)
-    for indices in invertedlabels:
-        subdescs = [descs[i] for i in indices]
-        sublabels = cluster(subdescs)
-        lastid = amax(sublabels) + 100 + lastid
-        sublabels = sublabels + lastid
-        for x, y in zip(indices, sublabels):
-            newcluster[x] = y
-    ListFile(TEXT_CLUSTER_COMBINED2).write(newcluster)
-    return
+    def run(self, images: List[Url]) -> ClusterResults:
+        """
+        Clusters images.
+        """
+        results1 = HistogramCluster().run(images)
+        cluster = [-1] * len(images)
+        for label1, urls1 in enumerate(results1.urls()):
+            results2 = SiftCluster().run(urls1)
+            for label2, urls2 in enumerate(results2.urls()):
+                label3 = self.combine(label1, label2, results1.k())
+                for url2 in urls2:
+                    i = images.index(url2)
+                    cluster[i] = label3
+        return ClusterResults(images, cluster)

@@ -6,7 +6,7 @@ from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
 
 import cv2
-from cluster import ImageCluster
+from cluster import ClusterResults, ImageCluster
 from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, ImageDirectory, Number,
                 ProgressBar, Url, npsave, read_image)
 
@@ -208,7 +208,7 @@ class SiftCluster(ImageCluster):
     Clusters images from SIFT descriptors.
     """
 
-    def run2(self, images: List[Url]) -> List[int]:
+    def run(self, images: List[Url]) -> ClusterResults:
         """
         Creates descriptors of images.
         Groups images together by how similar their descriptors are.
@@ -224,13 +224,4 @@ class SiftCluster(ImageCluster):
         sm.scale()
         print('Clustering by affinity propagation....')
         cluster = AffinityPropagation().fit_predict(sm.matrix).tolist()
-        return cluster
-
-    def run(self, directory: Url) -> List[int]:
-        """
-        Creates descriptors of images.
-        Groups images together by how similar their descriptors are.
-        Returns a cluster ID for each set of descriptors.
-        """
-        images = ImageDirectory(directory).jpeg()
-        return self.run2(images)
+        return ClusterResults(images, cluster)

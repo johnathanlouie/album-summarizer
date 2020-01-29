@@ -4,7 +4,7 @@ from numpy import concatenate, ndarray, reshape, vstack
 from sklearn.cluster import MeanShift
 
 import cv2
-from cluster import ImageCluster
+from cluster import ClusterResults, ImageCluster
 from jl import ImageDirectory, ProgressBar, Url, hsv, read_image
 
 
@@ -75,12 +75,13 @@ class HistogramCluster(ImageCluster):
     """
     """
 
-    def run(self, directory: Url) -> List[int]:
+    def run(self, images: List[Url]) -> ClusterResults:
         """
+        Clusters images.
         """
         print('Reading image directory....')
-        images = ImageDirectory(directory).jpeg()
-        return self.cluster(images)
+        cluster = self.cluster(images)
+        return ClusterResults(images, cluster)
 
     @staticmethod
     def cluster(images: List[Url], bandwidth: float = .09) -> List[int]:
