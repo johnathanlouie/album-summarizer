@@ -1,7 +1,8 @@
 from csv import reader
 from os import getcwd, makedirs, walk
-from os.path import abspath, dirname, isdir, isfile, join
+from os.path import abspath, basename, dirname, isdir, isfile, join, normpath
 from random import sample
+from shutil import copy2
 from time import time
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -150,10 +151,19 @@ def absurl2(url: Url) -> Url:
 
 def mkdirs(filename: Url) -> None:
     """
-    Makes directories given Windows style path.
+    Makes directories leading up to a file.
+    The child is not included.
     """
     name = dirname(filename)
     makedirs(name, exist_ok=True)
+    return
+
+
+def mkdirs2(path: Url) -> None:
+    """
+    Make all directories in a path including the child.
+    """
+    makedirs(path, exist_ok=True)
     return
 
 
@@ -407,3 +417,28 @@ class ProgressBar(object):
         self._iteration = self._iteration + 1
         self._print(self._iteration, self._total)
         return
+
+
+def parent_directory(url: Url) -> Url:
+    """
+    Returns the name of the immediate parent.
+    """
+    return basename(dirname(url))
+
+
+def copy_file(file_: Url, directory: Url, ancestors: int = 0) -> None:
+    """
+    Copies a file, optionally including any ancestors, to a new directory.
+    """
+    directory = normpath(directory)
+    file_ = normpath(file_)
+    new_url = basename(file_)
+    path = dirname(file_)
+    for _ in range(ancestors):
+        parent = basename(path)
+        new_url = join(parent, new_url)
+        path = dirname(path)
+    new_url = join(directory, new_url)
+    mkdirs(new_url)
+    copy2(file_, new_url)
+    return

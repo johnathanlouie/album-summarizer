@@ -4,19 +4,8 @@ from typing import List
 import aaa
 import cv2
 from deeplearning import DeepLearningFactory
-from jl import ImageDirectory, ListFile, ProgressBar, Url, mkdirs
+from jl import ImageDirectory, ListFile, ProgressBar, Url, copy_file
 from sift import SiftCluster
-
-
-def copy_img(image: Url, destination: Url) -> None:
-    """
-    Makes a copy of an image to another location.
-    """
-    x = cv2.imread(image, cv2.IMREAD_COLOR)
-    new_url = "out/summarized/%s.jpg" % destination
-    mkdirs(new_url)
-    cv2.imwrite(new_url, x)
-    return
 
 
 def proc_args() -> Namespace:
@@ -69,13 +58,21 @@ class ClusterRank(object):
             self._best[c].update_if_better(i, r)
         return
 
+    @staticmethod
+    def copy_img(image: Url) -> None:
+        """
+        Makes a copy of an image to another location.
+        """
+        copy_file(image, 'out/summarized', 1)
+        return
+
     def copy_images(self) -> None:
         """
         Makes a copy of each image in this summarized collection to a new location.
         """
         pb = ProgressBar(len(self._best))
-        for cluster, image_rating in enumerate(self._best):
-            copy_img(image_rating.image, cluster)
+        for image_rating in self._best:
+            self.copy_img(image_rating.image)
             pb.update()
         return
 
