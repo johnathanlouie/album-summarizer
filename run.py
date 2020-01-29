@@ -83,11 +83,12 @@ class ClusterRank(object):
 def main():
     args = proc_args()
     url = args.directory
-    clusters = SiftCluster().run2(url)
+    clusters = SiftCluster().run2(url).labels()
     s = DeepLearningFactory.create_split('smi1', 'ccrc', 0, 14, 0, 0)
     s.predict2(url)
     print('Loading rates....')
-    rates = ListFile(s.name().predictions()).read_as_floats()
+    prediction_file = s.name().predictions()
+    rates = ListFile(prediction_file).read_as_floats()
     print('Loading images....')
     images = ImageDirectory(url).jpeg()
     print('Ranking results....')
