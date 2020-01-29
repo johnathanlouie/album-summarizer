@@ -1,12 +1,8 @@
 from typing import List
 
-from numpy import amax, histogram
-
 from cluster import ClusterResults, ImageCluster
 from histogram import HistogramCluster
-from jl import (NPY_DESC, TEXT_CLUSTER_COMBINED, TEXT_CLUSTER_COMBINED2,
-                TEXT_CLUSTER_HISTOGRAM, TEXT_CLUSTER_SIFT, ImageDirectory,
-                ListFile, Url, npload)
+from jl import Url
 from sift import SiftCluster
 
 

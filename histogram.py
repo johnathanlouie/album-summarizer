@@ -5,7 +5,7 @@ from sklearn.cluster import MeanShift
 
 import cv2
 from cluster import ClusterResults, ImageCluster
-from jl import ImageDirectory, ProgressBar, Url, hsv, read_image
+from jl import ProgressBar, Url, hsv, read_image
 
 
 Histogram = ndarray
