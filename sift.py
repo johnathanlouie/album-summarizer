@@ -208,13 +208,12 @@ class SiftCluster(ImageCluster):
     Clusters images from SIFT descriptors.
     """
 
-    def run(self, directory: Url) -> List[int]:
+    def run2(self, images: List[Url]) -> List[int]:
         """
         Creates descriptors of images.
         Groups images together by how similar their descriptors are.
         Returns a cluster ID for each set of descriptors.
         """
-        images = ImageDirectory(directory).jpeg()
         print("Creating descriptors from images....")
         sds = SiftDescriptorSet(images)
         print('Normalizing descriptors to unit vectors....')
@@ -226,3 +225,12 @@ class SiftCluster(ImageCluster):
         print('Clustering by affinity propagation....')
         cluster = AffinityPropagation().fit_predict(sm.matrix).tolist()
         return cluster
+
+    def run(self, directory: Url) -> List[int]:
+        """
+        Creates descriptors of images.
+        Groups images together by how similar their descriptors are.
+        Returns a cluster ID for each set of descriptors.
+        """
+        images = ImageDirectory(directory).jpeg()
+        return self.run2(images)
