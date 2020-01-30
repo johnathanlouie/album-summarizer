@@ -20,6 +20,7 @@ class HybridCluster(ImageCluster):
         labels2 = results2.labels()
         k1 = results1.k()
         cluster = [self.combine(c1, c2, k1) for c1, c2 in zip(labels1, labels2)]
+        self.remove_empty_clusters(cluster)
         return ClusterResults(images, cluster)
 
     @staticmethod
@@ -28,6 +29,42 @@ class HybridCluster(ImageCluster):
         Returns a new cluster label by combining two cluster labels.
         """
         return label1 * k1 + label2
+
+    @staticmethod
+    def _next_lowest(min_: int, clusters: List[int]) -> int:
+        """
+        Returns the lowest integer from the list of integers no lower than the given minimum.
+        Returns none if there is no integer greater or equal to the minimum.
+        """
+        lowest = None
+        for i in clusters:
+            if lowest == None:
+                if min_ <= i:
+                    lowest = i
+            elif min_ <= i <= lowest:
+                lowest = i
+        return lowest
+
+    @staticmethod
+    def _replace_all(l: List[int], old: int, new: int) -> None:
+        """
+        """
+        for i, e in enumerate(l):
+            if e == old:
+                l[i] = new
+        return
+
+    def remove_empty_clusters(self, clusters: List[int]) -> None:
+        """
+        """
+        k = max(clusters) + 1
+        for i in range(k):
+            j = self._next_lowest(i, clusters)
+            if j == None:
+                return
+            elif i < j:
+                self._replace_all(clusters, j, i)
+        return
 
 
 class HybridCluster2(HybridCluster):
@@ -47,4 +84,5 @@ class HybridCluster2(HybridCluster):
                 for url2 in urls2:
                     i = images.index(url2)
                     cluster[i] = label3
+        self.remove_empty_clusters(cluster)
         return ClusterResults(images, cluster)
