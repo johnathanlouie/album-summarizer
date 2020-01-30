@@ -440,5 +440,8 @@ def copy_file(file_: Url, directory: Url, ancestors: int = 0) -> None:
         path = dirname(path)
     new_url = join(directory, new_url)
     mkdirs(new_url)
-    copy2(file_, new_url)
+    try:
+        copy2(file_, new_url)
+    except PermissionError:
+        raise PermissionError("Copy \"%s\" to \"%s\"." % (file_, new_url))
     return
