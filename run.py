@@ -3,7 +3,11 @@ from typing import List
 
 import aaa
 import cv2
+from archidata import ArchitectureSplit
+from cluster import ImageCluster
 from deeplearning import DeepLearningFactory
+from histogram import HistogramCluster
+from hybridcluster import HybridCluster, HybridCluster2
 from jl import ImageDirectory, ListFile, ProgressBar, Url, copy_file
 from sift import SiftCluster
 
@@ -77,14 +81,14 @@ class ClusterRank(object):
         return
 
 
-def main():
-    args = proc_args()
-    url = args.directory
-    clusters = SiftCluster().run2(url).labels()
-    s = DeepLearningFactory.create_split('smi1', 'ccrc', 0, 14, 0, 0)
-    s.predict2(url)
+def main2(url: Url, algorithm: ImageCluster, algorithm2: ArchitectureSplit) -> None:
+    """
+    Does all the work.
+    """
+    clusters = algorithm.run2(url).labels()
+    algorithm2.predict2(url)
     print('Loading rates....')
-    prediction_file = s.name().predictions()
+    prediction_file = algorithm2.name().predictions()
     rates = ListFile(prediction_file).read_as_floats()
     print('Loading images....')
     images = ImageDirectory(url).jpeg()
@@ -92,6 +96,18 @@ def main():
     cr = ClusterRank(clusters, rates, images)
     print('Making summarized album at out/summarized....')
     cr.copy_images()
+    return
+
+
+def main():
+    """
+    Command line shell interface.
+    """
+    args = proc_args()
+    url = args.directory
+    cluster = SiftCluster()
+    rater = DeepLearningFactory.create_split('smi1', 'ccrc', 0, 14, 0, 0)
+    main2(url, cluster, rater)
     return
 
 
