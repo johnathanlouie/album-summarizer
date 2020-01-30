@@ -4,7 +4,7 @@ from typing import List
 import aaa
 import cv2
 from archidata import ArchitectureSplit
-from cluster import ImageCluster
+from cluster import ClusterResults, ImageCluster
 from deeplearning import DeepLearningFactory
 from histogram import HistogramCluster
 from hybridcluster import HybridCluster, HybridCluster2
@@ -22,20 +22,13 @@ def proc_args() -> Namespace:
     return args
 
 
-def cluster_number(a: List[int]) -> int:
-    """
-    Returns the number of clusters in the clusters text file.
-    """
-    return max(a) + 1
-
-
 class ImageRating(object):
     """
     Struct for holding the URL and rating of an image.
     Used by the ClusterRank class.
     """
 
-    def __init__(self, image: Url = '', rating: int = -1) -> None:
+    def __init__(self, image: Url = None, rating: int = -1000000000000000000000000000) -> None:
         self.image = image
         self.rating = rating
         return
@@ -50,16 +43,25 @@ class ImageRating(object):
             return True
         return False
 
+    def valid(self) -> bool:
+        """
+        Returns true if the object has been updated at least once.
+        """
+        return self.image != None
+
 
 class ClusterRank(object):
     """
     A ranking system that picks the best out of each cluster.
     """
 
-    def __init__(self, clusters: List[int], rates: List[float], images: List[Url]) -> None:
-        self._best = [ImageRating() for _ in range(cluster_number(clusters))]
-        for c, r, i in zip(clusters, rates, images):
+    def __init__(self, clusters: ClusterResults, rates: List[float]) -> None:
+        self._best = [ImageRating() for _ in range(clusters.k())]
+        for c, r, i in zip(clusters.labels(), rates, clusters.get_all_urls()):
             self._best[c].update_if_better(i, r)
+        for i in self._best:
+            if not i.valid():
+                raise Exception('Some clusters are empty.')
         return
 
     @staticmethod
@@ -85,15 +87,13 @@ def main2(url: Url, algorithm: ImageCluster, algorithm2: ArchitectureSplit) -> N
     """
     Does all the work.
     """
-    clusters = algorithm.run2(url).labels()
+    clusters = algorithm.run2(url)
     algorithm2.predict2(url)
     print('Loading rates....')
     prediction_file = algorithm2.name().predictions()
     rates = ListFile(prediction_file).read_as_floats()
-    print('Loading images....')
-    images = ImageDirectory(url).jpeg()
     print('Ranking results....')
-    cr = ClusterRank(clusters, rates, images)
+    cr = ClusterRank(clusters, rates)
     print('Making summarized album at out/summarized....')
     cr.copy_images()
     return
