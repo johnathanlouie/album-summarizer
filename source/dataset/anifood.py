@@ -4,8 +4,8 @@ from typing import List, Optional, Union
 
 from numpy import asarray, ndarray
 
-from cc import CcDataFile
-from dataset import DataSet
+from core.dataset import DataSet
+from dataset.cc import CcDataFile
 from jl import ImageDirectory, Url
 
 

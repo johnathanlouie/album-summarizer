@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 
 import aaa
-from deeplearning import DeepLearningFactory
+from dlfactory import DeepLearningFactory
 
 
 def proc_args() -> Namespace:

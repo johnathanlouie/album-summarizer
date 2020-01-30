@@ -5,11 +5,11 @@ from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
 from numpy import asarray, ndarray
 
-from dataholder import DataHolder
-from dataset import DataSet, DataSetSplit
+from core.dataholder import DataHolder
+from core.dataset import DataSet, DataSetSplit
+from core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
+from core.model import Architecture, ArchitectureName
 from jl import ImageDirectory, ListFile, Url, mkdirs
-from kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
-from model import Architecture, ArchitectureName
 
 
 class ArchitectureSplitName(object):

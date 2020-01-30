@@ -6,7 +6,7 @@ from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
 
 import cv2
-from cluster import ClusterResults, ImageCluster
+from core.cluster import ClusterResults, ImageCluster
 from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, Number, ProgressBar, Url,
                 npsave, read_image)
 

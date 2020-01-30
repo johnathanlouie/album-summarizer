@@ -4,7 +4,7 @@ from typing import List, Optional, Union
 
 from numpy import asarray, ndarray
 
-from dataset import DataSet
+from core.dataset import DataSet
 from jl import Csv, Url
 
 

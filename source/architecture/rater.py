@@ -3,8 +3,8 @@ from keras.layers import (BatchNormalization, Conv2D, Dense, Flatten,
                           MaxPooling2D)
 from keras.models import Model
 
+from core.model import ModelFactory
 from jl import res2 as resolution
-from model import ModelFactory
 
 
 class Smi13(ModelFactory):

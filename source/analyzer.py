@@ -1,6 +1,6 @@
 from numpy import argmax, zeros
 
-from cc import CcDataFile
+from dataset.cc import CcDataFile
 from jl import NPY_CLASSES, NPY_PRED, TEXT_PRED, ListFile, npload
 
 

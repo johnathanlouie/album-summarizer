@@ -1,11 +1,11 @@
-from anifood import CccafDataSet
-from archidata import ArchitectureSet, ArchitectureSplit
-from cc import Ccc, Ccr, CcrCategorical
-from classifier import Vgg16A, Vgg16B, Vgg16C
-from dataset import DataSet
-from lamem import Lamem
-from model import LOSS, METRIC, OPTIMIZER, Architecture, ModelFactory
-from rater import Smi13, Smi13_1, Smi13_2
+from architecture.classifier import Vgg16A, Vgg16B, Vgg16C
+from architecture.rater import Smi13, Smi13_1, Smi13_2
+from core.archidata import ArchitectureSet, ArchitectureSplit
+from core.dataset import DataSet
+from core.model import LOSS, METRIC, OPTIMIZER, Architecture, ModelFactory
+from dataset.anifood import CccafDataSet
+from dataset.cc import Ccc, Ccr, CcrCategorical
+from dataset.lamem import Lamem
 
 
 class DeepLearningFactory(object):

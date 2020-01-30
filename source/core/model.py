@@ -4,7 +4,7 @@ from keras import backend as K
 from keras.models import Model
 from keras.optimizers import SGD, Optimizer
 
-import jl
+from jl import layers, npload
 
 
 def rmse(y_true, y_pred):
@@ -15,8 +15,8 @@ def rmse(y_true, y_pred):
 
 
 def loadweights(a):
-    for i in jl.layers:
-        w = jl.npload(i)
+    for i in layers:
+        w = npload(i)
         l = a.get_layer(i)
         l.set_weights(w)
         l.trainable = False

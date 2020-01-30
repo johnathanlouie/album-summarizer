@@ -3,13 +3,13 @@ from typing import List
 
 import aaa
 import cv2
-from archidata import ArchitectureSplit
-from cluster import ClusterResults, ImageCluster
-from deeplearning import DeepLearningFactory
-from histogram import HistogramCluster
-from hybridcluster import HybridCluster, HybridCluster2
+from cluster.histogram import HistogramCluster
+from cluster.hybridcluster import HybridCluster, HybridCluster2
+from cluster.sift import SiftCluster
+from core.archidata import ArchitectureSplit
+from core.cluster import ClusterResults, ImageCluster
+from dlfactory import DeepLearningFactory
 from jl import ImageDirectory, ListFile, ProgressBar, Url, copy_file
-from sift import SiftCluster
 
 
 def proc_args() -> Namespace:

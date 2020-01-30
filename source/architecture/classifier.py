@@ -3,8 +3,8 @@ from keras.engine.input_layer import Input
 from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
 from keras.models import Model
 
+from core.model import ModelFactory
 from jl import res2 as resolution
-from model import ModelFactory
 
 
 class Vgg16A(ModelFactory):

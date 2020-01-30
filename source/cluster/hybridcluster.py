@@ -1,9 +1,9 @@
 from typing import List
 
-from cluster import ClusterResults, ImageCluster
-from histogram import HistogramCluster
+from cluster.histogram import HistogramCluster
+from cluster.sift import SiftCluster
+from core.cluster import ClusterResults, ImageCluster
 from jl import Url
-from sift import SiftCluster
 
 
 class HybridCluster(ImageCluster):
