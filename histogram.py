@@ -88,8 +88,8 @@ class HistogramCluster(ImageCluster):
         """
         """
         c = list()
-        pb = ProgressBar(len(images))
         print('Creating histograms....')
+        pb = ProgressBar(len(images))
         for i in images:
             hh = HsvHistogram(i)
             histogram = HsvHistogram.scale(hh.hsv(), hh.size())
