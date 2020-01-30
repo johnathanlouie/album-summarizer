@@ -18,8 +18,8 @@ class HybridCluster(ImageCluster):
         results2 = HistogramCluster().run(images)
         labels1 = results1.labels()
         labels2 = results2.labels()
-        radix = results1.k()
-        cluster = [self.combine(s, h, radix) for s, h in zip(labels1, labels2)]
+        k1 = results1.k()
+        cluster = [self.combine(c1, c2, k1) for c1, c2 in zip(labels1, labels2)]
         return ClusterResults(images, cluster)
 
     @staticmethod
