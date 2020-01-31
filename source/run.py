@@ -3,13 +3,13 @@ from typing import List
 
 import aaa
 import cv2
-from cluster.histogram import HistogramCluster
-from cluster.hybridcluster import HybridCluster, HybridCluster2
-from cluster.sift import SiftCluster
-from core.archidata import ArchitectureSplit
-from core.cluster import ClusterResults, ImageCluster
-from dlfactory import DeepLearningFactory
-from jl import ImageDirectory, ListFile, ProgressBar, Url, copy_file
+from .cluster.histogram import HistogramCluster
+from .cluster.hybridcluster import HybridCluster, HybridCluster2
+from .cluster.sift import SiftCluster
+from .core.archidata import ArchitectureSplit
+from .core.cluster import ClusterResults, ImageCluster
+from .dlfactory import DeepLearningFactory
+from .jl import ImageDirectory, ListFile, ProgressBar, Url, copy_file
 
 
 def proc_args() -> Namespace:
@@ -83,12 +83,13 @@ class ClusterRank(object):
         return
 
 
-def main2(url: Url, algorithm: ImageCluster, algorithm2: ArchitectureSplit) -> None:
+def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchitectureSplit) -> None:
     """
     Does all the work.
     """
-    clusters = algorithm.run2(url)
-    algorithm2.predict2(url)
+    images = ImageDirectory(directory).jpeg()
+    clusters = algorithm.run(images)
+    algorithm2.predict2(images)
     print('Loading rates....')
     prediction_file = algorithm2.name().predictions()
     rates = ListFile(prediction_file).read_as_floats()
@@ -111,4 +112,4 @@ def main():
     return
 
 
-main()
+# main()

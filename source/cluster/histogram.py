@@ -4,8 +4,9 @@ from numpy import concatenate, ndarray, reshape, vstack
 from sklearn.cluster import MeanShift
 
 import cv2
-from core.cluster import ClusterResults, ImageCluster
-from jl import ProgressBar, Url, hsv, read_image
+
+from ..core.cluster import ClusterResults, ImageCluster
+from ..jl import ProgressBar, Url, hsv, read_image
 
 
 Histogram = ndarray

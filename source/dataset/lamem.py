@@ -4,8 +4,8 @@ from typing import List, Union
 
 from numpy import asarray
 
-from core.dataset import DataSet
-from jl import ListFile, Url
+from ..core.dataset import DataSet
+from ..jl import ListFile, Url
 
 
 class LamemDataFile(object):

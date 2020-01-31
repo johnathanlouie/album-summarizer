@@ -5,11 +5,11 @@ from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
 from numpy import asarray, ndarray
 
-from core.dataholder import DataHolder
-from core.dataset import DataSet, DataSetSplit
-from core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
-from core.model import Architecture, ArchitectureName
-from jl import ImageDirectory, ListFile, Url, mkdirs
+from ..core.dataholder import DataHolder
+from ..core.dataset import DataSet, DataSetSplit
+from ..core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
+from ..core.model import Architecture, ArchitectureName
+from ..jl import Image, ImageDirectory, ListFile, Url, mkdirs
 
 
 class ArchitectureSplitName(object):
@@ -198,14 +198,13 @@ class ArchitectureSplit(object):
         self._test(x, y)
         return
 
-    def predict(self, directory: Url) -> None:
+    def predict(self, images: List[Image]) -> None:
         """
         Predicts using the trained model.
         """
         if not self._is_test_loaded():
             return
-        print('Loading test X')
-        x = asarray(ImageDirectory(directory).jpeg())
+        x = asarray(images)
         print('Prediction sequence')
         seq = Sequence1(x, x, 10)
         print('Prediction starts')
@@ -327,7 +326,7 @@ class ArchitectureSplit(object):
         self.test()
         return
 
-    def predict2(self, directory: Url, epochs: int = 2**64, patience: int = 5) -> None:
+    def predict2(self, images: List[Image], epochs: int = 2**64, patience: int = 5) -> None:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then predict using the test set.
         """
@@ -335,7 +334,7 @@ class ArchitectureSplit(object):
             self.create(epochs, patience)
         if not self._is_test_loaded():
             self.load_test_model()
-        self.predict(directory)
+        self.predict(images)
         return
 
 
@@ -359,6 +358,6 @@ class ArchitectureSet(object):
 
     def train_all(self, epochs: int = 2**64, patience: int = 5) -> None:
         for i in range(self._dataset.SPLITS):
-            print("Split %d/%d" % (i, self._dataset.SPLITS - 1))
+            print("Split %d/%d" % (i + 1, self._dataset.SPLITS))
             self.split(i).train2(epochs, patience)
         return

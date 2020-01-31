@@ -4,9 +4,9 @@ from typing import List, Optional, Union
 
 from numpy import asarray, ndarray
 
-from core.dataset import DataSet
-from dataset.cc import CcDataFile
-from jl import ImageDirectory, Url
+from ..core.dataset import DataSet
+from ..dataset.cc import CcDataFile
+from ..jl import ImageDirectory, Url
 
 
 class AnimalCollection(ImageDirectory):

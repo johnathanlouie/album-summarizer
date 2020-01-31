@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 
 import aaa
-from dlfactory import DeepLearningFactory
+from .dlfactory import DeepLearningFactory
 
 
 def proc_args() -> Namespace:
@@ -60,7 +60,8 @@ def main() -> None:
     elif mode == 'test':
         x.test2(epochs, patience)
     elif mode == 'predict':
-        x.predict2(epochs, patience)
+        raise NotImplementedError
+        # x.predict2(epochs, patience)
     else:
         raise Exception
     return

@@ -5,7 +5,7 @@ from keras.utils import to_categorical
 from numpy import ndarray
 from sklearn.model_selection import train_test_split
 
-from jl import ArrayLike, Number, npexists, npload, npsave
+from ..jl import ArrayLike, Number, npexists, npload, npsave
 
 
 class XY(Enum):

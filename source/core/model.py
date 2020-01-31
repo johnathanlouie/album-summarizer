@@ -4,7 +4,7 @@ from keras import backend as K
 from keras.models import Model
 from keras.optimizers import SGD, Optimizer
 
-from jl import layers, npload
+from ..jl import layers, npload
 
 
 def rmse(y_true, y_pred):
