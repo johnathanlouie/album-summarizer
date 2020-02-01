@@ -37,9 +37,6 @@ class CccafDataSet(DataSet):
     The CC dataset does not have enough animals and food photos.
     """
 
-    NAME = 'ccaf'
-    SPLITS = 5
-
     def __init__(self, animals: Optional[int] = None, food: Optional[int] = 1300) -> None:
         if animals == None:
             animals = len(AnimalCollection().jpeg())
@@ -91,7 +88,7 @@ class CccafDataSet(DataSet):
         x = self._x()
         y = self._y()
         print('Generating data splits')
-        for i in range(self.SPLITS):
+        for i in range(self.splits()):
             self.create_split(x, y, i)
         print('Prep complete')
         return
@@ -101,3 +98,15 @@ class CccafDataSet(DataSet):
         Returns the human readable name of the classes.
         """
         return CcDataFile().to_category_str(results)
+
+    def splits(self) -> int:
+        """
+        Returns the number of splits.
+        """
+        return 5
+
+    def name(self) -> str:
+        """
+        Returns this dataset's name.
+        """
+        return 'cccaf'

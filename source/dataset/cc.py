@@ -89,9 +89,6 @@ class Cc(DataSet):
     An abstract base class for the CC dataset.
     """
 
-    NAME = 'cc'
-    SPLITS = 5
-
     def _relative_url(self, url: Url) -> str:
         """
         Returns the relative url of the image from the filename.
@@ -120,19 +117,23 @@ class Cc(DataSet):
         """
         x = self._x()
         y = self._y()
-        print('Generating data splits')
-        for i in range(self.SPLITS):
+        print('Generating data splits....')
+        for i in range(self.splits()):
             self.create_split(x, y, i)
         print('Prep complete')
         return
+
+    def splits(self) -> int:
+        """
+        Returns the number of splits.
+        """
+        return 5
 
 
 class Ccc(Cc):
     """
     The image classification subset of the CC dataset.
     """
-
-    NAME = 'ccc'
 
     def _y(self) -> ndarray:
         """
@@ -150,13 +151,17 @@ class Ccc(Cc):
         df = CcDataFile()
         return df.to_category_str(results)
 
+    def name(self) -> str:
+        """
+        Returns this dataset's name.
+        """
+        return 'ccc'
+
 
 class Ccr(Cc):
     """
     The aesthetic rating subset of the CC dataset.
     """
-
-    NAME = 'ccr'
 
     def _y(self) -> ndarray:
         """
@@ -172,13 +177,17 @@ class Ccr(Cc):
         """
         raise NotImplementedError
 
+    def name(self) -> str:
+        """
+        Returns this dataset's name.
+        """
+        return 'ccr'
+
 
 class CcrCategorical(Cc):
     """
     The aesthetic rating subset of the CC dataset using categories instead of a number.
     """
-
-    NAME = 'ccrc'
 
     def _y(self) -> ndarray:
         """
@@ -207,3 +216,9 @@ class CcrCategorical(Cc):
         Returns correct rating.
         """
         return [self._rate(i[0], i[1], i[2]) for i in results]
+
+    def name(self) -> str:
+        """
+        Returns this dataset's name.
+        """
+        return 'ccrc'
