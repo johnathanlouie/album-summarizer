@@ -158,59 +158,49 @@ class DataSet(object):
     Interface for datasets. Mainly used for hints.
     """
 
-    NAME = ''
-    SPLITS = 0
-
     def prepare(self) -> None:
         """
         Reads and convert the dataset data files into NumPy arrays for Keras.
         """
         raise NotImplementedError
 
-    def split(self, num: int) -> DataSetSplit:
+    def get_split(self, num: int) -> DataSetSplit:
         """
         Gets the training, testing, and validation split for Keras.
         """
-        return DataSetSplit(self.NAME, num)
+        return DataSetSplit(self.name(), num)
 
-    def train_valid_test_split(
+    def train_val_test(
         self,
-        x: ArrayLike,
-        y: ArrayLike,
-        test_size: Optional[Number] = 0.1,
-        valid_size: Optional[Number] = 0.1,
-        train_size: Optional[Number] = None,
-        random_state: Optional[int] = None,
+        xx: ArrayLike,
+        yy: ArrayLike,
+        test_size: Number = 0.1,
         shuffle: bool = True,
-        stratify: Optional[ArrayLike] = None
     ) -> Tuple[ndarray, ndarray, ndarray, ndarray, ndarray, ndarray]:
         """
-        Divides up the dataset into phases.
+        Divides up the dataset into training, validation, and testing phases.
         """
-        if test_size != None:
-            dx, ex, dy, ey = train_test_split(x, y, test_size=test_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
-            tx, vx, ty, vy = train_test_split(dx, dy, test_size=valid_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
-        else:
-            dx, vx, vy, vy = train_test_split(x, y, test_size=valid_size, train_size=None, random_state=random_state, shuffle=shuffle, stratify=None)
-            tx, ex, ty, ey = train_test_split(dx, dy, test_size=test_size, train_size=train_size, random_state=random_state, shuffle=shuffle, stratify=None)
+        vali_size = 1 / self.splits()
+        xx, ex, yy, ey = train_test_split(xx, yy, test_size=test_size, train_size=None, shuffle=shuffle)
+        tx, vx, ty, vy = train_test_split(xx, yy, test_size=vali_size, train_size=None, shuffle=shuffle)
         return tx, ty, vx, vy, ex, ey
 
     def create_split(self, x: ndarray, y: ndarray, index: int) -> None:
         """
         Randomly generates a split.
         """
-        tx, ty, vx, vy, ex, ey = self.train_valid_test_split(x, y)
-        print('Saving')
-        ds = self.split(index)
+        tx, ty, vx, vy, ex, ey = self.train_val_test(x, y)
+        print('Saving....')
+        ds = self.get_split(index)
         dtrain = ds.train()
-        dtest = ds.test()
         dval = ds.validation()
+        dtest = ds.test()
         dtrain.x().save(tx)
         dtrain.y().save(ty)
-        dtest.x().save(ex)
-        dtest.y().save(ey)
         dval.x().save(vx)
         dval.y().save(vy)
+        dtest.x().save(ex)
+        dtest.y().save(ey)
         return
 
     def one_hot(self, y: ndarray, num_classes: int) -> ndarray:
@@ -230,7 +220,19 @@ class DataSet(object):
         """
         Returns true if the dataset was already prepared.
         """
-        for i in range(self.SPLITS):
-            if not self.split(i).exists():
+        for i in range(self.splits()):
+            if not self.get_split(i).exists():
                 return False
         return True
+
+    def splits(self) -> int:
+        """
+        Returns the number of splits.
+        """
+        raise NotImplementedError
+
+    def name(self) -> str:
+        """
+        Returns a simple abbreviated name for filenames, command line interface, and factories.
+        """
+        raise NotImplementedError
