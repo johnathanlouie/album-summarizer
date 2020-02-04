@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 
 import aaa
-from .dlfactory import DeepLearningFactory
+from dlfactory import DeepLearningFactory
 
 
 def proc_args() -> Namespace:
@@ -20,21 +20,6 @@ def proc_args() -> Namespace:
     parser.add_argument('-p', '--patience', help='', type=int, default=5)
     args = parser.parse_args()
     return args
-
-
-# DATASETS
-# ccr = Ccr()
-# ccc = Ccc()
-# ccrc = CcrCategorical()
-# lamem = Lamem()
-# cccaf = CccafDataSet()
-
-# PREPARE DATASETS
-# ccc.prepare()
-# ccr.prepare()
-# ccrc.prepare()
-# lamem.prepare()
-# cccaf.prepare()
 
 
 def main() -> None:
@@ -67,4 +52,5 @@ def main() -> None:
     return
 
 
-main()
+if __name__ == '__main__':
+    main()

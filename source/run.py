@@ -3,13 +3,13 @@ from typing import List
 
 import aaa
 import cv2
-from .cluster.histogram import HistogramCluster
-from .cluster.hybridcluster import HybridCluster, HybridCluster2
-from .cluster.sift import SiftCluster
-from .core.archidata import ArchitectureSplit
-from .core.cluster import ClusterResults, ImageCluster
-from .dlfactory import DeepLearningFactory
-from .jl import ImageDirectory, ListFile, ProgressBar, Url, copy_file
+from cluster.histogram import HistogramCluster
+from cluster.hybridcluster import HybridCluster, HybridCluster2
+from cluster.sift import SiftCluster
+from core.archidata import ArchitectureSplit
+from core.cluster import ClusterResults, ImageCluster
+from dlfactory import DeepLearningFactory
+from jl import ImageDirectory, ListFile, ProgressBar, Url, copy_file
 
 
 def proc_args() -> Namespace:
@@ -89,10 +89,7 @@ def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchitectureSplit
     """
     images = ImageDirectory(directory).jpeg()
     clusters = algorithm.run(images)
-    algorithm2.predict2(images)
-    print('Loading rates....')
-    prediction_file = algorithm2.name().predictions()
-    rates = ListFile(prediction_file).read_as_floats()
+    rates = algorithm2.predict2(images).human_readable()
     print('Ranking results....')
     cr = ClusterRank(clusters, rates)
     print('Making summarized album at out/summarized....')
@@ -112,4 +109,5 @@ def main():
     return
 
 
-# main()
+if __name__ == '__main__':
+    main()

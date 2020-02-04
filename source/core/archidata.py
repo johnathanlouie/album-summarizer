@@ -5,12 +5,11 @@ from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
 from numpy import asarray, ndarray
 
-from ..core.dataholder import DataHolder
-from ..core.dataset import (DataSet, DataSetSplit, Predictions,
-                            PredictionsFactory)
-from ..core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
-from ..core.model import Architecture, ArchitectureName
-from ..jl import Image, ImageDirectory, ListFile, Url, mkdirs
+from core.dataholder import DataHolder
+from core.dataset import DataSet, DataSetSplit, Predictions, PredictionsFactory
+from core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
+from core.model import Architecture, ArchitectureName
+from jl import Image, ImageDirectory, ListFile, Url, mkdirs
 
 
 class ArchitectureSplitName(object):
@@ -344,7 +343,7 @@ class ArchitectureSet(object):
         """
         if not self._dataset.exists():
             self._dataset.prepare()
-        return ArchitectureSplit(self._architecture, self._dataset.split(num), self._dataset.get_predictions_factory())
+        return ArchitectureSplit(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
 
     def train_all(self, epochs: int = 2**64, patience: int = 5) -> None:
         for i in range(self._dataset.SPLITS):

@@ -4,8 +4,8 @@ from typing import Any, List, Optional, Union
 
 from numpy import asarray, ndarray
 
-from ..core.dataset import DataSet, Predictions, PredictionsFactory
-from ..jl import Csv, Url
+from core.dataset import DataSet, Predictions, PredictionsFactory
+from jl import Csv, Url
 
 
 class CcDataFile(object):

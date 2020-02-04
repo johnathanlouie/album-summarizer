@@ -1,6 +1,6 @@
 from typing import List
 
-from ..jl import ImageDirectory, Url
+from jl import ImageDirectory, Url
 
 
 class ClusterResults(object):
