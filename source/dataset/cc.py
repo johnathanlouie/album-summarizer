@@ -1,10 +1,10 @@
 from os import getcwd
 from os.path import join, normpath
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from numpy import asarray, ndarray
 
-from ..core.dataset import DataSet
+from ..core.dataset import DataSet, Predictions, PredictionsFactory
 from ..jl import Csv, Url
 
 
@@ -130,6 +130,26 @@ class Cc(DataSet):
         return 5
 
 
+class CccPredictions(Predictions):
+    """
+    """
+
+    def human_readable(self) -> List[Any]:
+        """
+        """
+        return CcDataFile().to_category_str(self._y)
+
+
+class CccPredictionsFactory(PredictionsFactory):
+    """
+    """
+
+    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+        """
+        """
+        return CccPredictions(x, y, url)
+
+
 class Ccc(Cc):
     """
     The image classification subset of the CC dataset.
@@ -144,18 +164,37 @@ class Ccc(Cc):
         y = self.one_hot(y, 6)
         return y
 
-    def class_names(self, results: List[int]) -> List[Union[str, int]]:
-        """
-        Returns the human readable name of the classes.
-        """
-        df = CcDataFile()
-        return df.to_category_str(results)
-
     def name(self) -> str:
         """
         Returns this dataset's name.
         """
         return 'ccc'
+
+    def get_predictions_factory(self) -> PredictionsFactory:
+        """
+        """
+        return CccPredictionsFactory()
+
+
+class CcrPredictions(Predictions):
+    """
+    """
+
+    def human_readable(self) -> List[Any]:
+        """
+        """
+        return self._y.flatten().tolist()
+
+
+class CcrPredictionsFactory(PredictionsFactory):
+    """
+    """
+
+    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+        """
+        Returns an instance of CcrPredictions.
+        """
+        return CcrPredictions(x, y, url)
 
 
 class Ccr(Cc):
@@ -171,17 +210,49 @@ class Ccr(Cc):
         y = asarray(data_file.rating())
         return y
 
-    def class_names(self, results: List[int]) -> List[Union[str, int]]:
-        """
-        Does not have classes.
-        """
-        raise NotImplementedError
-
     def name(self) -> str:
         """
         Returns this dataset's name.
         """
         return 'ccr'
+
+    def get_predictions_factory(self) -> PredictionsFactory:
+        """
+        Returns an instance of PredictionsFactory.
+        """
+        return CcrPredictionsFactory()
+
+
+class CcrcPredictions(Predictions):
+    """
+    """
+
+    @staticmethod
+    def _rate(one: float, two: float, three: float) -> float:
+        """
+        Calculates the predicted rating from percentages.
+        """
+        total = one + two + three
+        x1 = 1 * one
+        x2 = 2 * two
+        x3 = 3 * three
+        rate = (x1 + x2 + x3) / total
+        return rate
+
+    def human_readable(self) -> List[Any]:
+        """
+        """
+        return [self._rate(i[0], i[1], i[2]) for i in self._y]
+
+
+class CcrcPredictionsFactory(PredictionsFactory):
+    """
+    """
+
+    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+        """
+        """
+        return CcrcPredictions(x, y, url)
 
 
 class CcrCategorical(Cc):
@@ -200,25 +271,14 @@ class CcrCategorical(Cc):
         y = self.one_hot(y, 3)
         return y
 
-    def _rate(self, one: float, two: float, three: float) -> float:
-        """
-        Calculates the predicted rating from percentages.
-        """
-        total = one + two + three
-        x1 = 1 * one
-        x2 = 2 * two
-        x3 = 3 * three
-        rate = (x1 + x2 + x3) / total
-        return rate
-
-    def class_names(self, results: ndarray) -> List[float]:
-        """
-        Returns correct rating.
-        """
-        return [self._rate(i[0], i[1], i[2]) for i in results]
-
     def name(self) -> str:
         """
         Returns this dataset's name.
         """
         return 'ccrc'
+
+    def get_predictions_factory(self) -> PredictionsFactory:
+        """
+        Returns an instance of PredictionsFactory.
+        """
+        return CcrcPredictionsFactory()

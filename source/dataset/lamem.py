@@ -1,10 +1,10 @@
 from os import getcwd
 from os.path import join, normpath
-from typing import List, Union
+from typing import Any, List, Union
 
-from numpy import asarray
+from numpy import asarray, ndarray
 
-from ..core.dataset import DataSet
+from ..core.dataset import DataSet, Predictions, PredictionsFactory
 from ..jl import ListFile, Url
 
 
@@ -35,6 +35,26 @@ class LamemDataFile(object):
         """
         b = asarray(self.read())
         return [float(x) for x in b[:, 1]]
+
+
+class LamemPredictions(Predictions):
+    """
+    """
+
+    def human_readable(self) -> List[Any]:
+        """
+        """
+        return self._y.flatten().tolist()
+
+
+class LamemPredictionsFactory(PredictionsFactory):
+    """
+    """
+
+    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+        """
+        """
+        return LamemPredictions(x, y, url)
 
 
 class Lamem(DataSet):
@@ -88,12 +108,6 @@ class Lamem(DataSet):
                 self._prep_data_file(i, j)
         return
 
-    def class_names(self, results: List[int]) -> List[Union[str, int]]:
-        """
-        Does not have classes.
-        """
-        raise NotImplementedError
-
     def splits(self) -> int:
         """
         Returns the number of splits.
@@ -105,3 +119,8 @@ class Lamem(DataSet):
         Returns this dataset's name.
         """
         return 'lamem'
+
+    def get_predictions_factory(self) -> PredictionsFactory:
+        """
+        """
+        return LamemPredictionsFactory()

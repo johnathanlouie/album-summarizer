@@ -1,11 +1,11 @@
 from enum import Enum
-from typing import List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 from keras.utils import to_categorical
 from numpy import ndarray
 from sklearn.model_selection import train_test_split
 
-from ..jl import ArrayLike, Number, npexists, npload, npsave
+from ..jl import ArrayLike, ListFile, Number, Url, npexists, npload, npsave
 
 
 class XY(Enum):
@@ -153,6 +153,41 @@ class DataSetSplit(object):
         return True
 
 
+class Predictions(object):
+    """
+    An interpreter for predictions.
+    """
+
+    def __init__(self, x: ndarray, y: ndarray, url: Url) -> None:
+        self._x = x
+        self._y = y
+        self._url = url
+        return
+
+    def human_readable(self) -> List[Any]:
+        """
+        """
+        raise NotImplementedError
+
+    def save_as_list(self) -> None:
+        """
+        Saves the predictions a human readable format
+        """
+        ListFile(self._url).write(self.human_readable())
+        return
+
+
+class PredictionsFactory(object):
+    """
+    """
+
+    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+        """
+        Returns a concrete instance of Predictions.
+        """
+        raise NotImplementedError
+
+
 class DataSet(object):
     """
     Interface for datasets. Mainly used for hints.
@@ -209,10 +244,10 @@ class DataSet(object):
         """
         return to_categorical(y, num_classes=num_classes, dtype='int32')
 
-    def class_names(self, results: List[int]) -> List[Union[str, int]]:
+    def get_predictions_factory(self) -> PredictionsFactory:
         """
         Abstract method.
-        Returns the human readable name of the classes.
+        Returns an instance of PredictionsFactory.
         """
         raise NotImplementedError
 

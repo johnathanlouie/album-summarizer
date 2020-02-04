@@ -1,10 +1,10 @@
 from os import getcwd
 from os.path import join, normpath
-from typing import List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from numpy import asarray, ndarray
 
-from ..core.dataset import DataSet
+from ..core.dataset import DataSet, Predictions, PredictionsFactory
 from ..dataset.cc import CcDataFile
 from ..jl import ImageDirectory, Url
 
@@ -29,6 +29,27 @@ class FoodCollection(ImageDirectory):
 
     def __init__(self) -> None:
         super().__init__('data/food')
+
+
+class CccafPredictions(Predictions):
+    """
+    """
+
+    def human_readable(self) -> List[Any]:
+        """
+        """
+        return CcDataFile().to_category_str(self._y)
+
+
+class CccafPredictionsFactory(PredictionsFactory):
+    """
+    """
+
+    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+        """
+        Returns an instance of CccafPredictions.
+        """
+        return CccafPredictions(x, y, url)
 
 
 class CccafDataSet(DataSet):
@@ -92,12 +113,6 @@ class CccafDataSet(DataSet):
             self.create_split(x, y, i)
         print('Prep complete')
         return
-
-    def class_names(self, results: List[int]) -> List[Union[str, int]]:
-        """
-        Returns the human readable name of the classes.
-        """
-        return CcDataFile().to_category_str(results)
 
     def splits(self) -> int:
         """

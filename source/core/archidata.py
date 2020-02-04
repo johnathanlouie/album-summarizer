@@ -6,7 +6,8 @@ from keras.models import load_model
 from numpy import asarray, ndarray
 
 from ..core.dataholder import DataHolder
-from ..core.dataset import DataSet, DataSetSplit
+from ..core.dataset import (DataSet, DataSetSplit, Predictions,
+                            PredictionsFactory)
 from ..core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
 from ..core.model import Architecture, ArchitectureName
 from ..jl import Image, ImageDirectory, ListFile, Url, mkdirs
@@ -71,10 +72,10 @@ class ArchitectureSplit(object):
     Trains, validates, tests, and predicts.
     """
 
-    def __init__(self, architecture: Architecture, split: DataSetSplit, class_names: Callable[[List[int]], List[Union[str, int]]]) -> None:
+    def __init__(self, architecture: Architecture, split: DataSetSplit, prediction: PredictionsFactory) -> None:
         self._architecture = architecture
         self._split = split
-        self._class_names = class_names
+        self._pf = prediction
         self._model = None
         self._current_epoch = None
         self._max_epoch = None
@@ -198,30 +199,18 @@ class ArchitectureSplit(object):
         self._test(x, y)
         return
 
-    def predict(self, images: List[Image]) -> None:
+    def predict(self, images: List[Image]) -> Predictions:
         """
         Predicts using the trained model.
         """
         if not self._is_test_loaded():
             return
         x = asarray(images)
-        print('Prediction sequence')
         seq = Sequence1(x, x, 10)
-        print('Prediction starts')
+        print('Predicting....')
         results = self._best_model.predict_generator(generator=seq, verbose=1)
-        print('Prediction finished')
-        if results.ndim == 2:
-            if results.shape[1] == 1:  # if results are scalars
-                results = results.flatten()
-            else:  # otherwise results are class percentages
-                # results = results.argmax(1)  # index of max percentage is answer
-                results = self._class_names(results)
-        else:
-            raise Exception
-        url = self.name().predictions()
-        ListFile(url).write(results)
-        print('Saved predictions to %s' % (url))
-        return
+        print('Prediction finished.')
+        return self._pf.predictions(x, results, self.name().predictions())
 
     def create(self, epochs: int = 2**64, patience: int = 5) -> None:
         """
@@ -326,7 +315,7 @@ class ArchitectureSplit(object):
         self.test()
         return
 
-    def predict2(self, images: List[Image], epochs: int = 2**64, patience: int = 5) -> None:
+    def predict2(self, images: List[Image], epochs: int = 2**64, patience: int = 5) -> Predictions:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then predict using the test set.
         """
@@ -334,8 +323,7 @@ class ArchitectureSplit(object):
             self.create(epochs, patience)
         if not self._is_test_loaded():
             self.load_test_model()
-        self.predict(images)
-        return
+        return self.predict(images)
 
 
 class ArchitectureSet(object):
@@ -354,7 +342,9 @@ class ArchitectureSet(object):
         """
         Get a specific split.
         """
-        return ArchitectureSplit(self._architecture, self._dataset.split(num), self._dataset.class_names)
+        if not self._dataset.exists():
+            self._dataset.prepare()
+        return ArchitectureSplit(self._architecture, self._dataset.split(num), self._dataset.get_predictions_factory())
 
     def train_all(self, epochs: int = 2**64, patience: int = 5) -> None:
         for i in range(self._dataset.SPLITS):
