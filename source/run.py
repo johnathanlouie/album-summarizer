@@ -6,7 +6,7 @@ import cv2
 from cluster.histogram import HistogramCluster
 from cluster.hybridcluster import HybridCluster, HybridCluster2
 from cluster.sift import SiftCluster
-from core.archidata import ArchitectureSplit
+from core.archidata import ArchiSplitAdapter
 from core.cluster import ClusterResults, ImageCluster
 from dlfactory import DeepLearningFactory
 from jl import ImageDirectory, ListFile, ProgressBar, Url, copy_file
@@ -83,13 +83,13 @@ class ClusterRank(object):
         return
 
 
-def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchitectureSplit) -> None:
+def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchiSplitAdapter) -> None:
     """
     Does all the work.
     """
     images = ImageDirectory(directory).jpeg()
     clusters = algorithm.run(images)
-    rates = algorithm2.predict2(images).human_readable()
+    rates = algorithm2.predict(images).human_readable()
     print('Ranking results....')
     cr = ClusterRank(clusters, rates)
     print('Making summarized album at out/summarized....')

@@ -1,6 +1,6 @@
 from architecture.classifier import Vgg16A, Vgg16B, Vgg16C
 from architecture.rater import Smi13, Smi13_1, Smi13_2
-from core.archidata import ArchitectureSet, ArchitectureSplit
+from core.archidata import ArchiSplitAdapter, ArchitectureSet
 from core.dataset import DataSet
 from core.model import LOSS, METRIC, OPTIMIZER, Architecture, ModelFactory
 from dataset.anifood import CccafDataSet
@@ -39,7 +39,7 @@ class DeepLearningFactory(object):
         return ArchitectureSet(a, cls.DATASETS[ds])
 
     @classmethod
-    def create_split(cls, mf: str, ds: str, split: int, l: int, o: int, m: int) -> ArchitectureSplit:
+    def create_split(cls, mf: str, ds: str, split: int, l: int, o: int, m: int) -> ArchiSplitAdapter:
         """
         Compiles the dataset, architecture, and options into a split.
         """

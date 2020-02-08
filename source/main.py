@@ -39,14 +39,14 @@ def main() -> None:
         args.metric
     )
     if mode == 'train':
-        x.train2(epochs, patience)
+        x.train(epochs, patience)
     elif mode == 'validate':
-        x.validate2(epochs, patience)
+        x.validate(epochs, patience)
     elif mode == 'test':
-        x.test2(epochs, patience)
+        x.test(epochs, patience)
     elif mode == 'predict':
         raise NotImplementedError
-        # x.predict2(epochs, patience)
+        # x.predict(epochs, patience)
     else:
         raise Exception
     return

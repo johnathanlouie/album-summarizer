@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from os.path import isfile
-from typing import List, Tuple, Union
+from typing import List
 
 from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
@@ -9,7 +11,7 @@ from core.dataholder import DataHolder
 from core.dataset import DataSet, DataSetSplit, Predictions, PredictionsFactory
 from core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
 from core.model import Architecture, ArchitectureName
-from jl import Image, ImageDirectory, ListFile, Url, mkdirs
+from jl import Image, Url, mkdirs
 
 
 class ArchitectureSplitName(object):
@@ -113,7 +115,7 @@ class ArchitectureSplit(object):
         """
         return ArchitectureSplitName(self._architecture.name(), self._split)
 
-    def _is_train_loaded(self) -> bool:
+    def is_train_loaded(self) -> bool:
         """
         Returns true if all items are loaded.
         """
@@ -133,7 +135,7 @@ class ArchitectureSplit(object):
             return False
         return True
 
-    def _is_test_loaded(self) -> bool:
+    def is_test_loaded(self) -> bool:
         """
         Returns true if the test model is loaded.
         """
@@ -145,8 +147,6 @@ class ArchitectureSplit(object):
         """
         Trains the model.
         """
-        if not self._is_train_loaded():
-            return
         print('Loading training X')
         x1 = self._split.train().x().load()
         print('Loading training Y')
@@ -181,13 +181,11 @@ class ArchitectureSplit(object):
         print('Training finished')
         return
 
-    def _test(self, x: ndarray, y: ndarray) -> List[Evaluation]:
+    def evaluate(self, x: ndarray, y: ndarray) -> List[Evaluation]:
         """
         Tests the model using the given x and y.
         Returns a list of metrics
         """
-        if not self._is_test_loaded():
-            return
         seq = Sequence1(x, y, 10)
         results = self._best_model.evaluate_generator(generator=seq, verbose=1)
         return [Evaluation(label, value) for label, value in zip(self._best_model.metrics_names, results)]
@@ -196,32 +194,26 @@ class ArchitectureSplit(object):
         """
         Tests the model using the validation set.
         """
-        if not self._is_test_loaded():
-            return
         print('Loading validation X')
         x = self._split.validation().x().load()
         print('Loading validation Y')
         y = self._split.validation().y().load()
-        return self._test(x, y)
+        return self.evaluate(x, y)
 
     def test(self) -> List[Evaluation]:
         """
         Tests the model using the test set.
         """
-        if not self._is_test_loaded():
-            return
         print('Loading test X')
         x = self._split.test().x().load()
         print('Loading test Y')
         y = self._split.test().y().load()
-        return self._test(x, y)
+        return self.evaluate(x, y)
 
     def predict(self, images: List[Image]) -> Predictions:
         """
         Predicts using the trained model.
         """
-        if not self._is_test_loaded():
-            return
         x = asarray(images)
         seq = Sequence1(x, x, 10)
         print('Predicting....')
@@ -250,7 +242,7 @@ class ArchitectureSplit(object):
         print('Saved DataHolder.')
         return
 
-    def _is_saved(self) -> bool:
+    def is_saved(self) -> bool:
         """
         Returns true if all the saved files exist.
         """
@@ -270,8 +262,6 @@ class ArchitectureSplit(object):
         """
         Loads the training model file and other training state files.
         """
-        if not self._is_saved():
-            return
         url = self.name()
         self._model = load_model(url.train(), self._architecture.custom())
         dh = DataHolder.load(url.data_holder())
@@ -287,8 +277,6 @@ class ArchitectureSplit(object):
         """
         Loads the best model file.
         """
-        if not self._is_saved():
-            return
         url = self.name().test()
         self._best_model = load_model(url, self._architecture.custom())
         return
@@ -299,46 +287,55 @@ class ArchitectureSplit(object):
         """
         raise NotImplementedError
 
-    def train2(self, epochs: int = 2**64, patience: int = 5) -> None:
+
+class ArchiSplitAdapter(object):
+    """
+    """
+
+    def __init__(self, archisplit: ArchitectureSplit) -> None:
+        self._archisplit = archisplit
+        return
+
+    def train(self, epochs: int = 2**64, patience: int = 5) -> None:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then train.
         """
-        if not self._is_saved():
-            self.create(epochs, patience)
-        if not self._is_train_loaded():
-            self.load_train_model()
-        self.train()
+        if not self._archisplit.is_train_loaded():
+            if not self._archisplit.is_saved():
+                self._archisplit.create(epochs, patience)
+            self._archisplit.load_train_model()
+        self._archisplit.train()
         return
 
-    def validate2(self, epochs: int = 2**64, patience: int = 5) -> List[Evaluation]:
+    def validate(self, epochs: int = 2**64, patience: int = 5) -> List[Evaluation]:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then test against the validation set.
         """
-        if not self._is_saved():
-            self.create(epochs, patience)
-        if not self._is_test_loaded():
-            self.load_test_model()
-        return self.validate()
+        if not self._archisplit.is_test_loaded():
+            if not self._archisplit.is_saved():
+                self._archisplit.create(epochs, patience)
+            self._archisplit.load_test_model()
+        return self._archisplit.validate()
 
-    def test2(self, epochs: int = 2**64, patience: int = 5) -> List[Evaluation]:
+    def test(self, epochs: int = 2**64, patience: int = 5) -> List[Evaluation]:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then test against the test set.
         """
-        if not self._is_saved():
-            self.create(epochs, patience)
-        if not self._is_test_loaded():
-            self.load_test_model()
-        return self.test()
+        if not self._archisplit.is_test_loaded():
+            if not self._archisplit.is_saved():
+                self._archisplit.create(epochs, patience)
+            self._archisplit.load_test_model()
+        return self._archisplit.test()
 
-    def predict2(self, images: List[Image], epochs: int = 2**64, patience: int = 5) -> Predictions:
+    def predict(self, images: List[Image], epochs: int = 2**64, patience: int = 5) -> Predictions:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then predict using the test set.
         """
-        if not self._is_saved():
-            self.create(epochs, patience)
-        if not self._is_test_loaded():
-            self.load_test_model()
-        return self.predict(images)
+        if not self._archisplit.is_test_loaded():
+            if not self._archisplit.is_saved():
+                self._archisplit.create(epochs, patience)
+            self._archisplit.load_test_model()
+        return self._archisplit.predict(images)
 
 
 class ArchitectureSet(object):
@@ -353,20 +350,21 @@ class ArchitectureSet(object):
         self._dataset = dataset
         return
 
-    def split(self, num: int) -> ArchitectureSplit:
+    def split(self, num: int) -> ArchiSplitAdapter:
         """
         Get a specific split.
         """
         if not self._dataset.exists():
             self._dataset.prepare()
-        return ArchitectureSplit(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
+        archisplit = ArchitectureSplit(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
+        return ArchiSplitAdapter(archisplit)
 
     def train(self, epochs: int = 2**64, patience: int = 5) -> None:
         """
         """
         for i in range(self._dataset.splits()):
-            print("Split %d/%d" % (i + 1, self._dataset.splits()))
-            self.split(i).train2(epochs, patience)
+            print("Split %d / %d" % (i + 1, self._dataset.splits()))
+            self.split(i).train(epochs, patience)
         return
 
     def test(self) -> List[Evaluation]:
@@ -374,8 +372,8 @@ class ArchitectureSet(object):
         """
         results = list()
         for i in range(self._dataset.splits()):
-            print("Split %d/%d" % (i + 1, self._dataset.splits()))
-            r = self.split(i).test2()
+            print("Split %d / %d" % (i + 1, self._dataset.splits()))
+            r = self.split(i).test()
             results.append(r)
         averages = list()
         for i in range(len(results[0])):
@@ -389,8 +387,8 @@ class ArchitectureSet(object):
         """
         results = list()
         for i in range(self._dataset.splits()):
-            print("Split %d/%d" % (i + 1, self._dataset.splits()))
-            r = self.split(i).validate2()
+            print("Split %d / %d" % (i + 1, self._dataset.splits()))
+            r = self.split(i).validate()
             results.append(r)
         averages = list()
         for i in range(len(results[0])):
