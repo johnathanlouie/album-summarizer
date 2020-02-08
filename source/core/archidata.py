@@ -1,5 +1,5 @@
 from os.path import isfile
-from typing import Callable, List, Union
+from typing import List, Tuple, Union
 
 from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
 from keras.models import load_model
@@ -62,6 +62,29 @@ class ArchitectureSplitName(object):
         Returns the URL of the predictions file.
         """
         return "%s/pred.txt" % self._path()
+
+
+class Evaluation(object):
+    """
+    """
+
+    def __init__(self, label: str, value: float) -> None:
+        self.label = label
+        self.value = value
+        return
+
+    @staticmethod
+    def mean(evals: List[Evaluation]) -> Evaluation:
+        label = None
+        value = 0
+        for e in evals:
+            if label == None:
+                label = e.label
+            if label != e.label:
+                raise Exception('Evaluation labels do not match.')
+            value = value + e.value
+        value = value / len(evals)
+        return Evaluation(label, value)
 
 
 class ArchitectureSplit(object):
@@ -158,21 +181,18 @@ class ArchitectureSplit(object):
         print('Training finished')
         return
 
-    def _test(self, x: ndarray, y: ndarray) -> None:
+    def _test(self, x: ndarray, y: ndarray) -> List[Evaluation]:
         """
         Tests the model using the given x and y.
+        Returns a list of metrics
         """
         if not self._is_test_loaded():
             return
         seq = Sequence1(x, y, 10)
         results = self._best_model.evaluate_generator(generator=seq, verbose=1)
-        if type(results) != list:
-            results = [results]
-        for metric, scalar in zip(self._best_model.metrics_names, results):
-            print('%s: %f' % (metric, scalar))
-        return
+        return [Evaluation(label, value) for label, value in zip(self._best_model.metrics_names, results)]
 
-    def validate(self) -> None:
+    def validate(self) -> List[Evaluation]:
         """
         Tests the model using the validation set.
         """
@@ -182,10 +202,9 @@ class ArchitectureSplit(object):
         x = self._split.validation().x().load()
         print('Loading validation Y')
         y = self._split.validation().y().load()
-        self._test(x, y)
-        return
+        return self._test(x, y)
 
-    def test(self) -> None:
+    def test(self) -> List[Evaluation]:
         """
         Tests the model using the test set.
         """
@@ -195,8 +214,7 @@ class ArchitectureSplit(object):
         x = self._split.test().x().load()
         print('Loading test Y')
         y = self._split.test().y().load()
-        self._test(x, y)
-        return
+        return self._test(x, y)
 
     def predict(self, images: List[Image]) -> Predictions:
         """
@@ -292,7 +310,7 @@ class ArchitectureSplit(object):
         self.train()
         return
 
-    def validate2(self, epochs: int = 2**64, patience: int = 5) -> None:
+    def validate2(self, epochs: int = 2**64, patience: int = 5) -> List[Evaluation]:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then test against the validation set.
         """
@@ -300,10 +318,9 @@ class ArchitectureSplit(object):
             self.create(epochs, patience)
         if not self._is_test_loaded():
             self.load_test_model()
-        self.validate()
-        return
+        return self.validate()
 
-    def test2(self, epochs: int = 2**64, patience: int = 5) -> None:
+    def test2(self, epochs: int = 2**64, patience: int = 5) -> List[Evaluation]:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then test against the test set.
         """
@@ -311,8 +328,7 @@ class ArchitectureSplit(object):
             self.create(epochs, patience)
         if not self._is_test_loaded():
             self.load_test_model()
-        self.test()
-        return
+        return self.test()
 
     def predict2(self, images: List[Image], epochs: int = 2**64, patience: int = 5) -> Predictions:
         """
@@ -345,8 +361,40 @@ class ArchitectureSet(object):
             self._dataset.prepare()
         return ArchitectureSplit(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
 
-    def train_all(self, epochs: int = 2**64, patience: int = 5) -> None:
+    def train(self, epochs: int = 2**64, patience: int = 5) -> None:
+        """
+        """
         for i in range(self._dataset.splits()):
             print("Split %d/%d" % (i + 1, self._dataset.splits()))
             self.split(i).train2(epochs, patience)
         return
+
+    def test(self) -> List[Evaluation]:
+        """
+        """
+        results = list()
+        for i in range(self._dataset.splits()):
+            print("Split %d/%d" % (i + 1, self._dataset.splits()))
+            r = self.split(i).test2()
+            results.append(r)
+        averages = list()
+        for i in range(len(results[0])):
+            c = [split[i] for split in results]
+            m = Evaluation.mean(c)
+            averages.append(m)
+        return averages
+
+    def validate(self) -> List[Evaluation]:
+        """
+        """
+        results = list()
+        for i in range(self._dataset.splits()):
+            print("Split %d/%d" % (i + 1, self._dataset.splits()))
+            r = self.split(i).validate2()
+            results.append(r)
+        averages = list()
+        for i in range(len(results[0])):
+            c = [split[i] for split in results]
+            m = Evaluation.mean(c)
+            averages.append(m)
+        return averages
