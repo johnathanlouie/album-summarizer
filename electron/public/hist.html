@@ -1,121 +1,155 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Album Summarizer - Histogram</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <style>
+            img {
+                max-height: 400px
+            }
+        </style>
+    </head>
 
-<head>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<style>
-		img {
-			max-height: 400px
-		}
-	</style>
-</head>
+    <body>
 
-<body>
-	<p id="p1"></p>
-	<input type="file" id="file1">
-	<input type="file" id="file2" onchange="s()">
-	<br>
-	<button onclick="s()">submit</button>
-	<script>
-		var a = null;
-		var fr = null;
-		var url = null;
-		var cluster = null;
-		var isReady = 0;
-		var map = new Map();
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <a class="navbar-brand" href="index.html">
+                <svg class="bi" width="18" height="18" fill="currentColor" style="margin-bottom:5px;">
+                <use xlink:href="bootstrap-icons.svg#house-fill"/>
+                </svg>
+            </a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="checkrate.html">Check Rate</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="hist.html">Histogram</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index1.php">Rate Images</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="preview.html">Preview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="siftsimilarity.html">Sift Similarity</a>
+                </li>
+            </ul>
+        </nav>
 
-		function load1(e) {
-			url = e.target.result;
-			url = url.split("\n");
-			isReady++;
-			go();
-		}
+        <div class="container-fluid">
+            <p id="p1"></p>
+            <input type="file" id="file1">
+            <input type="file" id="file2" onchange="s()">
+            <br>
+            <button onclick="s()">submit</button>
+        </div>
 
-		function load2(e) {
-			cluster = e.target.result;
-			cluster = cluster.split("\n");
-			isReady++;
-			go();
-		}
+        <script>
+            var a = null;
+            var fr = null;
+            var url = null;
+            var cluster = null;
+            var isReady = 0;
+            var map = new Map();
 
-		function upsert(index, value) {
-			var arr = map.get(index);
-			if (!arr) {
-				arr = [];
-				map.set(index, arr);
-			}
-			arr.push(value);
-		}
+            function load1(e) {
+                url = e.target.result;
+                url = url.split("\n");
+                isReady++;
+                go();
+            }
 
-		function go() {
-			if (isReady === 2) {
-				for (let i = 0; i < url.length; i++) {
-					var v = url[i];
-					var k = cluster[i];
-					upsert(k, v);
-				}
-				drawClusters();
-			}
-		}
+            function load2(e) {
+                cluster = e.target.result;
+                cluster = cluster.split("\n");
+                isReady++;
+                go();
+            }
 
-		function drawClusters() {
-			for (let i of map.entries()) {
-				var clusterId = i[0];
-				var u = i[1];
-				$("<h1>").text("============================================" + clusterId + "=================================================").appendTo("#p1");
-				var newP = $("<p>").appendTo("#p1");
-				for (let j of u) {
-					$("<img>").attr("src", j).css('border', '1px pink solid').appendTo(newP);
-				}
-			}
-		}
+            function upsert(index, value) {
+                var arr = map.get(index);
+                if (!arr) {
+                    arr = [];
+                    map.set(index, arr);
+                }
+                arr.push(value);
+            }
 
-		function next() {
-			var i = Math.random() * (url.length - 1);
-			i = Math.round(i);
-			var u = url[i];
-			var r = rating[i];
-			document.getElementById("img1").src = u;
-			document.getElementById("span1").innerText = ewr(Number(r));
-		}
+            function go() {
+                if (isReady === 2) {
+                    for (let i = 0; i < url.length; i++) {
+                        var v = url[i];
+                        var k = cluster[i];
+                        upsert(k, v);
+                    }
+                    drawClusters();
+                }
+            }
 
-		function ewr(a) {
-			switch (a) {
-				case 1:
-					return "environment";
-				case 2:
-					return "people";
-				case 3:
-					return "object";
-				case 4:
-					return "hybrid";
-				case 5:
-					return "animal";
-				case 6:
-					return "food";
-				default:
-					return "no idea";
-			}
-		}
+            function drawClusters() {
+                for (let i of map.entries()) {
+                    var clusterId = i[0];
+                    var u = i[1];
+                    $("<h1>").text("============================================" + clusterId + "=================================================").appendTo("#p1");
+                    var newP = $("<p>").appendTo("#p1");
+                    for (let j of u) {
+                        $("<img>").attr("src", j).css('border', '1px pink solid').appendTo(newP);
+                    }
+                }
+            }
 
-		function asd(fid, cb) {
-			a = document.getElementById(fid).files[0];
-			fr = new FileReader();
-			fr.onload = cb;
-			fr.readAsText(a);
-		}
-		function s() {
-			$("#p1").empty();
-			a = null;
-			fr = null;
-			url = null;
-			cluster = null;
-			isReady = 0;
-			map = new Map();
-			asd("file1", load1);
-			asd("file2", load2);
-		}
-	</script>
+            function next() {
+                var i = Math.random() * (url.length - 1);
+                i = Math.round(i);
+                var u = url[i];
+                var r = rating[i];
+                document.getElementById("img1").src = u;
+                document.getElementById("span1").innerText = ewr(Number(r));
+            }
 
-</body>
+            function ewr(a) {
+                switch (a) {
+                    case 1:
+                        return "environment";
+                    case 2:
+                        return "people";
+                    case 3:
+                        return "object";
+                    case 4:
+                        return "hybrid";
+                    case 5:
+                        return "animal";
+                    case 6:
+                        return "food";
+                    default:
+                        return "no idea";
+                }
+            }
 
+            function asd(fid, cb) {
+                a = document.getElementById(fid).files[0];
+                fr = new FileReader();
+                fr.onload = cb;
+                fr.readAsText(a);
+            }
+            function s() {
+                $("#p1").empty();
+                a = null;
+                fr = null;
+                url = null;
+                cluster = null;
+                isReady = 0;
+                map = new Map();
+                asd("file1", load1);
+                asd("file2", load2);
+            }
+        </script>
+
+    </body>
 </html>

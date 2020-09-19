@@ -1,91 +1,132 @@
-<style>
-	td {
-		border: 1px black solid;
-	}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Album Summarizer - Check Rate</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <style>
+            td {
+                border: 1px black solid;
+            }
+            img {
+                max-width: 300px;
+                max-height: 300px;
+            }
+        </style>
+    </head>
+    <body>
 
-	img {
-		max-width: 300px;
-		max-height: 300px;
-	}
-</style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<table id="table1"></table>
-<input type="file" id="file1">
-<input type="file" id="file2">
-<input type="file" id="file3">
-<br>
-<button onclick="submitButton()">submit</button>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <a class="navbar-brand" href="index.html">
+                <svg class="bi" width="18" height="18" fill="currentColor" style="margin-bottom:5px;">
+                <use xlink:href="bootstrap-icons.svg#house-fill"/>
+                </svg>
+            </a>
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="checkrate.html">Check Rate</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="hist.html">Histogram</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index1.php">Rate Images</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="preview.html">Preview</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="siftsimilarity.html">Sift Similarity</a>
+                </li>
+            </ul>
+        </nav>
 
-<script>
-	var a = null;
-	var fr = null;
-	var url = null;
-	var rating1 = null;
-	var rating2 = null;
-	var isReady = 0;
+        <div class="container-fluid">
+            <table id="table1"></table>
+            <input type="file" id="file1">
+            <input type="file" id="file2">
+            <input type="file" id="file3">
+            <br>
+            <button onclick="submitButton()">submit</button>
+        </div>
 
-	function load1(e) {
-		url = e.target.result;
-		url = url.split("\n");
-		isReady++;
-		go();
-	}
+        <script>
+            var a = null;
+            var fr = null;
+            var url = null;
+            var rating1 = null;
+            var rating2 = null;
+            var isReady = 0;
 
-	function load2(e) {
-		rating1 = e.target.result;
-		rating1 = rating1.split("\n");
-		isReady++;
-		go();
-	}
+            function load1(e) {
+                url = e.target.result;
+                url = url.split("\n");
+                isReady++;
+                go();
+            }
 
-	function load3(e) {
-		rating2 = e.target.result;
-		rating2 = rating2.split("\n");
-		isReady++;
-		go();
-	}
+            function load2(e) {
+                rating1 = e.target.result;
+                rating1 = rating1.split("\n");
+                isReady++;
+                go();
+            }
 
-	function go() {
-		if (isReady === 3) {
-			thrs();
-		}
-	}
+            function load3(e) {
+                rating2 = e.target.result;
+                rating2 = rating2.split("\n");
+                isReady++;
+                go();
+            }
 
-	function asd(fid, cb) {
-		a = document.getElementById(fid).files[0];
-		fr = new FileReader();
-		fr.onload = cb;
-		fr.readAsText(a);
-	}
+            function go() {
+                if (isReady === 3) {
+                    thrs();
+                }
+            }
 
-	function submitButton() {
-		asd("file1", load1);
-		asd("file2", load2);
-		asd("file3", load3);
-	}
+            function asd(fid, cb) {
+                a = document.getElementById(fid).files[0];
+                fr = new FileReader();
+                fr.onload = cb;
+                fr.readAsText(a);
+            }
 
-	function dsgf(img, truth, pred) {
-		return { img: img, truth: truth, pred: pred };
-	}
+            function submitButton() {
+                asd("file1", load1);
+                asd("file2", load2);
+                asd("file3", load3);
+            }
 
-	function boirh(a, b) {
-		return b.pred - a.pred;
-	}
+            function dsgf(img, truth, pred) {
+                return {img: img, truth: truth, pred: pred};
+            }
 
-	function thrs() {
-		var combined = [];
-		for (var i = 0; i < url.length; i++) {
-			var rher = dsgf(url[i], rating1[i], rating2[i])
-			combined.push(rher);
-		}
-		combined.sort(boirh);
-		for (let i of combined) {
-			var tr = $("<tr>");
-			var td1 = $("<td>").appendTo(tr);
-			var td2 = $("<td>").text(i.pred).appendTo(tr);
-			var td3 = $("<td>").text(i.truth).appendTo(tr);
-			var img = $("<img>").attr("src", i.img).appendTo(td1);
-			tr.appendTo("#table1");
-		}
-	}
-</script>
+            function boirh(a, b) {
+                return b.pred - a.pred;
+            }
+
+            function thrs() {
+                var combined = [];
+                for (var i = 0; i < url.length; i++) {
+                    var rher = dsgf(url[i], rating1[i], rating2[i])
+                    combined.push(rher);
+                }
+                combined.sort(boirh);
+                for (let i of combined) {
+                    var tr = $("<tr>");
+                    var td1 = $("<td>").appendTo(tr);
+                    var td2 = $("<td>").text(i.pred).appendTo(tr);
+                    var td3 = $("<td>").text(i.truth).appendTo(tr);
+                    var img = $("<img>").attr("src", i.img).appendTo(td1);
+                    tr.appendTo("#table1");
+                }
+            }
+        </script>
+
+    </body>
+</html>
