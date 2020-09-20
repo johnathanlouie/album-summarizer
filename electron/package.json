@@ -4,7 +4,8 @@
     "description": "Note: Only Keras 2.3.0+ supports Tensorflow 2.0+. Use Tensorflow 1.15 if an older version of Keras is used.\r - Python 3\r - Keras\r - OpenCV\r - HDF5\r - scikit-learn\r - NumPy\r - Dill",
     "main": "index.js",
     "dependencies": {
-        "electron": "^10.1.1"
+        "electron": "^10.1.1",
+        "jquery": "^3.5.1"
     },
     "devDependencies": {},
     "scripts": {
