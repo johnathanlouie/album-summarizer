@@ -51,81 +51,73 @@
             <input type="file" id="file2">
             <input type="file" id="file3">
             <br>
-            <button onclick="submitButton()">submit</button>
+            <button class="btn btn-primary" id="sendButton">Submit</button>
         </div>
 
         <script>
-            var a = null;
-            var fr = null;
-            var url = null;
-            var rating1 = null;
-            var rating2 = null;
-            var isReady = 0;
+            var data = null;
+
+            class Data {
+                constructor() {
+                    this.url = null;
+                    this.rating1 = null;
+                    this.rating2 = null;
+                }
+
+                go() {
+                    if (this.url === null || this.rating1 === null || this.rating2 === null) {
+                    } else if (url.length !== rating1.length || rating1.length !== rating2.length) {
+                        throw "Number of entries mismatch.";
+                    } else {
+                        let entries = [];
+                        for (let i in url) {
+                            entries.push({
+                                img: url[i],
+                                truth: rating1[i],
+                                pred: rating2[i]
+                            });
+                        }
+                        entries.sort((a, b) => b.pred - a.pred);
+                        for (let i of entries) {
+                            let tr = $("<tr>").appendTo("#table1");
+                            let td1 = $("<td>").appendTo(tr);
+                            let td2 = $("<td>").text(i.pred).appendTo(tr);
+                            let td3 = $("<td>").text(i.truth).appendTo(tr);
+                            let img = $("<img>").attr("src", i.img).appendTo(td1);
+                        }
+                    }
+                }
+            }
 
             function load1(e) {
-                url = e.target.result;
-                url = url.split("\n");
-                isReady++;
-                go();
+                data.url = e.target.result.split("\n");
+                data.go();
             }
 
             function load2(e) {
-                rating1 = e.target.result;
-                rating1 = rating1.split("\n");
-                isReady++;
-                go();
+                data.rating1 = e.target.result.split("\n");
+                data.go();
             }
 
             function load3(e) {
-                rating2 = e.target.result;
-                rating2 = rating2.split("\n");
-                isReady++;
-                go();
+                data.rating2 = e.target.result.split("\n");
+                data.go();
             }
 
-            function go() {
-                if (isReady === 3) {
-                    thrs();
-                }
+
+            function readFile(fileId, callback) {
+                let f = $(fileId).prop("files")[0];
+                let fr = new FileReader();
+                fr.onload = callback;
+                fr.readAsText(f);
             }
 
-            function asd(fid, cb) {
-                a = document.getElementById(fid).files[0];
-                fr = new FileReader();
-                fr.onload = cb;
-                fr.readAsText(a);
-            }
-
-            function submitButton() {
-                asd("file1", load1);
-                asd("file2", load2);
-                asd("file3", load3);
-            }
-
-            function dsgf(img, truth, pred) {
-                return {img: img, truth: truth, pred: pred};
-            }
-
-            function boirh(a, b) {
-                return b.pred - a.pred;
-            }
-
-            function thrs() {
-                var combined = [];
-                for (var i = 0; i < url.length; i++) {
-                    var rher = dsgf(url[i], rating1[i], rating2[i])
-                    combined.push(rher);
-                }
-                combined.sort(boirh);
-                for (let i of combined) {
-                    var tr = $("<tr>");
-                    var td1 = $("<td>").appendTo(tr);
-                    var td2 = $("<td>").text(i.pred).appendTo(tr);
-                    var td3 = $("<td>").text(i.truth).appendTo(tr);
-                    var img = $("<img>").attr("src", i.img).appendTo(td1);
-                    tr.appendTo("#table1");
-                }
-            }
+            $("#sendButton").click(function () {
+                data = new Data();
+                readFile("#file1", load1);
+                readFile("#file2", load2);
+                readFile("#file3", load3);
+            });
         </script>
 
     </body>
