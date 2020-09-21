@@ -9,10 +9,7 @@
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
         <style>
-            td {
-                border: 1px black solid;
-            }
-            img {
+            img.rate-thumbnail {
                 max-width: 300px;
                 max-height: 300px;
             }
@@ -46,15 +43,60 @@
         </nav>
 
         <div class="container-fluid">
-            <table id="table1"></table>
-            <input type="file" id="file1">
-            <input type="file" id="file2">
-            <input type="file" id="file3">
-            <br>
-            <button class="btn btn-primary" id="sendButton">Submit</button>
+            <form class="mb-3">
+                <div class="form-row align-items-center">
+
+                    <div class="col-3">
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="file1">
+                                <label class="custom-file-label" for="file1">Image URLs</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="file2">
+                                <label class="custom-file-label" for="file2">True Value</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-4">
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="file3">
+                                <label class="custom-file-label" for="file3">Predicted Value</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-1">
+                        <button class="btn btn-primary" id="sendButton">Submit</button>
+                    </div>
+                </div>
+            </form>
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Image</th>
+                        <th>True Value</th>
+                        <th>Predicted Value</th>
+                    </tr>
+                </thead>
+                <tbody id="table1"></tbody>
+            </table>
         </div>
 
         <script>
+            for (let i of ["file1", "file2", "file3"]) {
+                $(`#${i}`).change(function () {
+                    $(`label[for="${i}"]`).text($(`#${i}`).val());
+                });
+            }
+
             var data = null;
 
             class Data {
@@ -83,7 +125,7 @@
                             let td1 = $("<td>").appendTo(tr);
                             let td2 = $("<td>").text(i.pred).appendTo(tr);
                             let td3 = $("<td>").text(i.truth).appendTo(tr);
-                            let img = $("<img>").attr("src", i.img).appendTo(td1);
+                            let img = $("<img>").attr("src", i.img).addClass("rate-thumbnail").appendTo(td1);
                         }
                     }
                 }
@@ -103,7 +145,6 @@
                 data.rating2 = e.target.result.split("\n");
                 data.go();
             }
-
 
             function readFile(fileId, callback) {
                 let f = $(fileId).prop("files")[0];
