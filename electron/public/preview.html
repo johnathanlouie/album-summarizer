@@ -39,81 +39,81 @@
 
         <div class="container-fluid">
             <img id="img1">
-            <span id="span1"></span>
+            <span id="classification"></span>
             <br>
             <br>
             <br>
-            <button onclick="next()">next</button>
+            <button id="nextButton">Next</button>
             <br>
             <input type="file" id="file1">
             <input type="file" id="file2">
             <br>
-            <button onclick="s()">submit</button>
+            <button id="sendButton">Submit</button>
         </div>
 
         <script>
-            var a = null;
-            var fr = null;
-            var url = null;
-            var rating = null;
-            var isReady = 0;
-            function load1(e) {
-                url = e.target.result;
-                url = url.split("\n");
-                isReady++;
-                //go();
-            }
-            function load2(e) {
-                rating = e.target.result;
-                rating = rating.split("\n");
-                isReady++;
-                //go();
-            }
+            const DICT = {
+                1: "environment",
+                2: "people",
+                3: "object",
+                4: "hybrid",
+                5: "animal",
+                6: "food"
+            };
 
-            function go() {
-                if (isReady === 2) {
+            class Data {
+                constructor() {
+                    this.images = null;
+                    this.classifications = null;
+                }
 
+                reset() {
+                    this.images = null;
+                    this.classifications = null;
+                    $("#img1").attr("src", "");
+                    $("#classification").text("");
+                }
+
+                next() {
+                    let i = Math.round(Math.random() * (this.images.length - 1));
+                    $("#img1").attr("src", this.images[i]);
+                    $("#classification").text(DICT[Number(this.classifications[i])]);
+                }
+
+                onLoad() {
+                    if (this.images === null || this.classifications === null) {
+                    } else if (this.images.length !== this.classifications.length) {
+                        throw "Number of entries mismatch.";
+                    } else {
+                        this.next();
+                    }
                 }
             }
 
-            function next() {
-                var i = Math.random() * (url.length - 1);
-                i = Math.round(i);
-                var u = url[i];
-                var r = rating[i];
-                document.getElementById("img1").src = u;
-                document.getElementById("span1").innerText = ewr(Number(r));
+            var data = new Data();
+
+            function readFile(fileId, callback) {
+                let f = $(fileId).prop("files")[0];
+                let fr = new FileReader();
+                fr.onload = callback;
+                fr.readAsText(f);
             }
 
-            function ewr(a) {
-                switch (a) {
-                    case 1:
-                        return "environment";
-                    case 2:
-                        return "people";
-                    case 3:
-                        return "object";
-                    case 4:
-                        return "hybrid";
-                    case 5:
-                        return "animal";
-                    case 6:
-                        return "food";
-                    default:
-                        return "no idea";
-                }
-            }
+            $("#sendButton").click(function () {
+                data.reset();
+                readFile("#file1", function (e) {
+                    data.images = e.target.result.split("\n");
+                    data.onLoad();
+                });
+                readFile("#file2", function (e) {
+                    data.classifications = e.target.result.split("\n");
+                    data.onLoad();
+                });
+            });
 
-            function asd(fid, cb) {
-                a = document.getElementById(fid).files[0];
-                fr = new FileReader();
-                fr.onload = cb;
-                fr.readAsText(a);
-            }
-            function s() {
-                asd("file1", load1);
-                asd("file2", load2);
-            }
+            $("#nextButton").click(function () {
+                data.next();
+            });
         </script>
 
     </body>
