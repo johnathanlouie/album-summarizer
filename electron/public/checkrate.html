@@ -99,20 +99,20 @@
 
             class Data {
                 constructor() {
-                    this.url = null;
+                    this.images = null;
                     this.rating1 = null;
                     this.rating2 = null;
                 }
 
                 onLoad() {
-                    if (this.url === null || this.rating1 === null || this.rating2 === null) {
-                    } else if (this.url.length !== this.rating1.length || this.rating1.length !== this.rating2.length) {
+                    if (this.images === null || this.rating1 === null || this.rating2 === null) {
+                    } else if (this.images.length !== this.rating1.length || this.rating1.length !== this.rating2.length) {
                         throw "Number of entries mismatch.";
                     } else {
                         let entries = [];
-                        for (let i in this.url) {
+                        for (let i in this.images) {
                             entries.push({
-                                img: this.url[i],
+                                img: this.images[i],
                                 truth: this.rating1[i],
                                 pred: this.rating2[i]
                             });
@@ -140,7 +140,7 @@
                 var data = new Data();
                 $("#table1").empty();
                 readFile("#file1", function (e) {
-                    data.url = e.target.result.split("\n");
+                    data.images = e.target.result.split("\n");
                     data.onLoad();
                 });
                 readFile("#file2", function (e) {
