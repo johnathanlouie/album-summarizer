@@ -38,20 +38,57 @@
         </nav>
 
         <div class="container-fluid">
-            <img id="img1">
-            <span id="classification"></span>
-            <br>
-            <br>
-            <br>
-            <button id="nextButton">Next</button>
-            <br>
-            <input type="file" id="file1">
-            <input type="file" id="file2">
-            <br>
-            <button id="sendButton">Submit</button>
+
+            <form class="mb-3">
+                <div class="form-row align-items-center">
+
+                    <div class="col-5">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Image URLs</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="file1">
+                                <label class="custom-file-label" for="file1">Choose file</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-5">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Class</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="file2">
+                                <label class="custom-file-label" for="file2">Choose file</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-2">
+                        <button class="btn btn-primary" id="loadButton">Load</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="text-center">
+                <button class="btn btn-primary" id="nextButton">Next</button>
+                <h1 id="classification">Class</h1>
+                <img class="img-thumbnail" id="img1">
+            </div>
+
         </div>
 
+
         <script>
+            for (let i of ["file1", "file2"]) {
+                $(`#${i}`).change(function () {
+                    let filename = $(`#${i}`).prop("files")[0].name;
+                    $(`label[for="${i}"]`).text(filename);
+                });
+            }
+
             const DICT = {
                 1: "environment",
                 2: "people",
@@ -71,26 +108,41 @@
                     this.images = null;
                     this.classifications = null;
                     $("#img1").attr("src", "");
-                    $("#classification").text("");
+                    $("#classification").text("Class");
                 }
 
                 next() {
-                    let i = Math.round(Math.random() * (this.images.length - 1));
-                    $("#img1").attr("src", this.images[i]);
-                    $("#classification").text(DICT[Number(this.classifications[i])]);
+                    if (!Array.isArray(this.images)) {
+                        alert("Image list not found.");
+                    } else if (this.images.length === 0) {
+                        alert("Image list is empty.");
+                    } else if (this.images.length === 1) {
+                        $("#img1").attr("src", this.images[0]);
+                        $("#classification").text(DICT[Number(this.classifications[0])]);
+                    } else {
+                        let imgUrl;
+                        let classi;
+                        do {
+                            let i = Math.round(Math.random() * (this.images.length - 1));
+                            imgUrl = this.images[i];
+                            classi = Number(this.classifications[i]);
+                        } while ($("#img1").attr("src") === imgUrl);
+                        $("#img1").attr("src", imgUrl);
+                        $("#classification").text(DICT[classi]);
+                    }
                 }
 
                 onLoad() {
                     if (this.images === null || this.classifications === null) {
                     } else if (this.images.length !== this.classifications.length) {
-                        throw "Number of entries mismatch.";
+                        alert("Number of entries mismatch.");
                     } else {
                         this.next();
                     }
                 }
             }
 
-            var data = new Data();
+            const DATA = new Data();
 
             function readFile(fileId, callback) {
                 let f = $(fileId).prop("files")[0];
@@ -99,20 +151,22 @@
                 fr.readAsText(f);
             }
 
-            $("#sendButton").click(function () {
-                data.reset();
-                readFile("#file1", function (e) {
-                    data.images = e.target.result.split("\n");
-                    data.onLoad();
+            $("#loadButton").click(function (e1) {
+                e1.preventDefault();
+                DATA.reset();
+                // TODO add check if a file is selected
+                readFile("#file1", function (e2) {
+                    DATA.images = e2.target.result.split("\n");
+                    DATA.onLoad();
                 });
-                readFile("#file2", function (e) {
-                    data.classifications = e.target.result.split("\n");
-                    data.onLoad();
+                readFile("#file2", function (e2) {
+                    DATA.classifications = e2.target.result.split("\n");
+                    DATA.onLoad();
                 });
             });
 
             $("#nextButton").click(function () {
-                data.next();
+                DATA.next();
             });
         </script>
 
