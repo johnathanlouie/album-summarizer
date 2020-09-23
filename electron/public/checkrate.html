@@ -48,27 +48,36 @@
 
                     <div class="col-3">
                         <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Image URLs</span>
+                            </div>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="file1">
-                                <label class="custom-file-label" for="file1">Image URLs</label>
+                                <label class="custom-file-label" for="file1">Choose file</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-4">
                         <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">True Value</span>
+                            </div>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="file2">
-                                <label class="custom-file-label" for="file2">True Value</label>
+                                <label class="custom-file-label" for="file2">Choose file</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-4">
                         <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Predicted Value</span>
+                            </div>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="file3">
-                                <label class="custom-file-label" for="file3">Predicted Value</label>
+                                <label class="custom-file-label" for="file3">Choose file</label>
                             </div>
                         </div>
                     </div>
@@ -93,7 +102,8 @@
         <script>
             for (let i of ["file1", "file2", "file3"]) {
                 $(`#${i}`).change(function () {
-                    $(`label[for="${i}"]`).text($(`#${i}`).val());
+                    let filename = $(`#${i}`).prop("files")[0].name;
+                    $(`label[for="${i}"]`).text(filename);
                 });
             }
 
