@@ -97,8 +97,6 @@
                 });
             }
 
-            var data = null;
-
             class Data {
                 constructor() {
                     this.url = null;
@@ -106,17 +104,17 @@
                     this.rating2 = null;
                 }
 
-                go() {
+                onLoad() {
                     if (this.url === null || this.rating1 === null || this.rating2 === null) {
-                    } else if (url.length !== rating1.length || rating1.length !== rating2.length) {
+                    } else if (this.url.length !== this.rating1.length || this.rating1.length !== this.rating2.length) {
                         throw "Number of entries mismatch.";
                     } else {
                         let entries = [];
-                        for (let i in url) {
+                        for (let i in this.url) {
                             entries.push({
-                                img: url[i],
-                                truth: rating1[i],
-                                pred: rating2[i]
+                                img: this.url[i],
+                                truth: this.rating1[i],
+                                pred: this.rating2[i]
                             });
                         }
                         entries.sort((a, b) => b.pred - a.pred);
@@ -131,21 +129,6 @@
                 }
             }
 
-            function load1(e) {
-                data.url = e.target.result.split("\n");
-                data.go();
-            }
-
-            function load2(e) {
-                data.rating1 = e.target.result.split("\n");
-                data.go();
-            }
-
-            function load3(e) {
-                data.rating2 = e.target.result.split("\n");
-                data.go();
-            }
-
             function readFile(fileId, callback) {
                 let f = $(fileId).prop("files")[0];
                 let fr = new FileReader();
@@ -154,11 +137,20 @@
             }
 
             $("#sendButton").click(function () {
-                data = new Data();
+                var data = new Data();
                 $("#table1").empty();
-                readFile("#file1", load1);
-                readFile("#file2", load2);
-                readFile("#file3", load3);
+                readFile("#file1", function (e) {
+                    data.url = e.target.result.split("\n");
+                    data.onLoad();
+                });
+                readFile("#file2", function (e) {
+                    data.rating1 = e.target.result.split("\n");
+                    data.onLoad();
+                });
+                readFile("#file3", function (e) {
+                    data.rating2 = e.target.result.split("\n");
+                    data.onLoad();
+                });
             });
         </script>
 
