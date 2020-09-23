@@ -83,7 +83,7 @@
                     </div>
 
                     <div class="col-1">
-                        <button class="btn btn-primary" id="sendButton">Submit</button>
+                        <button class="btn btn-primary" id="loadButton">Load</button>
                     </div>
                 </div>
             </form>
@@ -117,7 +117,7 @@
                 onLoad() {
                     if (this.images === null || this.rating1 === null || this.rating2 === null) {
                     } else if (this.images.length !== this.rating1.length || this.rating1.length !== this.rating2.length) {
-                        throw "Number of entries mismatch.";
+                        alert("Number of entries mismatch.");
                     } else {
                         let entries = [];
                         for (let i in this.images) {
@@ -146,19 +146,20 @@
                 fr.readAsText(f);
             }
 
-            $("#sendButton").click(function () {
+            $("#loadButton").click(function (e1) {
+                e1.preventDefault();
                 var data = new Data();
                 $("#table1").empty();
-                readFile("#file1", function (e) {
-                    data.images = e.target.result.split("\n");
+                readFile("#file1", function (e2) {
+                    data.images = e2.target.result.split("\n");
                     data.onLoad();
                 });
-                readFile("#file2", function (e) {
-                    data.rating1 = e.target.result.split("\n");
+                readFile("#file2", function (e2) {
+                    data.rating1 = e2.target.result.split("\n");
                     data.onLoad();
                 });
-                readFile("#file3", function (e) {
-                    data.rating2 = e.target.result.split("\n");
+                readFile("#file3", function (e2) {
+                    data.rating2 = e2.target.result.split("\n");
                     data.onLoad();
                 });
             });
