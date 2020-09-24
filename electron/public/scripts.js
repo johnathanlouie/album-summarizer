@@ -3,6 +3,12 @@ class LwdFilesReader {
         this.fileInputIds = Array.from(arguments);
     }
 
+    /**
+     * For internal use only.
+     * @param {type} fileId
+     * @param {type} callback
+     * @returns {undefined}
+     */
     static readFile(fileId, callback) {
         let f = $(fileId).prop("files")[0];
         let fr = new FileReader();
@@ -10,6 +16,11 @@ class LwdFilesReader {
         fr.readAsText(f);
     }
 
+    /**
+     * For internal use only.
+     * @param {type} arr
+     * @returns {Boolean}
+     */
     isLoaded(arr) {
         for (let i = 0; i < this.fileInputIds.length; i++) {
             if (!Array.isArray(arr[i])) {
@@ -20,7 +31,7 @@ class LwdFilesReader {
     }
 
     /**
-     * Checks if every array has the same length.
+     * Checks if every array has the same length. For internal use only.
      * @param {string[][]} arr - An array of arrays.
      * @returns {boolean} True if all equal.
      */
