@@ -1,0 +1,47 @@
+class LwdFilesReader {
+    constructor() {
+        this.fileInputIds = Array.from(arguments);
+    }
+
+    static readFile(fileId, callback) {
+        let f = $(fileId).prop("files")[0];
+        let fr = new FileReader();
+        fr.onload = callback;
+        fr.readAsText(f);
+    }
+
+    isLoaded(arr) {
+        for (let i = 0; i < this.fileInputIds.length; i++) {
+            if (!Array.isArray(arr[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if every array has the same length.
+     * @param {string[][]} arr - An array of arrays.
+     * @returns {boolean} True if all equal.
+     */
+    static sameLength(arr) {
+        return arr.every((val, i, arr) => val.length === arr[0].length);
+    }
+
+    read(callback) {
+        let data = [];
+        for (let i in this.fileInputIds) {
+            function onLoad(e) {
+                data[i] = e.target.result.split("\n");
+                if (!this.isLoaded(data)) {
+                    // multiple file inputs trigger this block
+                } else if (!this.sameLength(data)) {
+                    throw "Array lengths are not equal.";
+                } else {
+                    callback(data);
+                }
+            }
+            this.readFile(this.fileInputIds[i], onLoad);
+        }
+    }
+}
