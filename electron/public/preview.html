@@ -8,6 +8,7 @@
         <script>window.jQuery = window.$ = require('jquery');</script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+        <script src="scripts.js"></script>
     </head>
 
     <body>
@@ -75,7 +76,7 @@
             <div class="text-center">
                 <button class="btn btn-primary" id="nextButton">Next</button>
                 <h1 id="classification">Class</h1>
-                <img class="img-thumbnail" id="img1">
+                <img class="img-thumbnail" id="img1" src="image-placeholder.png" alt="Preview Image">
             </div>
 
         </div>
@@ -90,89 +91,61 @@
             }
 
             const DICT = {
-                1: "environment",
-                2: "people",
-                3: "object",
-                4: "hybrid",
-                5: "animal",
-                6: "food"
+                1: "Environment",
+                2: "People",
+                3: "Object",
+                4: "Hybrid",
+                5: "Animal",
+                6: "Food"
             };
 
             class Data {
                 constructor() {
-                    this.images = null;
-                    this.classifications = null;
-                }
-
-                reset() {
-                    this.images = null;
-                    this.classifications = null;
-                    $("#img1").attr("src", "");
-                    $("#classification").text("Class");
+                    this.images = undefined;
+                    this.classes = undefined;
+                    this.playlist = [];
                 }
 
                 next() {
-                    if (!this.isLoaded()) {
+                    if (!Array.isArray(this.images)) {
                         alert("Image list not found.");
                     } else if (this.images.length === 0) {
                         alert("Image list is empty.");
                     } else if (this.images.length === 1) {
                         $("#img1").attr("src", this.images[0]);
-                        $("#classification").text(DICT[Number(this.classifications[0])]);
+                        $("#classification").text(DICT[Number(this.classes[0])]);
                     } else {
-                        let imgUrl;
-                        let classi;
-                        do {
-                            let i = Math.round(Math.random() * (this.images.length - 1));
-                            imgUrl = this.images[i];
-                            classi = Number(this.classifications[i]);
-                        } while ($("#img1").attr("src") === imgUrl);
+                        if (this.playlist.length === 0) {
+                            this.playlist = shuffle(nArray(this.images.length));
+                        }
+                        let i = this.playlist.pop();
+                        let imgUrl = this.images[i];
+                        let class_ = Number(this.classes[i]);
                         $("#img1").attr("src", imgUrl);
-                        $("#classification").text(DICT[classi]);
+                        $("#classification").text(DICT[class_]);
                     }
                 }
 
-                onLoad() {
-                    if (!this.isLoaded()) {
-                    } else if (!this.sameLength()) {
-                        alert("Number of entries mismatch.");
-                    } else {
-                        this.next();
-                    }
-                }
-
-                isLoaded() {
-                    let arr = [this.images, this.classifications];
-                    return arr.every(Array.isArray);
-                }
-
-                sameLength() {
-                    let arr = [this.images, this.classifications];
-                    return arr.every((val, i, arr) => val.length === arr[0].length);
+                set(images, classes) {
+                    this.images = images;
+                    this.classes = classes;
+                    this.playlist = [];
+                    this.next();
                 }
             }
 
             const DATA = new Data();
+            const READER = new LwdFilesReader("#file1", "#file2");
 
-            function readFile(fileId, callback) {
-                let f = $(fileId).prop("files")[0];
-                let fr = new FileReader();
-                fr.onload = callback;
-                fr.readAsText(f);
+            function readerCallback(retVal) {
+                DATA.set(retVal[0], retVal[1]);
             }
 
-            $("#loadButton").click(function (e1) {
-                e1.preventDefault();
-                DATA.reset();
-                // TODO add check if a file is selected
-                readFile("#file1", function (e2) {
-                    DATA.images = e2.target.result.split("\n");
-                    DATA.onLoad();
-                });
-                readFile("#file2", function (e2) {
-                    DATA.classifications = e2.target.result.split("\n");
-                    DATA.onLoad();
-                });
+            $("#loadButton").click(function (e) {
+                e.preventDefault();
+                $("#img1").attr("src", "image-placeholder.png");
+                $("#classification").text("Class");
+                READER.read(readerCallback);
             });
 
             $("#nextButton").click(function () {
