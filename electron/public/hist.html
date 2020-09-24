@@ -9,8 +9,9 @@
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
         <style>
-            img {
-                max-height: 400px
+            img.hist-thumbnail {
+                max-height: 300px;
+                max-width: 300px;
             }
         </style>
     </head>
@@ -43,112 +44,125 @@
         </nav>
 
         <div class="container-fluid">
-            <p id="p1"></p>
-            <input type="file" id="file1">
-            <input type="file" id="file2" onchange="s()">
-            <br>
-            <button onclick="s()">submit</button>
+
+            <form class="mb-3">
+                <div class="form-row align-items-center">
+
+                    <div class="col-5">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Image URLs</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="file1">
+                                <label class="custom-file-label" for="file1">Choose file</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-5">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Cluster List</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="file2">
+                                <label class="custom-file-label" for="file2">Choose file</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-2">
+                        <button class="btn btn-primary" id="loadButton">Load</button>
+                    </div>
+                </div>
+            </form>
+
+            <div id="p1"></div>
         </div>
 
         <script>
-            var a = null;
-            var fr = null;
-            var url = null;
-            var cluster = null;
-            var isReady = 0;
-            var map = new Map();
-
-            function load1(e) {
-                url = e.target.result;
-                url = url.split("\n");
-                isReady++;
-                go();
+            for (let i of ["file1", "file2"]) {
+                $(`#${i}`).change(function () {
+                    let filename = $(`#${i}`).prop("files")[0].name;
+                    $(`label[for="${i}"]`).text(filename);
+                });
             }
 
-            function load2(e) {
-                cluster = e.target.result;
-                cluster = cluster.split("\n");
-                isReady++;
-                go();
-            }
-
-            function upsert(index, value) {
-                var arr = map.get(index);
-                if (!arr) {
-                    arr = [];
-                    map.set(index, arr);
+            class Data {
+                constructor() {
+                    this.imgs = null;
+                    this.clusterIds = null;
+                    this.clusters = new Map();
                 }
-                arr.push(value);
-            }
 
-            function go() {
-                if (isReady === 2) {
-                    for (let i = 0; i < url.length; i++) {
-                        var v = url[i];
-                        var k = cluster[i];
-                        upsert(k, v);
+                upsert(index, value) {
+                    let arr = this.clusters.get(index);
+                    if (!arr) {
+                        arr = [];
+                        this.clusters.set(index, arr);
                     }
-                    drawClusters();
+                    arr.push(value);
                 }
-            }
 
-            function drawClusters() {
-                for (let i of map.entries()) {
-                    var clusterId = i[0];
-                    var u = i[1];
-                    $("<h1>").text("============================================" + clusterId + "=================================================").appendTo("#p1");
-                    var newP = $("<p>").appendTo("#p1");
-                    for (let j of u) {
-                        $("<img>").attr("src", j).css('border', '1px pink solid').appendTo(newP);
+                drawClusters() {
+                    for (let i of this.clusters.entries()) {
+                        let clusterId = i[0];
+                        let cluster = i[1];
+                        let card = $("<div>").addClass("card mb-3").appendTo("#p1");
+                        let head = $("<h5>").addClass("card-header text-center").text(clusterId).appendTo(card);
+                        var body = $("<div>").addClass("card-body").appendTo(card);
+                        for (let url of cluster) {
+                            $("<img>").attr("src", url).addClass("img-thumbnail hist-thumbnail").appendTo(body);
+                        }
                     }
                 }
-            }
 
-            function next() {
-                var i = Math.random() * (url.length - 1);
-                i = Math.round(i);
-                var u = url[i];
-                var r = rating[i];
-                document.getElementById("img1").src = u;
-                document.getElementById("span1").innerText = ewr(Number(r));
-            }
+                onLoad() {
+                    if (!this.isLoaded()) {
+                    } else if (!this.sameLength()) {
+                        alert("Number of entries mismatch.");
+                    } else {
+                        for (let i in this.imgs) {
+                            var v = this.imgs[i];
+                            var k = this.clusterIds[i];
+                            this.upsert(k, v);
+                        }
+                        this.drawClusters();
+                    }
+                }
 
-            function ewr(a) {
-                switch (a) {
-                    case 1:
-                        return "environment";
-                    case 2:
-                        return "people";
-                    case 3:
-                        return "object";
-                    case 4:
-                        return "hybrid";
-                    case 5:
-                        return "animal";
-                    case 6:
-                        return "food";
-                    default:
-                        return "no idea";
+                isLoaded() {
+                    let arr = [this.imgs, this.clusterIds];
+                    return arr.every(Array.isArray);
+                }
+
+                sameLength() {
+                    let arr = [this.imgs, this.clusterIds];
+                    return arr.every((val, i, arr) => val.length === arr[0].length);
                 }
             }
 
-            function asd(fid, cb) {
-                a = document.getElementById(fid).files[0];
-                fr = new FileReader();
-                fr.onload = cb;
-                fr.readAsText(a);
+            function readFile(fileId, callback) {
+                let f = $(fileId).prop("files")[0];
+                let fr = new FileReader();
+                fr.onload = callback;
+                fr.readAsText(f);
             }
-            function s() {
+
+            $("#loadButton").click(function (e) {
+                e.preventDefault();
                 $("#p1").empty();
-                a = null;
-                fr = null;
-                url = null;
-                cluster = null;
-                isReady = 0;
-                map = new Map();
-                asd("file1", load1);
-                asd("file2", load2);
-            }
+                var data = new Data();
+                readFile("#file1", function (e2) {
+                    data.imgs = e2.target.result.split("\n");
+                    data.onLoad();
+                });
+                readFile("#file2", function (e2) {
+                    data.clusterIds = e2.target.result.split("\n");
+                    data.onLoad();
+                });
+            });
         </script>
 
     </body>
