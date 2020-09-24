@@ -41,18 +41,19 @@ class LwdFilesReader {
 
     read(callback) {
         let data = [];
+        let self = this;
         for (let i in this.fileInputIds) {
             function onLoad(e) {
                 data[i] = e.target.result.split("\n");
-                if (!this.isLoaded(data)) {
+                if (!self.isLoaded(data)) {
                     // multiple file inputs trigger this block
-                } else if (!this.sameLength(data)) {
+                } else if (!self.constructor.sameLength(data)) {
                     throw "Array lengths are not equal.";
                 } else {
                     callback(data);
                 }
             }
-            this.readFile(this.fileInputIds[i], onLoad);
+            this.constructor.readFile(this.fileInputIds[i], onLoad);
         }
     }
 }
