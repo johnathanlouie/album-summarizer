@@ -112,7 +112,7 @@
                 }
 
                 next() {
-                    if (!Array.isArray(this.images)) {
+                    if (!this.isLoaded()) {
                         alert("Image list not found.");
                     } else if (this.images.length === 0) {
                         alert("Image list is empty.");
@@ -133,12 +133,22 @@
                 }
 
                 onLoad() {
-                    if (this.images === null || this.classifications === null) {
-                    } else if (this.images.length !== this.classifications.length) {
+                    if (!this.isLoaded()) {
+                    } else if (!this.sameLength()) {
                         alert("Number of entries mismatch.");
                     } else {
                         this.next();
                     }
+                }
+
+                isLoaded() {
+                    let arr = [this.images, this.classifications];
+                    return arr.every(Array.isArray);
+                }
+
+                sameLength() {
+                    let arr = [this.images, this.classifications];
+                    return arr.every((val, i, arr) => val.length === arr[0].length);
                 }
             }
 
