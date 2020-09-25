@@ -135,22 +135,24 @@
             }
 
             const DATA = new Data();
-            const READER = new LwdFilesReader("#file1", "#file2");
 
-            function readerCallback(retVal) {
-                DATA.set(...retVal);
-            }
 
-            $("#loadButton").click(function (e) {
-                e.preventDefault();
+            function reset() {
                 $("#img1").attr("src", "image-placeholder.png");
                 $("#classification").text("Class");
-                READER.read(readerCallback);
+            }
+
+            $("#loadButton").click(function (event) {
+                event.preventDefault();
+                reset();
+                // read files, then parse
+                let images = readFile("file1").then(file => file.split("\n"));
+                let classes = readFile("file2").then(file => file.split("\n"));
+                // then wait for both, send file data to controller
+                Promise.all([images, classes]).then(retVal => DATA.set(...retVal));
             });
 
-            $("#nextButton").click(function () {
-                DATA.next();
-            });
+            $("#nextButton").click(event => DATA.next());
         </script>
 
     </body>

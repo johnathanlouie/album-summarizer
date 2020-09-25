@@ -122,7 +122,12 @@
             $("#loadButton").click(function (e) {
                 e.preventDefault();
                 $("#table1").empty();
-                new LwdFilesReader("#file1", "#file2", "#file3").read(readerCallback);
+                // read files, then parse
+                let images = readFile("file1").then(file => file.split("\n"));
+                let truths = readFile("file2").then(file => file.split("\n"));
+                let predic = readFile("file3").then(file => file.split("\n"));
+                // then wait for both, send file data to controller
+                Promise.all([images, truths, predic]).then(readerCallback);
             });
         </script>
 

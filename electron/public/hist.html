@@ -122,15 +122,14 @@
                 }
             }
 
-            function readerCallback(retVal) {
-                let clusters = toMap(retVal[0], retVal[1]);
-                drawClusters(clusters);
-            }
-
-            $("#loadButton").click(function (e) {
-                e.preventDefault();
+            $("#loadButton").click(function (event) {
+                event.preventDefault();
                 $("#p1").empty();
-                new LwdFilesReader("#file1", "#file2").read(readerCallback);
+                // read files, then parse
+                let images = readFile("file1").then(file => file.split("\n"));
+                let clusters = readFile("file2").then(file => file.split("\n"));
+                // then wait for both, send file data to controller
+                Promise.all([images, clusters]).then(retVal => drawClusters(toMap(...retVal)));
             });
         </script>
 

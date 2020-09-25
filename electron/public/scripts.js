@@ -1,61 +1,26 @@
-class LwdFilesReader {
-    constructor() {
-        this.fileInputIds = Array.from(arguments);
-    }
+/* global Promise */
 
-    /**
-     * For internal use only.
-     * @param {type} fileId
-     * @param {type} callback
-     * @returns {undefined}
-     */
-    static readFile(fileId, callback) {
-        let f = $(fileId).prop("files")[0];
-        let fr = new FileReader();
-        fr.onload = callback;
-        fr.readAsText(f);
-    }
+/**
+ * Reads a single text file.
+ * @param {String} id - ID of a file type input element
+ * @returns {Promise} File contents
+ */
+function readFile(id) {
+    const file = document.getElementById(id).files[0];
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+        reader.onload = (event) => resolve(event.target.result);
+        reader.onerror = reject;
+        reader.readAsText(file);
+    });
+}
 
-    /**
-     * For internal use only.
-     * @param {type} arr
-     * @returns {Boolean}
-     */
-    isLoaded(arr) {
-        for (let i = 0; i < this.fileInputIds.length; i++) {
-            if (!Array.isArray(arr[i])) {
-                return false;
-            }
-        }
-        return true;
+function readFiles(...ids) {
+    const promises = [];
+    for (let i of ids) {
+        promises.push(readFile(i));
     }
-
-    /**
-     * Checks if every array has the same length. For internal use only.
-     * @param {string[][]} arr - An array of arrays.
-     * @returns {boolean} True if all equal.
-     */
-    static sameLength(arr) {
-        return arr.every((val, i, arr) => val.length === arr[0].length);
-    }
-
-    read(callback) {
-        let data = [];
-        let self = this;
-        for (let i in this.fileInputIds) {
-            function onLoad(e) {
-                data[i] = e.target.result.split("\n");
-                if (!self.isLoaded(data)) {
-                    // multiple file inputs trigger this block
-                } else if (!self.constructor.sameLength(data)) {
-                    throw "Array lengths are not equal.";
-                } else {
-                    callback(data);
-                }
-            }
-            this.constructor.readFile(this.fileInputIds[i], onLoad);
-        }
-    }
+    return Promise.all(promises);
 }
 
 /**
