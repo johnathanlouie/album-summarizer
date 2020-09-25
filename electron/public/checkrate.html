@@ -8,6 +8,7 @@
         <script>window.jQuery = window.$ = require('jquery');</script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+        <script src="scripts.js"></script>
         <style>
             img.rate-thumbnail {
                 max-width: 300px;
@@ -107,61 +108,21 @@
                 });
             }
 
-            class Data {
-                constructor() {
-                    this.images = null;
-                    this.rating1 = null;
-                    this.rating2 = null;
-                }
-
-                onLoad() {
-                    if (this.images === null || this.rating1 === null || this.rating2 === null) {
-                    } else if (this.images.length !== this.rating1.length || this.rating1.length !== this.rating2.length) {
-                        alert("Number of entries mismatch.");
-                    } else {
-                        let entries = [];
-                        for (let i in this.images) {
-                            entries.push({
-                                img: this.images[i],
-                                truth: this.rating1[i],
-                                pred: this.rating2[i]
-                            });
-                        }
-                        entries.sort((a, b) => b.pred - a.pred);
-                        for (let i of entries) {
-                            let tr = $("<tr>").appendTo("#table1");
-                            let td1 = $("<td>").appendTo(tr);
-                            let td2 = $("<td>").text(i.pred).appendTo(tr);
-                            let td3 = $("<td>").text(i.truth).appendTo(tr);
-                            let img = $("<img>").attr("src", i.img).addClass("rate-thumbnail img-thumbnail").appendTo(td1);
-                        }
-                    }
+            function readerCallback(retVal) {
+                let [images, truth, pred] = retVal;
+                for (let i in images) {
+                    let tr = $("<tr>").appendTo("#table1");
+                    let td1 = $("<td>").appendTo(tr);
+                    let td2 = $("<td>").text(truth[i]).appendTo(tr);
+                    let td3 = $("<td>").text(pred[i]).appendTo(tr);
+                    let img = $("<img>").attr("src", images[i]).addClass("rate-thumbnail img-thumbnail").appendTo(td1);
                 }
             }
 
-            function readFile(fileId, callback) {
-                let f = $(fileId).prop("files")[0];
-                let fr = new FileReader();
-                fr.onload = callback;
-                fr.readAsText(f);
-            }
-
-            $("#loadButton").click(function (e1) {
-                e1.preventDefault();
-                var data = new Data();
+            $("#loadButton").click(function (e) {
+                e.preventDefault();
                 $("#table1").empty();
-                readFile("#file1", function (e2) {
-                    data.images = e2.target.result.split("\n");
-                    data.onLoad();
-                });
-                readFile("#file2", function (e2) {
-                    data.rating1 = e2.target.result.split("\n");
-                    data.onLoad();
-                });
-                readFile("#file3", function (e2) {
-                    data.rating2 = e2.target.result.split("\n");
-                    data.onLoad();
-                });
+                new LwdFilesReader("#file1", "#file2", "#file3").read(readerCallback);
             });
         </script>
 
