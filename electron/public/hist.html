@@ -8,6 +8,7 @@
         <script>window.jQuery = window.$ = require('jquery');</script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+        <script src="scripts.js"></script>
         <style>
             img.hist-thumbnail {
                 max-height: 300px;
@@ -89,79 +90,47 @@
                 });
             }
 
-            class Data {
-                constructor() {
-                    this.imgs = null;
-                    this.clusterIds = null;
-                    this.clusters = new Map();
+            function upsert(map, index, value) {
+                let arr = map.get(index);
+                if (!arr) {
+                    arr = [];
+                    map.set(index, arr);
                 }
+                arr.push(value);
+            }
 
-                upsert(index, value) {
-                    let arr = this.clusters.get(index);
-                    if (!arr) {
-                        arr = [];
-                        this.clusters.set(index, arr);
+            function toMap(imgs, clusterIds) {
+                var m = new Map();
+                for (let i in imgs) {
+                    var v = imgs[i];
+                    var k = clusterIds[i];
+                    upsert(m, k, v);
+                }
+                return m;
+            }
+
+            function drawClusters(clusters) {
+                for (let i of clusters.entries()) {
+                    let clusterId = i[0];
+                    let cluster = i[1];
+                    let card = $("<div>").addClass("card mb-3").appendTo("#p1");
+                    let head = $("<h5>").addClass("card-header text-center").text(clusterId).appendTo(card);
+                    var body = $("<div>").addClass("card-body").appendTo(card);
+                    for (let url of cluster) {
+                        $("<img>").attr("src", url).addClass("img-thumbnail hist-thumbnail").appendTo(body);
                     }
-                    arr.push(value);
-                }
-
-                drawClusters() {
-                    for (let i of this.clusters.entries()) {
-                        let clusterId = i[0];
-                        let cluster = i[1];
-                        let card = $("<div>").addClass("card mb-3").appendTo("#p1");
-                        let head = $("<h5>").addClass("card-header text-center").text(clusterId).appendTo(card);
-                        var body = $("<div>").addClass("card-body").appendTo(card);
-                        for (let url of cluster) {
-                            $("<img>").attr("src", url).addClass("img-thumbnail hist-thumbnail").appendTo(body);
-                        }
-                    }
-                }
-
-                onLoad() {
-                    if (!this.isLoaded()) {
-                    } else if (!this.sameLength()) {
-                        alert("Number of entries mismatch.");
-                    } else {
-                        for (let i in this.imgs) {
-                            var v = this.imgs[i];
-                            var k = this.clusterIds[i];
-                            this.upsert(k, v);
-                        }
-                        this.drawClusters();
-                    }
-                }
-
-                isLoaded() {
-                    let arr = [this.imgs, this.clusterIds];
-                    return arr.every(Array.isArray);
-                }
-
-                sameLength() {
-                    let arr = [this.imgs, this.clusterIds];
-                    return arr.every((val, i, arr) => val.length === arr[0].length);
                 }
             }
 
-            function readFile(fileId, callback) {
-                let f = $(fileId).prop("files")[0];
-                let fr = new FileReader();
-                fr.onload = callback;
-                fr.readAsText(f);
+            function readerCallback(retVal) {
+                let clusters = toMap(retVal[0], retVal[1]);
+                drawClusters(clusters);
             }
 
             $("#loadButton").click(function (e) {
                 e.preventDefault();
                 $("#p1").empty();
-                var data = new Data();
-                readFile("#file1", function (e2) {
-                    data.imgs = e2.target.result.split("\n");
-                    data.onLoad();
-                });
-                readFile("#file2", function (e2) {
-                    data.clusterIds = e2.target.result.split("\n");
-                    data.onLoad();
-                });
+                new LwdFilesReader("#file1", "#file2").read(readerCallback);
             });
         </script>
 
