@@ -103,7 +103,7 @@
                 constructor() {
                     this.images = undefined;
                     this.classes = undefined;
-                    this.playlist = [];
+                    this.queue = [];
                 }
 
                 next() {
@@ -115,10 +115,10 @@
                         $("#img1").attr("src", this.images[0]);
                         $("#classification").text(DICT[Number(this.classes[0])]);
                     } else {
-                        if (this.playlist.length === 0) {
-                            this.playlist = shuffle(nArray(this.images.length));
+                        if (this.queue.length === 0) {
+                            this.queue = shuffle(nArray(this.images.length));
                         }
-                        let i = this.playlist.pop();
+                        let i = this.queue.pop();
                         let imgUrl = this.images[i];
                         let class_ = Number(this.classes[i]);
                         $("#img1").attr("src", imgUrl);
@@ -129,7 +129,7 @@
                 set(images, classes) {
                     this.images = images;
                     this.classes = classes;
-                    this.playlist = [];
+                    this.queue = [];
                     this.next();
                 }
             }
@@ -138,7 +138,7 @@
             const READER = new LwdFilesReader("#file1", "#file2");
 
             function readerCallback(retVal) {
-                DATA.set(retVal[0], retVal[1]);
+                DATA.set(...retVal);
             }
 
             $("#loadButton").click(function (e) {
