@@ -45,3 +45,9 @@ function nArray(n) {
     }
     return arr;
 }
+
+jQuery.fn.extend({
+    number: function () {
+        return Number(this.val());
+    }
+});

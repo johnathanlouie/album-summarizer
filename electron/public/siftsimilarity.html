@@ -8,6 +8,7 @@
         <script>window.jQuery = window.$ = require('jquery');</script>
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+        <script src="scripts.js"></script>
         <style>
             img {
                 max-height: 200px;
@@ -47,92 +48,69 @@
         </nav>
 
         <div class="container-fluid">
-            <input id="id1" value="0" onchange="go();">
+            <input type="number" id="id1" value="0" onchange="MODEL.render();">
             <table id="tbl1"></table>
             <input type="file" id="file1">
-            <input type="file" id="file2" onchange="s();">
+            <input type="file" id="file2" onchange="loadFiles();">
             <br>
-            <button onclick="s();">submit</button>
+            <button onclick="loadFiles();">submit</button>
         </div>
 
         <script>
-            var a = null;
-            var fr = null;
-            var url = null;
-            var rating = null;
-            var isReady = 0;
-            var map = new Map();
-
-            function load1(e) {
-                url = e.target.result;
-                url = url.trim();
-                url = url.split("\n");
-                isReady++;
-                go();
-            }
-
-            function load2(e) {
-                rating = e.target.result;
-                rating = rating.trim();
-                // rating = rating.split("\n");
-                rating = JSON.parse(rating);
-                isReady++;
-                go();
-            }
-
-            function compare(a, b) {
-                return b[0] - a[0];
-            }
-
-            function go() {
-                if (isReady === 2) {
-                    $("#tbl1").empty();
-                    var newArray = [];
-                    for (let i = 0; i < url.length; i++) {
-                        let picId = $("#id1").val();
-                        picId = Number(picId);
-                        newArray.push([rating[picId][i], url[i], i]);
-                    }
-                    newArray.sort(compare);
-                    for (let i of newArray) {
-                        var tr = $("<tr>").appendTo('#tbl1');
-                        $("<td>").text(i[2]).appendTo(tr);
-                        var td1 = $("<td>").appendTo(tr);
-                        $("<img>").attr("src", i[1]).appendTo(td1);
-                        $("<td>").text(i[0]).appendTo(tr);
+            const MODEL = {
+                url: null,
+                rating: null,
+                isReady: false,
+                render: function () {
+                    if (this.isReady) {
+                        $("#tbl1").empty();
+                        let arr = [];
+                        for (let i in this.url) {
+                            let picId = $("#id1").number();
+                            arr.push({
+                                rating: this.rating[picId][i],
+                                url: this.url[i],
+                                id: i
+                            });
+                        }
+                        arr.sort((a, b) => b.rating - a.rating);
+                        for (let i of arr) {
+                            var tr = $("<tr>").appendTo('#tbl1');
+                            $("<td>").text(i.id).appendTo(tr);
+                            var td1 = $("<td>").appendTo(tr);
+                            $("<img>").attr("src", i.url).appendTo(td1);
+                            $("<td>").text(i.rating).appendTo(tr);
+                        }
                     }
                 }
+            };
+
+            function loadFiles() {
+                MODEL.isReady = false;
+                // read files, then parse
+                let urlFile = readFile("file1").then(file => file.trim().split("\n"));
+                let ratingFile = readFile("file2").then(file => JSON.parse(file.trim()));
+                // then wait for both, send file data to controller
+                Promise.all([urlFile, ratingFile]).then(retVal => {
+                    [MODEL.url, MODEL.rating] = retVal;
+                    MODEL.isReady = true;
+                });
             }
 
-            function asd(fid, cb) {
-                a = document.getElementById(fid).files[0];
-                fr = new FileReader();
-                fr.onload = cb;
-                fr.readAsText(a);
-            }
-
-            function s() {
-                a = null;
-                fr = null;
-                url = null;
-                rating = null;
-                isReady = 0;
-                map = new Map();
-                asd("file1", load1);
-                asd("file2", load2);
-            }
-
-            function decinc(event) {
-                var newVal = Number($("#id1").val());
-                if (event.keyCode === 43) {
-                    $("#id1").val(newVal + 1);
-                } else if (event.keyCode === 45) {
-                    $("#id1").val(newVal - 1);
+            function decInc(event) {
+                let newVal = $("#id1").number();
+                switch (event.keyCode) {
+                    case 43:
+                        $("#id1").val(newVal + 1);
+                        break;
+                    case 45:
+                        $("#id1").val(newVal - 1);
+                        break;
                 }
-                go();
+                MODEL.render();
             }
 
-            $("body").keypress(decinc);
+            $("body").keypress(decInc);
         </script>
 
     </body>
