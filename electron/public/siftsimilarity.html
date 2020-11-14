@@ -76,10 +76,10 @@
                         arr.sort((a, b) => b.rating - a.rating);
                         for (let i of arr) {
                             var tr = $("<tr>").appendTo('#tbl1');
-                            $("<td>").text(i.id).appendTo(tr);
-                            var td1 = $("<td>").appendTo(tr);
-                            $("<img>").attr("src", i.url).appendTo(td1);
-                            $("<td>").text(i.rating).appendTo(tr);
+                            var tdId = $("<td>").text(i.id).appendTo(tr);
+                            var tdImg = $("<td>").appendTo(tr);
+                            $("<img>").attr("src", i.url).appendTo(tdImg);
+                            var tdRate = $("<td>").text(i.rating).appendTo(tr);
                         }
                     }
                 }
