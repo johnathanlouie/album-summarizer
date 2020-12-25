@@ -61,21 +61,21 @@
             </form>
             <?php
             if (isset($_POST["photoid"]) && isset($_POST["phototype"]) && isset($_POST["rating"])) {
-                $postid = $_POST["photoid"];
-                $posttype = $_POST["phototype"];
-                $postrating = $_POST["rating"];
-                echo "$postid, $posttype, $postrating<br>";
-                if (!$mysqli->query("UPDATE table1 SET rating=$postrating, class='$posttype', done=1 WHERE id=$postid;")) {
-                    echo "update fail";
-                } else {
-                    echo "update good";
-                }
+            $postid = $_POST["photoid"];
+            $posttype = $_POST["phototype"];
+            $postrating = $_POST["rating"];
+            echo "$postid, $posttype, $postrating<br>";
+            if (!$mysqli->query("UPDATE table1 SET rating=$postrating, class='$posttype', done=1 WHERE id=$postid;")) {
+            echo "update fail";
+            } else {
+            echo "update good";
+            }
             }
             ?>
         </div>
 
         <script>
-            function a(event)
+            function keyEventHandler(event)
             {
                 event.preventDefault();
                 switch (event.which)
@@ -113,7 +113,8 @@
                         break;
                 }
             }
-            $("body").keypress(a);
+
+            $("body").keypress(keyEventHandler);
         </script>
 
     </body>
