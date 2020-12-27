@@ -98,5 +98,5 @@ class HistogramCluster(ImageCluster):
             pb.update()
         d = vstack(c)
         print('Clustering by mean shift....')
-        results = MeanShift(bandwidth).fit_predict(d).tolist()
+        results = MeanShift(bandwidth=bandwidth).fit_predict(d).tolist()
         return results
