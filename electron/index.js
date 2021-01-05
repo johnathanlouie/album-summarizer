@@ -9,6 +9,7 @@ function createWindow() {
             nodeIntegration: true
         }
     });
+    win.removeMenu(); // linux, windows, not macOS
 
     // and load the index.html of the app.
     win.loadFile('public/index.html');
