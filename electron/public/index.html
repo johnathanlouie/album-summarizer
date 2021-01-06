@@ -39,6 +39,17 @@
                 </a>
             </nav>
 
+            <div class="container-fluid">
+
+                <div class="alert alert-danger ng-hide" id="alertMissingDir" role="alert" ng-show="isCwdMissing">
+                    <h4 class="alert-heading">Directory not found!</h4>
+                    <p>The directory (also known as folder) was not found at the address. Check the spelling of the address or navigate by clicking on the folder icons.</p>
+                    <hr>
+                    <p class="mb-0">The directory may not exist or you do not have permission to access it.</p>
+                </div>
+
+            </div>
+
         </div>
 
         <script>
@@ -53,17 +64,20 @@
 
                 function readDirCb(err, dirEnts) {
                     if (err) {
-                        alert('Error');
+                        $scope.isCwdMissing = true;
+                        $scope.$apply();
+                    } else {
+                        var dirs = dirEnts.filter(e => e.isDirectory());
+                        var files = dirEnts.filter(e => e.isFile());
+                        var filenames = files.map(e => e.name);
+                        var images = filenames.filter(isImage);
+                        $scope.photos = images.map(e => fileUrl(path.resolve($scope.cwd, e)));
+                        $scope.$apply();
                     }
-                    var dirs = dirEnts.filter(e => e.isDirectory());
-                    var files = dirEnts.filter(e => e.isFile());
-                    var filenames = files.map(e => e.name);
-                    var images = filenames.filter(isImage);
-                    $scope.photos = images.map(e => fileUrl(path.resolve($scope.cwd, e)));
-                    $scope.$apply();
                 }
 
                 $scope.go = function () {
+                    $scope.isCwdMissing = false;
                     $scope.photos = [];
                     fs.readdir($scope.cwd, {withFileTypes: true}, readDirCb);
                 };
