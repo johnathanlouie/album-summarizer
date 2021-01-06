@@ -39,6 +39,12 @@
         </div>
 
         <script>
+            function isImage(filename) {
+                const validExt = ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.apng', '.avif'];
+                var ext = path.extname(filename).toLowerCase();
+                return validExt.some(e => e === ext);
+            }
+
             function viewCtrl($scope, $http) {
                 const homeDir = path.resolve(os.homedir(), 'Pictures');
 
