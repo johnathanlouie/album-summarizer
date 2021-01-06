@@ -23,12 +23,15 @@
         <div ng-app="myApp" ng-controller="viewCtrl">
 
             <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
-                <form class="form-inline mr-auto">
+                <form class="form-inline mr-auto" ng-submit="go()">
                     <button class="btn btn-outline-light mr-2" type="button" ng-click="goHome()">
                         <svg class="bi bi-house-fill" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#house-fill"/></svg>
                     </button>
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Enter address" size="100" ng-model="cwd">
+                        <div class="input-group-append">
+                            <input class="btn btn-primary" type="submit" value="Go">
+                        </div>
                     </div>
                 </form>
                 <a class="btn btn-outline-light" href="menu.html">
@@ -48,11 +51,30 @@
             function viewCtrl($scope, $http) {
                 const homeDir = path.resolve(os.homedir(), 'Pictures');
 
+                function readDirCb(err, dirEnts) {
+                    if (err) {
+                        alert('Error');
+                    }
+                    var dirs = dirEnts.filter(e => e.isDirectory());
+                    var files = dirEnts.filter(e => e.isFile());
+                    var filenames = files.map(e => e.name);
+                    var images = filenames.filter(isImage);
+                    $scope.photos = images.map(e => fileUrl(path.resolve($scope.cwd, e)));
+                    $scope.$apply();
+                }
+
+                $scope.go = function () {
+                    $scope.photos = [];
+                    fs.readdir($scope.cwd, {withFileTypes: true}, readDirCb);
+                };
+
                 $scope.goHome = function () {
                     $scope.cwd = homeDir;
+                    $scope.go();
                 };
 
                 $scope.cwd = homeDir;
+                $scope.go();
             }
 
             var app = angular.module('myApp', []);
