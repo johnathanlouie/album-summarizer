@@ -80,7 +80,7 @@ function viewCtrl($scope, $http) {
         $scope.isCwdMissing = false;
         $scope.photos = [];
         var cwd = $scope.cwd;
-        fs.readdir(cwd, {withFileTypes: true}, (err, dirEnts) => {
+        fs.readdir(cwd, { withFileTypes: true }, (err, dirEnts) => {
             if (err) {
                 $scope.isCwdMissing = true;
                 $scope.$apply();

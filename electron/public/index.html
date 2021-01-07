@@ -1,113 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Album Summarizer - Photo Album Organizer</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
-        <script>
-            const fs = require('fs');
-            const fileUrl = require('file-url');
-            const path = require('path');
-            const os = require('os');
-            window.jQuery = window.$ = require('jquery');
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js" crossorigin="anonymous"></script>
-        <script src="scripts.js"></script>
-        <style>
-            .btn-icon-light {
-                color: #f8f9fa;
-                border-color: transparent;
-            }
 
-            .btn-icon-light:not(:disabled):not(.disabled).active:focus, .btn-icon-light:not(:disabled):not(.disabled):active:focus, .show>.btn-icon-light.dropdown-toggle:focus {
-                box-shadow: 0 0 0 0.2rem rgba(248,249,250,.5);
-            }
+<head>
+    <title>Album Summarizer - Photo Album Organizer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        crossorigin="anonymous">
+    <script>
+        const fs = require('fs');
+        const fileUrl = require('file-url');
+        const path = require('path');
+        const os = require('os');
+        window.jQuery = window.$ = require('jquery');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js" crossorigin="anonymous"></script>
+    <script src="scripts.js"></script>
+    <style>
+        .btn-icon-light {
+            color: #f8f9fa;
+            border-color: transparent;
+        }
 
-            .btn-icon-light:not(:disabled):not(.disabled).active, .btn-icon-light:not(:disabled):not(.disabled):active, .show>.btn-icon-light.dropdown-toggle {
-                color: #212529;
-                background-color: #f8f9fa;
-                border-color: #f8f9fa;
-            }
+        .btn-icon-light:not(:disabled):not(.disabled).active:focus,
+        .btn-icon-light:not(:disabled):not(.disabled):active:focus,
+        .show>.btn-icon-light.dropdown-toggle:focus {
+            box-shadow: 0 0 0 0.2rem rgba(248, 249, 250, .5);
+        }
 
-            .btn-icon-light.focus, .btn-icon-light:focus {
-                box-shadow: 0 0 0 0.2rem rgba(248,249,250,.5);
-            }
+        .btn-icon-light:not(:disabled):not(.disabled).active,
+        .btn-icon-light:not(:disabled):not(.disabled):active,
+        .show>.btn-icon-light.dropdown-toggle {
+            color: #212529;
+            background-color: #f8f9fa;
+            border-color: #f8f9fa;
+        }
 
-            .btn-icon-light:hover {
-                color: #212529;
-                background-color: #f8f9fa;
-                border-color: #f8f9fa;
-            }
+        .btn-icon-light.focus,
+        .btn-icon-light:focus {
+            box-shadow: 0 0 0 0.2rem rgba(248, 249, 250, .5);
+        }
 
-            .thumbnail-xl {
-                width: 300px !important;
-            }
-        </style>
-    </head>
+        .btn-icon-light:hover {
+            color: #212529;
+            background-color: #f8f9fa;
+            border-color: #f8f9fa;
+        }
 
-    <body>
+        .thumbnail-xl {
+            width: 300px !important;
+        }
+    </style>
+</head>
 
-        <div ng-app="app" ng-controller="viewCtrl">
+<body>
 
-            <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
-                <form class="form-inline mr-auto" ng-submit="submit()">
-                    <button class="btn btn-icon-light mr-2" type="button" ng-click="goBack()" ng-disabled="isHistoryEmpty()">
-                        <svg class="bi bi-arrow-left" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-left"/></svg>
-                    </button>
-                    <button class="btn btn-icon-light mr-2" type="button" ng-click="goForward()" ng-disabled="isFutureEmpty()">
-                        <svg class="bi bi-arrow-right" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-right"/></svg>
-                    </button>
-                    <button class="btn btn-icon-light mr-2" type="button" ng-click="goParent()">
-                        <svg class="bi bi-arrow-90deg-up" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-90deg-up"/></svg>
-                    </button>
-                    <button class="btn btn-icon-light mr-2" type="button" ng-click="goHome()">
-                        <svg class="bi bi-house-fill" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#house-fill"/></svg>
-                    </button>
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Enter address" size="100" ng-model="cwd">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary mr-2" type="button" ng-click="refresh()">
-                                <svg class="bi bi-arrow-clockwise" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-clockwise"/></svg>
-                            </button>
-                        </div>
+    <div ng-app="app" ng-controller="viewCtrl">
+
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
+            <form class="form-inline mr-auto" ng-submit="submit()">
+                <button class="btn btn-icon-light mr-2" type="button" ng-click="goBack()"
+                    ng-disabled="isHistoryEmpty()">
+                    <svg class="bi bi-arrow-left" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#arrow-left" />
+                    </svg>
+                </button>
+                <button class="btn btn-icon-light mr-2" type="button" ng-click="goForward()"
+                    ng-disabled="isFutureEmpty()">
+                    <svg class="bi bi-arrow-right" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#arrow-right" />
+                    </svg>
+                </button>
+                <button class="btn btn-icon-light mr-2" type="button" ng-click="goParent()">
+                    <svg class="bi bi-arrow-90deg-up" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#arrow-90deg-up" />
+                    </svg>
+                </button>
+                <button class="btn btn-icon-light mr-2" type="button" ng-click="goHome()">
+                    <svg class="bi bi-house-fill" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#house-fill" />
+                    </svg>
+                </button>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Enter address" size="100" ng-model="cwd">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary mr-2" type="button" ng-click="refresh()">
+                            <svg class="bi bi-arrow-clockwise" width="1rem" height="1rem" fill="currentColor">
+                                <use xlink:href="bootstrap-icons.svg#arrow-clockwise" />
+                            </svg>
+                        </button>
                     </div>
-                </form>
-                <a class="btn btn-icon-light" href="menu.html">
-                    <svg class="bi bi-list" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#list"/></svg>
-                </a>
-            </nav>
-
-            <div class="container-fluid">
-
-                <div class="alert alert-danger ng-hide" role="alert" ng-show="isCwdMissing">
-                    <h4 class="alert-heading">Directory not found!</h4>
-                    <p>The directory (also known as folder) was not found at the address. Check the spelling of the address or navigate by clicking on the folder icons.</p>
-                    <hr>
-                    <p class="mb-0">The directory may not exist or you do not have permission to access it.</p>
                 </div>
+            </form>
+            <a class="btn btn-icon-light" href="menu.html">
+                <svg class="bi bi-list" width="1rem" height="1rem" fill="currentColor">
+                    <use xlink:href="bootstrap-icons.svg#list" />
+                </svg>
+            </a>
+        </nav>
 
-                <div class="alert alert-info ng-hide" role="alert" ng-show="!hasDirectories()">
-                    <h4 class="alert-heading">No subdirectories!</h4>
-                </div>
+        <div class="container-fluid">
 
+            <div class="alert alert-danger ng-hide" role="alert" ng-show="isCwdMissing">
+                <h4 class="alert-heading">Directory not found!</h4>
+                <p>The directory (also known as folder) was not found at the address. Check the spelling of the address
+                    or navigate by clicking on the folder icons.</p>
                 <hr>
+                <p class="mb-0">The directory may not exist or you do not have permission to access it.</p>
+            </div>
 
-                <div class="alert alert-info ng-hide" role="alert" ng-show="!hasImages()">
-                    <h4 class="alert-heading">No images here!</h4>
-                </div>
+            <div class="alert alert-info ng-hide" role="alert" ng-show="!hasDirectories()">
+                <h4 class="alert-heading">No subdirectories!</h4>
+            </div>
 
-                <div class="d-flex justify-content-around flex-wrap align-items-center">
-                    <img class="thumbnail-xl img-thumbnail" ng-repeat="image in photos" src="{{image}}">
-                </div>
+            <hr>
 
+            <div class="alert alert-info ng-hide" role="alert" ng-show="!hasImages()">
+                <h4 class="alert-heading">No images here!</h4>
+            </div>
+
+            <div class="d-flex justify-content-around flex-wrap align-items-center">
+                <img class="thumbnail-xl img-thumbnail" ng-repeat="image in photos" src="{{image}}">
             </div>
 
         </div>
 
-        <script src="app.js"></script>
+    </div>
 
-    </body>
+    <script src="app.js"></script>
+
+</body>
+
 </html>

@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const { app, BrowserWindow } = require('electron');
 
 function createWindow() {
     // Create the browser window.
@@ -9,13 +9,15 @@ function createWindow() {
             nodeIntegration: true
         }
     });
-    win.removeMenu(); // linux, windows, not macOS
+
+    // Removes the menu bar on linux, windows, but not macOS.
+    win.removeMenu();
 
     // and load the index.html of the app.
     win.loadFile('public/index.html');
 
     // Open the DevTools.
-//    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
 }
 
 // This method will be called when Electron has finished
