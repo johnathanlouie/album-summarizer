@@ -17,6 +17,31 @@
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js" crossorigin="anonymous"></script>
         <script src="scripts.js"></script>
         <style>
+            .btn-icon-light {
+                color: #f8f9fa;
+                border-color: transparent;
+            }
+
+            .btn-icon-light:not(:disabled):not(.disabled).active:focus, .btn-icon-light:not(:disabled):not(.disabled):active:focus, .show>.btn-icon-light.dropdown-toggle:focus {
+                box-shadow: 0 0 0 0.2rem rgba(248,249,250,.5);
+            }
+
+            .btn-icon-light:not(:disabled):not(.disabled).active, .btn-icon-light:not(:disabled):not(.disabled):active, .show>.btn-icon-light.dropdown-toggle {
+                color: #212529;
+                background-color: #f8f9fa;
+                border-color: #f8f9fa;
+            }
+
+            .btn-icon-light.focus, .btn-icon-light:focus {
+                box-shadow: 0 0 0 0.2rem rgba(248,249,250,.5);
+            }
+
+            .btn-icon-light:hover {
+                color: #212529;
+                background-color: #f8f9fa;
+                border-color: #f8f9fa;
+            }
+
             .thumbnail-xl {
                 width: 300px !important;
             }
@@ -29,7 +54,7 @@
 
             <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
                 <form class="form-inline mr-auto" ng-submit="go()">
-                    <button class="btn btn-outline-light mr-2" type="button" ng-click="goHome()">
+                    <button class="btn btn-icon-light mr-2" type="button" ng-click="goHome()">
                         <svg class="bi bi-house-fill" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#house-fill"/></svg>
                     </button>
                     <div class="input-group">
@@ -39,7 +64,7 @@
                         </div>
                     </div>
                 </form>
-                <a class="btn btn-outline-light" href="menu.html">
+                <a class="btn btn-icon-light" href="menu.html">
                     <svg class="bi bi-list" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#list"/></svg>
                 </a>
             </nav>
