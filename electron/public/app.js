@@ -38,6 +38,9 @@ class DirEntWrapper {
 class DirEntArrayWrapper {
     #o;
     #path;
+    #directories = null;
+    #files = null;
+    #images = null;
 
     constructor(o, path) {
         this.#o = o;
@@ -53,15 +56,24 @@ class DirEntArrayWrapper {
     }
 
     get directories() {
-        return new DirEntArrayWrapper(this.#o.filter(e => e.isDirectory()));
+        if (this.#directories === null) {
+            this.#directories = new DirEntArrayWrapper(this.#o.filter(e => e.isDirectory()))
+        }
+        return this.#directories;
     }
 
     get files() {
-        return new DirEntArrayWrapper(this.#o.filter(e => e.isFile()));
+        if (this.#files === null) {
+            this.#files = new DirEntArrayWrapper(this.#o.filter(e => e.isFile()))
+        }
+        return this.#files;
     }
 
     get images() {
-        return new DirEntArrayWrapper(this.#o.filter(e => e.isImage()));
+        if (this.#images === null) {
+            this.#images = new DirEntArrayWrapper(this.#o.filter(e => e.isImage()))
+        }
+        return this.#images;
     }
 
     get names() {
