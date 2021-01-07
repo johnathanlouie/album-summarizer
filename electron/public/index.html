@@ -60,7 +60,9 @@
                     <div class="input-group">
                         <input type="text" class="form-control" placeholder="Enter address" size="100" ng-model="cwd">
                         <div class="input-group-append">
-                            <input class="btn btn-primary" type="submit" value="Go">
+                            <button class="btn btn-primary mr-2" type="button" ng-click="refresh()">
+                                <svg class="bi bi-arrow-clockwise" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-clockwise"/></svg>
+                            </button>
                         </div>
                     </div>
                 </form>

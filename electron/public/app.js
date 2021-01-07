@@ -64,6 +64,7 @@ class DirEntArrayWrapper {
 
 function viewCtrl($scope, $http) {
     const homeDir = path.resolve(os.homedir(), 'Pictures');
+    var dir = DirEntArrayWrapper.fromUnwrapped([], '');
 
     $scope.go = function () {
         $scope.isCwdMissing = false;
@@ -74,7 +75,7 @@ function viewCtrl($scope, $http) {
                 $scope.isCwdMissing = true;
                 $scope.$apply();
             } else {
-                var dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, cwd);
+                dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, cwd);
                 var x = dir.images;
                 var v = x.fileUris;
                 $scope.photos = v;
@@ -85,6 +86,11 @@ function viewCtrl($scope, $http) {
 
     $scope.goHome = function () {
         $scope.cwd = homeDir;
+        $scope.go();
+    };
+
+    $scope.refresh = function () {
+        $scope.cwd = dir.cwd;
         $scope.go();
     };
 
