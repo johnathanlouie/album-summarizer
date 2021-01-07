@@ -60,6 +60,14 @@ class DirEntArrayWrapper {
         return this.o.map(e => e.fileUri);
     }
 
+    hasDirectories() {
+        return this.directories.o.length > 0;
+    }
+
+    hasImages() {
+        return this.images.o.length > 0;
+    }
+
 }
 
 function viewCtrl($scope, $http) {
@@ -130,6 +138,14 @@ function viewCtrl($scope, $http) {
 
     $scope.isFutureEmpty = function () {
         return future.length === 0;
+    };
+
+    $scope.hasDirectories = function () {
+        return dir.hasDirectories();
+    };
+
+    $scope.hasImages = function () {
+        return dir.hasImages();
     };
 
     $scope.cwd = homeDir;

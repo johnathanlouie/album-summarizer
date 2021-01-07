@@ -82,11 +82,21 @@
 
             <div class="container-fluid">
 
-                <div class="alert alert-danger ng-hide" id="alertMissingDir" role="alert" ng-show="isCwdMissing">
+                <div class="alert alert-danger ng-hide" role="alert" ng-show="isCwdMissing">
                     <h4 class="alert-heading">Directory not found!</h4>
                     <p>The directory (also known as folder) was not found at the address. Check the spelling of the address or navigate by clicking on the folder icons.</p>
                     <hr>
                     <p class="mb-0">The directory may not exist or you do not have permission to access it.</p>
+                </div>
+
+                <div class="alert alert-info ng-hide" role="alert" ng-show="!hasDirectories()">
+                    <h4 class="alert-heading">No subdirectories!</h4>
+                </div>
+
+                <hr>
+
+                <div class="alert alert-info ng-hide" role="alert" ng-show="!hasImages()">
+                    <h4 class="alert-heading">No images here!</h4>
                 </div>
 
                 <div class="d-flex justify-content-around flex-wrap align-items-center">
