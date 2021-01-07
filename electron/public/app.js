@@ -37,7 +37,7 @@ class DirEntArrayWrapper {
     }
 
     static fromUnwrapped(o, cwd) {
-        return new DirEntArrayWrapper(o.map(e => new DirEntWrapper(e, cwd)));
+        return new DirEntArrayWrapper(o.map(e => new DirEntWrapper(e, cwd)), cwd);
     }
 
     get directories() {
