@@ -108,18 +108,22 @@
             <p class="mb-0">The directory may not exist or you do not have permission to access it.</p>
         </div>
 
-        <div class="alert alert-info ng-hide" role="alert" ng-show="!hasDirectories()">
-            <h4 class="alert-heading">No subdirectories!</h4>
-        </div>
+        <div ng-hide="isCwdMissing">
 
-        <hr>
+            <div class="alert alert-info ng-hide" role="alert" ng-hide="hasDirectories()">
+                <h4 class="alert-heading">No subdirectories!</h4>
+            </div>
 
-        <div class="alert alert-info ng-hide" role="alert" ng-show="!hasImages()">
-            <h4 class="alert-heading">No images here!</h4>
-        </div>
+            <hr>
 
-        <div class="d-flex justify-content-around flex-wrap align-items-center">
-            <img class="thumbnail-xl img-thumbnail" ng-repeat="image in photos" src="{{ image }}">
+            <div class="alert alert-info ng-hide" role="alert" ng-hide="hasImages()">
+                <h4 class="alert-heading">No images here!</h4>
+            </div>
+
+            <div class="d-flex justify-content-around flex-wrap align-items-center">
+                <img class="thumbnail-xl img-thumbnail" ng-repeat="image in photos" src="{{ image }}">
+            </div>
+
         </div>
 
     </div>
