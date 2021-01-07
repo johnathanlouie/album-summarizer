@@ -53,7 +53,16 @@
         <div ng-app="app" ng-controller="viewCtrl">
 
             <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
-                <form class="form-inline mr-auto" ng-submit="go()">
+                <form class="form-inline mr-auto" ng-submit="submit()">
+                    <button class="btn btn-icon-light mr-2" type="button" ng-click="goBack()" ng-disabled="isHistoryEmpty()">
+                        <svg class="bi bi-arrow-left" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-left"/></svg>
+                    </button>
+                    <button class="btn btn-icon-light mr-2" type="button" ng-click="goForward()" ng-disabled="isFutureEmpty()">
+                        <svg class="bi bi-arrow-right" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-right"/></svg>
+                    </button>
+                    <button class="btn btn-icon-light mr-2" type="button" ng-click="goParent()">
+                        <svg class="bi bi-arrow-90deg-up" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#arrow-90deg-up"/></svg>
+                    </button>
                     <button class="btn btn-icon-light mr-2" type="button" ng-click="goHome()">
                         <svg class="bi bi-house-fill" width="1rem" height="1rem" fill="currentColor"><use xlink:href="bootstrap-icons.svg#house-fill"/></svg>
                     </button>

@@ -64,9 +64,11 @@ class DirEntArrayWrapper {
 
 function viewCtrl($scope, $http) {
     const homeDir = path.resolve(os.homedir(), 'Pictures');
-    var dir = DirEntArrayWrapper.fromUnwrapped([], '');
+    var dir = DirEntArrayWrapper.fromUnwrapped([], homeDir);
+    var history = [];
+    var future = [];
 
-    $scope.go = function () {
+    function go(makeHistory) {
         $scope.isCwdMissing = false;
         $scope.photos = [];
         var cwd = $scope.cwd;
@@ -75,27 +77,63 @@ function viewCtrl($scope, $http) {
                 $scope.isCwdMissing = true;
                 $scope.$apply();
             } else {
+                if (makeHistory) {
+                    future = [];
+                    history.push(dir.cwd);
+                }
                 dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, cwd);
-                var x = dir.images;
-                var v = x.fileUris;
-                $scope.photos = v;
+                $scope.photos = dir.images.fileUris;
                 $scope.$apply();
             }
         });
+    }
+
+    $scope.submit = function () {
+        $scope.cwd = path.normalize($scope.cwd);
+        if ($scope.cwd === dir.cwd) {
+            $scope.refresh();
+        } else {
+            go(true);
+        }
     };
 
     $scope.goHome = function () {
         $scope.cwd = homeDir;
-        $scope.go();
+        $scope.submit();
     };
 
     $scope.refresh = function () {
         $scope.cwd = dir.cwd;
-        $scope.go();
+        go(false);
+    };
+
+    $scope.goParent = function () {
+        $scope.cwd = path.dirname(dir.cwd);
+        $scope.submit();
+    };
+
+    $scope.goBack = function () {
+        $scope.cwd = history.pop();
+        future.push(dir.cwd);
+        go(false);
+    };
+
+    $scope.goForward = function () {
+        $scope.cwd = future.pop();
+        history.push(dir.cwd);
+        go(false);
+    };
+
+    $scope.isHistoryEmpty = function () {
+        return history.length === 0;
+    };
+
+    $scope.isFutureEmpty = function () {
+        return future.length === 0;
     };
 
     $scope.cwd = homeDir;
-    $scope.go();
+    $scope.submit();
 }
 
 var app = angular.module('app', []);
