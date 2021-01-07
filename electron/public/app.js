@@ -1,71 +1,83 @@
 class DirEntWrapper {
+    #o;
+    #path;
 
     constructor(o, cwd) {
-        this.o = o;
-        this.cwd = cwd;
+        this.#o = o;
+        this.#path = cwd;
     }
 
     get name() {
-        return this.o.name;
+        return this.#o.name;
+    }
+
+    get absolutePath() {
+        return path.resolve(this.#path, this.#o.name);
     }
 
     get fileUri() {
-        return fileUrl(path.resolve(this.cwd, this.o.name));
+        return fileUrl(this.absolutePath);
     }
 
     isImage() {
         const validExt = ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.apng', '.avif'];
-        var ext = path.extname(this.o.name).toLowerCase();
+        var ext = path.extname(this.#o.name).toLowerCase();
         return validExt.some(e => e === ext);
     }
 
     isFile() {
-        return this.o.isFile();
+        return this.#o.isFile();
     }
 
     isDirectory() {
-        return this.o.isDirectory();
+        return this.#o.isDirectory();
     }
 
 }
 
 class DirEntArrayWrapper {
+    #o;
+    #path;
 
-    constructor(o, cwd) {
-        this.o = o;
-        this.cwd = cwd;
+    constructor(o, path) {
+        this.#o = o;
+        this.#path = path;
     }
 
     static fromUnwrapped(o, cwd) {
         return new DirEntArrayWrapper(o.map(e => new DirEntWrapper(e, cwd)), cwd);
     }
 
+    get path() {
+        return this.#path;
+    }
+
     get directories() {
-        return new DirEntArrayWrapper(this.o.filter(e => e.isDirectory()));
+        return new DirEntArrayWrapper(this.#o.filter(e => e.isDirectory()));
     }
 
     get files() {
-        return new DirEntArrayWrapper(this.o.filter(e => e.isFile()));
+        return new DirEntArrayWrapper(this.#o.filter(e => e.isFile()));
     }
 
     get images() {
-        return new DirEntArrayWrapper(this.o.filter(e => e.isImage()));
+        return new DirEntArrayWrapper(this.#o.filter(e => e.isImage()));
     }
 
     get names() {
-        return this.o.map(e => e.name);
+        return this.#o.map(e => e.name);
     }
 
     get fileUris() {
-        return this.o.map(e => e.fileUri);
+        return this.#o.map(e => e.fileUri);
     }
 
     hasDirectories() {
-        return this.directories.o.length > 0;
+        return this.directories.#o.length > 0;
     }
 
     hasImages() {
-        return this.images.o.length > 0;
+        return this.images.#o.length > 0;
     }
 
 }
@@ -87,7 +99,7 @@ function viewCtrl($scope, $http) {
             } else {
                 if (makeHistory) {
                     future = [];
-                    history.push(dir.cwd);
+                    history.push(dir.path);
                 }
                 dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, cwd);
                 $scope.photos = dir.images.fileUris;
@@ -98,7 +110,7 @@ function viewCtrl($scope, $http) {
 
     $scope.submit = function () {
         $scope.cwd = path.normalize($scope.cwd);
-        if ($scope.cwd === dir.cwd) {
+        if ($scope.cwd === dir.path) {
             $scope.refresh();
         } else {
             go(true);
@@ -111,24 +123,24 @@ function viewCtrl($scope, $http) {
     };
 
     $scope.refresh = function () {
-        $scope.cwd = dir.cwd;
+        $scope.cwd = dir.path;
         go(false);
     };
 
     $scope.goParent = function () {
-        $scope.cwd = path.dirname(dir.cwd);
+        $scope.cwd = path.dirname(dir.path);
         $scope.submit();
     };
 
     $scope.goBack = function () {
         $scope.cwd = history.pop();
-        future.push(dir.cwd);
+        future.push(dir.path);
         go(false);
     };
 
     $scope.goForward = function () {
         $scope.cwd = future.pop();
-        history.push(dir.cwd);
+        history.push(dir.path);
         go(false);
     };
 
