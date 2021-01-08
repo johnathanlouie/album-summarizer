@@ -21,8 +21,14 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js" crossorigin="anonymous"></script>
     <script src="scripts.js"></script>
     <style>
-        .thumbnail-xl img {
-            width: 300px !important;
+        .thumbnail-xl div {
+            height: 300px;
+            width: 300px;
+        }
+
+        .thumbnail-xl div img {
+            max-height: 100%;
+            max-width: 100%;
         }
 
         .thumbnail-xl p {
@@ -114,9 +120,11 @@
                 <h4 class="alert-heading">No images here!</h4>
             </div>
 
-            <div class="d-flex justify-content-around flex-wrap align-items-end">
+            <div class="d-flex justify-content-around flex-wrap align-items-start">
                 <button class="btn btn-icon-dark thumbnail-xl" ng-repeat="image in dir.images">
-                    <img class="img-thumbnail" src="{{ image.fileUri }}">
+                    <div class="img-thumbnail d-table-cell align-middle text-center">
+                        <img src="{{ image.fileUri }}">
+                    </div>
                     <p class="mb-0 text-break text-center">{{ image.name }}</p>
                 </button>
             </div>
