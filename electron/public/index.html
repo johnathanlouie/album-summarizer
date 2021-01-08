@@ -50,8 +50,43 @@
             border-color: #f8f9fa;
         }
 
+        .btn-icon-dark {
+            color: #343a40;
+            border-color: transparent;
+        }
+
+        .btn-icon-dark:not(:disabled):not(.disabled).active:focus,
+        .btn-icon-dark:not(:disabled):not(.disabled):active:focus,
+        .show>.btn-icon-dark.dropdown-toggle:focus {
+            box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, .5);
+        }
+
+        .btn-icon-dark:not(:disabled):not(.disabled).active,
+        .btn-icon-dark:not(:disabled):not(.disabled):active,
+        .show>.btn-icon-dark.dropdown-toggle {
+            color: #fff;
+            background-color: #343a40;
+            border-color: #343a40;
+        }
+
+        .btn-icon-dark.focus,
+        .btn-icon-dark:focus {
+            box-shadow: 0 0 0 0.2rem rgba(52, 58, 64, .5);
+        }
+
+        .btn-icon-dark:hover {
+            color: #fff;
+            background-color: #343a40;
+            border-color: #343a40;
+        }
+
         .thumbnail-xl {
             width: 300px !important;
+        }
+
+        .icon-lg {
+            width: 100px !important;
+            height: 100px !important;
         }
     </style>
 </head>
@@ -114,14 +149,26 @@
                 <h4 class="alert-heading">No subdirectories!</h4>
             </div>
 
+            <div class="d-flex justify-content-start flex-wrap align-items-center">
+                <button class="btn btn-icon-dark" ng-repeat="d in dir.directories">
+                    <svg class="bi bi-folder icon-lg" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#folder" />
+                    </svg>
+                    <p class="mb-0">{{ d.name }}</p>
+                </button>
+            </div>
+
             <hr>
 
             <div class="alert alert-info ng-hide" role="alert" ng-hide="dir.hasImages()">
                 <h4 class="alert-heading">No images here!</h4>
             </div>
 
-            <div class="d-flex justify-content-around flex-wrap align-items-center">
-                <img class="thumbnail-xl img-thumbnail" ng-repeat="image in dir.images" src="{{ image.fileUri }}">
+            <div class="d-flex justify-content-around flex-wrap align-items-end">
+                <button class="btn btn-icon-dark" ng-repeat="image in dir.images">
+                    <img class="thumbnail-xl img-thumbnail" src="{{ image.fileUri }}">
+                    <p class="mb-0 thumbnail-xl text-break text-left">{{ image.name }}</p>
+                </button>
             </div>
 
         </div>
