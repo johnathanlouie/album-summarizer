@@ -110,18 +110,18 @@
 
         <div ng-hide="isCwdMissing">
 
-            <div class="alert alert-info ng-hide" role="alert" ng-hide="hasDirectories()">
+            <div class="alert alert-info ng-hide" role="alert" ng-hide="dir.hasDirectories()">
                 <h4 class="alert-heading">No subdirectories!</h4>
             </div>
 
             <hr>
 
-            <div class="alert alert-info ng-hide" role="alert" ng-hide="hasImages()">
+            <div class="alert alert-info ng-hide" role="alert" ng-hide="dir.hasImages()">
                 <h4 class="alert-heading">No images here!</h4>
             </div>
 
             <div class="d-flex justify-content-around flex-wrap align-items-center">
-                <img class="thumbnail-xl img-thumbnail" ng-repeat="image in photos" src="{{ image }}">
+                <img class="thumbnail-xl img-thumbnail" ng-repeat="image in dir.images" src="{{ image.fileUri }}">
             </div>
 
         </div>

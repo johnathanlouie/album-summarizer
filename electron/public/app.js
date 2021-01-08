@@ -35,20 +35,16 @@ class DirEntWrapper {
 
 }
 
-class DirEntArrayWrapper {
-    #o;
+class DirEntArrayWrapper extends Array {
     #path;
     #directories = null;
     #files = null;
     #images = null;
 
-    constructor(o, path) {
-        this.#o = o;
-        this.#path = path;
-    }
-
-    static fromUnwrapped(o, cwd) {
-        return new DirEntArrayWrapper(o.map(e => new DirEntWrapper(e, cwd)), cwd);
+    static fromUnwrapped(o, path) {
+        var x = DirEntArrayWrapper.from(o.map(e => new DirEntWrapper(e, path)));
+        x.#path = path;
+        return x;
     }
 
     get path() {
@@ -57,46 +53,46 @@ class DirEntArrayWrapper {
 
     get directories() {
         if (this.#directories === null) {
-            this.#directories = new DirEntArrayWrapper(this.#o.filter(e => e.isDirectory()))
+            this.#directories = this.filter(e => e.isDirectory());
         }
         return this.#directories;
     }
 
     get files() {
         if (this.#files === null) {
-            this.#files = new DirEntArrayWrapper(this.#o.filter(e => e.isFile()))
+            this.#files = this.filter(e => e.isFile());
         }
         return this.#files;
     }
 
     get images() {
         if (this.#images === null) {
-            this.#images = new DirEntArrayWrapper(this.#o.filter(e => e.isImage()))
+            this.#images = this.files.filter(e => e.isImage());
         }
         return this.#images;
     }
 
     get names() {
-        return this.#o.map(e => e.name);
+        return this.map(e => e.name);
     }
 
     get fileUris() {
-        return this.#o.map(e => e.fileUri);
+        return this.map(e => e.fileUri);
     }
 
     hasDirectories() {
-        return this.directories.#o.length > 0;
+        return this.directories.length > 0;
     }
 
     hasImages() {
-        return this.images.#o.length > 0;
+        return this.images.length > 0;
     }
 
 }
 
 function viewCtrl($scope, $http) {
     const homeDir = path.resolve(os.homedir(), 'Pictures');
-    var dir = DirEntArrayWrapper.fromUnwrapped([], homeDir);
+    $scope.dir = DirEntArrayWrapper.fromUnwrapped([], homeDir);
     var history = [];
     var future = [];
 
@@ -111,10 +107,9 @@ function viewCtrl($scope, $http) {
             } else {
                 if (makeHistory) {
                     future = [];
-                    history.push(dir.path);
+                    history.push($scope.dir.path);
                 }
-                dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, cwd);
-                $scope.photos = dir.images.fileUris;
+                asdf = $scope.dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, cwd);
                 $scope.$apply();
             }
         });
@@ -122,7 +117,7 @@ function viewCtrl($scope, $http) {
 
     $scope.submit = function () {
         $scope.cwd = path.normalize($scope.cwd);
-        if ($scope.cwd === dir.path) {
+        if ($scope.cwd === $scope.dir.path) {
             $scope.refresh();
         } else {
             go(true);
@@ -135,24 +130,24 @@ function viewCtrl($scope, $http) {
     };
 
     $scope.refresh = function () {
-        $scope.cwd = dir.path;
+        $scope.cwd = $scope.dir.path;
         go(false);
     };
 
     $scope.goParent = function () {
-        $scope.cwd = path.dirname(dir.path);
+        $scope.cwd = path.dirname($scope.dir.path);
         $scope.submit();
     };
 
     $scope.goBack = function () {
         $scope.cwd = history.pop();
-        future.push(dir.path);
+        future.push($scope.dir.path);
         go(false);
     };
 
     $scope.goForward = function () {
         $scope.cwd = future.pop();
-        history.push(dir.path);
+        history.push($scope.dir.path);
         go(false);
     };
 
@@ -162,14 +157,6 @@ function viewCtrl($scope, $http) {
 
     $scope.isFutureEmpty = function () {
         return future.length === 0;
-    };
-
-    $scope.hasDirectories = function () {
-        return dir.hasDirectories();
-    };
-
-    $scope.hasImages = function () {
-        return dir.hasImages();
     };
 
     $scope.cwd = homeDir;
