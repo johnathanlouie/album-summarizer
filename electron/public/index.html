@@ -150,7 +150,7 @@
             </div>
 
             <div class="d-flex justify-content-start flex-wrap align-items-center">
-                <button class="btn btn-icon-dark" ng-repeat="d in dir.directories">
+                <button class="btn btn-icon-dark" ng-repeat="d in dir.directories" ng-click="goTo(d.absolutePath)">
                     <svg class="bi bi-folder icon-lg" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#folder" />
                     </svg>

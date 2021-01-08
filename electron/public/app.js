@@ -159,6 +159,11 @@ function viewCtrl($scope, $http) {
         return future.length === 0;
     };
 
+    $scope.goTo = function (path) {
+        $scope.cwd = path;
+        $scope.submit();
+    };
+
     $scope.cwd = homeDir;
     $scope.submit();
 }
