@@ -49,7 +49,9 @@
 <body ng-app="app" ng-controller="viewCtrl">
 
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
+
         <form class="form-inline mr-auto" ng-submit="submit()">
+
             <button class="btn btn-icon-light mr-2" type="button" ng-click="goBack()" ng-disabled="isHistoryEmpty()">
                 <svg class="bi bi-arrow-left" width="1rem" height="1rem" fill="currentColor">
                     <use xlink:href="bootstrap-icons.svg#arrow-left" />
@@ -70,22 +72,41 @@
                     <use xlink:href="bootstrap-icons.svg#house-fill" />
                 </svg>
             </button>
-            <div class="input-group">
+
+            <div class="input-group mr-2">
                 <input type="text" class="form-control" placeholder="Enter address" size="100" ng-model="cwd">
                 <div class="input-group-append">
-                    <button class="btn btn-primary mr-2" type="button" ng-click="refresh()">
+                    <button class="btn btn-primary" type="button" ng-click="refresh()">
                         <svg class="bi bi-arrow-clockwise" width="1rem" height="1rem" fill="currentColor">
                             <use xlink:href="bootstrap-icons.svg#arrow-clockwise" />
                         </svg>
                     </button>
                 </div>
             </div>
+
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-warning active">
+                    <input type="radio" ng-model="view" value="icons">
+                    <svg class="bi bi-images" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#images" />
+                    </svg>
+                </label>
+                <label class="btn btn-warning">
+                    <input type="radio" ng-model="view" value="details">
+                    <svg class="bi bi-card-list" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#card-list" />
+                    </svg>
+                </label>
+            </div>
+
         </form>
+
         <a class="btn btn-icon-light" href="menu.html">
             <svg class="bi bi-list" width="1rem" height="1rem" fill="currentColor">
                 <use xlink:href="bootstrap-icons.svg#list" />
             </svg>
         </a>
+
     </nav>
 
     <div class="container-fluid">
@@ -120,7 +141,7 @@
                 <h4 class="alert-heading">No images here!</h4>
             </div>
 
-            <div class="d-flex justify-content-around flex-wrap align-items-start">
+            <div class="d-flex justify-content-around flex-wrap align-items-start" ng-show="view == 'icons'">
                 <button class="btn btn-icon-dark thumbnail-xl" ng-repeat="image in dir.images">
                     <div class="img-thumbnail d-table-cell align-middle text-center">
                         <img src="{{ image.fileUri }}">
@@ -128,6 +149,8 @@
                     <p class="mb-0 text-break text-center">{{ image.name }}</p>
                 </button>
             </div>
+
+            <div ng-show="view == 'details'"></div>
 
         </div>
 

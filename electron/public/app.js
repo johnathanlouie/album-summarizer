@@ -164,6 +164,7 @@ function viewCtrl($scope, $http) {
         $scope.submit();
     };
 
+    $scope.view = 'icons';
     $scope.cwd = homeDir;
     $scope.submit();
 }
