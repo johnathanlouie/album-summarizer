@@ -168,7 +168,7 @@ function viewCtrl($scope, $http) {
         $scope.submit();
     };
 
-    $scope.view = 'icons';
+    $scope.view = 'thumbnails';
     $scope.cwd = homeDir;
     $scope.submit();
 }
