@@ -19,6 +19,10 @@ class DirEntWrapper {
         return fileUrl(this.absolutePath);
     }
 
+    get extension() {
+        return path.extname(this.#o.name).toLowerCase();
+    }
+
     isImage() {
         const validExt = ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.apng', '.avif'];
         var ext = path.extname(this.#o.name).toLowerCase();

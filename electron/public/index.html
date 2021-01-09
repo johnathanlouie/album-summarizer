@@ -150,7 +150,20 @@
                 </button>
             </div>
 
-            <div ng-show="view == 'details'"></div>
+            <table class="table table-hover" ng-show="view == 'details'">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="image in dir.images">
+                        <td class="text-break text-wrap">{{ image.name }}</td>
+                        <td>{{ image.extension }}</td>
+                    </tr>
+                </tbody>
+            </table>
 
         </div>
 
