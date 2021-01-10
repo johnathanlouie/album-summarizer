@@ -9,6 +9,7 @@ function createWindow() {
             nodeIntegration: true
         }
     });
+    win.maximize();
 
     // Removes the menu bar on linux, windows, but not macOS.
     win.removeMenu();
