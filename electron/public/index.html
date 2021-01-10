@@ -50,7 +50,7 @@
             <form class="form-inline mr-auto" ng-submit="submit()">
 
                 <!-- Back button -->
-                <button class="btn btn-outline-light btn-borderless mr-2" type="button" ng-click="goBack()"
+                <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goBack()"
                     ng-disabled="isHistoryEmpty()">
                     <svg class="bi bi-arrow-left-circle-fill" width="1rem" height="1rem" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#arrow-left-circle-fill" />
@@ -58,7 +58,7 @@
                 </button>
 
                 <!-- Forward button -->
-                <button class="btn btn-outline-light btn-borderless mr-2" type="button" ng-click="goForward()"
+                <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goForward()"
                     ng-disabled="isFutureEmpty()">
                     <svg class="bi bi-arrow-right-circle-fill" width="1rem" height="1rem" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#arrow-right-circle-fill" />
@@ -66,14 +66,14 @@
                 </button>
 
                 <!-- Go up one level button -->
-                <button class="btn btn-outline-light btn-borderless mr-2" type="button" ng-click="goParent()">
+                <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goParent()">
                     <svg class="bi bi-arrow-up-circle-fill" width="1rem" height="1rem" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#arrow-up-circle-fill" />
                     </svg>
                 </button>
 
                 <!-- Home button -->
-                <button class="btn btn-outline-light btn-borderless mr-2" type="button" ng-click="goHome()">
+                <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goHome()">
                     <svg class="bi bi-house-fill" width="1rem" height="1rem" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#house-fill" />
                     </svg>
@@ -123,7 +123,7 @@
             </form>
 
             <!-- Menu button -->
-            <a class="btn btn-outline-light btn-borderless" href="menu.html">
+            <a class="btn btn-outline-light border-transparent" href="menu.html">
                 <svg class="bi bi-list" width="1rem" height="1rem" fill="currentColor">
                     <use xlink:href="bootstrap-icons.svg#list" />
                 </svg>
@@ -152,7 +152,7 @@
                 <div class="d-flex justify-content-start flex-wrap align-items-start">
 
                     <!-- Directory icons -->
-                    <button class="btn btn-outline-dark btn-borderless icon-lg" ng-repeat="d in dir.directories"
+                    <button class="btn btn-outline-dark border-transparent icon-lg" ng-repeat="d in dir.directories"
                         ng-click="goTo(d.absolutePath)">
                         <svg class="bi bi-folder" fill="currentColor">
                             <use xlink:href="bootstrap-icons.svg#folder" />
@@ -173,7 +173,7 @@
                 <div class="d-flex justify-content-around flex-wrap align-items-start" ng-show="view == 'thumbnails'">
 
                     <!-- Thumbnails -->
-                    <button class="btn btn-outline-dark btn-borderless thumbnail-xl" ng-repeat="image in dir.images"
+                    <button class="btn btn-outline-dark border-transparent thumbnail-xl" ng-repeat="image in dir.images"
                         ng-click="focusOnImage(image.fileUri)">
                         <div class="img-thumbnail d-table-cell align-middle">
                             <img class="mw-100 mh-100" src="{{ image.fileUri }}">
