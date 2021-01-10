@@ -47,3 +47,12 @@
     background-color: #343a40;
     border-color: #343a40;
 }
+
+.fixed-max {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1030;
+}
