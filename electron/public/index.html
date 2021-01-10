@@ -206,17 +206,17 @@
     </div>
 
     <!-- Image viewer -->
-    <div class="fixed-max" ng-show="screen == 'imageViewer'">
+    <div class="fixed-max d-flex flex-column" ng-show="screen == 'imageViewer'">
 
         <!-- Button bar -->
-        <nav class="navbar navbar-dark bg-dark justify-content-center">
+        <nav class="navbar navbar-dark bg-dark justify-content-center flex-grow-0 flex-shrink-1">
             <button class="btn btn-primary mr-2" type="button">Back</button>
             <button class="btn btn-primary mr-2" type="button">Next</button>
             <button class="btn btn-danger" ng-click="unfocusImage()" type="button">Close</button>
         </nav>
 
         <!-- Image -->
-        <div class="d-flex align-items-center justify-content-center bg-secondary">
+        <div class="d-flex align-items-center justify-content-center bg-secondary flex-grow-1 flex-shrink-1">
             <img class="img-fluid mh-100" src="{{ focusedImage }}">
         </div>
 
