@@ -168,6 +168,17 @@ function viewCtrl($scope, $http) {
         $scope.submit();
     };
 
+    $scope.focusOnImage = function (url) {
+        $scope.focusedImage = url;
+        $scope.screen = 'imageViewer';
+    }
+
+    $scope.unfocusImage = function () {
+        $scope.screen = 'main';
+    }
+
+    $scope.screen = 'main';
+    $scope.focusedImage = 'image-placeholder.png';
     $scope.view = 'thumbnails';
     $scope.cwd = homeDir;
     $scope.submit();

@@ -22,13 +22,8 @@
     <script src="scripts.js"></script>
     <style>
         .thumbnail-xl div {
-            height: 300px;
-            width: 300px;
-        }
-
-        .thumbnail-xl div img {
-            max-height: 100%;
-            max-width: 100%;
+            height: 300px !important;
+            width: 300px !important;
         }
 
         .thumbnail-xl p {
@@ -48,149 +43,173 @@
 
 <body ng-app="app" ng-controller="viewCtrl">
 
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
+    <div ng-show="screen == 'main'">
 
-        <form class="form-inline mr-auto" ng-submit="submit()">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
 
-            <!-- Back button -->
-            <button class="btn btn-icon-light mr-2" type="button" ng-click="goBack()" ng-disabled="isHistoryEmpty()">
-                <svg class="bi bi-arrow-left" width="1rem" height="1rem" fill="currentColor">
-                    <use xlink:href="bootstrap-icons.svg#arrow-left" />
-                </svg>
-            </button>
+            <form class="form-inline mr-auto" ng-submit="submit()">
 
-            <!-- Forward button -->
-            <button class="btn btn-icon-light mr-2" type="button" ng-click="goForward()" ng-disabled="isFutureEmpty()">
-                <svg class="bi bi-arrow-right" width="1rem" height="1rem" fill="currentColor">
-                    <use xlink:href="bootstrap-icons.svg#arrow-right" />
-                </svg>
-            </button>
+                <!-- Back button -->
+                <button class="btn btn-icon-light mr-2" type="button" ng-click="goBack()"
+                    ng-disabled="isHistoryEmpty()">
+                    <svg class="bi bi-arrow-left" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#arrow-left" />
+                    </svg>
+                </button>
 
-            <!-- Go up one level button -->
-            <button class="btn btn-icon-light mr-2" type="button" ng-click="goParent()">
-                <svg class="bi bi-arrow-90deg-up" width="1rem" height="1rem" fill="currentColor">
-                    <use xlink:href="bootstrap-icons.svg#arrow-90deg-up" />
-                </svg>
-            </button>
+                <!-- Forward button -->
+                <button class="btn btn-icon-light mr-2" type="button" ng-click="goForward()"
+                    ng-disabled="isFutureEmpty()">
+                    <svg class="bi bi-arrow-right" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#arrow-right" />
+                    </svg>
+                </button>
 
-            <!-- Home button -->
-            <button class="btn btn-icon-light mr-2" type="button" ng-click="goHome()">
-                <svg class="bi bi-house-fill" width="1rem" height="1rem" fill="currentColor">
-                    <use xlink:href="bootstrap-icons.svg#house-fill" />
-                </svg>
-            </button>
+                <!-- Go up one level button -->
+                <button class="btn btn-icon-light mr-2" type="button" ng-click="goParent()">
+                    <svg class="bi bi-arrow-90deg-up" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#arrow-90deg-up" />
+                    </svg>
+                </button>
 
-            <!-- Address bar -->
-            <div class="input-group mr-2">
-                <input type="text" class="form-control" placeholder="Enter address" size="100" ng-model="cwd">
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="button" ng-click="refresh()">
-                        <svg class="bi bi-arrow-clockwise" width="1rem" height="1rem" fill="currentColor">
-                            <use xlink:href="bootstrap-icons.svg#arrow-clockwise" />
-                        </svg>
-                    </button>
+                <!-- Home button -->
+                <button class="btn btn-icon-light mr-2" type="button" ng-click="goHome()">
+                    <svg class="bi bi-house-fill" width="1rem" height="1rem" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#house-fill" />
+                    </svg>
+                </button>
+
+                <!-- Address bar -->
+                <div class="input-group mr-2">
+                    <input type="text" class="form-control" placeholder="Enter address" size="100" ng-model="cwd">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" ng-click="refresh()">
+                            <svg class="bi bi-arrow-clockwise" width="1rem" height="1rem" fill="currentColor">
+                                <use xlink:href="bootstrap-icons.svg#arrow-clockwise" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
+
+                <!-- View toggler -->
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+
+                    <!-- View icons button -->
+                    <label class="btn btn-warning">
+                        <input type="radio" ng-model="view" value="thumbnails">
+                        <svg class="bi bi-image" width="1rem" height="1rem" fill="currentColor">
+                            <use xlink:href="bootstrap-icons.svg#image" />
+                        </svg>
+                    </label>
+
+                    <!-- View details button -->
+                    <label class="btn btn-warning">
+                        <input type="radio" ng-model="view" value="details">
+                        <svg class="bi bi-list-task" width="1rem" height="1rem" fill="currentColor">
+                            <use xlink:href="bootstrap-icons.svg#list-task" />
+                        </svg>
+                    </label>
+
+                </div>
+
+            </form>
+
+            <!-- Menu button -->
+            <a class="btn btn-icon-light" href="menu.html">
+                <svg class="bi bi-list" width="1rem" height="1rem" fill="currentColor">
+                    <use xlink:href="bootstrap-icons.svg#list" />
+                </svg>
+            </a>
+
+        </nav>
+
+        <div class="container-fluid">
+
+            <!-- Directory not found warning -->
+            <div class="alert alert-danger" role="alert" ng-show="isCwdMissing">
+                <h4 class="alert-heading">Directory not found!</h4>
+                <p>The directory (also known as folder) was not found at the address. Check the spelling of the address
+                    or navigate by clicking on the folder icons.</p>
+                <hr>
+                <p class="mb-0">The directory may not exist or you do not have permission to access it.</p>
             </div>
 
-            <!-- View toggler -->
-            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <div ng-hide="isCwdMissing">
 
-                <!-- View icons button -->
-                <label class="btn btn-warning">
-                    <input type="radio" ng-model="view" value="thumbnails">
-                    <svg class="bi bi-image" width="1rem" height="1rem" fill="currentColor">
-                        <use xlink:href="bootstrap-icons.svg#image" />
-                    </svg>
-                </label>
+                <!-- No subdirectories message -->
+                <div class="alert alert-info" role="alert" ng-hide="dir.hasDirectories()">
+                    <h4 class="alert-heading">No subdirectories!</h4>
+                </div>
 
-                <!-- View details button -->
-                <label class="btn btn-warning">
-                    <input type="radio" ng-model="view" value="details">
-                    <svg class="bi bi-list-task" width="1rem" height="1rem" fill="currentColor">
-                        <use xlink:href="bootstrap-icons.svg#list-task" />
-                    </svg>
-                </label>
+                <div class="d-flex justify-content-start flex-wrap align-items-start">
+
+                    <!-- Directory icons -->
+                    <button class="btn btn-icon-dark icon-lg" ng-repeat="d in dir.directories"
+                        ng-click="goTo(d.absolutePath)">
+                        <svg class="bi bi-folder" fill="currentColor">
+                            <use xlink:href="bootstrap-icons.svg#folder" />
+                        </svg>
+                        <p class="mb-0 text-break text-center">{{ d.name }}</p>
+                    </button>
+
+                </div>
+
+                <hr>
+
+                <!-- No images message -->
+                <div class="alert alert-info" role="alert" ng-hide="dir.hasImages()">
+                    <h4 class="alert-heading">No images here!</h4>
+                </div>
+
+                <!-- Thumbnail view -->
+                <div class="d-flex justify-content-around flex-wrap align-items-start" ng-show="view == 'thumbnails'">
+
+                    <!-- Thumbnails -->
+                    <button class="btn btn-icon-dark thumbnail-xl" ng-repeat="image in dir.images"
+                        ng-click="focusOnImage(image.fileUri)">
+                        <div class="img-thumbnail d-table-cell align-middle">
+                            <img class="mw-100 mh-100" src="{{ image.fileUri }}">
+                        </div>
+                        <p class="mb-0 text-break text-center">{{ image.name }}</p>
+                    </button>
+
+                </div>
+
+                <!-- Details view -->
+                <table class="table table-hover" ng-show="view == 'details'">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="image in dir.images">
+                            <td class="text-break text-wrap">{{ image.name }}</td>
+                            <td>{{ image.extension }}</td>
+                        </tr>
+                    </tbody>
+                </table>
 
             </div>
 
-        </form>
-
-        <!-- Menu button -->
-        <a class="btn btn-icon-light" href="menu.html">
-            <svg class="bi bi-list" width="1rem" height="1rem" fill="currentColor">
-                <use xlink:href="bootstrap-icons.svg#list" />
-            </svg>
-        </a>
-
-    </nav>
-
-    <div class="container-fluid">
-
-        <!-- Directory not found warning -->
-        <div class="alert alert-danger" role="alert" ng-show="isCwdMissing">
-            <h4 class="alert-heading">Directory not found!</h4>
-            <p>The directory (also known as folder) was not found at the address. Check the spelling of the address
-                or navigate by clicking on the folder icons.</p>
-            <hr>
-            <p class="mb-0">The directory may not exist or you do not have permission to access it.</p>
         </div>
 
-        <div ng-hide="isCwdMissing">
+    </div>
 
-            <!-- No subdirectories message -->
-            <div class="alert alert-info" role="alert" ng-hide="dir.hasDirectories()">
-                <h4 class="alert-heading">No subdirectories!</h4>
-            </div>
+    <!-- Image viewer -->
+    <div class="fixed-max" ng-show="screen == 'imageViewer'">
 
-            <div class="d-flex justify-content-start flex-wrap align-items-start">
+        <!-- Button bar -->
+        <nav class="navbar navbar-dark bg-dark justify-content-center">
+            <button class="btn btn-primary mr-2" type="button">Back</button>
+            <button class="btn btn-primary mr-2" type="button">Next</button>
+            <button class="btn btn-danger" ng-click="unfocusImage()" type="button">Close</button>
+        </nav>
 
-                <!-- Directory icons -->
-                <button class="btn btn-icon-dark icon-lg" ng-repeat="d in dir.directories"
-                    ng-click="goTo(d.absolutePath)">
-                    <svg class="bi bi-folder" fill="currentColor">
-                        <use xlink:href="bootstrap-icons.svg#folder" />
-                    </svg>
-                    <p class="mb-0 text-break text-center">{{ d.name }}</p>
-                </button>
-
-            </div>
-
-            <hr>
-
-            <!-- No images message -->
-            <div class="alert alert-info" role="alert" ng-hide="dir.hasImages()">
-                <h4 class="alert-heading">No images here!</h4>
-            </div>
-
-            <!-- Thumbnail view -->
-            <div class="d-flex justify-content-around flex-wrap align-items-start" ng-show="view == 'thumbnails'">
-
-                <!-- Thumbnails -->
-                <button class="btn btn-icon-dark thumbnail-xl" ng-repeat="image in dir.images">
-                    <div class="img-thumbnail d-table-cell align-middle text-center">
-                        <img src="{{ image.fileUri }}">
-                    </div>
-                    <p class="mb-0 text-break text-center">{{ image.name }}</p>
-                </button>
-
-            </div>
-
-            <!-- Details view -->
-            <table class="table table-hover" ng-show="view == 'details'">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-repeat="image in dir.images">
-                        <td class="text-break text-wrap">{{ image.name }}</td>
-                        <td>{{ image.extension }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
+        <!-- Image -->
+        <div class="d-flex align-items-center justify-content-center bg-secondary">
+            <img class="img-fluid mh-100" src="{{ focusedImage }}">
         </div>
 
     </div>
