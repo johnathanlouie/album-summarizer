@@ -1,8 +1,10 @@
 from argparse import ArgumentParser, Namespace
-from typing import List
+from json import dump
+from typing import Dict, List, Union
+
+import cv2
 
 import aaa
-import cv2
 from cluster.histogram import HistogramCluster
 from cluster.hybridcluster import HybridCluster, HybridCluster2
 from cluster.sift import SiftCluster
@@ -16,38 +18,11 @@ def proc_args() -> Namespace:
     """
     Parses program arguments.
     """
-    parser = ArgumentParser(description='A program that chooses the most representative photos from a photo album.')
+    parser = ArgumentParser(
+        description='A program that chooses the most representative photos from a photo album.')
     parser.add_argument('directory', help='')
     args = parser.parse_args()
     return args
-
-
-class ImageRating(object):
-    """
-    Struct for holding the URL and rating of an image.
-    Used by the ClusterRank class.
-    """
-
-    def __init__(self, image: Url = None, rating: int = -1000000000000000000000000000) -> None:
-        self.image = image
-        self.rating = rating
-        return
-
-    def update_if_better(self, image: Url, rating: int) -> bool:
-        """
-        Updates the data if the new image is better.
-        """
-        if self.rating < rating:
-            self.image = image
-            self.rating = rating
-            return True
-        return False
-
-    def valid(self) -> bool:
-        """
-        Returns true if the object has been updated at least once.
-        """
-        return self.image != None
 
 
 class ClusterRank(object):
@@ -56,31 +31,29 @@ class ClusterRank(object):
     """
 
     def __init__(self, clusters: ClusterResults, rates: List[float]) -> None:
-        self._best = [ImageRating() for _ in range(clusters.k())]
-        for c, r, i in zip(clusters.labels(), rates, clusters.get_all_urls()):
-            self._best[c].update_if_better(i, r)
-        for i in self._best:
-            if not i.valid():
+        self._results = [[]] * clusters.k()
+        for clusterId, rate, url in zip(clusters.labels(), rates, clusters.get_all_urls()):
+            self._results[clusterId].append(
+                {'image': url, 'rating': rate, 'cluster': clusterId})
+        for i in self._results:
+            i.sort(key=lambda x: x['rating'])
+        for url in self._best:
+            if not url.valid():
                 raise Exception('Some clusters are empty.')
         return
 
-    @staticmethod
-    def copy_img(image: Url) -> None:
+    def json(self) -> List[Dict[str, Union[str, int]]]:
         """
-        Makes a copy of an image to another location.
+        Returns a JSON serializable list object.
         """
-        copy_file(image, 'out/summarized', 1)
-        return
+        return [i.json() for i in self._best]
 
-    def copy_images(self) -> None:
+    def save_results(self) -> None:
         """
-        Makes a copy of each image in this summarized collection to a new location.
+        Saves the results to a JSON file at 'out/organized.json'.
         """
-        pb = ProgressBar(len(self._best))
-        for image_rating in self._best:
-            self.copy_img(image_rating.image)
-            pb.update()
-        return
+        with open('out/organized.json', 'w', encoding='utf8') as f:
+            dump(self.json(), f)
 
 
 def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchiSplitAdapter) -> None:
@@ -92,8 +65,8 @@ def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchiSplitAdapter
     rates = algorithm2.predict(images).human_readable()
     print('Ranking results....')
     cr = ClusterRank(clusters, rates)
-    print('Making summarized album at out/summarized....')
-    cr.copy_images()
+    print('Saving results....')
+    cr.save_results()
     return
 
 
