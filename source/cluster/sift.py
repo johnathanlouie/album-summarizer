@@ -7,7 +7,7 @@ from sklearn.preprocessing import normalize
 
 import cv2
 from core.cluster import ClusterResults, ImageCluster
-from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, Number, ProgressBar, Url,
+from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, Number, Url,
                 npsave, read_image)
 
 
@@ -131,11 +131,9 @@ class SimilarityMatrix(object):
     def __init__(self, descriptors: List[Descriptors], algorithm: Similarity) -> None:
         num = len(descriptors)
         matrix = self.empty_matrix(num)
-        pb = ProgressBar(num * num)
         for x, d1 in enumerate(descriptors):
             for y, d2 in enumerate(descriptors):
                 matrix[x, y] = algorithm.compute(d1, d2)
-                pb.update()
         self.matrix = matrix
         return
 
@@ -180,12 +178,10 @@ class SiftDescriptorSet(object):
     def __init__(self, images: List[Url], features: int = 300) -> None:
         sift = cv2.xfeatures2d.SIFT_create(nfeatures=features)
         a = list()
-        pb = ProgressBar(len(images))
         for url in images:
             image = read_image(url)
             _, descriptors = sift.detectAndCompute(image=image, mask=None)
             a.append(descriptors)
-            pb.update()
         self.descriptors = a
 
     def unit_normalize(self) -> None:
