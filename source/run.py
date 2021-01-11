@@ -11,7 +11,7 @@ from cluster.sift import SiftCluster
 from core.archidata import ArchiSplitAdapter
 from core.cluster import ClusterResults, ImageCluster
 from dlfactory import DeepLearningFactory
-from jl import ImageDirectory, ListFile, ProgressBar, Url, copy_file
+from jl import ImageDirectory, ListFile, Url, copy_file
 
 
 def proc_args() -> Namespace:
@@ -37,23 +37,14 @@ class ClusterRank(object):
                 {'image': url, 'rating': rate, 'cluster': clusterId})
         for i in self._results:
             i.sort(key=lambda x: x['rating'])
-        for url in self._best:
-            if not url.valid():
-                raise Exception('Some clusters are empty.')
         return
-
-    def json(self) -> List[Dict[str, Union[str, int]]]:
-        """
-        Returns a JSON serializable list object.
-        """
-        return [i.json() for i in self._best]
 
     def save_results(self) -> None:
         """
         Saves the results to a JSON file at 'out/organized.json'.
         """
         with open('out/organized.json', 'w', encoding='utf8') as f:
-            dump(self.json(), f)
+            dump(self._results, f)
 
 
 def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchiSplitAdapter) -> None:
