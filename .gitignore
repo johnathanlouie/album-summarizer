@@ -329,8 +329,13 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 
+# Visual Studio Code settings
+.vscode/launch.json
+.vscode/settings.json
+
+# Netbeans project files
+nbproject/private/
+
 # Data files
 /data/
 /out/
-/nbproject/private/
-/electron/nbproject/private/
