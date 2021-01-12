@@ -99,30 +99,52 @@ class DirEntArrayWrapper extends Array {
 
 }
 
-function viewCtrl($scope, $http) {
+class Stopwatch {
+    #time = 0;
+    #interval;
+    #callback = function () { };
+
+    constructor(callback) { this.#callback = callback; }
+
+    get time() { return this.#time; }
+
+    reset() { this.#time = 0; }
+
+    start() {
+        this.#interval = setInterval(() => {
+            this.#time += .01;
+            this.#callback();
+        }, 10);
+    }
+
+    stop() { clearInterval(this.#interval); }
+}
+
+class LoadingOverlay {
+    #isLoading = false;
+    #stopwatch;
+
+    constructor(callback) { this.#stopwatch = new Stopwatch(callback); }
+
+    get isLoading() { return this.#isLoading; }
+
+    show() {
+        this.#stopwatch.reset();
+        this.#stopwatch.start();
+        this.#isLoading = true;
+    }
+
+    hide() {
+        this.#stopwatch.stop();
+        this.#isLoading = false;
+    }
+}
+
+function viewCtrl($scope) {
     const homeDir = path.resolve(os.homedir(), 'Pictures');
     $scope.dir = DirEntArrayWrapper.fromUnwrapped([], homeDir);
     var history = [];
     var future = [];
-
-    class Stopwatch {
-        #time = 0;
-        #interval;
-
-        get time() { return this.#time; }
-
-        reset() { this.#time = 0; }
-
-        start() {
-            this.#interval = setInterval(() => {
-                this.#time += .01;
-                $scope.$apply();
-            }, 10);
-        }
-
-        stop() { clearInterval(this.#interval); }
-
-    }
 
     function go(makeHistory) {
         $scope.isCwdMissing = false;
@@ -201,6 +223,7 @@ function viewCtrl($scope, $http) {
         $scope.screen = 'main';
     }
 
+    $scope.loadingOverlay = new LoadingOverlay($scope.$apply);
     $scope.screen = 'main';
     $scope.focusedImage = 'image-placeholder.png';
     $scope.view = 'thumbnails';

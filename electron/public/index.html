@@ -107,7 +107,7 @@
                 </div>
 
                 <!-- Organize button -->
-                <button class="btn btn-success" type="button">
+                <button class="btn btn-success" ng-click="organize()" type="button">
                     <svg class="bi bi-diagram-3" width="1rem" height="1rem" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#diagram-3" />
                     </svg>
@@ -214,6 +214,15 @@
             <img class="img-fluid mh-100" src="{{ focusedImage }}">
         </div>
 
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="fixed-max d-flex flex-column justify-content-center align-items-center"
+        ng-show="loadingOverlay.isLoading" style="background-color: rgba(0, 0, 0, .75);">
+        <div class="spinner-border text-white" role="status" style="height: 25vh; width: 25vh;">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <h1 class="mt-5 display-1 text-white text-monospace">{{ loadStopwatch.time | number : 2 }} s</h1>
     </div>
 
     <script src="app.js"></script>
