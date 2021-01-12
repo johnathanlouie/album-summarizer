@@ -105,6 +105,25 @@ function viewCtrl($scope, $http) {
     var history = [];
     var future = [];
 
+    class Stopwatch {
+        #time = 0;
+        #interval;
+
+        get time() { return this.#time; }
+
+        reset() { this.#time = 0; }
+
+        start() {
+            this.#interval = setInterval(() => {
+                this.#time += .01;
+                $scope.$apply();
+            }, 10);
+        }
+
+        stop() { clearInterval(this.#interval); }
+
+    }
+
     function go(makeHistory) {
         $scope.isCwdMissing = false;
         $scope.photos = [];
@@ -118,7 +137,7 @@ function viewCtrl($scope, $http) {
                     future = [];
                     history.push($scope.dir.path);
                 }
-                asdf = $scope.dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, cwd);
+                $scope.dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, cwd);
                 $scope.$apply();
             }
         });
