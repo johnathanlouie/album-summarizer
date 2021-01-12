@@ -17,3 +17,10 @@ Note: End Users do not need to install these.
 ```
 conda create --name album keras-gpu "tensorflow-gpu<2" autopep8 pylint dill opencv scikit-learn --yes
 ```
+
+## Notes for Windows
+Run PowerShell as administrator and enter:
+```
+Set-ExecutionPolicy Bypass
+```
+This software needs to run scripts in the background.
