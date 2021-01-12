@@ -106,7 +106,7 @@ class Stopwatch {
 
     constructor(callback) { this.#callback = callback; }
 
-    get time() { return this.#time; }
+    time() { return this.#time; }
 
     reset() { this.#time = 0; }
 
@@ -127,6 +127,8 @@ class LoadingOverlay {
     constructor(callback) { this.#stopwatch = new Stopwatch(callback); }
 
     get isLoading() { return this.#isLoading; }
+
+    timeElapsed() { return this.#stopwatch.time(); }
 
     show() {
         this.#stopwatch.reset();

@@ -222,7 +222,7 @@
         <div class="spinner-border text-white" role="status" style="height: 25vh; width: 25vh;">
             <span class="sr-only">Loading...</span>
         </div>
-        <h1 class="mt-5 display-1 text-white text-monospace">{{ loadStopwatch.time | number : 2 }} s</h1>
+        <h1 class="mt-5 display-1 text-white text-monospace">{{ loadingOverlay.timeElapsed() | number : 2 }} s</h1>
     </div>
 
     <script src="app.js"></script>
