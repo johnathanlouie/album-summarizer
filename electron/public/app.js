@@ -150,7 +150,6 @@ function viewCtrl($scope) {
 
     function go(makeHistory) {
         $scope.isCwdMissing = false;
-        $scope.photos = [];
         var cwd = $scope.cwd;
         fs.readdir(cwd, { withFileTypes: true }, (err, dirEnts) => {
             if (err) {
