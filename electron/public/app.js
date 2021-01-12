@@ -1,3 +1,8 @@
+const fs = require('fs');
+const fileUrl = require('file-url');
+const path = require('path');
+const os = require('os');
+
 class DirEntWrapper {
     #o;
     #path;
