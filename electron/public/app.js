@@ -145,74 +145,81 @@ class LoadingOverlay {
 function viewCtrl($scope) {
     const homeDir = path.resolve(os.homedir(), 'Pictures');
     $scope.dir = DirEntArrayWrapper.fromUnwrapped([], homeDir);
-    var history = [];
-    var future = [];
 
-    function go(makeHistory) {
+    const history = {
+        _history: [],
+        _future: [],
+        _current: undefined,
+        get hasBack() { return this._history.length === 0; },
+        get hasNext() { return this._future.length === 0; },
+        get current() { return this._current; },
+
+        push: function (dir) {
+            dir = path.normalize(dir);
+            if (this._current !== dir) {
+                this._future = [];
+                if (this._current !== undefined) { this._history.push(this._current); }
+                this._current = dir;
+            }
+            return this._current;
+        },
+
+        goBack: function () {
+            this._future.push(this._current);
+            this._current = this._history.pop();
+            return this._current;
+        },
+
+        goForward: function () {
+            this._history.push(this._current);
+            this._current = this._future.pop();
+            return this._current;
+        }
+    };
+
+    function goTo(dst) {
         $scope.isCwdMissing = false;
-        var cwd = $scope.cwd;
-        fs.readdir(cwd, { withFileTypes: true }, (err, dirEnts) => {
+        fs.readdir(dst, { withFileTypes: true }, (err, dirEnts) => {
             if (err) {
                 $scope.isCwdMissing = true;
                 $scope.$apply();
             } else {
-                if (makeHistory) {
-                    future = [];
-                    history.push($scope.dir.path);
-                }
-                $scope.dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, cwd);
+                $scope.dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, dst);
                 $scope.$apply();
             }
         });
     }
 
-    $scope.submit = function () {
-        $scope.cwd = path.normalize($scope.cwd);
-        if ($scope.cwd === $scope.dir.path) {
-            $scope.refresh();
-        } else {
-            go(true);
-        }
+    $scope.goTo = function (dst = $scope.cwd) {
+        goTo($scope.cwd = history.push(dst));
     };
 
     $scope.goHome = function () {
-        $scope.cwd = homeDir;
-        $scope.submit();
+        goTo($scope.cwd = history.push(homeDir));
     };
 
     $scope.refresh = function () {
-        $scope.cwd = $scope.dir.path;
-        go(false);
+        goTo($scope.cwd = history.current);
     };
 
     $scope.goParent = function () {
-        $scope.cwd = path.dirname($scope.dir.path);
-        $scope.submit();
+        goTo($scope.cwd = history.push(path.dirname(history.current)));
     };
 
     $scope.goBack = function () {
-        $scope.cwd = history.pop();
-        future.push($scope.dir.path);
-        go(false);
+        goTo($scope.cwd = history.goBack());
     };
 
     $scope.goForward = function () {
-        $scope.cwd = future.pop();
-        history.push($scope.dir.path);
-        go(false);
+        goTo($scope.cwd = history.goForward());
     };
 
-    $scope.isHistoryEmpty = function () {
-        return history.length === 0;
+    $scope.hasBack = function () {
+        return history.hasBack;
     };
 
-    $scope.isFutureEmpty = function () {
-        return future.length === 0;
-    };
-
-    $scope.goTo = function (path) {
-        $scope.cwd = path;
-        $scope.submit();
+    $scope.hasNext = function () {
+        return history.hasNext;
     };
 
     $scope.focusOnImage = function (url) {
@@ -228,8 +235,7 @@ function viewCtrl($scope) {
     $scope.screen = 'main';
     $scope.focusedImage = 'image-placeholder.png';
     $scope.view = 'thumbnails';
-    $scope.cwd = homeDir;
-    $scope.submit();
+    $scope.goHome();
 }
 
 var app = angular.module('app', []);

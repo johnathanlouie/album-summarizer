@@ -41,11 +41,11 @@
 
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
 
-            <form class="form-inline mr-auto" ng-submit="submit()">
+            <form class="form-inline mr-auto" ng-submit="goTo()">
 
                 <!-- Back button -->
                 <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goBack()"
-                    ng-disabled="isHistoryEmpty()">
+                    ng-disabled="hasBack()">
                     <svg class="bi bi-arrow-left-circle-fill" width="1rem" height="1rem" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#arrow-left-circle-fill" />
                     </svg>
@@ -53,7 +53,7 @@
 
                 <!-- Forward button -->
                 <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goForward()"
-                    ng-disabled="isFutureEmpty()">
+                    ng-disabled="hasNext()">
                     <svg class="bi bi-arrow-right-circle-fill" width="1rem" height="1rem" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#arrow-right-circle-fill" />
                     </svg>
