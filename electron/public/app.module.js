@@ -99,50 +99,7 @@ class DirEntArrayWrapper extends Array {
 
 }
 
-class Stopwatch {
-    #time = 0;
-    #interval;
-    #callback = function () { };
-
-    constructor(callback) { this.#callback = callback; }
-
-    time() { return this.#time; }
-
-    reset() { this.#time = 0; }
-
-    start() {
-        this.#interval = setInterval(() => {
-            this.#time += .01;
-            this.#callback();
-        }, 10);
-    }
-
-    stop() { clearInterval(this.#interval); }
-}
-
-class LoadingOverlay {
-    #isLoading = false;
-    #stopwatch;
-
-    constructor(callback) { this.#stopwatch = new Stopwatch(callback); }
-
-    get isLoading() { return this.#isLoading; }
-
-    timeElapsed() { return this.#stopwatch.time(); }
-
-    show() {
-        this.#stopwatch.reset();
-        this.#stopwatch.start();
-        this.#isLoading = true;
-    }
-
-    hide() {
-        this.#stopwatch.stop();
-        this.#isLoading = false;
-    }
-}
-
-function viewCtrl($scope) {
+function viewCtrl($scope, $interval) {
     const homeDir = path.resolve(os.homedir(), 'Pictures');
     $scope.dir = DirEntArrayWrapper.fromUnwrapped([], homeDir);
 
@@ -154,7 +111,7 @@ function viewCtrl($scope) {
         get hasNext() { return this._future.length === 0; },
         get current() { return this._current; },
 
-        push: function (dir) {
+        push(dir) {
             dir = path.normalize(dir);
             if (this._current !== dir) {
                 this._future = [];
@@ -164,18 +121,50 @@ function viewCtrl($scope) {
             return this._current;
         },
 
-        goBack: function () {
+        goBack() {
             this._future.push(this._current);
             this._current = this._history.pop();
             return this._current;
         },
 
-        goForward: function () {
+        goForward() {
             this._history.push(this._current);
             this._current = this._future.pop();
             return this._current;
         }
     };
+
+    $scope.loadingOverlay = {
+        _isLoading: false,
+        _stopwatch: {
+            _time: 0,
+            _interval: null,
+            get time() { return this._time; },
+            reset() { this._time = 0; },
+            stop() { $interval.cancel(this._interval); },
+            start() { this._interval = $interval(() => { this._time += .01; }, 10); },
+
+            restart() {
+                this.stop();
+                this.reset();
+                this.start();
+            }
+        },
+
+        get isLoading() { return this._isLoading; },
+
+        get timeElapsed() { return this._stopwatch.time; },
+
+        show() {
+            this._stopwatch.restart();
+            this._isLoading = true;
+        },
+
+        hide() {
+            this._stopwatch.stop();
+            this._isLoading = false;
+        }
+    }
 
     function goTo(dst) {
         $scope.isCwdMissing = false;
@@ -231,7 +220,6 @@ function viewCtrl($scope) {
         $scope.screen = 'main';
     }
 
-    $scope.loadingOverlay = new LoadingOverlay($scope.$apply);
     $scope.screen = 'main';
     $scope.focusedImage = 'image-placeholder.png';
     $scope.view = 'thumbnails';
