@@ -177,6 +177,7 @@ function viewCtrl($scope, $interval) {
 
     function goTo(dst) {
         $scope.isCwdMissing = false;
+
         fs.readdir(dst, { withFileTypes: true }, (err, dirEnts) => {
             if (err) {
                 $scope.isCwdMissing = true;
@@ -231,6 +232,7 @@ function viewCtrl($scope, $interval) {
 
     $scope.organize = function () {
         $scope.loadingOverlay.show();
+
         var commands = [
             'conda activate album',
             `pythonw ./source/run.py "${$scope.dir.path}"`
@@ -239,6 +241,7 @@ function viewCtrl($scope, $interval) {
         var options = { cwd: '..', windowsHide: true };
         var proc = childProcess.exec(commands.join(' & '), options);
         ipcRenderer.send('add-pid', proc.pid);
+
         proc.on('exit', (code, signal) => {
             $scope.loadingOverlay.hide();
             ipcRenderer.send('remove-pid', proc.pid);
