@@ -1,4 +1,8 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
+const process = require('process');
+
+// Holds all subprocess IDs.
+const pids = [];
 
 function createWindow() {
     // Create the browser window.
@@ -41,6 +45,30 @@ app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
+});
+
+// When a subprocess is created by the renderer, keep track of the PID.
+ipcMain.on('add-pid', function (event, arg) {
+    pids.push(arg);
+    console.log(`Added PID ${arg}`);
+});
+
+// When a subprocess ends, remove it from the array.
+ipcMain.on('remove-pid', function (event, arg) {
+    var i = pids.indexOf(arg);
+    if (i >= 0) {
+        pids.splice(i, 1);
+        console.log(`Removed PID ${arg}`);
+    } else {
+        console.log(`PID ${arg} not found`);
+    }
+});
+
+app.on('before-quit', () => {
+    pids.forEach(pid => {
+        process.kill(pid);
+        console.log(`Killed PID ${pid}`);
+    });
 });
 
 // In this file you can include the rest of your app's specific main process

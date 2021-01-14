@@ -2,6 +2,8 @@ const fs = require('fs');
 const fileUrl = require('file-url');
 const path = require('path');
 const os = require('os');
+const childProcess = require('child_process');
+const { ipcRenderer } = require('electron');
 
 class DirEntWrapper {
     #o;
@@ -141,7 +143,14 @@ function viewCtrl($scope, $interval) {
             _interval: null,
             get time() { return this._time; },
             reset() { this._time = 0; },
-            stop() { $interval.cancel(this._interval); },
+
+            stop() {
+                if (this._interval !== null) {
+                    $interval.cancel(this._interval);
+                    this._interval = null;
+                }
+            },
+
             start() { this._interval = $interval(() => { this._time += .01; }, 10); },
 
             restart() {
@@ -152,7 +161,6 @@ function viewCtrl($scope, $interval) {
         },
 
         get isLoading() { return this._isLoading; },
-
         get timeElapsed() { return this._stopwatch.time; },
 
         show() {
@@ -163,8 +171,9 @@ function viewCtrl($scope, $interval) {
         hide() {
             this._stopwatch.stop();
             this._isLoading = false;
+            $scope.$apply();
         }
-    }
+    };
 
     function goTo(dst) {
         $scope.isCwdMissing = false;
@@ -214,11 +223,29 @@ function viewCtrl($scope, $interval) {
     $scope.focusOnImage = function (url) {
         $scope.focusedImage = url;
         $scope.screen = 'imageViewer';
-    }
+    };
 
     $scope.unfocusImage = function () {
         $scope.screen = 'main';
-    }
+    };
+
+    $scope.organize = function () {
+        $scope.loadingOverlay.show();
+        var commands = [
+            'conda activate album',
+            `pythonw ./source/run.py "${$scope.dir.path}"`
+        ];
+
+        var options = { cwd: '..', windowsHide: true };
+        var proc = childProcess.exec(commands.join(' & '), options);
+        ipcRenderer.send('add-pid', proc.pid);
+        proc.on('exit', (code, signal) => {
+            $scope.loadingOverlay.hide();
+            ipcRenderer.send('remove-pid', proc.pid);
+            if (code !== 0) { }
+            else { }
+        });
+    };
 
     $scope.screen = 'main';
     $scope.focusedImage = 'image-placeholder.png';
@@ -226,5 +253,4 @@ function viewCtrl($scope, $interval) {
     $scope.goHome();
 }
 
-var app = angular.module('app', []);
-app.controller('viewCtrl', viewCtrl);
+angular.module('app', []).controller('viewCtrl', viewCtrl);
