@@ -339,3 +339,4 @@ nbproject/private/
 # Data files
 /data/
 /out/
+/electron/public/data/
