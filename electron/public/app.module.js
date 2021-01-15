@@ -43,7 +43,6 @@ class DirEntWrapper {
     isDirectory() {
         return this.#o.isDirectory();
     }
-
 }
 
 class DirEntArrayWrapper extends Array {
@@ -98,7 +97,6 @@ class DirEntArrayWrapper extends Array {
     hasImages() {
         return this.images.length > 0;
     }
-
 }
 
 function viewCtrl($scope, $interval) {
@@ -230,26 +228,52 @@ function viewCtrl($scope, $interval) {
         $scope.screen = 'main';
     };
 
-    $scope.organize = function () {
-        $scope.loadingOverlay.show();
-
+    function reorganize() {
         var commands = [
             'conda activate album',
             `pythonw ./source/run.py "${$scope.dir.path}"`
         ];
 
         var options = { cwd: '..', windowsHide: true };
-        var proc = childProcess.exec(commands.join(' & '), options);
+        var proc = childProcess.exec(commands.join(' & '), options); // TODO add linux pipe
         ipcRenderer.send('add-pid', proc.pid);
 
         proc.on('exit', (code, signal) => {
-            $scope.loadingOverlay.hide();
             ipcRenderer.send('remove-pid', proc.pid);
-            if (code !== 0) { }
-            else { }
+            if (code !== 0) {
+                // TODO error handling
+                console.error('Organize subprocess error');
+            } else {
+                organize(true);
+            }
         });
+    }
+
+    function organize(pythoned) {
+        fs.readFile(`public/data/${encodeURIComponent($scope.dir.path)}.json`, (err, data) => {
+            if (err) {
+                if (pythoned) {
+                    console.error('Cannot read organized data file');
+                    $scope.isOrganized = false;
+                    $scope.loadingOverlay.hide();
+                } else {
+                    reorganize();
+                }
+            } else {
+                $scope.organization = JSON.parse(data);
+                $scope.isOrganized = true;
+                $scope.loadingOverlay.hide();
+            }
+        });
+    }
+
+    $scope.organize = function () {
+        $scope.isOrganized = false;
+        $scope.loadingOverlay.show();
+        organize(false);
     };
 
+    $scope.isOrganized = false;
     $scope.screen = 'main';
     $scope.focusedImage = 'image-placeholder.png';
     $scope.view = 'thumbnails';
