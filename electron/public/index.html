@@ -195,7 +195,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr ng-repeat="image in cwd.images">
+                        <tr ng-repeat="image in cwd.images" ng-click="focusOnImage(image.path)"
+                            style="cursor: pointer;">
                             <td class="text-center">
                                 <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1rem;">
                             </td>
