@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, Namespace
 from json import dump
 from typing import Dict, List, Union
+from urllib.parse import quote
 
 import cv2
 
@@ -39,12 +40,13 @@ class ClusterRank(object):
             i.sort(key=lambda x: x['rating'])
         return
 
-    def save_results(self) -> None:
+    def save_results(self, dst: Url) -> None:
         """
-        Saves the results to a JSON file at 'out/organized.json'.
+        Saves the results to a JSON file at 'electron/public/data/***.json'.
         """
-        with open('out/organized.json', 'w', encoding='utf8') as f:
-            dump(self._results, f)
+        dst = 'electron/public/data/%s.json' % quote(dst)
+        with open(dst, 'w', encoding='utf8') as f:
+            dump(self._results, f, indent=4)
 
 
 def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchiSplitAdapter) -> None:
@@ -57,7 +59,7 @@ def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchiSplitAdapter
     print('Ranking results....')
     cr = ClusterRank(clusters, rates)
     print('Saving results....')
-    cr.save_results()
+    cr.save_results(directory)
     return
 
 
