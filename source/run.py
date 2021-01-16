@@ -33,9 +33,9 @@ class ClusterRank(object):
 
     def __init__(self, clusters: ClusterResults, rates: List[float]) -> None:
         self._results = [[] for _ in range(clusters.k())]
-        for clusterId, rate, url in zip(clusters.labels(), rates, clusters.get_all_urls()):
+        for clusterId, rate, path in zip(clusters.labels(), rates, clusters.get_all_urls()):
             self._results[clusterId].append({
-                'image': url,
+                'path': path,
                 'rating': rate,
                 'cluster': clusterId
             })

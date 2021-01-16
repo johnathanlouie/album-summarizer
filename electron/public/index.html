@@ -219,9 +219,9 @@
 
                     <!-- Thumbnails in a cluster -->
                     <button class="btn btn-outline-dark border-transparent thumbnail-xl" ng-repeat="image in cluster"
-                        ng-click="focusOnImage(image.image)">
+                        ng-click="focusOnImage(image.path)">
                         <div class="img-thumbnail d-table-cell align-middle">
-                            <img class="mw-100 mh-100" ng-src="{{ image.image | fileUrl }}">
+                            <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
                         </div>
                         <p class="mb-0 text-break text-center">{{ image.rating }}</p>
                     </button>
