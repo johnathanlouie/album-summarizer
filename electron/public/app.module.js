@@ -91,7 +91,7 @@ class DirEntArrayWrapper extends Array {
 }
 
 function viewCtrl($scope, $interval) {
-    const homeDir = path.resolve(os.homedir(), 'Pictures');
+    const homeDir = os.homedir();
     $scope.dir = DirEntArrayWrapper.fromUnwrapped([], homeDir);
 
     const history = {
