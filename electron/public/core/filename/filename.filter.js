@@ -1,5 +1,6 @@
 angular.module('core').filter('filename', function () {
+    const path = require('path');
     return function (url) {
-        return require('path').basename(url);
+        return path.basename(url);
     };
 });
