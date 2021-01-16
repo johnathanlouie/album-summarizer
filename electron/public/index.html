@@ -189,12 +189,16 @@
                 <table class="table table-hover" ng-show="view == 'details'">
                     <thead class="thead-dark">
                         <tr>
+                            <th>Thumbnail</th>
                             <th>Name</th>
                             <th>Type</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr ng-repeat="image in cwd.images">
+                            <td class="text-center">
+                                <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1rem;">
+                            </td>
                             <td class="text-break text-wrap">{{ image.path | filename }}</td>
                             <td>{{ image.extension }}</td>
                         </tr>
