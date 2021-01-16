@@ -32,12 +32,15 @@ class ClusterRank(object):
     """
 
     def __init__(self, clusters: ClusterResults, rates: List[float]) -> None:
-        self._results = [[]] * clusters.k()
+        self._results = [[] for _ in range(clusters.k())]
         for clusterId, rate, url in zip(clusters.labels(), rates, clusters.get_all_urls()):
-            self._results[clusterId].append(
-                {'image': url, 'rating': rate, 'cluster': clusterId})
-        for i in self._results:
-            i.sort(key=lambda x: x['rating'])
+            self._results[clusterId].append({
+                'image': url,
+                'rating': rate,
+                'cluster': clusterId
+            })
+        for cluster in self._results:
+            cluster.sort(key=lambda x: x['rating'], reverse=True)
         return
 
     def save_results(self, dst: Url) -> None:
@@ -47,6 +50,7 @@ class ClusterRank(object):
         dst = 'electron/public/data/%s.json' % quote(dst)
         with open(dst, 'w', encoding='utf8') as f:
             dump(self._results, f, indent=4)
+        return
 
 
 def main2(directory: Url, algorithm: ImageCluster, algorithm2: ArchiSplitAdapter) -> None:
