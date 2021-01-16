@@ -107,7 +107,8 @@
                 </div>
 
                 <!-- Organize button -->
-                <button class="btn btn-success" ng-click="organize()" type="button">
+                <button class="btn btn-success" ng-click="organize()" ng-disabled="isCwdMissing || isOrganized"
+                    type="button">
                     <svg class="bi bi-diagram-3" width="1rem" height="1rem" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#diagram-3" />
                     </svg>
@@ -125,7 +126,8 @@
 
         </nav>
 
-        <div class="container-fluid">
+        <!-- Regular gallery -->
+        <div class="container-fluid" ng-hide="isOrganized">
 
             <!-- Directory not found warning -->
             <div class="alert alert-danger" role="alert" ng-show="isCwdMissing">
@@ -193,6 +195,28 @@
                     </tbody>
                 </table>
 
+            </div>
+
+        </div>
+
+        <!-- Organized gallery -->
+        <div class="container-fluid" ng-show="isOrganized">
+
+            <!-- Cluster row -->
+            <div ng-repeat="cluster in organization">
+                <div class="overflow-x-auto text-nowrap mb-3">
+
+                    <!-- Thumbnails in a cluster -->
+                    <button class="btn btn-outline-dark border-transparent thumbnail-xl" ng-repeat="image in cluster"
+                        ng-click="focusOnImage(image.image)">
+                        <div class="img-thumbnail d-table-cell align-middle">
+                            <img class="mw-100 mh-100" ng-src="{{ image.image }}">
+                        </div>
+                        <p class="mb-0 text-break text-center">{{ image.rating }}</p>
+                    </button>
+
+                </div>
+                <hr>
             </div>
 
         </div>
