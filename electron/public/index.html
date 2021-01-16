@@ -155,11 +155,11 @@
 
                     <!-- Directory icons -->
                     <button class="btn btn-outline-dark border-transparent icon-lg" ng-repeat="d in dir.directories"
-                        ng-click="goTo(d.absolutePath)">
+                        ng-click="goTo(d.path)">
                         <svg class="bi bi-folder" fill="currentColor">
                             <use xlink:href="bootstrap-icons.svg#folder" />
                         </svg>
-                        <p class="mb-0 text-break text-center">{{ d.name }}</p>
+                        <p class="mb-0 text-break text-center">{{ d.path | filename }}</p>
                     </button>
 
                 </div>
@@ -176,11 +176,11 @@
 
                     <!-- Thumbnails -->
                     <button class="btn btn-outline-dark border-transparent thumbnail-xl" ng-repeat="image in dir.images"
-                        ng-click="focusOnImage(image.absolutePath)">
+                        ng-click="focusOnImage(image.path)">
                         <div class="img-thumbnail d-table-cell align-middle">
-                            <img class="mw-100 mh-100" ng-src="{{ image.absolutePath | fileUrl }}">
+                            <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
                         </div>
-                        <p class="mb-0 text-break text-center">{{ image.name }}</p>
+                        <p class="mb-0 text-break text-center">{{ image.path | filename }}</p>
                     </button>
 
                 </div>
@@ -195,7 +195,7 @@
                     </thead>
                     <tbody>
                         <tr ng-repeat="image in dir.images">
-                            <td class="text-break text-wrap">{{ image.name }}</td>
+                            <td class="text-break text-wrap">{{ image.path | filename }}</td>
                             <td>{{ image.extension }}</td>
                         </tr>
                     </tbody>

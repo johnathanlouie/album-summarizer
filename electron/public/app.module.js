@@ -4,52 +4,50 @@ const os = require('os');
 const childProcess = require('child_process');
 const { ipcRenderer } = require('electron');
 
-class DirEntWrapper {
-    #o;
+class File_ {
     #path;
+    #isFile;
+    #isDirectory;
 
-    constructor(o, cwd) {
-        this.#o = o;
-        this.#path = cwd;
+    constructor(dirent, dirname) {
+        this.#path = path.resolve(dirname, dirent.name);
+        this.#isFile = dirent.isFile();
+        this.#isDirectory = dirent.isDirectory();
     }
 
-    get name() {
-        return this.#o.name;
-    }
-
-    get absolutePath() {
-        return path.resolve(this.#path, this.#o.name);
+    get path() {
+        return this.#path;
     }
 
     get extension() {
-        return path.extname(this.#o.name).toLowerCase();
+        return path.extname(this.#path);
     }
 
     isImage() {
         const validExt = ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.apng', '.avif'];
-        var ext = path.extname(this.#o.name).toLowerCase();
-        return validExt.some(e => e === ext);
+        var ext = this.extension.toLowerCase();
+        return this.isFile() && validExt.some(e => e === ext);
     }
 
     isFile() {
-        return this.#o.isFile();
+        return this.#isFile;
     }
 
     isDirectory() {
-        return this.#o.isDirectory();
+        return this.#isDirectory;
     }
 }
 
-class DirEntArrayWrapper extends Array {
+class Directory_ extends Array {
     #path;
     #directories = null;
     #files = null;
     #images = null;
 
-    static fromUnwrapped(o, path) {
-        var x = DirEntArrayWrapper.from(o.map(e => new DirEntWrapper(e, path)));
-        x.#path = path;
-        return x;
+    static factory(direntArray, path) {
+        var instance = Directory_.from(direntArray.map(e => new File_(e, path)));
+        instance.#path = path;
+        return instance;
     }
 
     get path() {
@@ -77,10 +75,6 @@ class DirEntArrayWrapper extends Array {
         return this.#images;
     }
 
-    get names() {
-        return this.map(e => e.name);
-    }
-
     hasDirectories() {
         return this.directories.length > 0;
     }
@@ -92,7 +86,7 @@ class DirEntArrayWrapper extends Array {
 
 function viewCtrl($scope, $interval) {
     const homeDir = os.homedir();
-    $scope.dir = DirEntArrayWrapper.fromUnwrapped([], homeDir);
+    $scope.dir = Directory_.factory([], homeDir);
 
     const history = {
         _history: [],
@@ -172,7 +166,7 @@ function viewCtrl($scope, $interval) {
                 $scope.isCwdMissing = true;
                 $scope.$apply();
             } else {
-                $scope.dir = DirEntArrayWrapper.fromUnwrapped(dirEnts, dst);
+                $scope.dir = Directory_.factory(dirEnts, dst);
                 $scope.$apply();
             }
         });
