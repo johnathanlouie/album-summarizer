@@ -86,7 +86,7 @@ class Directory_ extends Array {
 
 function viewCtrl($scope, $interval) {
     const homeDir = os.homedir();
-    $scope.dir = Directory_.factory([], homeDir);
+    $scope.cwd = Directory_.factory([], homeDir);
 
     const history = {
         _history: [],
@@ -166,34 +166,34 @@ function viewCtrl($scope, $interval) {
                 $scope.isCwdMissing = true;
                 $scope.$apply();
             } else {
-                $scope.dir = Directory_.factory(dirEnts, dst);
+                $scope.cwd = Directory_.factory(dirEnts, dst);
                 $scope.$apply();
             }
         });
     }
 
-    $scope.goTo = function (dst = $scope.cwd) {
-        goTo($scope.cwd = history.push(dst));
+    $scope.goTo = function (dst = $scope.address) {
+        goTo($scope.address = history.push(dst));
     };
 
     $scope.goHome = function () {
-        goTo($scope.cwd = history.push(homeDir));
+        goTo($scope.address = history.push(homeDir));
     };
 
     $scope.refresh = function () {
-        goTo($scope.cwd = history.current);
+        goTo($scope.address = history.current);
     };
 
     $scope.goParent = function () {
-        goTo($scope.cwd = history.push(path.dirname(history.current)));
+        goTo($scope.address = history.push(path.dirname(history.current)));
     };
 
     $scope.goBack = function () {
-        goTo($scope.cwd = history.goBack());
+        goTo($scope.address = history.goBack());
     };
 
     $scope.goForward = function () {
-        goTo($scope.cwd = history.goForward());
+        goTo($scope.address = history.goForward());
     };
 
     $scope.hasBack = function () {
@@ -216,7 +216,7 @@ function viewCtrl($scope, $interval) {
     function reorganize() {
         var commands = [
             'conda activate album',
-            `pythonw ./source/run.py "${$scope.dir.path}"`
+            `pythonw ./source/run.py "${$scope.cwd.path}"`
         ];
 
         var options = { cwd: '..', windowsHide: true };
@@ -235,7 +235,7 @@ function viewCtrl($scope, $interval) {
     }
 
     function organize(pythoned) {
-        fs.readFile(`public/data/${encodeURIComponent($scope.dir.path)}.json`, (err, data) => {
+        fs.readFile(`public/data/${encodeURIComponent($scope.cwd.path)}.json`, (err, data) => {
             if (err) {
                 if (pythoned) {
                     console.error('Cannot read organized data file');
