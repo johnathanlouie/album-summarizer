@@ -1,5 +1,4 @@
 const fs = require('fs');
-const fileUrl = require('file-url');
 const path = require('path');
 const os = require('os');
 const childProcess = require('child_process');
@@ -20,10 +19,6 @@ class DirEntWrapper {
 
     get absolutePath() {
         return path.resolve(this.#path, this.#o.name);
-    }
-
-    get fileUri() {
-        return fileUrl(this.absolutePath);
     }
 
     get extension() {
@@ -84,10 +79,6 @@ class DirEntArrayWrapper extends Array {
 
     get names() {
         return this.map(e => e.name);
-    }
-
-    get fileUris() {
-        return this.map(e => e.fileUri);
     }
 
     hasDirectories() {
@@ -280,4 +271,4 @@ function viewCtrl($scope, $interval) {
     $scope.goHome();
 }
 
-angular.module('app', []).controller('viewCtrl', viewCtrl);
+angular.module('app', ['core']).controller('viewCtrl', viewCtrl);

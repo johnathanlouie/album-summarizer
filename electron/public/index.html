@@ -5,15 +5,10 @@
     <title>Album Summarizer - Photo Album Organizer</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         crossorigin="anonymous">
     <link rel="stylesheet" href="bootstrap-extension.css">
-    <script>window.jQuery = window.$ = require('jquery');</script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
-        crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js" crossorigin="anonymous"></script>
-    <script src="scripts.js"></script>
     <style>
         .thumbnail-xl div {
             height: 300px !important;
@@ -33,6 +28,16 @@
             width: 100px !important;
         }
     </style>
+
+    <script>window.jQuery = window.$ = require('jquery');</script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js" crossorigin="anonymous"></script>
+    <script src="app.module.js"></script>
+    <script src="core/core.module.js"></script>
+    <script src="core/file-url/file-url.filter.js"></script>
+    <script src="scripts.js"></script>
 </head>
 
 <body ng-app="app" ng-controller="viewCtrl">
@@ -170,9 +175,9 @@
 
                     <!-- Thumbnails -->
                     <button class="btn btn-outline-dark border-transparent thumbnail-xl" ng-repeat="image in dir.images"
-                        ng-click="focusOnImage(image.fileUri)">
+                        ng-click="focusOnImage(image.absolutePath)">
                         <div class="img-thumbnail d-table-cell align-middle">
-                            <img class="mw-100 mh-100" ng-src="{{ image.fileUri }}">
+                            <img class="mw-100 mh-100" ng-src="{{ image.absolutePath | fileUrl }}">
                         </div>
                         <p class="mb-0 text-break text-center">{{ image.name }}</p>
                     </button>
@@ -210,7 +215,7 @@
                     <button class="btn btn-outline-dark border-transparent thumbnail-xl" ng-repeat="image in cluster"
                         ng-click="focusOnImage(image.image)">
                         <div class="img-thumbnail d-table-cell align-middle">
-                            <img class="mw-100 mh-100" ng-src="{{ image.image }}">
+                            <img class="mw-100 mh-100" ng-src="{{ image.image | fileUrl }}">
                         </div>
                         <p class="mb-0 text-break text-center">{{ image.rating }}</p>
                     </button>
@@ -235,7 +240,7 @@
 
         <!-- Image -->
         <div class="d-flex align-items-center justify-content-center bg-secondary flex-grow-1 flex-shrink-1">
-            <img class="img-fluid mh-100" ng-src="{{ focusedImage }}">
+            <img class="img-fluid mh-100" ng-src="{{ focusedImage | fileUrl }}">
         </div>
 
     </div>
@@ -248,8 +253,6 @@
         </div>
         <h1 class="mt-5 display-1 text-white text-monospace">{{ loadingOverlay.timeElapsed | number : 2 }} s</h1>
     </div>
-
-    <script src="app.module.js"></script>
 
 </body>
 
