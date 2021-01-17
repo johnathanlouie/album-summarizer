@@ -271,7 +271,7 @@ function viewCtrl($scope, $interval) {
     $scope.isOrganized = false;
     $scope.isOrganizeToggled = false;
     $scope.screen = 'main';
-    $scope.focusedImage = 'image-placeholder.png';
+    $scope.focusedImage = 'public/image-placeholder.png';
     $scope.view = 'thumbnails';
     $scope.goHome();
 }
