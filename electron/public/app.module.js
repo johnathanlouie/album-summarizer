@@ -235,7 +235,8 @@ function viewCtrl($scope, $interval) {
     }
 
     function organize(pythoned) {
-        fs.readFile(`public/data/${encodeURIComponent($scope.cwd.path)}.json`, (err, data) => {
+        dataFile = path.resolve('public', 'data', `${encodeURIComponent($scope.cwd.path)}.json`);
+        fs.readFile(dataFile, (err, data) => {
             if (err) {
                 if (pythoned) {
                     console.error('Cannot read organized data file');
