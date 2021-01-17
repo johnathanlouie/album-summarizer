@@ -214,13 +214,9 @@ function viewCtrl($scope, $interval) {
     };
 
     function reorganize() {
-        var commands = [
-            'conda activate album',
-            `pythonw ./source/run.py "${$scope.cwd.path}"`
-        ];
-
+        var command = `conda run -n album pythonw "${path.normalize('source/run.py')}" "${$scope.cwd.path}"`;
         var options = { cwd: '..', windowsHide: true };
-        var proc = childProcess.exec(commands.join(' & '), options); // TODO add linux pipe
+        var proc = childProcess.exec(command, options);
         ipcRenderer.send('add-pid', proc.pid);
 
         proc.on('exit', (code, signal) => {

@@ -1,6 +1,7 @@
 # Album Summarizer
 ## Requirements
 Note: Only Keras 2.3.0+ supports Tensorflow 2.0+. Use Tensorflow 1.15 if an older version of Keras is used.
+- Anaconda
 - Python 3
 - Keras
 - OpenCV
@@ -18,10 +19,3 @@ Note: End Users do not need to install these.
 ```
 conda create --name album keras-gpu "tensorflow-gpu<2" autopep8 pylint dill opencv scikit-learn --yes
 ```
-
-## Notes for Windows
-Run PowerShell as administrator and enter:
-```
-Set-ExecutionPolicy Bypass
-```
-This software needs to run scripts in the background.
