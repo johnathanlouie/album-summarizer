@@ -10,7 +10,7 @@ class File_ {
     #isDirectory;
 
     constructor(dirent, dirname) {
-        this.#path = path.resolve(dirname, dirent.name);
+        this.#path = path.join(dirname, dirent.name);
         this.#isFile = dirent.isFile();
         this.#isDirectory = dirent.isDirectory();
     }
@@ -231,7 +231,7 @@ function viewCtrl($scope, $interval) {
     }
 
     function organize(pythoned) {
-        dataFile = path.resolve('public', 'data', `${encodeURIComponent($scope.cwd.path)}.json`);
+        dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
         fs.readFile(dataFile, (err, data) => {
             if (err) {
                 if (pythoned) {
