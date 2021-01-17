@@ -91,35 +91,53 @@
                     </div>
                 </div>
 
-                <!-- View toggler -->
-                <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
+                <div class="btn-toolbar" role="toolbar">
 
-                    <!-- View icons button -->
-                    <label class="btn btn-warning">
-                        <input type="radio" ng-model="view" value="thumbnails">
-                        <svg class="bi bi-image" width="1rem" height="1rem" fill="currentColor">
-                            <use xlink:href="bootstrap-icons.svg#image" />
-                        </svg>
-                    </label>
+                    <!-- View toggler -->
+                    <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
 
-                    <!-- View details button -->
-                    <label class="btn btn-warning">
-                        <input type="radio" ng-model="view" value="details">
-                        <svg class="bi bi-list-task" width="1rem" height="1rem" fill="currentColor">
-                            <use xlink:href="bootstrap-icons.svg#list-task" />
-                        </svg>
-                    </label>
+                        <!-- View icons button -->
+                        <label class="btn btn-warning">
+                            <input type="radio" ng-model="view" value="thumbnails">
+                            <svg class="bi bi-image" width="1rem" height="1rem" fill="currentColor">
+                                <use xlink:href="bootstrap-icons.svg#image" />
+                            </svg>
+                        </label>
+
+                        <!-- View details button -->
+                        <label class="btn btn-warning">
+                            <input type="radio" ng-model="view" value="details">
+                            <svg class="bi bi-list-task" width="1rem" height="1rem" fill="currentColor">
+                                <use xlink:href="bootstrap-icons.svg#list-task" />
+                            </svg>
+                        </label>
+
+                    </div>
+
+                    <!-- Organize button group -->
+                    <div class="btn-group btn-group-toggle mr-2" data-toggle="buttons">
+
+                        <!-- Organize toggle -->
+                        <label class="btn" ng-class="isOrganizeToggled ? 'btn-success' : 'btn-outline-success'">
+                            <input ng-model="isOrganizeToggled" ng-change="toggleOrganize()" ng-disabled="isCwdMissing"
+                                type="checkbox">
+                            <svg class="bi bi-diagram-3 mr-1" width="1rem" height="1rem" fill="currentColor">
+                                <use xlink:href="bootstrap-icons.svg#diagram-3" />
+                            </svg>
+                            Smart Organize
+                        </label>
+
+                        <!-- Reorganize button -->
+                        <button class="btn btn-success" ng-click="reorganize()"
+                            ng-disabled="!isOrganized || isCwdMissing" type="button">
+                            <svg class="bi bi-arrow-clockwise" width="1rem" height="1rem" fill="currentColor">
+                                <use xlink:href="bootstrap-icons.svg#arrow-clockwise" />
+                            </svg>
+                        </button>
+
+                    </div>
 
                 </div>
-
-                <!-- Organize button -->
-                <button class="btn btn-success" ng-click="organize()" ng-disabled="isCwdMissing || isOrganized"
-                    type="button">
-                    <svg class="bi bi-diagram-3" width="1rem" height="1rem" fill="currentColor">
-                        <use xlink:href="bootstrap-icons.svg#diagram-3" />
-                    </svg>
-                    Auto Organize
-                </button>
 
             </form>
 

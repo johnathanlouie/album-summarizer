@@ -241,6 +241,7 @@ function viewCtrl($scope, $interval) {
                 if (pythoned) {
                     console.error('Cannot read organized data file');
                     $scope.isOrganized = false;
+                    $scope.isOrganizeToggled = false;
                     $scope.loadingOverlay.hide();
                 } else {
                     reorganize();
@@ -253,13 +254,22 @@ function viewCtrl($scope, $interval) {
         });
     }
 
-    $scope.organize = function () {
-        $scope.isOrganized = false;
-        $scope.loadingOverlay.show();
-        organize(false);
+    $scope.toggleOrganize = function () {
+        if ($scope.isOrganizeToggled) {
+            $scope.loadingOverlay.show();
+            organize(false);
+        } else {
+            $scope.isOrganized = false;
+        }
     };
 
+    $scope.reorganize = function () {
+        $scope.loadingOverlay.show();
+        reorganize();
+    }
+
     $scope.isOrganized = false;
+    $scope.isOrganizeToggled = false;
     $scope.screen = 'main';
     $scope.focusedImage = 'image-placeholder.png';
     $scope.view = 'thumbnails';
