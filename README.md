@@ -19,3 +19,9 @@ Note: End Users do not need to install these.
 ```
 conda create --name album keras-gpu "tensorflow-gpu<2" autopep8 pylint dill opencv scikit-learn --yes
 ```
+
+## Running the Program
+The current working directory must be `<project-home>/electron`.
+```
+npm start
+```
