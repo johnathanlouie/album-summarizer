@@ -27,6 +27,24 @@
         .icon-lg p {
             width: 100px !important;
         }
+
+        .addressbar {
+            display: grid;
+            grid-template-areas: 'left middle right';
+            grid-template-columns: auto 1fr auto;
+        }
+
+        .addressbar-left {
+            grid-area: left;
+        }
+
+        .addressbar-middle {
+            grid-area: middle;
+        }
+
+        .addressbar-right {
+            grid-area: right;
+        }
     </style>
 
     <script>window.jQuery = window.$ = require('jquery');</script>
@@ -46,9 +64,9 @@
 
     <div ng-show="screen == 'main'">
 
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
+        <nav class="addressbar navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
 
-            <form class="form-inline mr-auto" ng-submit="goTo()">
+            <form class="form-inline addressbar-left">
 
                 <!-- Back button -->
                 <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goBack()"
@@ -80,9 +98,13 @@
                     </svg>
                 </button>
 
+            </form>
+
+            <form class="form-inline addressbar-middle" ng-submit="goTo()">
+
                 <!-- Address bar -->
-                <div class="input-group mr-2">
-                    <input type="text" class="form-control" placeholder="Enter address" size="100" ng-model="address">
+                <div class="input-group w-100 mr-2">
+                    <input type="text" class="form-control" placeholder="Enter address" ng-model="address">
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="button" ng-click="refresh()">
                             <svg class="bi bi-arrow-clockwise" width="1em" height="1em" fill="currentColor">
@@ -90,6 +112,22 @@
                             </svg>
                         </button>
                     </div>
+                </div>
+
+            </form>
+
+            <form class="form-inline addressbar-right">
+
+                <!-- Filter -->
+                <div class="input-group mr-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <svg class="bi bi-search" width="1em" height="1em" fill="currentColor">
+                                <use xlink:href="bootstrap-icons.svg#search" />
+                            </svg>
+                        </span>
+                    </div>
+                    <input class="form-control" ng-model="filterText" type="text" placeholder="Find in this directory">
                 </div>
 
                 <div class="btn-toolbar" role="toolbar">
@@ -140,26 +178,14 @@
 
                 </div>
 
-                <!-- Filter -->
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">
-                            <svg class="bi bi-search" width="1em" height="1em" fill="currentColor">
-                                <use xlink:href="bootstrap-icons.svg#search" />
-                            </svg>
-                        </span>
-                    </div>
-                    <input class="form-control" ng-model="filterText" type="text" placeholder="Find in this directory">
-                </div>
+                <!-- Menu button -->
+                <a class="btn btn-outline-light border-transparent" href="menu.html">
+                    <svg class="bi bi-list" width="1em" height="1em" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#list" />
+                    </svg>
+                </a>
 
             </form>
-
-            <!-- Menu button -->
-            <a class="btn btn-outline-light border-transparent" href="menu.html">
-                <svg class="bi bi-list" width="1em" height="1em" fill="currentColor">
-                    <use xlink:href="bootstrap-icons.svg#list" />
-                </svg>
-            </a>
 
         </nav>
 
