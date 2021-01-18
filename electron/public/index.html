@@ -165,14 +165,14 @@
         <div ng-hide="isCwdMissing">
 
             <!-- No subdirectories message -->
-            <div class="container-fluid">
-                <div class="alert alert-info" role="alert" ng-hide="cwd.hasDirectories()">
+            <div class="container-fluid" ng-hide="cwd.hasDirectories()">
+                <div class="alert alert-info" role="alert">
                     <h4 class="alert-heading">No subdirectories!</h4>
                 </div>
             </div>
 
             <!-- Directories section -->
-            <div class="d-flex justify-content-start flex-wrap align-items-start">
+            <div class="d-flex justify-content-start flex-wrap align-items-start" ng-show="cwd.hasDirectories()">
 
                 <!-- Directory icons -->
                 <button class="btn btn-outline-dark border-transparent icon-lg" ng-repeat="d in cwd.directories"
