@@ -188,118 +188,123 @@
             <hr>
 
             <!-- No images message -->
-            <div class="container-fluid">
-                <div class="alert alert-info" role="alert" ng-hide="cwd.hasImages()">
+            <div class="container-fluid" ng-hide="cwd.hasImages()">
+                <div class="alert alert-info" role="alert">
                     <h4 class="alert-heading">No images here!</h4>
                 </div>
             </div>
 
-            <!-- Regular gallery -->
-            <div class="container-fluid" ng-hide="isOrganized">
+            <div ng-show="cwd.hasImages()">
 
-                <!-- Thumbnail view -->
-                <div class="d-flex justify-content-around flex-wrap align-items-start" ng-show="view == 'thumbnails'">
+                <!-- Regular gallery -->
+                <div class="container-fluid" ng-hide="isOrganized">
 
-                    <!-- Thumbnails -->
-                    <button class="btn btn-outline-dark border-transparent thumbnail-xl" ng-repeat="image in cwd.images"
-                        ng-click="focusOnImage(image.path)">
-                        <div class="img-thumbnail d-table-cell align-middle">
-                            <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
-                        </div>
-                        <p class="mb-0 text-break text-center">{{ image.path | filename }}</p>
-                    </button>
+                    <!-- Thumbnail view -->
+                    <div class="d-flex justify-content-around flex-wrap align-items-start"
+                        ng-show="view == 'thumbnails'">
 
-                </div>
-
-                <!-- Details view -->
-                <table class="table table-hover" ng-show="view == 'details'">
-                    <colgroup>
-                        <col span="1" style="width: fit-content;">
-                        <col span="1" style="width: auto;">
-                        <col span="1" style="width: fit-content;">
-                    </colgroup>
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Thumbnail</th>
-                            <th>Name</th>
-                            <th>Type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="image in cwd.images" ng-click="focusOnImage(image.path)"
-                            style="cursor: pointer;">
-                            <td class="text-center">
-                                <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1rem;">
-                            </td>
-                            <td class="text-break text-wrap">{{ image.path | filename }}</td>
-                            <td>{{ image.extension }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-            </div>
-
-            <!-- Organized gallery -->
-            <div class="container-fluid" ng-show="isOrganized">
-
-                <!-- Organized thumbnail view -->
-                <div ng-show="view == 'thumbnails'">
-
-                    <!-- Cluster row -->
-                    <div ng-repeat="cluster in organization">
-                        <div class="overflow-x-auto text-nowrap mb-3">
-
-                            <!-- Thumbnails in a cluster -->
-                            <button class="btn btn-outline-dark border-transparent thumbnail-xl"
-                                ng-repeat="image in cluster" ng-click="focusOnImage(image.path)">
-                                <div class="img-thumbnail d-table-cell align-middle">
-                                    <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
-                                </div>
-                                <p class="mb-0 text-wrap text-break text-center">{{ image.path | filename }}</p>
-                            </button>
-
-                        </div>
-                        <hr>
-                    </div>
-
-                </div>
-
-                <!-- Organized details view -->
-                <div ng-show="view == 'details'">
-
-                    <div class="mb-2" ng-repeat="(clusterId, cluster) in organization">
-
-                        <button class="btn btn-light btn-lg btn-block text-left" type="button" data-toggle="collapse"
-                            data-target="#tableCluster{{ clusterId }}" role="button" aria-expanded="true"
-                            aria-controls="tableCluster{{ clusterId }}">
-                            Group {{ clusterId + 1 }}
+                        <!-- Thumbnails -->
+                        <button class="btn btn-outline-dark border-transparent thumbnail-xl"
+                            ng-repeat="image in cwd.images" ng-click="focusOnImage(image.path)">
+                            <div class="img-thumbnail d-table-cell align-middle">
+                                <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
+                            </div>
+                            <p class="mb-0 text-break text-center">{{ image.path | filename }}</p>
                         </button>
 
-                        <div class="collapse show" id="tableCluster{{ clusterId }}">
-                            <table class="table table-hover">
-                                <colgroup>
-                                    <col span="1" style="width: fit-content;">
-                                    <col span="1" style="width: auto;">
-                                    <col span="1" style="width: fit-content;">
-                                </colgroup>
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th scope="col">Thumbnail</th>
-                                        <th scope="col">Name</th>
-                                        <th scope="col">Rating</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="image in cluster" ng-click="focusOnImage(image.path)"
-                                        style="cursor: pointer;">
-                                        <td class="text-center">
-                                            <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1rem;">
-                                        </td>
-                                        <td class="text-break text-wrap">{{ image.path | filename }}</td>
-                                        <td>{{ image.rating | normalizeRating |number : 2 }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    </div>
+
+                    <!-- Details view -->
+                    <table class="table table-hover" ng-show="view == 'details'">
+                        <colgroup>
+                            <col span="1" style="width: fit-content;">
+                            <col span="1" style="width: auto;">
+                            <col span="1" style="width: fit-content;">
+                        </colgroup>
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Thumbnail</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="image in cwd.images" ng-click="focusOnImage(image.path)"
+                                style="cursor: pointer;">
+                                <td class="text-center">
+                                    <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1rem;">
+                                </td>
+                                <td class="text-break text-wrap">{{ image.path | filename }}</td>
+                                <td>{{ image.extension }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <!-- Organized gallery -->
+                <div class="container-fluid" ng-show="isOrganized">
+
+                    <!-- Organized thumbnail view -->
+                    <div ng-show="view == 'thumbnails'">
+
+                        <!-- Cluster row -->
+                        <div ng-repeat="cluster in organization">
+                            <div class="overflow-x-auto text-nowrap mb-3">
+
+                                <!-- Thumbnails in a cluster -->
+                                <button class="btn btn-outline-dark border-transparent thumbnail-xl"
+                                    ng-repeat="image in cluster" ng-click="focusOnImage(image.path)">
+                                    <div class="img-thumbnail d-table-cell align-middle">
+                                        <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
+                                    </div>
+                                    <p class="mb-0 text-wrap text-break text-center">{{ image.path | filename }}</p>
+                                </button>
+
+                            </div>
+                            <hr>
+                        </div>
+
+                    </div>
+
+                    <!-- Organized details view -->
+                    <div ng-show="view == 'details'">
+
+                        <div class="mb-2" ng-repeat="(clusterId, cluster) in organization">
+
+                            <button class="btn btn-light btn-lg btn-block text-left" type="button"
+                                data-toggle="collapse" data-target="#tableCluster{{ clusterId }}" role="button"
+                                aria-expanded="true" aria-controls="tableCluster{{ clusterId }}">
+                                Group {{ clusterId + 1 }}
+                            </button>
+
+                            <div class="collapse show" id="tableCluster{{ clusterId }}">
+                                <table class="table table-hover">
+                                    <colgroup>
+                                        <col span="1" style="width: fit-content;">
+                                        <col span="1" style="width: auto;">
+                                        <col span="1" style="width: fit-content;">
+                                    </colgroup>
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th scope="col">Thumbnail</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Rating</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="image in cluster" ng-click="focusOnImage(image.path)"
+                                            style="cursor: pointer;">
+                                            <td class="text-center">
+                                                <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1rem;">
+                                            </td>
+                                            <td class="text-break text-wrap">{{ image.path | filename }}</td>
+                                            <td>{{ image.rating | normalizeRating |number : 2 }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
 
                     </div>
