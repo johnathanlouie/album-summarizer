@@ -86,12 +86,16 @@ class Directory_ extends Array {
         return this.#organization;
     }
 
-    set organization(val) {
+    get isOrganized() {
+        return this.#organization === null;
+    }
+
+    organize(val) {
         this.#organization = val;
     }
 
-    get isOrganized() {
-        return this.#organization === null;
+    unorganize() {
+        this.#organization = null;
     }
 
     hasDirectories() {
