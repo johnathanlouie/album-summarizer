@@ -43,11 +43,17 @@ class Directory_ extends Array {
     #directories = null;
     #files = null;
     #images = null;
+    #exists;
 
-    static factory(direntArray, path) {
+    static factory(direntArray, path, exists) {
         var instance = Directory_.from(direntArray.map(e => new File_(e, path)));
         instance.#path = path;
+        instance.#exists = exists;
         return instance;
+    }
+
+    get exists() {
+        return this.#exists;
     }
 
     get path() {
