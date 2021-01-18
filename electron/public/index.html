@@ -129,8 +129,8 @@
                         </label>
 
                         <!-- Reorganize button -->
-                        <button class="btn btn-success" ng-click="reorganize()"
-                            ng-disabled="!isOrganized || !cwd.exists" type="button">
+                        <button class="btn btn-success" ng-click="reorganize()" ng-disabled="!cwd.isOrganized"
+                            type="button">
                             <svg class="bi bi-arrow-clockwise" width="1rem" height="1rem" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#arrow-clockwise" />
                             </svg>
@@ -197,7 +197,7 @@
             <div ng-show="cwd.hasImages()">
 
                 <!-- Regular gallery -->
-                <div class="container-fluid" ng-hide="isOrganized">
+                <div class="container-fluid" ng-hide="isOrganizeToggled && cwd.isOrganized">
 
                     <!-- Thumbnail view -->
                     <div class="d-flex justify-content-around flex-wrap align-items-start"
@@ -243,13 +243,13 @@
                 </div>
 
                 <!-- Organized gallery -->
-                <div class="container-fluid" ng-show="isOrganized">
+                <div class="container-fluid" ng-show="isOrganizeToggled && cwd.isOrganized">
 
                     <!-- Organized thumbnail view -->
                     <div ng-show="view == 'thumbnails'">
 
                         <!-- Cluster row -->
-                        <div ng-repeat="cluster in organization">
+                        <div ng-repeat="cluster in cwd.organization">
                             <div class="overflow-x-auto text-nowrap mb-3">
 
                                 <!-- Thumbnails in a cluster -->
@@ -270,7 +270,7 @@
                     <!-- Organized details view -->
                     <div ng-show="view == 'details'">
 
-                        <div class="mb-2" ng-repeat="(clusterId, cluster) in organization">
+                        <div class="mb-2" ng-repeat="(clusterId, cluster) in cwd.organization">
 
                             <button class="btn btn-light btn-lg btn-block text-left" type="button"
                                 data-toggle="collapse" data-target="#tableCluster{{ clusterId }}" role="button"

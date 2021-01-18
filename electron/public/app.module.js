@@ -87,7 +87,7 @@ class Directory_ extends Array {
     }
 
     get isOrganized() {
-        return this.#organization === null;
+        return this.#organization !== null;
     }
 
     organize(val) {
@@ -235,6 +235,7 @@ function viewCtrl($scope, $interval) {
     };
 
     function reorganize() {
+        $scope.cwd.unorganize();
         var command = `conda run -n album pythonw "${path.normalize('source/run.py')}" "${$scope.cwd.path}"`;
         var options = { cwd: '..', windowsHide: true };
         var proc = childProcess.exec(command, options);
@@ -257,15 +258,13 @@ function viewCtrl($scope, $interval) {
             if (err) {
                 if (pythoned) {
                     console.error('Cannot read organized data file');
-                    $scope.isOrganized = false;
                     $scope.isOrganizeToggled = false;
                     $scope.loadingOverlay.hide();
                 } else {
                     reorganize();
                 }
             } else {
-                $scope.organization = JSON.parse(data);
-                $scope.isOrganized = true;
+                $scope.cwd.organize(JSON.parse(data));
                 $scope.loadingOverlay.hide();
             }
         });
@@ -275,8 +274,6 @@ function viewCtrl($scope, $interval) {
         if ($scope.isOrganizeToggled) {
             $scope.loadingOverlay.show();
             organize(false);
-        } else {
-            $scope.isOrganized = false;
         }
     };
 
@@ -285,7 +282,6 @@ function viewCtrl($scope, $interval) {
         reorganize();
     }
 
-    $scope.isOrganized = false;
     $scope.isOrganizeToggled = false;
     $scope.screen = 'main';
     $scope.focusedImage = 'public/image-placeholder.png';
