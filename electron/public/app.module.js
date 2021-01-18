@@ -39,11 +39,12 @@ class File_ {
 }
 
 class Directory_ extends Array {
-    #path;
+    #path = '';
     #directories = null;
     #files = null;
     #images = null;
-    #exists;
+    #exists = false;
+    #organization = null;
 
     static factory(path, direntArray = [], exists = false) {
         var instance = Directory_.from(direntArray.map(e => new File_(e, path)));
@@ -79,6 +80,18 @@ class Directory_ extends Array {
             this.#images = this.files.filter(e => e.isImage());
         }
         return this.#images;
+    }
+
+    get organization() {
+        return this.#organization;
+    }
+
+    set organization(val) {
+        this.#organization = val;
+    }
+
+    get isOrganized() {
+        return this.#organization === null;
     }
 
     hasDirectories() {
