@@ -120,7 +120,7 @@
 
                         <!-- Organize toggle -->
                         <label class="btn" ng-class="isOrganizeToggled ? 'btn-success' : 'btn-outline-success'">
-                            <input ng-model="isOrganizeToggled" ng-change="toggleOrganize()" ng-disabled="isCwdMissing"
+                            <input ng-model="isOrganizeToggled" ng-change="toggleOrganize()" ng-disabled="!cwd.exists"
                                 type="checkbox">
                             <svg class="bi bi-diagram-3 mr-1" width="1rem" height="1rem" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#diagram-3" />
@@ -130,7 +130,7 @@
 
                         <!-- Reorganize button -->
                         <button class="btn btn-success" ng-click="reorganize()"
-                            ng-disabled="!isOrganized || isCwdMissing" type="button">
+                            ng-disabled="!isOrganized || !cwd.exists" type="button">
                             <svg class="bi bi-arrow-clockwise" width="1rem" height="1rem" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#arrow-clockwise" />
                             </svg>
@@ -152,7 +152,7 @@
         </nav>
 
         <!-- CWD not found warning -->
-        <div class="container-fluid" ng-show="isCwdMissing">
+        <div class="container-fluid" ng-hide="cwd.exists">
             <div class="alert alert-danger" role="alert">
                 <h4 class="alert-heading">Directory not found!</h4>
                 <p>The directory (also known as folder) was not found at the address. Check the spelling of the address
@@ -162,7 +162,7 @@
             </div>
         </div>
 
-        <div ng-hide="isCwdMissing">
+        <div ng-show="cwd.exists">
 
             <!-- No subdirectories message -->
             <div class="container-fluid" ng-hide="cwd.hasDirectories()">

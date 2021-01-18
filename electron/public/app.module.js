@@ -45,7 +45,7 @@ class Directory_ extends Array {
     #images = null;
     #exists;
 
-    static factory(direntArray, path, exists) {
+    static factory(path, direntArray = [], exists = false) {
         var instance = Directory_.from(direntArray.map(e => new File_(e, path)));
         instance.#path = path;
         instance.#exists = exists;
@@ -92,7 +92,7 @@ class Directory_ extends Array {
 
 function viewCtrl($scope, $interval) {
     const homeDir = os.homedir();
-    $scope.cwd = Directory_.factory([], homeDir);
+    $scope.cwd = Directory_.factory(homeDir);
 
     const history = {
         _history: [],
@@ -165,14 +165,12 @@ function viewCtrl($scope, $interval) {
     };
 
     function goTo(dst) {
-        $scope.isCwdMissing = false;
-
         fs.readdir(dst, { withFileTypes: true }, (err, dirEnts) => {
             if (err) {
-                $scope.isCwdMissing = true;
+                $scope.cwd = Directory_.factory(dst);
                 $scope.$apply();
             } else {
-                $scope.cwd = Directory_.factory(dirEnts, dst);
+                $scope.cwd = Directory_.factory(dst, dirEnts, true);
                 $scope.$apply();
             }
         });
