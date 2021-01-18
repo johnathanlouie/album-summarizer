@@ -206,6 +206,11 @@
 
                 <!-- Details view -->
                 <table class="table table-hover" ng-show="view == 'details'">
+                    <colgroup>
+                        <col span="1" style="width: fit-content;">
+                        <col span="1" style="width: auto;">
+                        <col span="1" style="width: fit-content;">
+                    </colgroup>
                     <thead class="thead-dark">
                         <tr>
                             <th>Thumbnail</th>
@@ -258,6 +263,11 @@
             <div ng-show="view == 'details'">
 
                 <table class="table table-hover" ng-repeat="cluster in organization">
+                    <colgroup>
+                        <col span="1" style="width: fit-content;">
+                        <col span="1" style="width: auto;">
+                        <col span="1" style="width: fit-content;">
+                    </colgroup>
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">Thumbnail</th>
