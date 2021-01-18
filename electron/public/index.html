@@ -140,6 +140,18 @@
 
                 </div>
 
+                <!-- Filter -->
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <svg class="bi bi-search" width="1em" height="1em" fill="currentColor">
+                                <use xlink:href="bootstrap-icons.svg#search" />
+                            </svg>
+                        </span>
+                    </div>
+                    <input class="form-control" ng-model="filterText" type="text" placeholder="Find in this directory">
+                </div>
+
             </form>
 
             <!-- Menu button -->
@@ -175,8 +187,8 @@
             <div class="d-flex justify-content-start flex-wrap align-items-start" ng-show="cwd.hasDirectories()">
 
                 <!-- Directory icons -->
-                <button class="btn btn-outline-dark border-transparent icon-lg" ng-repeat="d in cwd.directories"
-                    ng-click="goTo(d.path)">
+                <button class="btn btn-outline-dark border-transparent icon-lg"
+                    ng-repeat="d in cwd.directories | filter : { path : filterText }" ng-click="goTo(d.path)">
                     <svg class="bi bi-folder" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#folder" />
                     </svg>
@@ -205,7 +217,8 @@
 
                         <!-- Thumbnails -->
                         <button class="btn btn-outline-dark border-transparent thumbnail-xl"
-                            ng-repeat="image in cwd.images" ng-click="focusOnImage(image.path)">
+                            ng-repeat="image in cwd.images | filter : { path : filterText }"
+                            ng-click="focusOnImage(image.path)">
                             <div class="img-thumbnail d-table-cell align-middle">
                                 <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
                             </div>
@@ -229,8 +242,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="image in cwd.images" ng-click="focusOnImage(image.path)"
-                                style="cursor: pointer;">
+                            <tr ng-repeat="image in cwd.images | filter : { path : filterText }"
+                                ng-click="focusOnImage(image.path)" style="cursor: pointer;">
                                 <td class="text-center">
                                     <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1em;">
                                 </td>
@@ -254,7 +267,8 @@
 
                                 <!-- Thumbnails in a cluster -->
                                 <button class="btn btn-outline-dark border-transparent thumbnail-xl"
-                                    ng-repeat="image in cluster" ng-click="focusOnImage(image.path)">
+                                    ng-repeat="image in cluster | filter : { path : filterText }"
+                                    ng-click="focusOnImage(image.path)">
                                     <div class="img-thumbnail d-table-cell align-middle">
                                         <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
                                     </div>
@@ -293,8 +307,8 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr ng-repeat="image in cluster" ng-click="focusOnImage(image.path)"
-                                            style="cursor: pointer;">
+                                        <tr ng-repeat="image in cluster | filter : { path : filterText }"
+                                            ng-click="focusOnImage(image.path)" style="cursor: pointer;">
                                             <td class="text-center">
                                                 <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1em;">
                                             </td>

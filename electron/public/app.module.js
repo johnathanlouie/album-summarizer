@@ -182,6 +182,7 @@ function viewCtrl($scope, $interval) {
     };
 
     function goTo(dst) {
+        $scope.filterText = '';
         fs.readdir(dst, { withFileTypes: true }, (err, dirEnts) => {
             if (err) {
                 $scope.cwd = Directory_.factory(dst);
