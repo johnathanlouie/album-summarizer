@@ -151,45 +151,51 @@
 
         </nav>
 
-        <!-- Regular gallery -->
-        <div class="container-fluid" ng-hide="isOrganized">
-
-            <!-- Directory not found warning -->
-            <div class="alert alert-danger" role="alert" ng-show="isCwdMissing">
+        <!-- CWD not found warning -->
+        <div class="container-fluid" ng-show="isCwdMissing">
+            <div class="alert alert-danger" role="alert">
                 <h4 class="alert-heading">Directory not found!</h4>
                 <p>The directory (also known as folder) was not found at the address. Check the spelling of the address
                     or navigate by clicking on the folder icons.</p>
                 <hr>
                 <p class="mb-0">The directory may not exist or you do not have permission to access it.</p>
             </div>
+        </div>
 
-            <div ng-hide="isCwdMissing">
+        <div ng-hide="isCwdMissing">
 
-                <!-- No subdirectories message -->
+            <!-- No subdirectories message -->
+            <div class="container-fluid">
                 <div class="alert alert-info" role="alert" ng-hide="cwd.hasDirectories()">
                     <h4 class="alert-heading">No subdirectories!</h4>
                 </div>
+            </div>
 
-                <!-- Directories section -->
-                <div class="d-flex justify-content-start flex-wrap align-items-start">
+            <!-- Directories section -->
+            <div class="d-flex justify-content-start flex-wrap align-items-start">
 
-                    <!-- Directory icons -->
-                    <button class="btn btn-outline-dark border-transparent icon-lg" ng-repeat="d in cwd.directories"
-                        ng-click="goTo(d.path)">
-                        <svg class="bi bi-folder" fill="currentColor">
-                            <use xlink:href="bootstrap-icons.svg#folder" />
-                        </svg>
-                        <p class="mb-0 text-break text-center">{{ d.path | filename }}</p>
-                    </button>
+                <!-- Directory icons -->
+                <button class="btn btn-outline-dark border-transparent icon-lg" ng-repeat="d in cwd.directories"
+                    ng-click="goTo(d.path)">
+                    <svg class="bi bi-folder" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#folder" />
+                    </svg>
+                    <p class="mb-0 text-break text-center">{{ d.path | filename }}</p>
+                </button>
 
-                </div>
+            </div>
 
-                <hr>
+            <hr>
 
-                <!-- No images message -->
+            <!-- No images message -->
+            <div class="container-fluid">
                 <div class="alert alert-info" role="alert" ng-hide="cwd.hasImages()">
                     <h4 class="alert-heading">No images here!</h4>
                 </div>
+            </div>
+
+            <!-- Regular gallery -->
+            <div class="container-fluid" ng-hide="isOrganized">
 
                 <!-- Thumbnail view -->
                 <div class="d-flex justify-content-around flex-wrap align-items-start" ng-show="view == 'thumbnails'">
@@ -233,59 +239,60 @@
 
             </div>
 
-        </div>
+            <!-- Organized gallery -->
+            <div class="container-fluid" ng-show="isOrganized">
 
-        <!-- Organized gallery -->
-        <div class="container-fluid" ng-show="isOrganized">
+                <!-- Organized thumbnail view -->
+                <div ng-show="view == 'thumbnails'">
 
-            <!-- Organized thumbnail view -->
-            <div ng-show="view == 'thumbnails'">
+                    <!-- Cluster row -->
+                    <div ng-repeat="cluster in organization">
+                        <div class="overflow-x-auto text-nowrap mb-3">
 
-                <!-- Cluster row -->
-                <div ng-repeat="cluster in organization">
-                    <div class="overflow-x-auto text-nowrap mb-3">
+                            <!-- Thumbnails in a cluster -->
+                            <button class="btn btn-outline-dark border-transparent thumbnail-xl"
+                                ng-repeat="image in cluster" ng-click="focusOnImage(image.path)">
+                                <div class="img-thumbnail d-table-cell align-middle">
+                                    <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
+                                </div>
+                                <p class="mb-0 text-break text-center">{{ image.rating }}</p>
+                            </button>
 
-                        <!-- Thumbnails in a cluster -->
-                        <button class="btn btn-outline-dark border-transparent thumbnail-xl"
-                            ng-repeat="image in cluster" ng-click="focusOnImage(image.path)">
-                            <div class="img-thumbnail d-table-cell align-middle">
-                                <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
-                            </div>
-                            <p class="mb-0 text-break text-center">{{ image.rating }}</p>
-                        </button>
-
+                        </div>
+                        <hr>
                     </div>
-                    <hr>
+
                 </div>
 
-            </div>
+                <!-- Organized details view -->
+                <div ng-show="view == 'details'">
 
-            <!-- Organized details view -->
-            <div ng-show="view == 'details'">
+                    <table class="table table-hover" ng-repeat="cluster in organization">
+                        <colgroup>
+                            <col span="1" style="width: fit-content;">
+                            <col span="1" style="width: auto;">
+                            <col span="1" style="width: fit-content;">
+                        </colgroup>
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Thumbnail</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="image in cluster" ng-click="focusOnImage(image.path)"
+                                style="cursor: pointer;">
+                                <td class="text-center">
+                                    <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1rem;">
+                                </td>
+                                <td class="text-break text-wrap">{{ image.path | filename }}</td>
+                                <td>{{ image.rating | normalizeRating |number : 2 }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                <table class="table table-hover" ng-repeat="cluster in organization">
-                    <colgroup>
-                        <col span="1" style="width: fit-content;">
-                        <col span="1" style="width: auto;">
-                        <col span="1" style="width: fit-content;">
-                    </colgroup>
-                    <thead class="thead-dark">
-                        <tr>
-                            <th scope="col">Thumbnail</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Rating</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr ng-repeat="image in cluster" ng-click="focusOnImage(image.path)" style="cursor: pointer;">
-                            <td class="text-center">
-                                <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1rem;">
-                            </td>
-                            <td class="text-break text-wrap">{{ image.path | filename }}</td>
-                            <td>{{ image.rating | normalizeRating |number : 2 }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                </div>
 
             </div>
 
