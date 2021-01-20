@@ -11,7 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
         crossorigin="anonymous"></script>
-    <script src="scripts.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
+    <script src="jquery3-extensions.js"></script>
 </head>
 
 <body>
@@ -119,7 +120,7 @@
                     $("#classification").text(DICT[Number(this.classes[0])]);
                 } else {
                     if (this.queue.length === 0) {
-                        this.queue = shuffle(nArray(this.images.length));
+                        this.queue = _.shuffle(_.range(this.images.length));
                     }
                     let i = this.queue.pop();
                     let imgUrl = this.images[i];
@@ -149,8 +150,8 @@
             event.preventDefault();
             reset();
             // read files, then parse
-            let images = readFile("file1").then(file => file.split("\n"));
-            let classes = readFile("file2").then(file => file.split("\n"));
+            let images = $("#file1").readText().then(file => file[0].split("\n"));
+            let classes = $("#file2").readText().then(file => file[0].split("\n"));
             // then wait for both, send file data to controller
             Promise.all([images, classes]).then(retVal => DATA.set(...retVal));
         });
