@@ -36,7 +36,7 @@
                 <!-- Back button -->
                 <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goBack()"
                     ng-disabled="hasBack()">
-                    <svg class="bi bi-arrow-left-circle-fill" width="1em" height="1em" fill="currentColor">
+                    <svg class="btn-icon bi bi-arrow-left-circle-fill" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#arrow-left-circle-fill" />
                     </svg>
                 </button>
@@ -44,21 +44,21 @@
                 <!-- Forward button -->
                 <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goForward()"
                     ng-disabled="hasNext()">
-                    <svg class="bi bi-arrow-right-circle-fill" width="1em" height="1em" fill="currentColor">
+                    <svg class="btn-icon bi bi-arrow-right-circle-fill" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#arrow-right-circle-fill" />
                     </svg>
                 </button>
 
                 <!-- Go up one level button -->
                 <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goParent()">
-                    <svg class="bi bi-arrow-up-circle-fill" width="1em" height="1em" fill="currentColor">
+                    <svg class="btn-icon bi bi-arrow-up-circle-fill" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#arrow-up-circle-fill" />
                     </svg>
                 </button>
 
                 <!-- Home button -->
                 <button class="btn btn-outline-light border-transparent mr-2" type="button" ng-click="goHome()">
-                    <svg class="bi bi-house-fill" width="1em" height="1em" fill="currentColor">
+                    <svg class="btn-icon bi bi-house-fill" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#house-fill" />
                     </svg>
                 </button>
@@ -72,7 +72,7 @@
                     <input type="text" class="form-control" placeholder="Enter address" ng-model="address">
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="button" ng-click="refresh()">
-                            <svg class="bi bi-arrow-clockwise" width="1em" height="1em" fill="currentColor">
+                            <svg class="btn-icon bi bi-arrow-clockwise" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#arrow-clockwise" />
                             </svg>
                         </button>
@@ -87,7 +87,7 @@
                 <div class="input-group mr-2">
                     <div class="input-group-prepend">
                         <span class="input-group-text">
-                            <svg class="bi bi-search" width="1em" height="1em" fill="currentColor">
+                            <svg class="btn-icon bi bi-search" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#search" />
                             </svg>
                         </span>
@@ -103,7 +103,7 @@
                         <!-- View icons button -->
                         <label class="btn btn-warning">
                             <input type="radio" ng-model="view" value="thumbnails">
-                            <svg class="bi bi-image" width="1em" height="1em" fill="currentColor">
+                            <svg class="btn-icon bi bi-image" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#image" />
                             </svg>
                         </label>
@@ -111,7 +111,7 @@
                         <!-- View details button -->
                         <label class="btn btn-warning">
                             <input type="radio" ng-model="view" value="details">
-                            <svg class="bi bi-list-task" width="1em" height="1em" fill="currentColor">
+                            <svg class="btn-icon bi bi-list-task" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#list-task" />
                             </svg>
                         </label>
@@ -125,7 +125,7 @@
                         <label class="btn" ng-class="isOrganizeToggled ? 'btn-success' : 'btn-outline-success'">
                             <input ng-model="isOrganizeToggled" ng-change="toggleOrganize()" ng-disabled="!cwd.exists"
                                 type="checkbox">
-                            <svg class="bi bi-diagram-3 mr-1" width="1em" height="1em" fill="currentColor">
+                            <svg class="btn-icon bi bi-diagram-3 mr-1" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#diagram-3" />
                             </svg>
                             Smart Organize
@@ -134,7 +134,7 @@
                         <!-- Reorganize button -->
                         <button class="btn btn-success" ng-click="reorganize()" ng-disabled="!cwd.isOrganized"
                             type="button">
-                            <svg class="bi bi-arrow-clockwise" width="1em" height="1em" fill="currentColor">
+                            <svg class="btn-icon bi bi-arrow-clockwise" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#arrow-clockwise" />
                             </svg>
                         </button>
@@ -145,7 +145,7 @@
 
                 <!-- Menu button -->
                 <a class="btn btn-outline-light border-transparent" href="menu.html">
-                    <svg class="bi bi-list" width="1em" height="1em" fill="currentColor">
+                    <svg class="btn-icon bi bi-list" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#list" />
                     </svg>
                 </a>
