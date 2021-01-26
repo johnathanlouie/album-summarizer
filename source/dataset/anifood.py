@@ -2,11 +2,12 @@ from os import getcwd
 from os.path import join, normpath
 from typing import Any, List, Optional, Union
 
+import dlfactory
+from core.dataset import DataSet, Predictions, PredictionsFactory
+from jl import ImageDirectory, Url
 from numpy import asarray, ndarray
 
-from core.dataset import DataSet, Predictions, PredictionsFactory
 from dataset.cc import CcDataFile
-from jl import ImageDirectory, Url
 
 
 class AnimalCollection(ImageDirectory):
@@ -57,6 +58,8 @@ class CccafDataSet(DataSet):
     The CC dataset combined with a subsection of Animals and a subsection of Food-101.
     The CC dataset does not have enough animals and food photos.
     """
+
+    NAME = 'cccaf'
 
     def __init__(self, animals: Optional[int] = None, food: Optional[int] = 1300) -> None:
         if animals == None:
@@ -120,8 +123,5 @@ class CccafDataSet(DataSet):
         """
         return 5
 
-    def name(self) -> str:
-        """
-        Returns this dataset's name.
-        """
-        return 'cccaf'
+
+dlfactory.DeepLearningFactory.dataset(CccafDataSet())

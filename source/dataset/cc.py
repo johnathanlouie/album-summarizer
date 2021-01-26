@@ -2,10 +2,10 @@ from os import getcwd
 from os.path import join, normpath
 from typing import Any, List, Optional, Union
 
-from numpy import asarray, ndarray
-
+import dlfactory
 from core.dataset import DataSet, Predictions, PredictionsFactory
 from jl import Csv, Url
+from numpy import asarray, ndarray
 
 
 class CcDataFile(object):
@@ -155,6 +155,8 @@ class Ccc(Cc):
     The image classification subset of the CC dataset.
     """
 
+    NAME = 'ccc'
+
     def _y(self) -> ndarray:
         """
         Returns the Y as one hot arrays.
@@ -163,12 +165,6 @@ class Ccc(Cc):
         y = asarray(data_file.category_as_int())
         y = self.one_hot(y, 6)
         return y
-
-    def name(self) -> str:
-        """
-        Returns this dataset's name.
-        """
-        return 'ccc'
 
     def get_predictions_factory(self) -> PredictionsFactory:
         """
@@ -202,6 +198,8 @@ class Ccr(Cc):
     The aesthetic rating subset of the CC dataset.
     """
 
+    NAME = 'ccr'
+
     def _y(self) -> ndarray:
         """
         Returns the Y as integers.
@@ -209,12 +207,6 @@ class Ccr(Cc):
         data_file = CcDataFile()
         y = asarray(data_file.rating())
         return y
-
-    def name(self) -> str:
-        """
-        Returns this dataset's name.
-        """
-        return 'ccr'
 
     def get_predictions_factory(self) -> PredictionsFactory:
         """
@@ -260,6 +252,8 @@ class CcrCategorical(Cc):
     The aesthetic rating subset of the CC dataset using categories instead of a number.
     """
 
+    NAME = 'ccrc'
+
     def _y(self) -> ndarray:
         """
         Returns the Y as one hot arrays.
@@ -271,14 +265,13 @@ class CcrCategorical(Cc):
         y = self.one_hot(y, 3)
         return y
 
-    def name(self) -> str:
-        """
-        Returns this dataset's name.
-        """
-        return 'ccrc'
-
     def get_predictions_factory(self) -> PredictionsFactory:
         """
         Returns an instance of PredictionsFactory.
         """
         return CcrcPredictionsFactory()
+
+
+dlfactory.DeepLearningFactory.dataset(Ccc())
+dlfactory.DeepLearningFactory.dataset(Ccr())
+dlfactory.DeepLearningFactory.dataset(CcrCategorical())

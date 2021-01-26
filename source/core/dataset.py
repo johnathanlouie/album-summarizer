@@ -193,6 +193,8 @@ class DataSet(object):
     Interface for datasets. Mainly used for hints.
     """
 
+    NAME = ''
+
     def prepare(self) -> None:
         """
         Reads and convert the dataset data files into NumPy arrays for Keras.
@@ -203,7 +205,7 @@ class DataSet(object):
         """
         Gets the training, testing, and validation split for Keras.
         """
-        return DataSetSplit(self.name(), num)
+        return DataSetSplit(self.NAME, num)
 
     def train_val_test(
         self,
@@ -263,11 +265,5 @@ class DataSet(object):
     def splits(self) -> int:
         """
         Returns the number of splits.
-        """
-        raise NotImplementedError
-
-    def name(self) -> str:
-        """
-        Returns a simple abbreviated name for filenames, command line interface, and factories.
         """
         raise NotImplementedError

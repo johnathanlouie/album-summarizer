@@ -2,10 +2,10 @@ from os import getcwd
 from os.path import join, normpath
 from typing import Any, List, Union
 
-from numpy import asarray, ndarray
-
+import dlfactory
 from core.dataset import DataSet, Predictions, PredictionsFactory
 from jl import ListFile, Url
+from numpy import asarray, ndarray
 
 
 class LamemDataFile(object):
@@ -62,6 +62,8 @@ class Lamem(DataSet):
     Dataset used for large scale image memorability.
     """
 
+    NAME = 'lamem'
+
     _phases = ['train', 'test', 'val']
 
     def _data_file_url(self, split: int, phase: str) -> str:
@@ -114,13 +116,10 @@ class Lamem(DataSet):
         """
         return 5
 
-    def name(self) -> str:
-        """
-        Returns this dataset's name.
-        """
-        return 'lamem'
-
     def get_predictions_factory(self) -> PredictionsFactory:
         """
         """
         return LamemPredictionsFactory()
+
+
+dlfactory.DeepLearningFactory.dataset(Lamem())
