@@ -44,14 +44,14 @@ class DeepLearningFactory(object):
 
     @classmethod
     def architecture(cls, architecture: ModelFactory) -> None:
-        if architecture.name in cls.ARCHITECTURES:
+        if architecture.NAME in cls.ARCHITECTURES:
             raise KeyError
         else:
-            cls.ARCHITECTURES[architecture.name] = architecture
+            cls.ARCHITECTURES[architecture.NAME] = architecture
 
     @classmethod
     def dataset(cls, dataset: DataSet) -> None:
-        if dataset.name in cls.DATASETS:
+        if dataset.NAME in cls.DATASETS:
             raise KeyError
         else:
-            cls.DATASETS[dataset.name] = dataset
+            cls.DATASETS[dataset.NAME] = dataset

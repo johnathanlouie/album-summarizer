@@ -12,7 +12,7 @@ class Vgg16A(ModelFactory):
     Fully manual configuration of VGG16.
     """
 
-    name = 'vgg16a'
+    NAME = 'vgg16a'
 
     def create(self) -> Model:
         """
@@ -62,7 +62,7 @@ class Vgg16B(ModelFactory):
     The classification block is manually configured.
     """
 
-    name = 'vgg16b'
+    NAME = 'vgg16b'
 
     def create(self) -> Model:
         """
@@ -82,7 +82,7 @@ class Vgg16C(ModelFactory):
     VGG16 by Keras.
     """
 
-    name = 'vgg16c'
+    NAME = 'vgg16c'
 
     def create(self) -> Model:
         """

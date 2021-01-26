@@ -28,8 +28,7 @@ class ModelFactory(object):
     Abstract factory class for keras.models.Model.
     """
 
-    name = ''
-    version = -1
+    NAME = ''
 
     def create(self) -> Model:
         """
@@ -146,4 +145,4 @@ class Architecture(object):
         """
         Returns an object containing the combination of model and compile options.
         """
-        return ArchitectureName(self._model.name, self._loss.name, self._optimizer.name, self._metric.name)
+        return ArchitectureName(self._model.NAME, self._loss.name, self._optimizer.name, self._metric.name)
