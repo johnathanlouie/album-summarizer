@@ -1,10 +1,10 @@
+import dlfactory
+from core.model import ModelFactory
+from jl import res2 as resolution
 from keras.engine.input_layer import Input
 from keras.layers import (BatchNormalization, Conv2D, Dense, Flatten,
                           MaxPooling2D)
 from keras.models import Model
-
-from core.model import ModelFactory
-from jl import res2 as resolution
 
 
 class Smi13(ModelFactory):
@@ -12,8 +12,7 @@ class Smi13(ModelFactory):
     A deep learning model for predicting memorability.
     """
 
-    name = 'smi13'
-    version = 0
+    NAME = 'smi13'
 
     def create(self) -> Model:
         """
@@ -103,8 +102,7 @@ class Smi13_1(ModelFactory):
     A deep learning model for predicting memorability.
     """
 
-    name = 'smi13'
-    version = 1
+    NAME = 'smi13a'
 
     def create(self) -> Model:
         """
@@ -193,8 +191,7 @@ class Smi13_2(ModelFactory):
     A deep learning model for predicting memorability.
     """
 
-    name = 'smi13'
-    version = 2
+    NAME = 'smi13b'
 
     def create(self) -> Model:
         """
@@ -277,3 +274,8 @@ class Smi13_2(ModelFactory):
         x = Dense(1, activation='relu', name='predictions2')(x)
         model = Model(img_input, x, name='smi13')
         return model
+
+
+dlfactory.DeepLearningFactory.architecture(Smi13())
+dlfactory.DeepLearningFactory.architecture(Smi13_1())
+dlfactory.DeepLearningFactory.architecture(Smi13_2())
