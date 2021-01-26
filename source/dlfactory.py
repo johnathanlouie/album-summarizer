@@ -14,12 +14,9 @@ class DeepLearningFactory(object):
     """
 
     ARCHITECTURES = {
-        'vgg': Vgg16A(),
-        'vgg1': Vgg16B(),
-        'vgg2': Vgg16C(),
         'smi': Smi13(),
         'smi1': Smi13_1(),
-        'smi2': Smi13_2()
+        'smi2': Smi13_2(),
     }
 
     DATASETS = {

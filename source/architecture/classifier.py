@@ -1,10 +1,10 @@
+import dlfactory
+from core.model import ModelFactory
+from jl import res2 as resolution
 from keras.applications.vgg16 import VGG16
 from keras.engine.input_layer import Input
 from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
 from keras.models import Model
-
-from core.model import ModelFactory
-from jl import res2 as resolution
 
 
 class Vgg16A(ModelFactory):
@@ -12,8 +12,7 @@ class Vgg16A(ModelFactory):
     Fully manual configuration of VGG16.
     """
 
-    name = 'vgg16'
-    version = 'a'
+    name = 'vgg16a'
 
     def create(self) -> Model:
         """
@@ -63,8 +62,7 @@ class Vgg16B(ModelFactory):
     The classification block is manually configured.
     """
 
-    name = 'vgg16'
-    version = 'b'
+    name = 'vgg16b'
 
     def create(self) -> Model:
         """
@@ -84,11 +82,15 @@ class Vgg16C(ModelFactory):
     VGG16 by Keras.
     """
 
-    name = 'vgg16'
-    version = 'c'
+    name = 'vgg16c'
 
     def create(self) -> Model:
         """
         Creates a keras.models.Model object.
         """
         return VGG16(weights=None, input_tensor=Input(resolution), classes=6)
+
+
+dlfactory.DeepLearningFactory.architecture(Vgg16A())
+dlfactory.DeepLearningFactory.architecture(Vgg16B())
+dlfactory.DeepLearningFactory.architecture(Vgg16C())
