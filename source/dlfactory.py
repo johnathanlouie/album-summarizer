@@ -1,3 +1,5 @@
+from typing import Type
+
 from architecture.classifier import Vgg16A, Vgg16B, Vgg16C
 from architecture.rater import Smi13, Smi13_1, Smi13_2
 from core.archidata import ArchiSplitAdapter, ArchitectureSet
@@ -44,3 +46,17 @@ class DeepLearningFactory(object):
         Compiles the dataset, architecture, and options into a split.
         """
         return cls.create_set(mf, ds, l, o, m).split(split)
+
+    @classmethod
+    def architecture(cls, architecture: Type[ModelFactory]) -> None:
+        if architecture.key in cls.ARCHITECTURES:
+            raise KeyError
+        else:
+            cls.ARCHITECTURES[architecture.key] = architecture
+
+    @classmethod
+    def dataset(cls, dataset: Type[DataSet]) -> None:
+        if dataset.key in cls.DATASETS:
+            raise KeyError
+        else:
+            cls.DATASETS[dataset.key] = dataset
