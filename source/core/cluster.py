@@ -64,7 +64,7 @@ class ClusterResults(object):
         return [[self._images[i] for i in cluster] for cluster in self.indices()]
 
 
-class ImageCluster(object):
+class ClusterStrategy(object):
     """
     """
 

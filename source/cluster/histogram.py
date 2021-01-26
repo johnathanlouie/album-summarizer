@@ -1,7 +1,7 @@
 from typing import List
 
 import cv2
-from core.cluster import ClusterResults, ImageCluster
+from core.cluster import ClusterResults, ClusterStrategy
 from jl import Url, hsv, read_image
 from numpy import concatenate, ndarray, reshape, vstack
 from sklearn.cluster import MeanShift
@@ -71,7 +71,7 @@ class HsvHistogram(object):
         return histogram / pixels
 
 
-class HistogramCluster(ImageCluster):
+class HistogramCluster(ClusterStrategy):
     """
     """
 

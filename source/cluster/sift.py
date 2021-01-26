@@ -6,7 +6,7 @@ from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
 
 import cv2
-from core.cluster import ClusterResults, ImageCluster
+from core.cluster import ClusterResults, ClusterStrategy
 from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, Number, Url,
                 npsave, read_image)
 
@@ -199,7 +199,7 @@ class SiftDescriptorSet(object):
         return
 
 
-class SiftCluster(ImageCluster):
+class SiftCluster(ClusterStrategy):
     """
     Clusters images from SIFT descriptors.
     """
