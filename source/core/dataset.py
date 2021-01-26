@@ -31,19 +31,19 @@ class DataSetXY(object):
     """
 
     def __init__(self, name: str, split: int, phase: Phase, xy: XY) -> None:
-        self.name = name
-        self.split = split
-        self.phase = phase
-        self.xy = xy
+        self.name: str = name
+        self.split: int = split
+        self.phase: Phase = phase
+        self.xy: XY = xy
         return
 
     def __str__(self) -> str:
         return '%s/%d/%s.%s' % (self.name, self.split, self.phase.value, self.xy.value)
 
-    def __add__(self, other) -> str:
+    def __add__(self, other: Any) -> str:
         return str(self) + other
 
-    def __radd__(self, other) -> str:
+    def __radd__(self, other: Any) -> str:
         return other + str(self)
 
     def save(self, data: ndarray) -> None:
@@ -218,8 +218,10 @@ class DataSet(object):
         Divides up the dataset into training, validation, and testing phases.
         """
         vali_size = 1 / self.splits()
-        xx, ex, yy, ey = train_test_split(xx, yy, test_size=test_size, train_size=None, shuffle=shuffle)
-        tx, vx, ty, vy = train_test_split(xx, yy, test_size=vali_size, train_size=None, shuffle=shuffle)
+        xx, ex, yy, ey = train_test_split(
+            xx, yy, test_size=test_size, train_size=None, shuffle=shuffle)
+        tx, vx, ty, vy = train_test_split(
+            xx, yy, test_size=vali_size, train_size=None, shuffle=shuffle)
         return tx, ty, vx, vy, ex, ey
 
     def create_split(self, x: ndarray, y: ndarray, index: int) -> None:
