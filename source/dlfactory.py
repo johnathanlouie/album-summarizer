@@ -14,14 +14,7 @@ class DeepLearningFactory(object):
     """
 
     ARCHITECTURES = dict()
-
-    DATASETS = {
-        'ccr': Ccr(),
-        'ccc': Ccc(),
-        'ccrc': CcrCategorical(),
-        'lamem': Lamem(),
-        'cccaf': CccafDataSet()
-    }
+    DATASETS = dict()
 
     @classmethod
     def create_set(cls, mf: str, ds: str, l: int, o: int, m: int) -> ArchitectureSet:
