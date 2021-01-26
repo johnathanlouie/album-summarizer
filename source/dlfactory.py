@@ -13,11 +13,7 @@ class DeepLearningFactory(object):
     Convenience functions to create deep learning models.
     """
 
-    ARCHITECTURES = {
-        'smi': Smi13(),
-        'smi1': Smi13_1(),
-        'smi2': Smi13_2(),
-    }
+    ARCHITECTURES = dict()
 
     DATASETS = {
         'ccr': Ccr(),
