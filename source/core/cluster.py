@@ -1,6 +1,25 @@
-from typing import List
+from typing import Dict, List, Union
 
 from jl import ImageDirectory, Url
+
+
+class ClusterResult(object):
+    """
+    A data object that is used by ClusterResults.
+    """
+
+    def __init__(self, image: Url, cluster: int) -> None:
+        self.url = image
+        self.cluster = cluster
+
+    def toJson(self) -> Dict[str, Union[Url, int]]:
+        """
+        Returns a JSON serializable dict.
+        """
+        return {
+            'url': self.url,
+            'cluster': self.cluster
+        }
 
 
 class ClusterResults(object):
