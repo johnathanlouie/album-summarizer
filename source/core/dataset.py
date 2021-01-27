@@ -35,7 +35,6 @@ class DataSetXY(object):
         self.split: int = split
         self.phase: Phase = phase
         self.xy: XY = xy
-        return
 
     def __str__(self) -> str:
         return '%s/%d/%s.%s' % (self.name, self.split, self.phase.value, self.xy.value)
@@ -51,7 +50,6 @@ class DataSetXY(object):
         Saves a NumPy array as a file.
         """
         npsave(self, data)
-        return
 
     def load(self) -> ndarray:
         """
