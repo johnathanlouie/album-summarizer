@@ -109,11 +109,10 @@ class DataSetSplit(object):
     """
 
     def __init__(self, dataset: str, split: int) -> None:
-        self.dataset = dataset
-        self.split = split
-        return
+        self.dataset: str = dataset
+        self.split: int = split
 
-    def _get_phase(self, phase: Phase) -> DataSetPhase:
+    def _phase(self, phase: Phase) -> DataSetPhase:
         """
         Gets a phase from this split.
         """
@@ -123,19 +122,19 @@ class DataSetSplit(object):
         """
         Gets the training phase from this split.
         """
-        return self._get_phase(Phase.TRAIN)
+        return self._phase(Phase.TRAIN)
 
     def test(self) -> DataSetPhase:
         """
         Gets the testing phase from this split.
         """
-        return self._get_phase(Phase.TEST)
+        return self._phase(Phase.TEST)
 
     def validation(self) -> DataSetPhase:
         """
         Gets the validation phase from this split.
         """
-        return self._get_phase(Phase.VALIDATION)
+        return self._phase(Phase.VALIDATION)
 
     def exists(self) -> bool:
         """
