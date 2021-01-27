@@ -89,6 +89,9 @@ class Cc(DataSet):
     An abstract base class for the CC dataset.
     """
 
+    def __init__(self):
+        raise NotImplementedError
+
     def _relative_url(self, url: Url) -> str:
         """
         Returns the relative url of the image from the filename.
