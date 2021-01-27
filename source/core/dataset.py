@@ -189,6 +189,9 @@ class DataSet(object):
 
     NAME = ''
 
+    def __init__(self):
+        raise NotImplementedError
+
     def prepare(self) -> None:
         """
         Reads and convert the dataset data files into NumPy arrays for Keras.
