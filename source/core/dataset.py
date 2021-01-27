@@ -155,10 +155,9 @@ class Predictions(object):
     """
 
     def __init__(self, x: ndarray, y: ndarray, url: Url) -> None:
-        self._x = x
-        self._y = y
-        self._url = url
-        return
+        self._x: ndarray = x
+        self._y: ndarray = y
+        self._url: Url = url
 
     def human_readable(self) -> List[Any]:
         """
@@ -170,7 +169,6 @@ class Predictions(object):
         Saves the predictions a human readable format
         """
         ListFile(self._url).write(self.human_readable())
-        return
 
 
 class PredictionsFactory(object):
