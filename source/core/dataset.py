@@ -70,10 +70,9 @@ class DataSetPhase(object):
     """
 
     def __init__(self, name: str, split: int, phase: Phase) -> None:
-        self.name = name
-        self.split = split
-        self.phase = phase
-        return
+        self.name: str = name
+        self.split: int = split
+        self.phase: Phase = phase
 
     def _get_xy(self, xy: XY) -> DataSetXY:
         """
