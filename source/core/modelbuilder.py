@@ -1,6 +1,6 @@
 from core.architecture import Architecture, CompiledArchitecture, CompileOption
 from core.dataset import DataSet
-from core.model import Model, ModelSplitAdapter
+from core.model import Model, ModelSplit
 
 
 class ModelBuilder(object):
@@ -43,7 +43,7 @@ class ModelBuilder(object):
         loss: str,
         optimizer: str,
         metrics: str,
-    ) -> ModelSplitAdapter:
+    ) -> ModelSplit:
         """
         Compiles the dataset, architecture, and options into a split.
         """

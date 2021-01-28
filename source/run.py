@@ -11,7 +11,7 @@ from cluster.hybridcluster import HybridCluster, HybridCluster2
 from cluster.sift import SiftCluster
 from core import modelbuilder
 from core.cluster import ClusterResults, ClusterStrategy
-from core.model import ModelSplitAdapter
+from core.model import ModelSplit
 from jl import ImageDirectory, ListFile, Url, copy_file
 
 
@@ -53,7 +53,7 @@ class ClusterRank(object):
         return
 
 
-def main2(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplitAdapter) -> None:
+def main2(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> None:
     """
     Does all the work.
     """

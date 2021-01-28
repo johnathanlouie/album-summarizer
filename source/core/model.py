@@ -288,7 +288,7 @@ class KerasAdapter(object):
         raise NotImplementedError
 
 
-class ModelSplitAdapter(object):
+class ModelSplit(object):
     """
     """
 
@@ -356,14 +356,14 @@ class Model(object):
         self._architecture: CompiledArchitecture = CompiledArchitecture(architecture, loss, optimizer, metrics)
         self._dataset: DataSet = dataset
 
-    def split(self, num: int) -> ModelSplitAdapter:
+    def split(self, num: int) -> ModelSplit:
         """
         Get a specific split.
         """
         if not self._dataset.exists():
             self._dataset.prepare()
         archisplit = KerasAdapter(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
-        return ModelSplitAdapter(archisplit)
+        return ModelSplit(archisplit)
 
     def train(self, epochs: int = 2**64, patience: int = 5) -> None:
         """
