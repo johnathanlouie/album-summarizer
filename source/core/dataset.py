@@ -190,7 +190,7 @@ class DataSet(object):
     Interface for datasets. Mainly used for hints.
     """
 
-    NAME = ''
+    NAME: str = ''
 
     def __init__(self):
         raise NotImplementedError
@@ -219,9 +219,19 @@ class DataSet(object):
         """
         vali_size = 1 / self.splits()
         xx, ex, yy, ey = train_test_split(
-            xx, yy, test_size=test_size, train_size=None, shuffle=shuffle)
+            xx,
+            yy,
+            test_size=test_size,
+            train_size=None,
+            shuffle=shuffle,
+        )
         tx, vx, ty, vy = train_test_split(
-            xx, yy, test_size=vali_size, train_size=None, shuffle=shuffle)
+            xx,
+            yy,
+            test_size=vali_size,
+            train_size=None,
+            shuffle=shuffle,
+        )
         return tx, ty, vx, vy, ex, ey
 
     def create_split(self, x: ndarray, y: ndarray, index: int) -> None:
@@ -240,7 +250,6 @@ class DataSet(object):
         dval.y().save(vy)
         dtest.x().save(ex)
         dtest.y().save(ey)
-        return
 
     def one_hot(self, y: ndarray, num_classes: int) -> ndarray:
         """
