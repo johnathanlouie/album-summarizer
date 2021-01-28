@@ -108,21 +108,20 @@ class Predictions(object):
     An interpreter for predictions.
     """
 
-    def __init__(self, x: ndarray, y: ndarray, url: Url) -> None:
+    def __init__(self, x: ndarray, y: ndarray) -> None:
         self._x: ndarray = x
         self._y: ndarray = y
-        self._url: Url = url
 
     def human_readable(self) -> List[Any]:
         """
         """
         raise NotImplementedError
 
-    def save_as_list(self) -> None:
+    def save_as_list(self, url: Url) -> None:
         """
-        Saves the predictions a human readable format
+        Saves to a text file in human readable format.
         """
-        ListFile(self._url).write(self.human_readable())
+        ListFile(url).write(self.human_readable())
 
 
 class PredictionsFactory(object):
@@ -132,7 +131,7 @@ class PredictionsFactory(object):
     def __init__(self):
         raise NotImplementedError
 
-    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         Returns a concrete instance of Predictions.
         """

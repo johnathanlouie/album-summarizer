@@ -147,10 +147,10 @@ class CccPredictionsFactory(PredictionsFactory):
     """
     """
 
-    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         """
-        return CccPredictions(x, y, url)
+        return CccPredictions(x, y)
 
 
 class Ccc(Cc):
@@ -189,11 +189,11 @@ class CcrPredictionsFactory(PredictionsFactory):
     """
     """
 
-    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         Returns an instance of CcrPredictions.
         """
-        return CcrPredictions(x, y, url)
+        return CcrPredictions(x, y)
 
 
 class Ccr(Cc):
@@ -244,10 +244,10 @@ class CcrcPredictionsFactory(PredictionsFactory):
     """
     """
 
-    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         """
-        return CcrcPredictions(x, y, url)
+        return CcrcPredictions(x, y)
 
 
 class CcrCategorical(Cc):

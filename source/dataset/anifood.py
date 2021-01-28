@@ -46,11 +46,11 @@ class CccafPredictionsFactory(PredictionsFactory):
     """
     """
 
-    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         Returns an instance of CccafPredictions.
         """
-        return CccafPredictions(x, y, url)
+        return CccafPredictions(x, y)
 
 
 class CccafDataSet(DataSet):

@@ -51,10 +51,10 @@ class LamemPredictionsFactory(PredictionsFactory):
     """
     """
 
-    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         """
-        return LamemPredictions(x, y, url)
+        return LamemPredictions(x, y)
 
 
 class Lamem(DataSet):
