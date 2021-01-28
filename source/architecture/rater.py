@@ -276,6 +276,6 @@ class Smi13_2(Architecture):
         return model
 
 
-dlfactory.DeepLearningFactory.architecture(Smi13())
-dlfactory.DeepLearningFactory.architecture(Smi13_1())
-dlfactory.DeepLearningFactory.architecture(Smi13_2())
+dlfactory.ModelBuilder.architecture(Smi13())
+dlfactory.ModelBuilder.architecture(Smi13_1())
+dlfactory.ModelBuilder.architecture(Smi13_2())

@@ -275,6 +275,6 @@ class CcrCategorical(Cc):
         return CcrcPredictionsFactory()
 
 
-dlfactory.DeepLearningFactory.dataset(Ccc())
-dlfactory.DeepLearningFactory.dataset(Ccr())
-dlfactory.DeepLearningFactory.dataset(CcrCategorical())
+dlfactory.ModelBuilder.dataset(Ccc())
+dlfactory.ModelBuilder.dataset(Ccr())
+dlfactory.ModelBuilder.dataset(CcrCategorical())

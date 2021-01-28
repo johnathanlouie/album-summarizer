@@ -122,4 +122,4 @@ class Lamem(DataSet):
         return LamemPredictionsFactory()
 
 
-dlfactory.DeepLearningFactory.dataset(Lamem())
+dlfactory.ModelBuilder.dataset(Lamem())

@@ -11,7 +11,7 @@ from cluster.hybridcluster import HybridCluster, HybridCluster2
 from cluster.sift import SiftCluster
 from core.model import ModelSplitAdapter
 from core.cluster import ClusterResults, ClusterStrategy
-from dlfactory import DeepLearningFactory
+from dlfactory import ModelBuilder
 from jl import ImageDirectory, ListFile, Url, copy_file
 
 
@@ -74,7 +74,7 @@ def main():
     args = proc_args()
     url = args.directory
     cluster = SiftCluster()
-    rater = DeepLearningFactory.create_split('smi1', 'ccrc', 0, 14, 0, 0)
+    rater = ModelBuilder.create_split('smi1', 'ccrc', 0, 14, 0, 0)
     main2(url, cluster, rater)
     return
 

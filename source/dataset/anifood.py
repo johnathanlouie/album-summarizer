@@ -124,4 +124,4 @@ class CccafDataSet(DataSet):
         return 5
 
 
-dlfactory.DeepLearningFactory.dataset(CccafDataSet())
+dlfactory.ModelBuilder.dataset(CccafDataSet())

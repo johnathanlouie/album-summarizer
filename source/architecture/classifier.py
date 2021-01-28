@@ -91,6 +91,6 @@ class Vgg16C(Architecture):
         return VGG16(weights=None, input_tensor=Input(resolution), classes=6)
 
 
-dlfactory.DeepLearningFactory.architecture(Vgg16A())
-dlfactory.DeepLearningFactory.architecture(Vgg16B())
-dlfactory.DeepLearningFactory.architecture(Vgg16C())
+dlfactory.ModelBuilder.architecture(Vgg16A())
+dlfactory.ModelBuilder.architecture(Vgg16B())
+dlfactory.ModelBuilder.architecture(Vgg16C())

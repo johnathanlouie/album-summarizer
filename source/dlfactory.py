@@ -3,7 +3,7 @@ from core.dataset import DataSet
 from core.architecture import LOSS, METRIC, OPTIMIZER, CompiledArchitecture, Architecture
 
 
-class DeepLearningFactory(object):
+class ModelBuilder(object):
     """
     Convenience functions to create deep learning models.
     """

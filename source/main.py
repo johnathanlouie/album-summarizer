@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 
 import aaa
-from dlfactory import DeepLearningFactory
+from dlfactory import ModelBuilder
 
 
 def proc_args() -> Namespace:
@@ -10,8 +10,8 @@ def proc_args() -> Namespace:
     """
     parser = ArgumentParser(description='Deep learning section of the album summarizer.')
     parser.add_argument('mode', help='', choices=['train', 'predict'])
-    parser.add_argument('architecture', help='', choices=DeepLearningFactory.ARCHITECTURES.keys())
-    parser.add_argument('dataset', help='', choices=DeepLearningFactory.DATASETS.keys())
+    parser.add_argument('architecture', help='', choices=ModelBuilder.ARCHITECTURES.keys())
+    parser.add_argument('dataset', help='', choices=ModelBuilder.DATASETS.keys())
     parser.add_argument('split', help='', type=int)
     parser.add_argument('loss', help='', type=int)
     parser.add_argument('optimizer', help='', type=int)
@@ -30,7 +30,7 @@ def main() -> None:
     mode = args.mode
     epochs = args.epochs
     patience = args.patience
-    x = DeepLearningFactory.create_split(
+    x = ModelBuilder.create_split(
         args.architecture,
         args.dataset,
         args.split,
