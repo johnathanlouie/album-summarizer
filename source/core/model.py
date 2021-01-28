@@ -10,7 +10,7 @@ from numpy import asarray, ndarray
 from core.dataholder import DataHolder
 from core.dataset import DataSet, DataSetSplit, Predictions, PredictionsFactory
 from core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
-from core.architecture import CompiledArchitecture, CompiledArchitectureName
+from core.architecture import Architecture, CompiledArchitecture, CompiledArchitectureName, CompileOption
 from jl import Image, Url, mkdirs
 
 
@@ -345,10 +345,16 @@ class Model(object):
     Each split is handled by an ArchitectureSplit object produced by this class.
     """
 
-    def __init__(self, architecture: CompiledArchitecture, dataset: DataSet) -> None:
-        self._architecture = architecture
-        self._dataset = dataset
-        return
+    def __init__(
+        self, 
+        architecture: Architecture, 
+        dataset: DataSet, 
+        loss: CompileOption, 
+        optimizer: CompileOption, 
+        metrics: CompileOption,
+    ) -> None:
+        self._architecture: CompiledArchitecture = CompiledArchitecture(architecture, loss, optimizer, metrics)
+        self._dataset: DataSet = dataset
 
     def split(self, num: int) -> ModelSplitAdapter:
         """
