@@ -5,7 +5,8 @@ from core.model import Model, ModelSplit
 
 class ModelBuilder(object):
     """
-    Convenience functions to create deep learning models.
+    Builder class to create deep learning models.
+    New architectures, data sets, and compile options are added here.
     """
 
     ARCHITECTURES = dict()
@@ -24,30 +25,15 @@ class ModelBuilder(object):
         metrics: str,
     ) -> Model:
         """
-        Compiles the dataset, architecture, and options into a architecture set.
+        Builds a deep learning model from a pool of datasets, architectures, and options.
         """
-        a = CompiledArchitecture(
+        return Model(
             cls.ARCHITECTURES[architecture],
+            cls.DATASETS[dataset],
             cls.LOSSES[loss],
             cls.OPTIMIZERS[optimizer],
             cls.METRICS[metrics],
         )
-        return Model(a, cls.DATASETS[dataset])
-
-    @classmethod
-    def create_split(
-        cls,
-        architecture: str,
-        dataset: str,
-        split: int,
-        loss: str,
-        optimizer: str,
-        metrics: str,
-    ) -> ModelSplit:
-        """
-        Compiles the dataset, architecture, and options into a split.
-        """
-        return cls.create_set(architecture, dataset, loss, optimizer, metrics).split(split)
 
     @classmethod
     def architecture(cls, architecture: Architecture) -> None:
