@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 
 import aaa
-from dlfactory import ModelBuilder
+from core import modelbuilder
 
 
 def proc_args() -> Namespace:
@@ -10,8 +10,8 @@ def proc_args() -> Namespace:
     """
     parser = ArgumentParser(description='Deep learning section of the album summarizer.')
     parser.add_argument('mode', help='', choices=['train', 'predict'])
-    parser.add_argument('architecture', help='', choices=ModelBuilder.ARCHITECTURES.keys())
-    parser.add_argument('dataset', help='', choices=ModelBuilder.DATASETS.keys())
+    parser.add_argument('architecture', help='', choices=modelbuilder.ModelBuilder.ARCHITECTURES.keys())
+    parser.add_argument('dataset', help='', choices=modelbuilder.ModelBuilder.DATASETS.keys())
     parser.add_argument('split', help='', type=int)
     parser.add_argument('loss', help='', type=int)
     parser.add_argument('optimizer', help='', type=int)

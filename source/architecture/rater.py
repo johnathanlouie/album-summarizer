@@ -1,4 +1,4 @@
-import dlfactory
+from core import modelbuilder
 from core.architecture import Architecture
 from jl import res2 as resolution
 from keras.engine.input_layer import Input
@@ -276,6 +276,6 @@ class Smi13_2(Architecture):
         return model
 
 
-dlfactory.ModelBuilder.architecture(Smi13())
-dlfactory.ModelBuilder.architecture(Smi13_1())
-dlfactory.ModelBuilder.architecture(Smi13_2())
+modelbuilder.ModelBuilder.architecture(Smi13())
+modelbuilder.ModelBuilder.architecture(Smi13_1())
+modelbuilder.ModelBuilder.architecture(Smi13_2())

@@ -2,7 +2,7 @@ from os import getcwd
 from os.path import join, normpath
 from typing import Any, List, Optional, Union
 
-import dlfactory
+from core import modelbuilder
 from core.dataset import DataSet, Predictions, PredictionsFactory
 from jl import Csv, Url
 from numpy import asarray, ndarray
@@ -275,6 +275,6 @@ class CcrCategorical(Cc):
         return CcrcPredictionsFactory()
 
 
-dlfactory.ModelBuilder.dataset(Ccc())
-dlfactory.ModelBuilder.dataset(Ccr())
-dlfactory.ModelBuilder.dataset(CcrCategorical())
+modelbuilder.ModelBuilder.dataset(Ccc())
+modelbuilder.ModelBuilder.dataset(Ccr())
+modelbuilder.ModelBuilder.dataset(CcrCategorical())

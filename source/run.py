@@ -9,9 +9,9 @@ import aaa
 from cluster.histogram import HistogramCluster
 from cluster.hybridcluster import HybridCluster, HybridCluster2
 from cluster.sift import SiftCluster
-from core.model import ModelSplitAdapter
+from core import modelbuilder
 from core.cluster import ClusterResults, ClusterStrategy
-from dlfactory import ModelBuilder
+from core.model import ModelSplitAdapter
 from jl import ImageDirectory, ListFile, Url, copy_file
 
 
@@ -74,7 +74,7 @@ def main():
     args = proc_args()
     url = args.directory
     cluster = SiftCluster()
-    rater = ModelBuilder.create_split('smi1', 'ccrc', 0, 14, 0, 0)
+    rater = modelbuilder.ModelBuilder.create_split('smi1', 'ccrc', 0, 14, 0, 0)
     main2(url, cluster, rater)
     return
 

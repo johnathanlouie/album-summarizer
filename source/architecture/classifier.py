@@ -1,4 +1,4 @@
-import dlfactory
+from core import modelbuilder
 from core.architecture import Architecture
 from jl import res2 as resolution
 from keras.applications.vgg16 import VGG16
@@ -91,6 +91,6 @@ class Vgg16C(Architecture):
         return VGG16(weights=None, input_tensor=Input(resolution), classes=6)
 
 
-dlfactory.ModelBuilder.architecture(Vgg16A())
-dlfactory.ModelBuilder.architecture(Vgg16B())
-dlfactory.ModelBuilder.architecture(Vgg16C())
+modelbuilder.ModelBuilder.architecture(Vgg16A())
+modelbuilder.ModelBuilder.architecture(Vgg16B())
+modelbuilder.ModelBuilder.architecture(Vgg16C())

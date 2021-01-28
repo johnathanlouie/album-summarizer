@@ -2,7 +2,7 @@ from os import getcwd
 from os.path import join, normpath
 from typing import Any, List, Optional, Union
 
-import dlfactory
+from core import modelbuilder
 from core.dataset import DataSet, Predictions, PredictionsFactory
 from jl import ImageDirectory, Url
 from numpy import asarray, ndarray
@@ -124,4 +124,4 @@ class CccafDataSet(DataSet):
         return 5
 
 
-dlfactory.ModelBuilder.dataset(CccafDataSet())
+modelbuilder.ModelBuilder.dataset(CccafDataSet())
