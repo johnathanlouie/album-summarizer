@@ -175,6 +175,9 @@ class PredictionsFactory(object):
     """
     """
 
+    def __init__(self):
+        raise NotImplementedError
+
     def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
         """
         Returns a concrete instance of Predictions.
