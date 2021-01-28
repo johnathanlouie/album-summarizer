@@ -25,7 +25,7 @@ def loadweights(a):
 
 class Architecture(object):
     """
-    Abstract factory class for keras.models.Model.
+    Factory for keras.models.Model.
     """
 
     NAME = ''
@@ -35,14 +35,14 @@ class Architecture(object):
 
     def create(self) -> Model:
         """
-        Abstract method for ModelFactory.
+        Creates an keras.models.Model.
         """
         raise NotImplementedError
 
 
 class CompileOption(object):
     """
-    Options for the Architecture class.
+    Options for compiling deep learning architecture.
     """
 
     def __init__(self, name: str, value: Union[Callable, str, Optimizer]) -> None:
