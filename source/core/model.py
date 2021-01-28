@@ -23,7 +23,7 @@ def loadweights(a):
     return
 
 
-class ModelFactory(object):
+class Architecture(object):
     """
     Abstract factory class for keras.models.Model.
     """
@@ -86,7 +86,7 @@ METRIC = [
 ]
 
 
-class ArchitectureName(object):
+class CompiledArchitectureName(object):
     """
     Passes information to the ArchitectureSplit class for making URLs.
     """
@@ -98,12 +98,12 @@ class ArchitectureName(object):
         self.metric = metric
 
 
-class Architecture(object):
+class CompiledArchitecture(object):
     """
     Creates a compiled keras.models.Model object with options and creates the argument for the custom_objects parameter for the keras.models.load_model function.
     """
 
-    def __init__(self, model: ModelFactory, loss: CompileOption, optimizer: CompileOption, metric: CompileOption) -> None:
+    def __init__(self, model: Architecture, loss: CompileOption, optimizer: CompileOption, metric: CompileOption) -> None:
         self._model = model
         self._loss = loss
         self._optimizer = optimizer
@@ -141,8 +141,8 @@ class Architecture(object):
             d[self._metric.value.__name__] = self._metric.value
         return d
 
-    def name(self) -> ArchitectureName:
+    def name(self) -> CompiledArchitectureName:
         """
         Returns an object containing the combination of model and compile options.
         """
-        return ArchitectureName(self._model.NAME, self._loss.name, self._optimizer.name, self._metric.name)
+        return CompiledArchitectureName(self._model.NAME, self._loss.name, self._optimizer.name, self._metric.name)

@@ -9,7 +9,7 @@ import aaa
 from cluster.histogram import HistogramCluster
 from cluster.hybridcluster import HybridCluster, HybridCluster2
 from cluster.sift import SiftCluster
-from core.archidata import ArchiSplitAdapter
+from core.archidata import ModelSplitAdapter
 from core.cluster import ClusterResults, ClusterStrategy
 from dlfactory import DeepLearningFactory
 from jl import ImageDirectory, ListFile, Url, copy_file
@@ -53,7 +53,7 @@ class ClusterRank(object):
         return
 
 
-def main2(directory: Url, algorithm: ClusterStrategy, algorithm2: ArchiSplitAdapter) -> None:
+def main2(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplitAdapter) -> None:
     """
     Does all the work.
     """

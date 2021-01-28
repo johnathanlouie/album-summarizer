@@ -1,5 +1,5 @@
 import dlfactory
-from core.model import ModelFactory
+from core.model import Architecture
 from jl import res2 as resolution
 from keras.applications.vgg16 import VGG16
 from keras.engine.input_layer import Input
@@ -7,7 +7,7 @@ from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
 from keras.models import Model
 
 
-class Vgg16A(ModelFactory):
+class Vgg16A(Architecture):
     """
     Fully manual configuration of VGG16.
     """
@@ -56,7 +56,7 @@ class Vgg16A(ModelFactory):
         return model
 
 
-class Vgg16B(ModelFactory):
+class Vgg16B(Architecture):
     """
     The convolution blocks of VGG16 are constructed by Keras.
     The classification block is manually configured.
@@ -77,7 +77,7 @@ class Vgg16B(ModelFactory):
         return model
 
 
-class Vgg16C(ModelFactory):
+class Vgg16C(Architecture):
     """
     VGG16 by Keras.
     """

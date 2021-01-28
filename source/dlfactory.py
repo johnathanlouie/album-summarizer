@@ -1,6 +1,6 @@
-from core.archidata import ArchiSplitAdapter, ArchitectureSet
+from core.archidata import ModelSplitAdapter, Model
 from core.dataset import DataSet
-from core.model import LOSS, METRIC, OPTIMIZER, Architecture, ModelFactory
+from core.model import LOSS, METRIC, OPTIMIZER, CompiledArchitecture, Architecture
 
 
 class DeepLearningFactory(object):
@@ -12,22 +12,22 @@ class DeepLearningFactory(object):
     DATASETS = dict()
 
     @classmethod
-    def create_set(cls, mf: str, ds: str, l: int, o: int, m: int) -> ArchitectureSet:
+    def create_set(cls, mf: str, ds: str, l: int, o: int, m: int) -> Model:
         """
         Compiles the dataset, architecture, and options into a architecture set.
         """
-        a = Architecture(cls.ARCHITECTURES[mf], LOSS[l], OPTIMIZER[o], METRIC[m])
-        return ArchitectureSet(a, cls.DATASETS[ds])
+        a = CompiledArchitecture(cls.ARCHITECTURES[mf], LOSS[l], OPTIMIZER[o], METRIC[m])
+        return Model(a, cls.DATASETS[ds])
 
     @classmethod
-    def create_split(cls, mf: str, ds: str, split: int, l: int, o: int, m: int) -> ArchiSplitAdapter:
+    def create_split(cls, mf: str, ds: str, split: int, l: int, o: int, m: int) -> ModelSplitAdapter:
         """
         Compiles the dataset, architecture, and options into a split.
         """
         return cls.create_set(mf, ds, l, o, m).split(split)
 
     @classmethod
-    def architecture(cls, architecture: ModelFactory) -> None:
+    def architecture(cls, architecture: Architecture) -> None:
         if architecture.NAME in cls.ARCHITECTURES:
             raise KeyError
         else:

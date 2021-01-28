@@ -10,16 +10,16 @@ from numpy import asarray, ndarray
 from core.dataholder import DataHolder
 from core.dataset import DataSet, DataSetSplit, Predictions, PredictionsFactory
 from core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
-from core.model import Architecture, ArchitectureName
+from core.model import CompiledArchitecture, CompiledArchitectureName
 from jl import Image, Url, mkdirs
 
 
-class ArchitectureSplitName(object):
+class ModelSplitName(object):
     """
     Naming object for the files used by the ArchitectureSplit class.
     """
 
-    def __init__(self, architecture: ArchitectureName, split: DataSetSplit) -> None:
+    def __init__(self, architecture: CompiledArchitectureName, split: DataSetSplit) -> None:
         self.model = architecture.model
         self.dataset = split.dataset
         self.loss = architecture.loss
@@ -89,14 +89,14 @@ class Evaluation(object):
         return Evaluation(label, value)
 
 
-class ArchitectureSplit(object):
+class ModelSplit(object):
     """
     Produced by the ArchitectureSet class.
     A combination of the ArchitectureSet class and the DataSetSplit class.
     Trains, validates, tests, and predicts.
     """
 
-    def __init__(self, architecture: Architecture, split: DataSetSplit, prediction: PredictionsFactory) -> None:
+    def __init__(self, architecture: CompiledArchitecture, split: DataSetSplit, prediction: PredictionsFactory) -> None:
         self._architecture = architecture
         self._split = split
         self._pf = prediction
@@ -109,11 +109,11 @@ class ArchitectureSplit(object):
         self._pcp = None
         self._best_model = None
 
-    def name(self) -> ArchitectureSplitName:
+    def name(self) -> ModelSplitName:
         """
         Returns the naming object for this combination of architecture, dataset, and compile options.
         """
-        return ArchitectureSplitName(self._architecture.name(), self._split)
+        return ModelSplitName(self._architecture.name(), self._split)
 
     def is_train_loaded(self) -> bool:
         """
@@ -288,11 +288,11 @@ class ArchitectureSplit(object):
         raise NotImplementedError
 
 
-class ArchiSplitAdapter(object):
+class ModelSplitAdapter(object):
     """
     """
 
-    def __init__(self, archisplit: ArchitectureSplit) -> None:
+    def __init__(self, archisplit: ModelSplit) -> None:
         self._archisplit = archisplit
         return
 
@@ -338,26 +338,26 @@ class ArchiSplitAdapter(object):
         return self._archisplit.predict(images)
 
 
-class ArchitectureSet(object):
+class Model(object):
     """
     A combination of a DataSet object and Architecture object.
     It oversees the cross-validation process, which is training and testing over multiple splits.
     Each split is handled by an ArchitectureSplit object produced by this class.
     """
 
-    def __init__(self, architecture: Architecture, dataset: DataSet) -> None:
+    def __init__(self, architecture: CompiledArchitecture, dataset: DataSet) -> None:
         self._architecture = architecture
         self._dataset = dataset
         return
 
-    def split(self, num: int) -> ArchiSplitAdapter:
+    def split(self, num: int) -> ModelSplitAdapter:
         """
         Get a specific split.
         """
         if not self._dataset.exists():
             self._dataset.prepare()
-        archisplit = ArchitectureSplit(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
-        return ArchiSplitAdapter(archisplit)
+        archisplit = ModelSplit(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
+        return ModelSplitAdapter(archisplit)
 
     def train(self, epochs: int = 2**64, patience: int = 5) -> None:
         """

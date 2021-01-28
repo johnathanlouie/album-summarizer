@@ -1,5 +1,5 @@
 import dlfactory
-from core.model import ModelFactory
+from core.model import Architecture
 from jl import res2 as resolution
 from keras.engine.input_layer import Input
 from keras.layers import (BatchNormalization, Conv2D, Dense, Flatten,
@@ -7,7 +7,7 @@ from keras.layers import (BatchNormalization, Conv2D, Dense, Flatten,
 from keras.models import Model
 
 
-class Smi13(ModelFactory):
+class Smi13(Architecture):
     """
     A deep learning model for predicting memorability.
     """
@@ -97,7 +97,7 @@ class Smi13(ModelFactory):
         return model
 
 
-class Smi13_1(ModelFactory):
+class Smi13_1(Architecture):
     """
     A deep learning model for predicting memorability.
     """
@@ -186,7 +186,7 @@ class Smi13_1(ModelFactory):
         return model
 
 
-class Smi13_2(ModelFactory):
+class Smi13_2(Architecture):
     """
     A deep learning model for predicting memorability.
     """
