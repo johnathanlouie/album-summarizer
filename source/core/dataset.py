@@ -103,6 +103,42 @@ class DataSetPhase(object):
         return True
 
 
+class Predictions(object):
+    """
+    An interpreter for predictions.
+    """
+
+    def __init__(self, x: ndarray, y: ndarray, url: Url) -> None:
+        self._x: ndarray = x
+        self._y: ndarray = y
+        self._url: Url = url
+
+    def human_readable(self) -> List[Any]:
+        """
+        """
+        raise NotImplementedError
+
+    def save_as_list(self) -> None:
+        """
+        Saves the predictions a human readable format
+        """
+        ListFile(self._url).write(self.human_readable())
+
+
+class PredictionsFactory(object):
+    """
+    """
+
+    def __init__(self):
+        raise NotImplementedError
+
+    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
+        """
+        Returns a concrete instance of Predictions.
+        """
+        raise NotImplementedError
+
+
 class DataSetSplit(object):
     """
     Represents a split of a dataset for cross-validation.
@@ -147,42 +183,6 @@ class DataSetSplit(object):
         if not self.validation().exists():
             return False
         return True
-
-
-class Predictions(object):
-    """
-    An interpreter for predictions.
-    """
-
-    def __init__(self, x: ndarray, y: ndarray, url: Url) -> None:
-        self._x: ndarray = x
-        self._y: ndarray = y
-        self._url: Url = url
-
-    def human_readable(self) -> List[Any]:
-        """
-        """
-        raise NotImplementedError
-
-    def save_as_list(self) -> None:
-        """
-        Saves the predictions a human readable format
-        """
-        ListFile(self._url).write(self.human_readable())
-
-
-class PredictionsFactory(object):
-    """
-    """
-
-    def __init__(self):
-        raise NotImplementedError
-
-    def predictions(self, x: ndarray, y: ndarray, url: Url) -> Predictions:
-        """
-        Returns a concrete instance of Predictions.
-        """
-        raise NotImplementedError
 
 
 class DataSet(object):
