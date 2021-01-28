@@ -19,7 +19,7 @@ class Architecture(object):
     Factory for keras.models.Model.
     """
 
-    NAME = ''
+    NAME: str = ''
 
     def __init__(self):
         raise NotImplementedError
