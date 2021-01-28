@@ -169,7 +169,7 @@ class Ccc(Cc):
         y = self.one_hot(y, 6)
         return y
 
-    def get_predictions_factory(self) -> PredictionsFactory:
+    def _predictions_factory(self) -> PredictionsFactory:
         """
         """
         return CccPredictionsFactory()
@@ -211,7 +211,7 @@ class Ccr(Cc):
         y = asarray(data_file.rating())
         return y
 
-    def get_predictions_factory(self) -> PredictionsFactory:
+    def _predictions_factory(self) -> PredictionsFactory:
         """
         Returns an instance of PredictionsFactory.
         """
@@ -268,7 +268,7 @@ class CcrCategorical(Cc):
         y = self.one_hot(y, 3)
         return y
 
-    def get_predictions_factory(self) -> PredictionsFactory:
+    def _predictions_factory(self) -> PredictionsFactory:
         """
         Returns an instance of PredictionsFactory.
         """

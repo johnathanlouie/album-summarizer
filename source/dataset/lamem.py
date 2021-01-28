@@ -116,7 +116,7 @@ class Lamem(DataSet):
         """
         return 5
 
-    def get_predictions_factory(self) -> PredictionsFactory:
+    def _predictions_factory(self) -> PredictionsFactory:
         """
         """
         return LamemPredictionsFactory()

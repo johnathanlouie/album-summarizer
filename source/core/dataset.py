@@ -257,7 +257,7 @@ class DataSet(object):
         """
         return to_categorical(y, num_classes=num_classes, dtype='int32')
 
-    def get_predictions_factory(self) -> PredictionsFactory:
+    def _predictions_factory(self) -> PredictionsFactory:
         """
         Abstract method.
         Returns an instance of PredictionsFactory.

@@ -123,5 +123,11 @@ class CccafDataSet(DataSet):
         """
         return 5
 
+    def _predictions_factory(self) -> PredictionsFactory:
+        """
+        See base class.
+        """
+        return CccafPredictionsFactory()
+
 
 modelbuilder.ModelBuilder.dataset(CccafDataSet())
