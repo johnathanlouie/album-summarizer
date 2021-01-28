@@ -58,8 +58,8 @@ class CompiledArchitecture(object):
     Creates a compiled keras.models.Model object with options and creates the argument for the custom_objects parameter for the keras.models.load_model function.
     """
 
-    def __init__(self, model: Architecture, loss: CompileOption, optimizer: CompileOption, metric: CompileOption) -> None:
-        self._model = model
+    def __init__(self, architecture: Architecture, loss: CompileOption, optimizer: CompileOption, metric: CompileOption) -> None:
+        self._architecture = architecture
         self._loss = loss
         self._optimizer = optimizer
         self._metric = metric
@@ -70,9 +70,9 @@ class CompiledArchitecture(object):
         """
         # if type(m) != list or type(m) != dict:
         #     m = [m]
-        model = self._model.create()
-        model.compile(loss=self._loss.value, optimizer=self._optimizer.value, metrics=[self._metric.value])
-        return model
+        kmodel = self._architecture.create()
+        kmodel.compile(loss=self._loss.value, optimizer=self._optimizer.value, metrics=[self._metric.value])
+        return kmodel
 
     @staticmethod
     def _is_custom(x: Any) -> bool:
@@ -100,4 +100,4 @@ class CompiledArchitecture(object):
         """
         Returns an object containing the combination of model and compile options.
         """
-        return CompiledArchitectureName(self._model.NAME, self._loss.name, self._optimizer.name, self._metric.name)
+        return CompiledArchitectureName(self._architecture.NAME, self._loss.name, self._optimizer.name, self._metric.name)
