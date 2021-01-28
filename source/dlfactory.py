@@ -1,4 +1,4 @@
-from core.archidata import ModelSplitAdapter, Model
+from core.model import ModelSplitAdapter, Model
 from core.dataset import DataSet
 from core.architecture import LOSS, METRIC, OPTIMIZER, CompiledArchitecture, Architecture
 

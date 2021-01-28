@@ -9,7 +9,7 @@ import aaa
 from cluster.histogram import HistogramCluster
 from cluster.hybridcluster import HybridCluster, HybridCluster2
 from cluster.sift import SiftCluster
-from core.archidata import ModelSplitAdapter
+from core.model import ModelSplitAdapter
 from core.cluster import ClusterResults, ClusterStrategy
 from dlfactory import DeepLearningFactory
 from jl import ImageDirectory, ListFile, Url, copy_file
