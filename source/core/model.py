@@ -89,7 +89,7 @@ class Evaluation(object):
         return Evaluation(label, value)
 
 
-class ModelSplit(object):
+class KerasAdapter(object):
     """
     Produced by the ArchitectureSet class.
     A combination of the ArchitectureSet class and the DataSetSplit class.
@@ -292,7 +292,7 @@ class ModelSplitAdapter(object):
     """
     """
 
-    def __init__(self, archisplit: ModelSplit) -> None:
+    def __init__(self, archisplit: KerasAdapter) -> None:
         self._archisplit = archisplit
         return
 
@@ -362,7 +362,7 @@ class Model(object):
         """
         if not self._dataset.exists():
             self._dataset.prepare()
-        archisplit = ModelSplit(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
+        archisplit = KerasAdapter(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
         return ModelSplitAdapter(archisplit)
 
     def train(self, epochs: int = 2**64, patience: int = 5) -> None:
