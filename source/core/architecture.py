@@ -30,6 +30,9 @@ class Architecture(object):
 
     NAME = ''
 
+    def __init__(self):
+        raise NotImplementedError
+
     def create(self) -> Model:
         """
         Abstract method for ModelFactory.
