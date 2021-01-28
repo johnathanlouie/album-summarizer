@@ -30,7 +30,7 @@ def main() -> None:
     mode = args.mode
     epochs = args.epochs
     patience = args.patience
-    x = ModelBuilder.create_split(
+    x = modelbuilder.ModelBuilder.create_split(
         args.architecture,
         args.dataset,
         args.split,
