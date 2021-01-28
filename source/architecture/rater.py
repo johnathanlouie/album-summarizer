@@ -1,5 +1,5 @@
 import dlfactory
-from core.model import Architecture
+from core.architecture import Architecture
 from jl import res2 as resolution
 from keras.engine.input_layer import Input
 from keras.layers import (BatchNormalization, Conv2D, Dense, Flatten,

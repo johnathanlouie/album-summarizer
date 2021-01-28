@@ -10,7 +10,7 @@ from numpy import asarray, ndarray
 from core.dataholder import DataHolder
 from core.dataset import DataSet, DataSetSplit, Predictions, PredictionsFactory
 from core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
-from core.model import CompiledArchitecture, CompiledArchitectureName
+from core.architecture import CompiledArchitecture, CompiledArchitectureName
 from jl import Image, Url, mkdirs
 
 

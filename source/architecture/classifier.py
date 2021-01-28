@@ -1,5 +1,5 @@
 import dlfactory
-from core.model import Architecture
+from core.architecture import Architecture
 from jl import res2 as resolution
 from keras.applications.vgg16 import VGG16
 from keras.engine.input_layer import Input

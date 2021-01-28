@@ -1,6 +1,6 @@
 from core.archidata import ModelSplitAdapter, Model
 from core.dataset import DataSet
-from core.model import LOSS, METRIC, OPTIMIZER, CompiledArchitecture, Architecture
+from core.architecture import LOSS, METRIC, OPTIMIZER, CompiledArchitecture, Architecture
 
 
 class DeepLearningFactory(object):
