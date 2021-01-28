@@ -37,8 +37,8 @@ class CompileOption(object):
     """
 
     def __init__(self, name: str, value: Union[Callable, str, Optimizer]) -> None:
-        self.name = name
-        self.value = value
+        self.name: str = name
+        self.value: Union[Callable, str, Optimizer] = value
 
 
 class CompiledArchitectureName(object):
@@ -47,10 +47,10 @@ class CompiledArchitectureName(object):
     """
 
     def __init__(self, model: str, loss: str, optimizer: str, metric: str):
-        self.model = model
-        self.loss = loss
-        self.optimizer = optimizer
-        self.metric = metric
+        self.model: str = model
+        self.loss: str = loss
+        self.optimizer: str = optimizer
+        self.metric: str = metric
 
 
 class CompiledArchitecture(object):
@@ -58,11 +58,17 @@ class CompiledArchitecture(object):
     Creates a compiled keras.models.Model object with options and creates the argument for the custom_objects parameter for the keras.models.load_model function.
     """
 
-    def __init__(self, architecture: Architecture, loss: CompileOption, optimizer: CompileOption, metric: CompileOption) -> None:
-        self._architecture = architecture
-        self._loss = loss
-        self._optimizer = optimizer
-        self._metric = metric
+    def __init__(
+        self,
+        architecture: Architecture,
+        loss: CompileOption,
+        optimizer: CompileOption,
+        metric: CompileOption,
+    ) -> None:
+        self._architecture: architecture = architecture
+        self._loss: CompileOption = loss
+        self._optimizer: CompileOption = optimizer
+        self._metric: CompileOption = metric
 
     def compile(self) -> Model:
         """
@@ -71,7 +77,11 @@ class CompiledArchitecture(object):
         # if type(m) != list or type(m) != dict:
         #     m = [m]
         kmodel = self._architecture.create()
-        kmodel.compile(loss=self._loss.value, optimizer=self._optimizer.value, metrics=[self._metric.value])
+        kmodel.compile(
+            loss=self._loss.value,
+            optimizer=self._optimizer.value,
+            metrics=[self._metric.value],
+        )
         return kmodel
 
     @staticmethod
