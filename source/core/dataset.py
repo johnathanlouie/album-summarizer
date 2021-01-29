@@ -143,9 +143,10 @@ class DataSetSplit(object):
     Represents a split of a dataset for cross-validation.
     """
 
-    def __init__(self, dataset: str, split: int) -> None:
+    def __init__(self, dataset: str, split: int, predFac: PredictionsFactory) -> None:
         self.dataset: str = dataset
         self.split: int = split
+        self._predFac: PredictionsFactory = predFac
 
     def _phase(self, phase: Phase) -> DataSetPhase:
         """
@@ -182,6 +183,9 @@ class DataSetSplit(object):
         if not self.validation().exists():
             return False
         return True
+
+    def translate_predictions(self, x: ndarray, y: ndarray) -> Predictions:
+        return self._predFac.predictions(x, y)
 
 
 class DataSet(object):
