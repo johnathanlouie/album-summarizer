@@ -46,8 +46,8 @@ class CompiledArchitectureName(object):
     Passes information to the ArchitectureSplit class for making URLs.
     """
 
-    def __init__(self, model: str, loss: str, optimizer: str, metric: str):
-        self.model: str = model
+    def __init__(self, architecture: str, loss: str, optimizer: str, metric: str):
+        self.architecture: str = architecture
         self.loss: str = loss
         self.optimizer: str = optimizer
         self.metric: str = metric
