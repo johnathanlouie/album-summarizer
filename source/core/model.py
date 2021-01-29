@@ -362,8 +362,7 @@ class Model(object):
         """
         if not self._dataset.exists():
             self._dataset.prepare()
-        archisplit = KerasAdapter(self._architecture, self._dataset.get_split(num), self._dataset.get_predictions_factory())
-        return ModelSplit(archisplit)
+        return ModelSplit(self._architecture, self._dataset.get_split(num))
 
     def train(self, epochs: int = 2**64, patience: int = 5) -> None:
         """
