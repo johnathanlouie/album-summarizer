@@ -292,9 +292,9 @@ class ModelSplit(object):
     """
     """
 
-    def __init__(self, archisplit: KerasAdapter) -> None:
-        self._archisplit = archisplit
-        return
+    def __init__(self, architecture: CompiledArchitecture, data: DataSetSplit) -> None:
+        self._architecture = architecture
+        self._data = data
 
     def train(self, epochs: int = 2**64, patience: int = 5) -> None:
         """
