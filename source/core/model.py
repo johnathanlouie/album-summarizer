@@ -8,7 +8,7 @@ from keras.models import load_model
 from numpy import asarray, ndarray
 
 from core.dataholder import DataHolder
-from core.dataset import DataSet, DataSetSplit, Predictions, PredictionsFactory
+from core.dataset import DataSet, DataSetSplit, DataSetSplitName, Predictions, PredictionsFactory
 from core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
 from core.architecture import Architecture, CompiledArchitecture, CompiledArchitectureName, CompileOption
 from jl import Image, Url, mkdirs
@@ -16,54 +16,58 @@ from jl import Image, Url, mkdirs
 
 class ModelSplitName(object):
     """
-    Naming object for the files used by the ArchitectureSplit class.
     """
 
-    def __init__(self, architecture: CompiledArchitectureName, split: DataSetSplit) -> None:
-        self.model = architecture.model
-        self.dataset = split.dataset
-        self.loss = architecture.loss
-        self.optimizer = architecture.optimizer
-        self.split = split.split
-        return
+    def __init__(self, architecture: CompiledArchitectureName, data: DataSetSplitName, epochs: int, patience: int) -> None:
+        self.architecture: str = architecture.architecture
+        self.dataset: str = data.dataset
+        self.split: int = data.split
+        self.loss: str = architecture.loss
+        self.optimizer: str = architecture.optimizer
+        self.epochs: int = epochs
+        self.patience: int = patience
 
-    def _path(self) -> Url:
+    def _dirname(self) -> Url:
         """
         Returns the path up to each file.
-        Example:
-        out/model.dataset.loss.optimizer/split/saved.file
         """
-        return "out/%s.%s.%s.%s/%d" % (self.model, self.dataset, self.loss, self.optimizer, self.split)
+        return "out/%s-%s-%s-%s/%d-%d/%d" % (self.architecture, self.dataset, self.loss, self.optimizer, self.epochs, self.patience, self.split)
 
-    def train(self) -> Url:
+    def model(self) -> Url:
         """
         Returns the URL of the training model file.
         """
-        return "%s/model.h5" % self._path()
+        return "%s/model.h5" % self._dirname()
 
-    def test(self) -> Url:
+    def best_model(self) -> Url:
         """
-        Returns the URL of the testing model file.
+        Returns the URL of the model file that measured the best against the testing set.
         """
-        return "%s/best.h5" % self._path()
+        return "%s/best.h5" % self._dirname()
 
-    def data_holder(self) -> Url:
+    def training_data(self) -> Url:
         """
-        Returns the URL of the dill file.
+        Returns the URL of the training state data file.
         """
-        return "%s/train.dill" % self._path()
+        return "%s/train.dill" % self._dirname()
 
-    def csv(self) -> Url:
+    def best_data(self) -> Url:
+        """
+        Returns the URL of the training state data file of the best model.
+        """
+        return "%s/best.dill" % self._dirname()
+
+    def log(self) -> Url:
         """
         Returns the URL of the training log.
         """
-        return "%s/log.csv" % self._path()
+        return "%s/log.csv" % self._dirname()
 
     def predictions(self) -> Url:
         """
         Returns the URL of the predictions file.
         """
-        return "%s/pred.txt" % self._path()
+        return "%s/predictions.txt" % self._dirname()
 
 
 class Evaluation(object):
