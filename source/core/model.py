@@ -293,11 +293,13 @@ class ModelSplit(object):
     """
     """
 
-    def __init__(self, architecture: CompiledArchitecture, data: DataSetSplit) -> None:
+    def __init__(self, architecture: CompiledArchitecture, data: DataSetSplit, epochs: int, patience: int) -> None:
         self._architecture = architecture
         self._data = data
+        self._epochs = epochs
+        self._patience = patience
 
-    def train(self, epochs: int = 2**64, patience: int = 5) -> None:
+    def train(self) -> None:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then train.
         """
@@ -308,7 +310,7 @@ class ModelSplit(object):
         self._archisplit.train()
         return
 
-    def validate(self, epochs: int = 2**64, patience: int = 5) -> List[Evaluation]:
+    def validate(self) -> List[Evaluation]:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then test against the validation set.
         """
@@ -318,7 +320,7 @@ class ModelSplit(object):
             self._archisplit.load_test_model()
         return self._archisplit.validate()
 
-    def test(self, epochs: int = 2**64, patience: int = 5) -> List[Evaluation]:
+    def test(self) -> List[Evaluation]:
         """
         Convenience method to create if there are no saved files, load if not yet loaded, and then test against the test set.
         """
@@ -328,9 +330,8 @@ class ModelSplit(object):
             self._archisplit.load_test_model()
         return self._archisplit.test()
 
-    def predict(self, images: List[Image], epochs: int = 2**64, patience: int = 5) -> Predictions:
+    def predict(self, images: List[Url]) -> Predictions:
         """
-        Convenience method to create if there are no saved files, load if not yet loaded, and then predict using the test set.
         """
         if not self._archisplit.is_test_loaded():
             if not self._archisplit.is_saved():
