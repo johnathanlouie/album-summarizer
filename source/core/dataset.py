@@ -138,21 +138,30 @@ class PredictionsFactory(object):
         raise NotImplementedError
 
 
+class DataSetSplitName(object):
+    """
+    """
+
+    def __init__(self, dataset: str, split: int) -> None:
+        self.dataset: str = dataset
+        self.split: int = split
+
+
 class DataSetSplit(object):
     """
     Represents a split of a dataset for cross-validation.
     """
 
     def __init__(self, dataset: str, split: int, predFac: PredictionsFactory) -> None:
-        self.dataset: str = dataset
-        self.split: int = split
+        self._dataset: str = dataset
+        self._split: int = split
         self._predFac: PredictionsFactory = predFac
 
     def _phase(self, phase: Phase) -> DataSetPhase:
         """
         Gets a phase from this split.
         """
-        return DataSetPhase(self.dataset, self.split, phase)
+        return DataSetPhase(self._dataset, self._split, phase)
 
     def train(self) -> DataSetPhase:
         """
@@ -186,6 +195,9 @@ class DataSetSplit(object):
 
     def translate_predictions(self, x: ndarray, y: ndarray) -> Predictions:
         return self._predFac.predictions(x, y)
+
+    def name(self) -> DataSetSplitName:
+        return DataSetSplitName(self._dataset, self._split)
 
 
 class DataSet(object):
