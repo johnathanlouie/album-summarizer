@@ -208,7 +208,7 @@ class DataSet(object):
         """
         Gets the training, testing, and validation split for Keras.
         """
-        return DataSetSplit(self.NAME, num)
+        return DataSetSplit(self.NAME, num, self._predictions_factory())
 
     def train_val_test(
         self,
