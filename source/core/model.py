@@ -95,9 +95,7 @@ class Evaluation(object):
 
 class KerasAdapter(object):
     """
-    Produced by the ArchitectureSet class.
-    A combination of the ArchitectureSet class and the DataSetSplit class.
-    Trains, validates, tests, and predicts.
+    Wrapper class that encapsulates how the model and training state is saved and loaded.
     """
 
     def __init__(self, architecture: CompiledArchitecture, split: DataSetSplit, prediction: PredictionsFactory) -> None:
