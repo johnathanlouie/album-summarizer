@@ -270,7 +270,8 @@ class KerasAdapter(object):
         self._lr = dh.get_lr()
         self._mcp = dh.get_mcp()
         self._mcpb = dh.get_mcpb()
-        self._pcp = PickleCheckpoint(self._mcp, self._mcpb, self._lr, url.data_holder(), dh.total_epoch)
+        self._pcp = PickleCheckpoint(
+            self._mcp, self._mcpb, self._lr, url.data_holder(), dh.total_epoch)
         return
 
     def load_test_model(self) -> None:
@@ -346,15 +347,24 @@ class Model(object):
     """
 
     def __init__(
-        self, 
-        architecture: Architecture, 
-        dataset: DataSet, 
-        loss: CompileOption, 
-        optimizer: CompileOption, 
+        self,
+        architecture: Architecture,
+        dataset: DataSet,
+        loss: CompileOption,
+        optimizer: CompileOption,
         metrics: CompileOption,
+        epochs: int = 2**64,
+        patience: int = 5,
     ) -> None:
-        self._architecture: CompiledArchitecture = CompiledArchitecture(architecture, loss, optimizer, metrics)
+        self._architecture: CompiledArchitecture = CompiledArchitecture(
+            architecture,
+            loss,
+            optimizer,
+            metrics,
+        )
         self._dataset: DataSet = dataset
+        self._epochs: int = epochs
+        self._patience: int = patience
 
     def split(self, num: int) -> ModelSplit:
         """
@@ -362,18 +372,24 @@ class Model(object):
         """
         if not self._dataset.exists():
             self._dataset.prepare()
-        return ModelSplit(self._architecture, self._dataset.get_split(num))
+        return ModelSplit(
+            self._architecture,
+            self._dataset.get_split(num),
+            self._epochs,
+            self._patience,
+        )
 
-    def train(self, epochs: int = 2**64, patience: int = 5) -> None:
+    def train(self) -> None:
         """
+        Starts or continues training the model.
         """
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
-            self.split(i).train(epochs, patience)
-        return
+            self.split(i).train()
 
     def test(self) -> List[Evaluation]:
         """
+        Tests the model against the data set's provided test set.
         """
         results = list()
         for i in range(self._dataset.splits()):
@@ -389,6 +405,7 @@ class Model(object):
 
     def validate(self) -> List[Evaluation]:
         """
+        Tests the model against the data set's provided validation set.
         """
         results = list()
         for i in range(self._dataset.splits()):
