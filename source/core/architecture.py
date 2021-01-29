@@ -108,6 +108,6 @@ class CompiledArchitecture(object):
 
     def name(self) -> CompiledArchitectureName:
         """
-        Returns an object containing the combination of model and compile options.
+        Creates a data object with the names of the architecture and compile options.
         """
         return CompiledArchitectureName(self._architecture.NAME, self._loss.name, self._optimizer.name, self._metric.name)
