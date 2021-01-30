@@ -85,10 +85,8 @@ class DataHolder(object):
     Holds the picklable state of training and callbacks.
     """
 
-    def __init__(self, url: Url, current_epoch: int, total_epoch: int, lr: ReduceLROnPlateau, mcp: ModelCheckpoint, mcpb: ModelCheckpoint) -> None:
-        self._url = url
+    def __init__(self, current_epoch: int, lr: ReduceLROnPlateau, mcp: ModelCheckpoint, mcpb: ModelCheckpoint) -> None:
         self.current_epoch = current_epoch
-        self.total_epoch = total_epoch
         self._lr = LrData(lr)
         self._mcp = McpData(mcp)
         self._mcpb = McpData(mcpb)
@@ -118,8 +116,8 @@ class DataHolder(object):
         """
         return load(open(url, 'rb'))
 
-    def save(self) -> None:
+    def save(self, url: Url) -> None:
         """
         Saves this instance to a binary file.
         """
-        dump(self, open(self._url, "wb"))
+        dump(self, open(url, "wb"))
