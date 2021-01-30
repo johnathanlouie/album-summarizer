@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Union
 
 from dill import dump, load
+from jl import Url
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from numpy import greater, less
 
@@ -14,7 +15,6 @@ class LrData(object):
 
     def __init__(self, lr: ReduceLROnPlateau) -> None:
         self._copy(lr, self)
-        return
 
     @staticmethod
     def _copy(src: Union[LrData, ReduceLROnPlateau], dst: Union[LrData, ReduceLROnPlateau]) -> None:
@@ -32,7 +32,6 @@ class LrData(object):
         dst.patience = src.patience
         dst.verbose = src.verbose
         dst.wait = src.wait
-        return
 
     def get(self) -> ReduceLROnPlateau:
         """
@@ -51,7 +50,6 @@ class McpData(object):
     def __init__(self, mcp: ModelCheckpoint) -> None:
         self._copy(mcp, self)
         self.monitor_op = mcp.monitor_op.__name__
-        return
 
     @staticmethod
     def _copy(src: Union[LrData, ModelCheckpoint], dst: Union[LrData, ModelCheckpoint]) -> None:
@@ -66,7 +64,6 @@ class McpData(object):
         dst.save_best_only = src.save_best_only
         dst.save_weights_only = src.save_weights_only
         dst.verbose = src.verbose
-        return
 
     def get(self) -> ModelCheckpoint:
         """
@@ -88,14 +85,13 @@ class DataHolder(object):
     Holds the picklable state of training and callbacks.
     """
 
-    def __init__(self, url: str, current_epoch: int, total_epoch: int, lr: ReduceLROnPlateau, mcp: ModelCheckpoint, mcpb: ModelCheckpoint) -> None:
+    def __init__(self, url: Url, current_epoch: int, total_epoch: int, lr: ReduceLROnPlateau, mcp: ModelCheckpoint, mcpb: ModelCheckpoint) -> None:
         self._url = url
         self.current_epoch = current_epoch
         self.total_epoch = total_epoch
         self._lr = LrData(lr)
         self._mcp = McpData(mcp)
         self._mcpb = McpData(mcpb)
-        return
 
     def get_mcp(self) -> ModelCheckpoint:
         """
@@ -116,7 +112,7 @@ class DataHolder(object):
         return self._lr.get()
 
     @staticmethod
-    def load(url) -> DataHolder:
+    def load(url: Url) -> DataHolder:
         """
         Loads a saved instance from a binary file.
         """
@@ -127,4 +123,3 @@ class DataHolder(object):
         Saves this instance to a binary file.
         """
         dump(self, open(self._url, "wb"))
-        return
