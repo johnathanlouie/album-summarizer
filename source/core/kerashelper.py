@@ -141,6 +141,18 @@ class CheckpointObserver(object):
         raise NotImplementedError
 
 
+class ReduceLROnPlateauObserver(CheckpointObserver):
+    """
+    """
+
+    def __init__(self, save_location: Url, lr: ReduceLROnPlateau):
+        self._url: Url = save_location
+        self._lr: ReduceLROnPlateau = lr
+
+    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+        ReduceLROnPlateauPickle(self._lr).save(self._url)
+
+
 class SaveKmodelObserver(CheckpointObserver):
     """
     """
