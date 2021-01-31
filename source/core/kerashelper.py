@@ -66,7 +66,7 @@ class ReduceLROnPlateauPickle(PickleAbstractClass):
 
     @staticmethod
     def _copyTo(
-        src: Union[ReduceLROnPlateauPickle, ReduceLROnPlateau], 
+        src: Union[ReduceLROnPlateauPickle, ReduceLROnPlateau],
         dst: Union[ReduceLROnPlateauPickle, ReduceLROnPlateau],
         ) -> None:
         """
@@ -93,31 +93,7 @@ class ReduceLROnPlateauPickle(PickleAbstractClass):
         return other
 
 
-class CheckpointObserver(object):
-    """
-    Observer interface for ModelCheckpoint2.
-    """
-
-    def __init__(self):
-        raise NotImplementedError
-
-    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
-        raise NotImplementedError
-
-
-class SaveKmodelObserver(CheckpointObserver):
-    """
-    """
-
-    def __init__(self, save_location: Url):
-        self._url: Url = save_location
-
-    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
-        print('\nEpoch %05d: saving model to %s' % (epoch + 1, self._url))
-        kmodel.save_weights(self._url, overwrite=True)
-
-
-class ModelCheckpoint2Pickle(object):
+class ModelCheckpoint2Pickle(PickleAbstractClass):
     """
     """
 
@@ -152,12 +128,28 @@ class ModelCheckpoint2Pickle(object):
             raise Exception('monitor_op field missing')
         return mcp
 
-    def save(self, save_location: Url) -> None:
-        dill.dump(self, open(save_location, "wb"))
 
-    @staticmethod
-    def load(save_location: Url) -> ModelCheckpoint2Pickle:
-        return dill.load(open(save_location, 'rb'))
+class CheckpointObserver(object):
+    """
+    Observer interface for ModelCheckpoint2.
+    """
+
+    def __init__(self):
+        raise NotImplementedError
+
+    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+        raise NotImplementedError
+
+
+class SaveKmodelObserver(CheckpointObserver):
+    """
+    """
+
+    def __init__(self, save_location: Url):
+        self._url: Url = save_location
+
+    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+        kmodel.save_weights(self._url, overwrite=True)
 
 
 class ModelCheckpoint2(Callback):
