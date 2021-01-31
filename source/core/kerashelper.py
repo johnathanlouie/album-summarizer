@@ -40,6 +40,24 @@ class Sequence1(Sequence):
         return xx, yy
 
 
+class PickleAbstractClass(object):
+    """
+    """
+
+    def __init__(self):
+        raise NotImplementedError
+
+    def get(self) -> PickleAbstractClass:
+        raise NotImplementedError
+
+    def save(self, save_location: Url) -> None:
+        dill.dump(self, open(save_location, "wb"))
+
+    @staticmethod
+    def load(save_location: Url) -> PickleAbstractClass:
+        return dill.load(open(save_location, 'rb'))
+
+
 class CheckpointObserver(object):
     """
     Observer interface for ModelCheckpoint2.
