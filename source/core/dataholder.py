@@ -8,7 +8,7 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from numpy import greater, less
 
 
-class LrData(object):
+class ReduceLROnPlateauPickle(object):
     """
     A picklable class that contains the data fields from ReduceLROnPlateau.
     """
@@ -17,7 +17,7 @@ class LrData(object):
         self._copy(lr, self)
 
     @staticmethod
-    def _copy(src: Union[LrData, ReduceLROnPlateau], dst: Union[LrData, ReduceLROnPlateau]) -> None:
+    def _copy(src: Union[ReduceLROnPlateauPickle, ReduceLROnPlateau], dst: Union[ReduceLROnPlateauPickle, ReduceLROnPlateau]) -> None:
         """
         Copies the data from one type to another.
         """
@@ -52,7 +52,7 @@ class McpData(object):
         self.monitor_op = mcp.monitor_op.__name__
 
     @staticmethod
-    def _copy(src: Union[LrData, ModelCheckpoint], dst: Union[LrData, ModelCheckpoint]) -> None:
+    def _copy(src: Union[ReduceLROnPlateauPickle, ModelCheckpoint], dst: Union[ReduceLROnPlateauPickle, ModelCheckpoint]) -> None:
         """
         Copies the data from one type to another.
         """
@@ -87,7 +87,7 @@ class DataHolder(object):
 
     def __init__(self, current_epoch: int, lr: ReduceLROnPlateau, mcp: ModelCheckpoint, mcpb: ModelCheckpoint) -> None:
         self.current_epoch = current_epoch
-        self._lr = LrData(lr)
+        self._lr = ReduceLROnPlateauPickle(lr)
         self._mcp = McpData(mcp)
         self._mcpb = McpData(mcpb)
 
