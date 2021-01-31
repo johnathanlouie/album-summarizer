@@ -46,6 +46,18 @@ class CheckpointObserver(object):
         raise NotImplementedError
 
 
+class SaveKmodelObserver(CheckpointObserver):
+    """
+    """
+
+    def __init__(self, save_location: Url):
+        self._url: Url = save_location
+
+    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+        print('\nEpoch %05d: saving model to %s' % (epoch + 1, self._url))
+        kmodel.save_weights(self._url, overwrite=True)
+
+
 class PickleCheckpoint(Callback):
     """
     It saves the training state whenever ModelCheckpoint saves the training model.
