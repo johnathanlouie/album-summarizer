@@ -1,5 +1,6 @@
 from warnings import warn
 
+import keras
 from jl import Url, resize_img
 from keras.backend import get_value
 from keras.callbacks import Callback, ModelCheckpoint, ReduceLROnPlateau
@@ -32,6 +33,17 @@ class Sequence1(Sequence):
         xx = asarray([resize_img(filename) for filename in batch_x])
         yy = asarray(batch_y)
         return xx, yy
+
+class CheckpointObserver(object):
+    """
+    Observer interface for ModelCheckpoint2's events.
+    """
+
+    def __init__(self):
+        raise NotImplementedError
+
+    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+        raise NotImplementedError
 
 
 class PickleCheckpoint(Callback):
