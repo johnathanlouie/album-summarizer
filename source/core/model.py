@@ -66,6 +66,12 @@ class ModelSplitName(object):
         """
         return "%s/bestlr.dill" % self._dirname()
 
+    def epoch(self) -> Url:
+        return "%s/epoch.dill" % self._dirname()
+
+    def best_epoch(self) -> Url:
+        return "%s/bestepoch.dill" % self._dirname()
+
     def log(self) -> Url:
         """
         Returns the URL of the training log.
