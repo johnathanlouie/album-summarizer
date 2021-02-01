@@ -40,21 +40,31 @@ class ModelSplitName(object):
 
     def best_model(self) -> Url:
         """
-        Returns the URL of the model file that measured the best against the testing set.
+        Returns the URL of the model file that measured the best against the validation set.
         """
         return "%s/best.h5" % self._dirname()
 
-    def training_data(self) -> Url:
+    def mcp(self) -> Url:
         """
-        Returns the URL of the training state data file.
+        Returns the URL of the pickled ModelCheckpoint2.
         """
-        return "%s/train.dill" % self._dirname()
+        return "%s/mcp.dill" % self._dirname()
 
-    def best_data(self) -> Url:
+    def best_mcp(self) -> Url:
         """
-        Returns the URL of the training state data file of the best model.
+        Returns the URL of the pickled ModelCheckpoint2 when the best model was saved.
         """
-        return "%s/best.dill" % self._dirname()
+        return "%s/bestmcp.dill" % self._dirname()
+
+    def lr(self) -> Url:
+        """
+        """
+        return "%s/lr.dill" % self._dirname()
+
+    def best_lr(self) -> Url:
+        """
+        """
+        return "%s/bestlr.dill" % self._dirname()
 
     def log(self) -> Url:
         """
