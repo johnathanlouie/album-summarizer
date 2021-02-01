@@ -129,6 +129,17 @@ class ModelCheckpoint2Pickle(PickleAbstractClass):
         return mcp
 
 
+class EpochPickle(PickleAbstractClass):
+    """
+    """
+
+    def __init__(self, current_epoch: int) -> None:
+        self.current_epoch: int = current_epoch
+
+    def get(self) -> int:
+        return self.current_epoch
+
+
 class CheckpointObserver(object):
     """
     Observer interface for ModelCheckpoint2.
@@ -162,6 +173,17 @@ class SaveKmodelObserver(CheckpointObserver):
 
     def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
         kmodel.save_weights(self._url, overwrite=True)
+
+
+class EpochObserver(CheckpointObserver):
+    """
+    """
+
+    def __init__(self, save_location: Url) -> None:
+        self._url: Url = save_location
+
+    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+        EpochPickle(epoch + 1).save(self._url)
 
 
 class ModelCheckpoint2(Callback):
