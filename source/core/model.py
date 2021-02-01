@@ -3,15 +3,14 @@ from __future__ import annotations
 from os.path import isfile
 from typing import List
 
-from keras.callbacks import CSVLogger, ModelCheckpoint, ReduceLROnPlateau
+from jl import Image, Url, mkdirs
+from keras.callbacks import CSVLogger, ReduceLROnPlateau
 from keras.models import load_model
 from numpy import asarray, ndarray
 
-from core.dataholder import DataHolder
-from core.dataset import DataSet, DataSetSplit, DataSetSplitName, Predictions, PredictionsFactory
-from core.kerashelper import PickleCheckpoint, Sequence1, TerminateOnDemand
 from core.architecture import Architecture, CompiledArchitecture, CompiledArchitectureName, CompileOption
-from jl import Image, Url, mkdirs
+from core.dataset import DataSet, DataSetSplit, DataSetSplitName, Predictions, PredictionsFactory
+from core.kerashelper import Sequence1, TerminateOnDemand
 
 
 class ModelSplitName(object):
