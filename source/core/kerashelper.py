@@ -204,8 +204,8 @@ class ModelCheckpoint2(Callback):
         self.monitor: str = 'val_loss'
         self.period: int = period
         self.epochs_since_last_save: int = 0
-        self._periodic: List[CheckpointObserver]
-        self._best: List[CheckpointObserver]
+        self._periodic: List[CheckpointObserver] = list()
+        self._best: List[CheckpointObserver] = list()
 
         if mode not in ['auto', 'min', 'max']:
             warnings.warn('ModelCheckpoint2 mode %s is unknown, fallback to auto mode.' % (mode), RuntimeWarning)
@@ -256,11 +256,11 @@ class ModelCheckpoint2(Callback):
     def load(save_location: Url) -> ModelCheckpoint2:
         return ModelCheckpoint2Pickle.load(save_location).get()
 
-    def set_periodic_observers(self, obs: List[CheckpointObserver]) -> None:
-        self._periodic = obs
+    def add_periodic_observer(self, obs: CheckpointObserver) -> None:
+        self._periodic.append(obs)
 
-    def set_improvement_observers(self, obs: List[CheckpointObserver]) -> None:
-        self._best = obs
+    def add_improvement_observer(self, obs: CheckpointObserver) -> None:
+        self._best.append(obs)
 
 
 class TerminateOnDemand(Callback):
