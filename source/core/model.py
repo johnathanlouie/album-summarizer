@@ -13,64 +13,54 @@ from core.dataset import DataSet, DataSetSplit, DataSetSplitName, Predictions, P
 from core.kerashelper import Sequence1, TerminateOnDemand
 
 
-class ModelSplitName(object):
+class ModelSplitName2(object):
     """
     """
 
-    def __init__(self, architecture: CompiledArchitectureName, data: DataSetSplitName, epochs: int, patience: int) -> None:
-        self.architecture: str = architecture.architecture
-        self.dataset: str = data.dataset
-        self.split: int = data.split
-        self.loss: str = architecture.loss
-        self.optimizer: str = architecture.optimizer
-        self.epochs: int = epochs
-        self.patience: int = patience
+    def __init__(self, dirname: Url, snapshot: Url):
+        self._dirname: Url = '%s/%s' % (dirname, snapshot)
 
-    def _dirname(self) -> Url:
-        """
-        Returns the path up to each file.
-        """
-        return "out/%s-%s-%s-%s/%d-%d/%d" % (self.architecture, self.dataset, self.loss, self.optimizer, self.epochs, self.patience, self.split)
-
-    def model(self) -> Url:
+    def weights(self) -> Url:
         """
         Returns the URL of the training model file.
         """
-        return "%s/model.h5" % self._dirname()
-
-    def best_model(self) -> Url:
-        """
-        Returns the URL of the model file that measured the best against the validation set.
-        """
-        return "%s/best.h5" % self._dirname()
+        return "%s/weights.h5" % self._dirname
 
     def mcp(self) -> Url:
         """
         Returns the URL of the pickled ModelCheckpoint2.
         """
-        return "%s/mcp.dill" % self._dirname()
-
-    def best_mcp(self) -> Url:
-        """
-        Returns the URL of the pickled ModelCheckpoint2 when the best model was saved.
-        """
-        return "%s/bestmcp.dill" % self._dirname()
+        return "%s/mcp.dill" % self._dirname
 
     def lr(self) -> Url:
         """
         """
-        return "%s/lr.dill" % self._dirname()
-
-    def best_lr(self) -> Url:
-        """
-        """
-        return "%s/bestlr.dill" % self._dirname()
+        return "%s/lr.dill" % self._dirname
 
     def epoch(self) -> Url:
-        return "%s/epoch.dill" % self._dirname()
+        return "%s/epoch.dill" % self._dirname
 
-    def best_epoch(self) -> Url:
-        return "%s/bestepoch.dill" % self._dirname()
+
+class ModelSplitName(object):
+    """
+    """
+
+    def __init__(self, architecture: CompiledArchitectureName, data: DataSetSplitName, epochs: int, patience: int) -> None:
+        self._architecture: str = architecture.architecture
+        self._dataset: str = data.dataset
+        self._split: int = data.split
+        self._loss: str = architecture.loss
+        self._optimizer: str = architecture.optimizer
+        self._epochs: int = epochs
+        self._patience: int = patience
+        self.latest: ModelSplitName2 = ModelSplitName2(self._dirname(), 'latest')
+        self.best: ModelSplitName2 = ModelSplitName2(self._dirname(), 'best')
+
+    def _dirname(self) -> Url:
+        """
+        Returns the path up to each file.
+        """
+        return "out/%s-%s-%s-%s/%d-%d/%d" % (self._architecture, self._dataset, self._loss, self._optimizer, self._epochs, self._patience, self._split)
 
     def log(self) -> Url:
         """
