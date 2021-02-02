@@ -18,27 +18,27 @@ class ModelSplitName2(object):
     """
 
     def __init__(self, dirname: Url, snapshot: Url):
-        self._dirname: Url = '%s/%s' % (dirname, snapshot)
+        self.dirname: Url = '%s/%s' % (dirname, snapshot)
 
     def weights(self) -> Url:
         """
         Returns the URL of the training model file.
         """
-        return "%s/weights.h5" % self._dirname
+        return "%s/weights.h5" % self.dirname
 
     def mcp(self) -> Url:
         """
         Returns the URL of the pickled ModelCheckpoint2.
         """
-        return "%s/mcp.dill" % self._dirname
+        return "%s/mcp.dill" % self.dirname
 
     def lr(self) -> Url:
         """
         """
-        return "%s/lr.dill" % self._dirname
+        return "%s/lr.dill" % self.dirname
 
     def epoch(self) -> Url:
-        return "%s/epoch.dill" % self._dirname
+        return "%s/epoch.dill" % self.dirname
 
 
 class ModelSplitName(object):
