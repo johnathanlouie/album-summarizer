@@ -97,7 +97,7 @@ class Smi13(Architecture):
         return model
 
 
-class Smi13_1(Architecture):
+class Smi13A(Architecture):
     """
     A deep learning model for predicting memorability.
     """
@@ -186,7 +186,7 @@ class Smi13_1(Architecture):
         return model
 
 
-class Smi13_2(Architecture):
+class Smi13B(Architecture):
     """
     A deep learning model for predicting memorability.
     """
@@ -277,5 +277,5 @@ class Smi13_2(Architecture):
 
 
 modelbuilder.ModelBuilder.architecture(Smi13())
-modelbuilder.ModelBuilder.architecture(Smi13_1())
-modelbuilder.ModelBuilder.architecture(Smi13_2())
+modelbuilder.ModelBuilder.architecture(Smi13A())
+modelbuilder.ModelBuilder.architecture(Smi13B())
