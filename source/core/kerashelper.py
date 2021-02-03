@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import warnings
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 import dill
 import keras
@@ -45,7 +45,7 @@ class PickleAbstractClass(object):
     def __init__(self):
         raise NotImplementedError
 
-    def get(self) -> PickleAbstractClass:
+    def get(self) -> Any:
         raise NotImplementedError
 
     def save(self, save_location: Url) -> None:
