@@ -448,7 +448,7 @@ class Model(object):
 
     def split(self, num: int) -> ModelSplit:
         """
-        Get a specific split.
+        Gets a specific split
         """
         if not self._dataset.exists():
             self._dataset.prepare()
@@ -461,7 +461,7 @@ class Model(object):
 
     def train(self) -> None:
         """
-        Starts or continues training the model.
+        Starts or continues training the model
         """
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
@@ -469,7 +469,7 @@ class Model(object):
 
     def test(self) -> List[Evaluation]:
         """
-        Tests the model against the data set's provided test set.
+        Evaluates the model against the data's test set
         """
         results = list()
         for i in range(self._dataset.splits()):
@@ -485,9 +485,10 @@ class Model(object):
 
     def validate(self) -> List[Evaluation]:
         """
-        Tests the model against the data set's provided validation set.
+        Evaluates the model against the data's validation set
         """
-        results = list()
+        # Evaluates each split
+        results: List[List[Evaluation]] = list()
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
             r = self.split(i).validate()
