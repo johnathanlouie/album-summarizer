@@ -1,16 +1,21 @@
-from __future__ import annotations
-
+from enum import Enum, auto
 from os.path import isfile
 from typing import List
 
+import keras.models
 from jl import Image, Url, mkdirs
 from keras.callbacks import CSVLogger, ReduceLROnPlateau
-from keras.models import load_model
 from numpy import asarray, ndarray
 
-from core.architecture import Architecture, CompiledArchitecture, CompiledArchitectureName, CompileOption
-from core.dataset import DataSet, DataSetSplit, DataSetSplitName, Predictions, PredictionsFactory
-from core.kerashelper import Sequence1, TerminateOnDemand
+from core.architecture import (Architecture, CompiledArchitecture,
+                               CompiledArchitectureName, CompileOption)
+from core.dataset import (DataSet, DataSetSplit, DataSetSplitName, Predictions,
+                          PredictionsFactory)
+from core.kerashelper import (EpochObserver, EpochPickle, ModelCheckpoint2,
+                              ModelCheckpoint2Pickle,
+                              ReduceLROnPlateauObserver,
+                              ReduceLROnPlateauPickle, SaveKmodelObserver,
+                              Sequence1, TerminateOnDemand)
 
 
 class ModelSplitName2(object):
@@ -103,191 +108,217 @@ class KerasAdapter(object):
     Wrapper class that encapsulates how the model and training state is saved and loaded.
     """
 
-    def __init__(self, architecture: CompiledArchitecture, split: DataSetSplit, prediction: PredictionsFactory) -> None:
-        self._architecture = architecture
-        self._split = split
-        self._pf = prediction
-        self._model = None
-        self._current_epoch = None
-        self._max_epoch = None
-        self._lr = None
-        self._mcp = None
-        self._mcpb = None
-        self._pcp = None
-        self._best_model = None
-
-    def name(self) -> ModelSplitName:
-        """
-        Returns the naming object for this combination of architecture, dataset, and compile options.
-        """
-        return ModelSplitName(self._architecture.name(), self._split)
-
-    def is_train_loaded(self) -> bool:
-        """
-        Returns true if all items are loaded.
-        """
-        if self._model == None:
-            return False
-        if self._current_epoch == None:
-            return False
-        if self._max_epoch == None:
-            return False
-        if self._lr == None:
-            return False
-        if self._mcp == None:
-            return False
-        if self._mcpb == None:
-            return False
-        if self._pcp == None:
-            return False
-        return True
-
-    def is_test_loaded(self) -> bool:
-        """
-        Returns true if the test model is loaded.
-        """
-        if self._best_model == None:
-            return False
-        return True
+    def __init__(
+        self,
+        architecture: CompiledArchitecture,
+        data: DataSetSplit,
+        epochs: int,
+        patience: int,
+    ) -> None:
+        self._architecture: CompiledArchitecture = architecture
+        self._data: DataSetSplit = data
+        self._names: ModelSplitName = ModelSplitName(architecture, data, epochs, patience)
+        self._kmodel: keras.models.Model = None
+        self._total_epochs: int = epochs
+        self._patience: int = patience
+        self._is_best: bool = False
 
     def train(self) -> None:
         """
-        Trains the model.
+        Trains the model
         """
+        # Training state
+        term = TerminateOnDemand()
+        log = CSVLogger(self._names.log(), append=True)
+        print('Loading training state')
+        if not self._is_best:
+            print('Loading %s' % self._names.latest.epoch())
+            current_epoch: int = EpochPickle.load(self._names.latest.epoch()).get()
+            print('Loading %s' % self._names.latest.lr())
+            lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.latest.lr()).get()
+            print('Loading %s' % self._names.latest.mcp())
+            mcp = ModelCheckpoint2.load(self._names.latest.mcp())
+        else:
+            print('Loading %s' % self._names.best.epoch())
+            current_epoch: int = EpochPickle.load(self._names.best.epoch()).get()
+            print('Loading %s' % self._names.best.lr())
+            lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.best.lr()).get()
+            print('Loading %s' % self._names.best.mcp())
+            mcp = ModelCheckpoint2.load(self._names.best.mcp())
+        mcp.add_periodic_observers(SaveKmodelObserver(self._names.latest.weights()))
+        mcp.add_periodic_observers(ReduceLROnPlateauObserver(self._names.latest.lr(), lr))
+        mcp.add_periodic_observers(EpochObserver(self._names.latest.epoch()))
+        mcp.add_improvement_observers(SaveKmodelObserver(self._names.best.weights()))
+        mcp.add_improvement_observers(ReduceLROnPlateauObserver(self._names.best.lr(), lr))
+        mcp.add_improvement_observers(EpochObserver(self._names.best.epoch()))
+
+        # Training set
         print('Loading training X')
-        x1 = self._split.train().x().load()
+        x1 = self._data.train().x().load()
         print('Loading training Y')
-        y1 = self._split.train().y().load()
+        y1 = self._data.train().y().load()
         print('Loading validation X')
-        x2 = self._split.validation().x().load()
+        x2 = self._data.validation().x().load()
         print('Loading validation Y')
-        y2 = self._split.validation().y().load()
+        y2 = self._data.validation().y().load()
         print('Training sequence')
         seq1 = Sequence1(x1, y1, 10)
         print('Validation sequence')
         seq2 = Sequence1(x2, y2, 10)
+
+        # Training
         print('Training starts')
-        term = TerminateOnDemand()
-        csv = CSVLogger(self.name().csv(), append=True)
-        self._model.fit_generator(
+        self._kmodel.fit_generator(
             generator=seq1,
-            epochs=self._max_epoch,
+            epochs=self._total_epochs,
             verbose=1,
             validation_data=seq2,
             shuffle=False,
-            initial_epoch=self._current_epoch,
+            initial_epoch=current_epoch,
             callbacks=[
-                self._lr,
-                self._mcp,
-                self._mcpb,
-                self._pcp,
-                csv,
-                term
-            ]
+                lr,
+                log,
+                mcp,
+                term,
+            ],
         )
         print('Training finished')
-        return
 
     def evaluate(self, x: ndarray, y: ndarray) -> List[Evaluation]:
         """
-        Tests the model using the given x and y.
-        Returns a list of metrics
+        Evaluates the model using the given x and y.
+        Returns a list of metrics.
         """
         seq = Sequence1(x, y, 10)
-        results = self._best_model.evaluate_generator(generator=seq, verbose=1)
-        return [Evaluation(label, value) for label, value in zip(self._best_model.metrics_names, results)]
+        results = self._kmodel.evaluate_generator(generator=seq, verbose=1)
+        return [Evaluation(label, value) for label, value in zip(self._kmodel.metrics_names, results)]
+
+    def evaluate_training_set(self) -> List[Evaluation]:
+        """
+        Evaluates the model using the training set
+        """
+        print('Loading validation X')
+        x = self._data.train().x().load()
+        print('Loading validation Y')
+        y = self._data.train().y().load()
+        return self.evaluate(x, y)
 
     def validate(self) -> List[Evaluation]:
         """
-        Tests the model using the validation set.
+        Evaluates the model using the validation set
         """
         print('Loading validation X')
-        x = self._split.validation().x().load()
+        x = self._data.validation().x().load()
         print('Loading validation Y')
-        y = self._split.validation().y().load()
+        y = self._data.validation().y().load()
         return self.evaluate(x, y)
 
     def test(self) -> List[Evaluation]:
         """
-        Tests the model using the test set.
+        Evaluates the model using the test set
         """
         print('Loading test X')
-        x = self._split.test().x().load()
+        x = self._data.test().x().load()
         print('Loading test Y')
-        y = self._split.test().y().load()
+        y = self._data.test().y().load()
         return self.evaluate(x, y)
 
     def predict(self, images: List[Image]) -> Predictions:
         """
-        Predicts using the trained model.
+        Predicts using the trained model
         """
         x = asarray(images)
         seq = Sequence1(x, x, 10)
         print('Predicting....')
-        results = self._best_model.predict_generator(generator=seq, verbose=1)
-        print('Prediction finished.')
-        return self._pf.predictions(x, results, self.name().predictions())
+        results = self._kmodel.predict_generator(generator=seq, verbose=1)
+        print('Prediction finished')
+        return self._data.translate_predictions(x, results).save_as_list(self._names.predictions())
 
-    def create(self, epochs: int = 2**64, patience: int = 5) -> None:
+    def create(self) -> None:
         """
         Creates and saves the model file and other training state files.
         Initial settings are found here.
         """
-        print('No saved files found.')
-        print('Creating new model.')
-        url = self.name()
-        mkdirs(url.train())
-        model = self._architecture.compile()
-        model.save(url.train())
-        model.save(url.test())
-        print('Saved model.')
-        print('Creating new training status.')
-        mcp = ModelCheckpoint(url.train(), verbose=1)
-        mcpb = ModelCheckpoint(url.test(), verbose=1, save_best_only=True)
-        lr = ReduceLROnPlateau(patience=patience, verbose=1)
-        DataHolder(url.data_holder(), 0, epochs, lr, mcp, mcpb).save()
-        print('Saved DataHolder.')
-        return
+        # Blank model and training state
+        print('Compiling architecture')
+        kmodel = self._architecture.compile()
+        mcp = ModelCheckpoint2(
+            self._names.latest.mcp(),
+            self._names.best.mcp(),
+        )
+        lr = ReduceLROnPlateauPickle(ReduceLROnPlateau(
+            patience=self._patience, 
+            verbose=1,
+        ))
+        epoch = EpochPickle(0)
+
+        # Latest snapshot
+        print('Making %s' % self._names.latest.dirname)
+        mkdirs(self._names.latest.weights())
+        print('Saving to %s' % self._names.latest.weights())
+        kmodel.save_weights(self._names.latest.weights())
+        print('Saving to %s' % self._names.latest.mcp())
+        mcp.save(self._names.latest.mcp())
+        print('Saving to %s' % self._names.latest.lr())
+        lr.save(self._names.latest.lr())
+        print('Saving to %s' % self._names.latest.epoch())
+        epoch.save(self._names.latest.epoch())
+
+        # Best snapshot
+        print('Making %s' % self._names.best.dirname)
+        mkdirs(self._names.best.weights())
+        print('Saving to %s' % self._names.best.weights())
+        kmodel.save_weights(self._names.best.weights())
+        print('Saving to %s' % self._names.best.mcp())
+        mcp.save(self._names.best.mcp())
+        print('Saving to %s' % self._names.best.lr())
+        lr.save(self._names.best.lr())
+        print('Saving to %s' % self._names.best.epoch())
+        epoch.save(self._names.best.epoch())
 
     def is_saved(self) -> bool:
         """
         Returns true if all the saved files exist.
         """
-        url = self.name()
-        if not isfile(url.train()):
-            print('Missing training model file.')
+        if not isfile(self._names.latest.weights()):
+            print('Missing %s' % self._names.latest.weights())
             return False
-        if not isfile(url.test()):
-            print('Missing training model file.')
+        if not isfile(self._names.latest.mcp()):
+            print('Missing %s' % self._names.latest.mcp())
             return False
-        if not isfile(url.data_holder()):
-            print('Missing training model file.')
+        if not isfile(self._names.latest.lr()):
+            print('Missing %s' % self._names.latest.lr())
+            return False
+        if not isfile(self._names.latest.epoch()):
+            print('Missing %s' % self._names.latest.epoch())
+            return False
+        if not isfile(self._names.best.weights()):
+            print('Missing %s' % self._names.best.weights())
+            return False
+        if not isfile(self._names.best.mcp()):
+            print('Missing %s' % self._names.best.mcp())
+            return False
+        if not isfile(self._names.best.lr()):
+            print('Missing %s' % self._names.best.lr())
+            return False
+        if not isfile(self._names.best.epoch()):
+            print('Missing %s' % self._names.best.epoch())
             return False
         return True
 
-    def load_train_model(self) -> None:
+    def load(self, best_snapshot: bool = False) -> None:
         """
         Loads the training model file and other training state files.
         """
-        url = self.name()
-        self._model = load_model(url.train(), self._architecture.custom())
-        dh = DataHolder.load(url.data_holder())
-        self._current_epoch = dh.current_epoch
-        self._max_epoch = dh.total_epoch
-        self._lr = dh.get_lr()
-        self._mcp = dh.get_mcp()
-        self._mcpb = dh.get_mcpb()
-        self._pcp = PickleCheckpoint(
-            self._mcp, self._mcpb, self._lr, url.data_holder(), dh.total_epoch)
-        return
-
-    def load_test_model(self) -> None:
-        """
-        Loads the best model file.
-        """
-        url = self.name().test()
-        self._best_model = load_model(url, self._architecture.custom())
-        return
+        self._is_best = best_snapshot
+        print('Compiling architecture')
+        self._kmodel = self._architecture.compile()
+        if best_snapshot:
+            print('Loading best snapshot')
+            self._kmodel.load_weights(self._names.best.weights())
+        else:
+            print('Loading weights')
+            self._kmodel.load_weights(self._names.latest.weights())
 
     def delete(self) -> None:
         """
