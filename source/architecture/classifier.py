@@ -7,12 +7,48 @@ from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
 from keras.models import Model
 
 
+class Vgg16(Architecture):
+    """
+    VGG16 by Keras.
+    """
+
+    NAME = 'vgg16'
+
+    def create(self) -> Model:
+        """
+        Creates a keras.models.Model object.
+        """
+        return VGG16(weights=None, input_tensor=Input(resolution), classes=6)
+
+
 class Vgg16A(Architecture):
+    """
+    The convolution blocks of VGG16 are constructed by Keras.
+    The classification block is manually configured.
+    """
+
+    NAME = 'vgg16a'
+
+    def create(self) -> Model:
+        """
+        Creates a keras.models.Model object.
+        """
+        base = VGG16(include_top=False, input_shape=resolution)
+        x = Flatten(name='flatten')(base.output)
+        x = Dense(4096, activation='relu', name='fc1')(x)
+        x = Dense(4096, activation='relu', name='fc2')(x)
+        x = Dense(6, activation='softmax', name='predictions')(x)
+        model = Model(base.input, x, name='vgg16')
+        return model
+
+
+
+class Vgg16B(Architecture):
     """
     Fully manual configuration of VGG16.
     """
 
-    NAME = 'vgg16a'
+    NAME = 'vgg16b'
 
     def create(self) -> Model:
         """
@@ -56,41 +92,6 @@ class Vgg16A(Architecture):
         return model
 
 
-class Vgg16B(Architecture):
-    """
-    The convolution blocks of VGG16 are constructed by Keras.
-    The classification block is manually configured.
-    """
-
-    NAME = 'vgg16b'
-
-    def create(self) -> Model:
-        """
-        Creates a keras.models.Model object.
-        """
-        base = VGG16(include_top=False, input_shape=resolution)
-        x = Flatten(name='flatten')(base.output)
-        x = Dense(4096, activation='relu', name='fc1')(x)
-        x = Dense(4096, activation='relu', name='fc2')(x)
-        x = Dense(6, activation='softmax', name='predictions')(x)
-        model = Model(base.input, x, name='vgg16')
-        return model
-
-
-class Vgg16C(Architecture):
-    """
-    VGG16 by Keras.
-    """
-
-    NAME = 'vgg16c'
-
-    def create(self) -> Model:
-        """
-        Creates a keras.models.Model object.
-        """
-        return VGG16(weights=None, input_tensor=Input(resolution), classes=6)
-
-
+modelbuilder.ModelBuilder.architecture(Vgg16())
 modelbuilder.ModelBuilder.architecture(Vgg16A())
 modelbuilder.ModelBuilder.architecture(Vgg16B())
-modelbuilder.ModelBuilder.architecture(Vgg16C())
