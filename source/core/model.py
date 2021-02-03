@@ -331,7 +331,13 @@ class ModelSplit(object):
     """
     """
 
-    def __init__(self, architecture: CompiledArchitecture, data: DataSetSplit, epochs: int, patience: int) -> None:
+    def __init__(
+        self, 
+        architecture: CompiledArchitecture, 
+        data: DataSetSplit, 
+        epochs: int, 
+        patience: int
+    ) -> None:
         self._architecture = architecture
         self._data = data
         self._epochs = epochs
@@ -339,43 +345,78 @@ class ModelSplit(object):
 
     def train(self) -> None:
         """
-        Convenience method to create if there are no saved files, load if not yet loaded, and then train.
+        Trains the model
         """
-        if not self._archisplit.is_train_loaded():
-            if not self._archisplit.is_saved():
-                self._archisplit.create(epochs, patience)
-            self._archisplit.load_train_model()
-        self._archisplit.train()
-        return
+        kadapter = KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        )
+        if not kadapter.is_saved():
+            kadapter.create()
+        kadapter.load()
+        kadapter.train()
+
+    def evaluate_training_set(self) -> List[Evaluation]:
+        """
+        Measures the effectiveness of the model against the training set
+        """
+        kadapter = KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        )
+        if not kadapter.is_saved():
+            kadapter.create()
+        kadapter.load()
+        return kadapter.evaluate_training_set()
 
     def validate(self) -> List[Evaluation]:
         """
-        Convenience method to create if there are no saved files, load if not yet loaded, and then test against the validation set.
+        Measures the effectiveness of the model against the validation set
         """
-        if not self._archisplit.is_test_loaded():
-            if not self._archisplit.is_saved():
-                self._archisplit.create(epochs, patience)
-            self._archisplit.load_test_model()
-        return self._archisplit.validate()
+        kadapter = KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        )
+        if not kadapter.is_saved():
+            kadapter.create()
+        kadapter.load()
+        return kadapter.validate()
 
     def test(self) -> List[Evaluation]:
         """
-        Convenience method to create if there are no saved files, load if not yet loaded, and then test against the test set.
+        Measures the effectiveness of the model against the test set
         """
-        if not self._archisplit.is_test_loaded():
-            if not self._archisplit.is_saved():
-                self._archisplit.create(epochs, patience)
-            self._archisplit.load_test_model()
-        return self._archisplit.test()
+        kadapter = KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        )
+        if not kadapter.is_saved():
+            kadapter.create()
+        kadapter.load()
+        return kadapter.test()
 
     def predict(self, images: List[Url]) -> Predictions:
         """
+        Takes the input and returns an output
         """
-        if not self._archisplit.is_test_loaded():
-            if not self._archisplit.is_saved():
-                self._archisplit.create(epochs, patience)
-            self._archisplit.load_test_model()
-        return self._archisplit.predict(images)
+        kadapter = KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        )
+        if not kadapter.is_saved():
+            kadapter.create()
+        kadapter.load()
+        return kadapter.predict(images)
 
 
 class Model(object):
