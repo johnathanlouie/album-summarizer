@@ -1,6 +1,6 @@
-from core.architecture import Architecture, CompiledArchitecture, CompileOption
+from core.architecture import Architecture, CompileOption
 from core.dataset import DataSet
-from core.model import Model, ModelSplit
+from core.model import Model
 
 
 class ModelBuilder(object):
