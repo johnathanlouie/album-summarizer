@@ -249,7 +249,7 @@ class KerasAdapter(object):
             self._names.best.mcp(),
         )
         lr = ReduceLROnPlateauPickle(ReduceLROnPlateau(
-            patience=self._patience, 
+            patience=self._patience,
             verbose=1,
         ))
         epoch = EpochPickle(0)
@@ -334,10 +334,10 @@ class ModelSplit(object):
     """
 
     def __init__(
-        self, 
-        architecture: CompiledArchitecture, 
-        data: DataSetSplit, 
-        epochs: int, 
+        self,
+        architecture: CompiledArchitecture,
+        data: DataSetSplit,
+        epochs: int,
         patience: int
     ) -> None:
         self._architecture = architecture
