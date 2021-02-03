@@ -10,7 +10,7 @@ from jl import Url, resize_img
 from keras.backend import get_value
 from keras.callbacks import Callback, ReduceLROnPlateau
 from keras.utils import Sequence
-from numpy import asarray, ceil
+from numpy import asarray, ceil, ndarray
 
 
 class Sequence1(Sequence):
@@ -18,7 +18,7 @@ class Sequence1(Sequence):
     Generate batches of data.
     """
 
-    def __init__(self, x_set, y_set, batch_size):
+    def __init__(self, x_set: ndarray, y_set: ndarray, batch_size: int):
         self.x = x_set
         self.y = y_set
         self.batch_size = batch_size
