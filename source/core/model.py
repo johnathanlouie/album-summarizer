@@ -118,6 +118,10 @@ class KerasAdapter(object):
         self._patience: int = patience
         self._is_best: bool = False
 
+    def __exit__(self, exc_type, exc_value, traceback) -> bool:
+        del self._kmodel
+        return False
+
     def train(self) -> None:
         """
         Trains the model
