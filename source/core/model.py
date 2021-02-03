@@ -58,10 +58,10 @@ class ModelSplitName(object):
         self._optimizer: str = architecture.optimizer
         self._epochs: int = epochs
         self._patience: int = patience
-        self.latest: ModelSplitName2 = ModelSplitName2(self._dirname(), 'latest')
-        self.best: ModelSplitName2 = ModelSplitName2(self._dirname(), 'best')
+        self.latest: ModelSplitName2 = ModelSplitName2(self.dirname(), 'latest')
+        self.best: ModelSplitName2 = ModelSplitName2(self.dirname(), 'best')
 
-    def _dirname(self) -> Url:
+    def dirname(self) -> Url:
         """
         Returns the path up to each file.
         """
@@ -71,13 +71,13 @@ class ModelSplitName(object):
         """
         Returns the URL of the training log.
         """
-        return "%s/log.csv" % self._dirname()
+        return "%s/log.csv" % self.dirname()
 
     def predictions(self) -> Url:
         """
         Returns the URL of the predictions file.
         """
-        return "%s/predictions.txt" % self._dirname()
+        return "%s/predictions.txt" % self.dirname()
 
 
 class Evaluation(dict):
