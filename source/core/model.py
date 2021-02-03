@@ -80,27 +80,22 @@ class ModelSplitName(object):
         return "%s/predictions.txt" % self._dirname()
 
 
-class Evaluation(object):
+class Evaluation(dict):
     """
+    Dictionary that holds loss/metric names as keys and scalar values.
     """
-
-    def __init__(self, label: str, value: float) -> None:
-        self.label = label
-        self.value = value
-        return
 
     @staticmethod
     def mean(evals: List[Evaluation]) -> Evaluation:
-        label = None
-        value = 0
+        result = dict()
         for e in evals:
-            if label == None:
-                label = e.label
-            if label != e.label:
-                raise Exception('Evaluation labels do not match.')
-            value = value + e.value
-        value = value / len(evals)
-        return Evaluation(label, value)
+            for k, v in e.items():
+                if k not in result:
+                    result[k] = 0.0
+                result[k] += v
+        for k, v in result:
+            result[k] = v / len(evals)
+        return result
 
 
 class KerasAdapter(object):
@@ -184,16 +179,19 @@ class KerasAdapter(object):
         )
         print('Training finished')
 
-    def evaluate(self, x: ndarray, y: ndarray) -> List[Evaluation]:
+    def evaluate(self, x: ndarray, y: ndarray) -> Evaluation:
         """
         Evaluates the model using the given x and y.
         Returns a list of metrics.
         """
         seq = Sequence1(x, y, 10)
-        results = self._kmodel.evaluate_generator(generator=seq, verbose=1)
-        return [Evaluation(label, value) for label, value in zip(self._kmodel.metrics_names, results)]
+        results: List[float] = self._kmodel.evaluate_generator(
+            generator=seq,
+            verbose=1
+        )
+        return Evaluation({metric: scalar for metric, scalar in zip(self._kmodel.metrics_names, results)})
 
-    def evaluate_training_set(self) -> List[Evaluation]:
+    def evaluate_training_set(self) -> Evaluation:
         """
         Evaluates the model using the training set
         """
@@ -203,7 +201,7 @@ class KerasAdapter(object):
         y = self._data.train().y().load()
         return self.evaluate(x, y)
 
-    def validate(self) -> List[Evaluation]:
+    def validate(self) -> Evaluation:
         """
         Evaluates the model using the validation set
         """
@@ -213,7 +211,7 @@ class KerasAdapter(object):
         y = self._data.validation().y().load()
         return self.evaluate(x, y)
 
-    def test(self) -> List[Evaluation]:
+    def test(self) -> Evaluation:
         """
         Evaluates the model using the test set
         """
@@ -358,7 +356,7 @@ class ModelSplit(object):
         kadapter.load()
         kadapter.train()
 
-    def evaluate_training_set(self) -> List[Evaluation]:
+    def evaluate_training_set(self) -> Evaluation:
         """
         Measures the effectiveness of the model against the training set
         """
@@ -373,7 +371,7 @@ class ModelSplit(object):
         kadapter.load()
         return kadapter.evaluate_training_set()
 
-    def validate(self) -> List[Evaluation]:
+    def validate(self) -> Evaluation:
         """
         Measures the effectiveness of the model against the validation set
         """
@@ -388,7 +386,7 @@ class ModelSplit(object):
         kadapter.load()
         return kadapter.validate()
 
-    def test(self) -> List[Evaluation]:
+    def test(self) -> Evaluation:
         """
         Measures the effectiveness of the model against the test set
         """
@@ -467,35 +465,32 @@ class Model(object):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
             self.split(i).train()
 
-    def test(self) -> List[Evaluation]:
+    def evaluate_training_set(self) -> Evaluation:
         """
-        Evaluates the model against the data's test set
+        Evaluates the model against the data's training set
         """
-        results = list()
+        evaluations: List[Evaluation] = list()
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
-            r = self.split(i).test()
-            results.append(r)
-        averages = list()
-        for i in range(len(results[0])):
-            c = [split[i] for split in results]
-            m = Evaluation.mean(c)
-            averages.append(m)
-        return averages
+            evaluations.append(self.split(i).evaluate_training_set())
+        return Evaluation.mean(evaluations)
 
-    def validate(self) -> List[Evaluation]:
+    def validate(self) -> Evaluation:
         """
         Evaluates the model against the data's validation set
         """
-        # Evaluates each split
-        results: List[List[Evaluation]] = list()
+        evaluations: List[Evaluation] = list()
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
-            r = self.split(i).validate()
-            results.append(r)
-        averages = list()
-        for i in range(len(results[0])):
-            c = [split[i] for split in results]
-            m = Evaluation.mean(c)
-            averages.append(m)
-        return averages
+            evaluations.append(self.split(i).validate())
+        return Evaluation.mean(evaluations)
+
+    def test(self) -> Evaluation:
+        """
+        Evaluates the model against the data's test set
+        """
+        evaluations: List[Evaluation] = list()
+        for i in range(self._dataset.splits()):
+            print("Split %d / %d" % (i + 1, self._dataset.splits()))
+            evaluations.append(self.split(i).test())
+        return Evaluation.mean(evaluations)
