@@ -114,6 +114,8 @@ class ModelCheckpoint2Pickle(PickleAbstractClass):
         dst.epochs_since_last_save = src.epochs_since_last_save
         dst.monitor = src.monitor
         dst.period = src.period
+        dst.url = src.url
+        dst.url2 = src.url2
 
     def get(self) -> ModelCheckpoint2:
         """
