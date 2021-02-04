@@ -1,25 +1,30 @@
-from typing import List
+from typing import Dict, List
+
+from core.cluster import ClusterResults, ClusterStrategy
+from jl import Url
 
 from cluster.histogram import HistogramCluster
 from cluster.sift import SiftCluster
-from core.cluster import ClusterResults, ClusterStrategy
-from jl import Url
 
 
 class HybridCluster(ClusterStrategy):
     """
     """
 
+    def __init__(self, options: Dict[str, str]):
+        self._options = options
+
     def run(self, images: List[Url]) -> ClusterResults:
         """
         Clusters images.
         """
-        results1 = SiftCluster().run(images)
-        results2 = HistogramCluster().run(images)
+        results1 = SiftCluster(self._options).run(images)
+        results2 = HistogramCluster(dict()).run(images)
         labels1 = results1.labels()
         labels2 = results2.labels()
         k1 = results1.k()
-        cluster = [self.combine(c1, c2, k1) for c1, c2 in zip(labels1, labels2)]
+        cluster = [self.combine(c1, c2, k1)
+                   for c1, c2 in zip(labels1, labels2)]
         self.remove_empty_clusters(cluster)
         return ClusterResults(images, cluster)
 
@@ -75,10 +80,10 @@ class HybridCluster2(HybridCluster):
         """
         Clusters images.
         """
-        results1 = HistogramCluster().run(images)
+        results1 = HistogramCluster(dict()).run(images)
         cluster = [-1] * len(images)
         for label1, urls1 in enumerate(results1.urls()):
-            results2 = SiftCluster().run(urls1)
+            results2 = SiftCluster(self._options).run(urls1)
             for label2, urls2 in enumerate(results2.urls()):
                 label3 = self.combine(label1, label2, results1.k())
                 for url2 in urls2:
