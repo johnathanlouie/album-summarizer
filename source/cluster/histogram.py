@@ -104,3 +104,6 @@ class HistogramCluster(ClusterStrategy):
         print('Clustering by mean shift....')
         results = MeanShift(bandwidth=bandwidth).fit_predict(d).tolist()
         return results
+
+
+ClusterStrategy.REGISTRY['histogram'] = HistogramCluster

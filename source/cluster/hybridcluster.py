@@ -91,3 +91,7 @@ class HybridCluster2(HybridCluster):
                     cluster[i] = label3
         self.remove_empty_clusters(cluster)
         return ClusterResults(images, cluster)
+
+
+ClusterStrategy.REGISTRY['hybrid'] = HybridCluster
+ClusterStrategy.REGISTRY['hybrid2'] = HybridCluster2

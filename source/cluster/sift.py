@@ -230,3 +230,6 @@ class SiftCluster(ClusterStrategy):
         print('Clustering by affinity propagation....')
         cluster = AffinityPropagation().fit_predict(sm.matrix).tolist()
         return ClusterResults(images, cluster)
+
+
+ClusterStrategy.REGISTRY['sift'] = SiftCluster
