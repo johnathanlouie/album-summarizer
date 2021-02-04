@@ -23,6 +23,8 @@ class ModelBuilder(object):
         loss: str,
         optimizer: str,
         metrics: str,
+        epochs: int,
+        patience: int,
     ) -> Model:
         """
         Builds a deep learning model from a pool of datasets, architectures, and options.
@@ -33,6 +35,8 @@ class ModelBuilder(object):
             cls.LOSSES[loss],
             cls.OPTIMIZERS[optimizer],
             cls.METRICS[metrics],
+            epochs,
+            patience,
         )
 
     @classmethod
