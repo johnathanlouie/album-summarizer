@@ -172,7 +172,7 @@ def resize_img(filename: Url) -> Image:
     Returns a resized image.
     """
     if not isfile(filename):
-        raise FileNotFoundError
+        raise FileNotFoundError(filename)
     img = cv.imread(filename, cv.IMREAD_COLOR)
     img2 = cv.resize(img, res_resize, interpolation=cv.INTER_CUBIC)
     return img2
