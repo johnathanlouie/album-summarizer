@@ -147,6 +147,9 @@ class CccPredictionsFactory(PredictionsFactory):
     """
     """
 
+    def __init__(self):
+        pass
+
     def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         """
@@ -159,6 +162,9 @@ class Ccc(Cc):
     """
 
     NAME = 'ccc'
+
+    def __init__(self):
+        pass
 
     def _y(self) -> ndarray:
         """
@@ -189,6 +195,9 @@ class CcrPredictionsFactory(PredictionsFactory):
     """
     """
 
+    def __init__(self):
+        pass
+
     def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         Returns an instance of CcrPredictions.
@@ -202,6 +211,9 @@ class Ccr(Cc):
     """
 
     NAME = 'ccr'
+
+    def __init__(self):
+        pass
 
     def _y(self) -> ndarray:
         """
@@ -244,6 +256,9 @@ class CcrcPredictionsFactory(PredictionsFactory):
     """
     """
 
+    def __init__(self):
+        pass
+
     def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         """
@@ -256,6 +271,9 @@ class CcrCategorical(Cc):
     """
 
     NAME = 'ccrc'
+
+    def __init__(self):
+        pass
 
     def _y(self) -> ndarray:
         """

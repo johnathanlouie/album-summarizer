@@ -46,6 +46,9 @@ class CccafPredictionsFactory(PredictionsFactory):
     """
     """
 
+    def __init__(self):
+        pass
+
     def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         Returns an instance of CccafPredictions.

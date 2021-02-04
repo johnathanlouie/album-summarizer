@@ -51,6 +51,9 @@ class LamemPredictionsFactory(PredictionsFactory):
     """
     """
 
+    def __init__(self):
+        pass
+
     def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         """
@@ -65,6 +68,9 @@ class Lamem(DataSet):
     NAME = 'lamem'
 
     _phases = ['train', 'test', 'val']
+
+    def __init__(self):
+        pass
 
     def _data_file_url(self, split: int, phase: str) -> str:
         """

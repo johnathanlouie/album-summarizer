@@ -14,6 +14,9 @@ class Smi13(Architecture):
 
     NAME = 'smi13'
 
+    def __init__(self):
+        pass
+
     def create(self) -> Model:
         """
         Returns a Keras Model object.
@@ -104,6 +107,9 @@ class Smi13A(Architecture):
 
     NAME = 'smi13a'
 
+    def __init__(self):
+        pass
+
     def create(self) -> Model:
         """
         Returns a Keras Model object.
@@ -192,6 +198,9 @@ class Smi13B(Architecture):
     """
 
     NAME = 'smi13b'
+
+    def __init__(self):
+        pass
 
     def create(self) -> Model:
         """

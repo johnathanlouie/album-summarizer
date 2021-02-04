@@ -14,6 +14,9 @@ class Vgg16(Architecture):
 
     NAME = 'vgg16'
 
+    def __init__(self):
+        pass
+
     def create(self) -> Model:
         """
         Creates a keras.models.Model object.
@@ -28,6 +31,9 @@ class Vgg16A(Architecture):
     """
 
     NAME = 'vgg16a'
+
+    def __init__(self):
+        pass
 
     def create(self) -> Model:
         """
@@ -49,6 +55,9 @@ class Vgg16B(Architecture):
     """
 
     NAME = 'vgg16b'
+
+    def __init__(self):
+        pass
 
     def create(self) -> Model:
         """
