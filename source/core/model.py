@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from enum import Enum, auto
 from os.path import isfile
 from typing import List
@@ -89,7 +90,7 @@ class Evaluation(dict):
 
     @staticmethod
     def mean(evals: List[Evaluation]) -> Evaluation:
-        result = dict()
+        result = Evaluation()
         for e in evals:
             for k, v in e.items():
                 if k not in result:
@@ -98,6 +99,9 @@ class Evaluation(dict):
         for k, v in result:
             result[k] = v / len(evals)
         return result
+
+    def save_json(self, url: Url) -> None:
+        json.dump(self, open(url, 'w'))
 
 
 class KerasAdapter(object):
