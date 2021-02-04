@@ -77,9 +77,3 @@ class ClusterStrategy(object):
         """
         """
         raise NotImplementedError
-
-    def run2(self, directory: Url) -> ClusterResults:
-        """
-        """
-        images = ImageDirectory(directory).jpeg()
-        return self.run(images)
