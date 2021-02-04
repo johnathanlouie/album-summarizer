@@ -339,7 +339,7 @@ def resize_imgs2(src_list: List[Url], dst_list: List[Url]) -> None:
     return
 
 
-def list_files(directory: Url) -> List[Url]:
+def list_files(directory: Url, recursive: bool) -> List[Url]:
     """
     Returns the URLs of all the files in the directory and its subdirectories.
     """
@@ -347,6 +347,8 @@ def list_files(directory: Url) -> List[Url]:
     for path, _, filenames in walk(directory):
         for f in filenames:
             a.append(abspath(join(path, f)))
+        if not recursive:
+            break
     return a
 
 
@@ -376,11 +378,11 @@ class ImageDirectory(object):
         url = url.lower()
         return url.endswith('.jpg') or url.endswith('.jpeg')
 
-    def jpeg(self, k: Optional[int] = None) -> List[Url]:
+    def jpeg(self, recursive: bool, k: Optional[int] = None) -> List[Url]:
         """
         Returns a list of JPEG files from this directory.
         """
-        files = list_files(self._url)
+        files = list_files(self._url, recursive)
         images = list(filter(self.jpeg_filter, files))
         images = random_sample(images, k)
         return images

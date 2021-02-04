@@ -63,9 +63,9 @@ class CccafDataSet(DataSet):
 
     def __init__(self, animals: Optional[int] = None, food: Optional[int] = 1300) -> None:
         if animals == None:
-            animals = len(AnimalCollection().jpeg())
+            animals = len(AnimalCollection().jpeg(True))
         if food == None:
-            food = len(FoodCollection().jpeg())
+            food = len(FoodCollection().jpeg(True))
         self._animal_num = animals
         self._food_num = food
         return
@@ -85,8 +85,8 @@ class CccafDataSet(DataSet):
         data_file = CcDataFile()
         x = data_file.url()
         x = [self._relative_url(i) for i in x]
-        x2 = AnimalCollection().jpeg(self._animal_num)
-        x3 = FoodCollection().jpeg(self._food_num)
+        x2 = AnimalCollection().jpeg(True, self._animal_num)
+        x3 = FoodCollection().jpeg(True, self._food_num)
         x4 = x + x2 + x3
         return asarray(x4)
 
