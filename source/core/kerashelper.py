@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Union
 import dill
 import keras
 import numpy as np
-from jl import Url, resize_img
+from jl import Url, resize_img,mkdirname
 from keras.backend import get_value
 from keras.callbacks import Callback, ReduceLROnPlateau
 from keras.utils import Sequence
@@ -49,7 +49,8 @@ class PickleAbstractClass(object):
         raise NotImplementedError
 
     def save(self, save_location: Url) -> None:
-        dill.dump(self, open(save_location, "wb"))
+        mkdirname(save_location)
+        dill.dump(self, open(save_location, 'wb'))
 
     @staticmethod
     def load(save_location: Url) -> PickleAbstractClass:

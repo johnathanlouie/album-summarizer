@@ -258,7 +258,7 @@ class KerasAdapter(object):
 
         # Latest snapshot
         print('Making %s' % self._names.latest.dirname)
-        mkdirs(self._names.latest.weights())
+        mkdirs(self._names.latest.dirname)
         print('Saving to %s' % self._names.latest.weights())
         kmodel.save_weights(self._names.latest.weights())
         print('Saving to %s' % self._names.latest.mcp())
@@ -270,7 +270,7 @@ class KerasAdapter(object):
 
         # Best snapshot
         print('Making %s' % self._names.best.dirname)
-        mkdirs(self._names.best.weights())
+        mkdirs(self._names.best.dirname)
         print('Saving to %s' % self._names.best.weights())
         kmodel.save_weights(self._names.best.weights())
         print('Saving to %s' % self._names.best.mcp())

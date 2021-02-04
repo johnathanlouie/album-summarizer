@@ -75,7 +75,7 @@ def npsave(name: str, data: ArrayLike) -> None:
     Saves to a binary NumPy file.
     """
     url = "out/%s" % name
-    mkdirs(url)
+    mkdirname(url)
     return save(url, data)
 
 
@@ -149,22 +149,20 @@ def absurl2(url: Url) -> Url:
     return url
 
 
-def mkdirs(filename: Url) -> None:
+def mkdirname(filename: Url) -> None:
     """
     Makes directories leading up to a file.
     The child is not included.
     """
     name = dirname(filename)
     makedirs(name, exist_ok=True)
-    return
 
 
-def mkdirs2(path: Url) -> None:
+def mkdirs(path: Url) -> None:
     """
     Make all directories in a path including the child.
     """
     makedirs(path, exist_ok=True)
-    return
 
 
 def resize_img(filename: Url) -> Image:
@@ -333,7 +331,7 @@ def resize_imgs2(src_list: List[Url], dst_list: List[Url]) -> None:
         print(src)
         print(dst)
         img2 = resize_img(src)
-        mkdirs(dst)
+        mkdirname(dst)
         cv.imwrite(dst, img2)
     print('done')
     return
@@ -441,7 +439,7 @@ def copy_file(file_: Url, directory: Url, ancestors: int = 0) -> None:
         new_url = join(parent, new_url)
         path = dirname(path)
     new_url = join(directory, new_url)
-    mkdirs(new_url)
+    mkdirname(new_url)
     try:
         copy2(file_, new_url)
     except PermissionError:
