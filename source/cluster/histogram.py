@@ -6,7 +6,6 @@ from jl import Url, hsv, read_image
 from numpy import concatenate, ndarray, reshape, vstack
 from sklearn.cluster import MeanShift
 
-
 Histogram = ndarray
 
 
@@ -24,8 +23,13 @@ class HsvHistogram(object):
         """
         Returns the histogram from one of the HSV channels.
         """
-        histogram = cv2.calcHist(images=[self._image], channels=[
-                                 channel], mask=None, histSize=[range], ranges=[0, range])
+        histogram = cv2.calcHist(
+            images=[self._image],
+            channels=[channel],
+            mask=None,
+            histSize=[range],
+            ranges=[0, range],
+        )
         histogram2 = reshape(histogram, (histogram.size))
         return histogram2
 
