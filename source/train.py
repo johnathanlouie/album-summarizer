@@ -1,12 +1,17 @@
+import argparse
+import json
+from typing import Dict
+
+import aaa
 import architecture.classifier
 import architecture.rater
+import coption.custom
+import coption.keras
+import coption.keras2
 import core.modelbuilder
 import dataset.anifood
 import dataset.cc
 import dataset.lamem
-import argparse
-import json
-from typing import Dict
 
 
 def main():
