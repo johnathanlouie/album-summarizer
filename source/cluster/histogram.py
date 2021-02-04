@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import cv2
 from core.cluster import ClusterResults, ClusterStrategy
@@ -78,6 +78,9 @@ class HsvHistogram(object):
 class HistogramCluster(ClusterStrategy):
     """
     """
+
+    def __init__(self, options: Dict[str, str]):
+        pass
 
     def run(self, images: List[Url]) -> ClusterResults:
         """
