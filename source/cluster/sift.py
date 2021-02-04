@@ -204,6 +204,9 @@ class SiftCluster(ClusterStrategy):
     Clusters images from SIFT descriptors.
     """
 
+    def __init__(self, similarity: Similarity):
+        self._similarity = similarity
+
     def run(self, images: List[Url]) -> ClusterResults:
         """
         Creates descriptors of images.
@@ -215,7 +218,7 @@ class SiftCluster(ClusterStrategy):
         print('Normalizing descriptors to unit vectors....')
         sds.unit_normalize()
         print('Similarity matrix....')
-        sm = SimilarityMatrix(sds.descriptors, Similarity2())
+        sm = SimilarityMatrix(sds.descriptors, self._similarity)
         print('Scaling each row of the similarity matrix....')
         sm.scale()
         print('Clustering by affinity propagation....')
