@@ -16,7 +16,7 @@ class ModelBuilder(object):
     METRICS = dict()
 
     @classmethod
-    def create_set(
+    def create(
         cls,
         architecture: str,
         dataset: str,
