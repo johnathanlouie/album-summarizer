@@ -1,15 +1,14 @@
-from json import dump
-from typing import List
+from __future__ import annotations
 
-from numpy import amax, apply_along_axis, ndarray, set_printoptions, zeros
-from sklearn.cluster import AffinityPropagation
-from sklearn.preprocessing import normalize
+from json import dump
+from typing import Dict, List
 
 import cv2
 from core.cluster import ClusterResults, ClusterStrategy
-from jl import (JSON_SIMILARITYMATRIX, NPY_DESC, Number, Url,
-                npsave, read_image)
-
+from jl import JSON_SIMILARITYMATRIX, NPY_DESC, Number, Url, npsave, read_image
+from numpy import amax, apply_along_axis, ndarray, set_printoptions, zeros
+from sklearn.cluster import AffinityPropagation
+from sklearn.preprocessing import normalize
 
 set_printoptions(threshold=10000000000)
 Descriptors = ndarray
@@ -20,6 +19,8 @@ class Similarity(object):
     """
     Abstract class for computing similarity between images.
     """
+
+    REGISTRY: Dict[str, Similarity] = dict()
 
     def compute(self, a: Descriptors, b: Descriptors) -> Number:
         """
@@ -122,6 +123,11 @@ class Similarity3(Similarity2):
         return sim
 
 
+Similarity.REGISTRY['similarity1'] = Similarity1()
+Similarity.REGISTRY['similarity2'] = Similarity2()
+Similarity.REGISTRY['similarity3'] = Similarity3()
+
+
 class SimilarityMatrix(object):
     """
     A square array.
@@ -204,8 +210,8 @@ class SiftCluster(ClusterStrategy):
     Clusters images from SIFT descriptors.
     """
 
-    def __init__(self, similarity: Similarity):
-        self._similarity = similarity
+    def __init__(self, options: Dict[str, str]):
+        self._similarity: Similarity = Similarity.REGISTRY[options['similarity']]
 
     def run(self, images: List[Url]) -> ClusterResults:
         """
