@@ -68,6 +68,9 @@ class ClusterStrategy(object):
     """
     """
 
+    def __init__(self) -> None:
+        raise NotImplementedError
+
     def run(self,  images: List[Url]) -> ClusterResults:
         """
         """
