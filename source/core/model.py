@@ -114,7 +114,7 @@ class KerasAdapter(object):
     ) -> None:
         self._architecture: CompiledArchitecture = architecture
         self._data: DataSetSplit = data
-        self._names: ModelSplitName = ModelSplitName(architecture, data, epochs, patience)
+        self._names: ModelSplitName = ModelSplitName(architecture.name(), data.name(), epochs, patience)
         self._kmodel: keras.models.Model = None
         self._total_epochs: int = epochs
         self._patience: int = patience
@@ -146,12 +146,12 @@ class KerasAdapter(object):
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.best.lr()).get()
             print('Loading %s' % self._names.best.mcp())
             mcp = ModelCheckpoint2.load(self._names.best.mcp())
-        mcp.add_periodic_observers(SaveKmodelObserver(self._names.latest.weights()))
-        mcp.add_periodic_observers(ReduceLROnPlateauObserver(self._names.latest.lr(), lr))
-        mcp.add_periodic_observers(EpochObserver(self._names.latest.epoch()))
-        mcp.add_improvement_observers(SaveKmodelObserver(self._names.best.weights()))
-        mcp.add_improvement_observers(ReduceLROnPlateauObserver(self._names.best.lr(), lr))
-        mcp.add_improvement_observers(EpochObserver(self._names.best.epoch()))
+        mcp.add_periodic_observer(SaveKmodelObserver(self._names.latest.weights()))
+        mcp.add_periodic_observer(ReduceLROnPlateauObserver(self._names.latest.lr(), lr))
+        mcp.add_periodic_observer(EpochObserver(self._names.latest.epoch()))
+        mcp.add_improvement_observer(SaveKmodelObserver(self._names.best.weights()))
+        mcp.add_improvement_observer(ReduceLROnPlateauObserver(self._names.best.lr(), lr))
+        mcp.add_improvement_observer(EpochObserver(self._names.best.epoch()))
 
         # Training set
         print('Loading training X')
