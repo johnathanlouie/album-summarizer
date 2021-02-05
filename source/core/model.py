@@ -240,7 +240,7 @@ class KerasAdapter(object):
         print('Predicting....')
         results = self._kmodel.predict_generator(generator=seq, verbose=1)
         print('Prediction finished')
-        return self._data.translate_predictions(x, results).save_as_list(self._names.predictions())
+        return self._data.translate_predictions(x, results)
 
     def create(self) -> None:
         """
