@@ -1,11 +1,11 @@
+import json
 from enum import Enum
 from typing import Any, List, Optional, Tuple, Union
 
+from jl import ArrayLike, ListFile, Number, Url, npexists, npload, npsave
 from keras.utils import to_categorical
 from numpy import ndarray
 from sklearn.model_selection import train_test_split
-
-from jl import ArrayLike, ListFile, Number, Url, npexists, npload, npsave
 
 
 class XY(Enum):
@@ -122,6 +122,9 @@ class Predictions(object):
         Saves to a text file in human readable format.
         """
         ListFile(url).write(self.human_readable())
+
+    def save_json(self, url: Url) -> None:
+        json.dump(self.human_readable(), open(url, 'w'))
 
 
 class PredictionsFactory(object):
