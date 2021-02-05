@@ -251,7 +251,7 @@ class CcrcPredictions(Predictions):
     def human_readable(self) -> List[Any]:
         """
         """
-        return [self._rate(i[0], i[1], i[2]) for i in self._y]
+        return [self._rate(i, j, k) for i, j, k in self._y]
 
 
 class CcrcPredictionsFactory(PredictionsFactory):
