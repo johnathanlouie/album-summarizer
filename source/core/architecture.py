@@ -20,6 +20,7 @@ class Architecture(object):
     """
 
     NAME: str = ''
+    OUTPUT_NUM: int = 0
 
     def __init__(self):
         raise NotImplementedError

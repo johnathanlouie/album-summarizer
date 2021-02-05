@@ -162,6 +162,7 @@ class Ccc(Cc):
     """
 
     NAME = 'ccc'
+    OUTPUT_NUM: int = 6
 
     def __init__(self):
         pass
@@ -211,6 +212,7 @@ class Ccr(Cc):
     """
 
     NAME = 'ccr'
+    OUTPUT_NUM: int = 1
 
     def __init__(self):
         pass
@@ -271,6 +273,7 @@ class CcrCategorical(Cc):
     """
 
     NAME = 'ccrc'
+    OUTPUT_NUM: int = 3
 
     def __init__(self):
         pass

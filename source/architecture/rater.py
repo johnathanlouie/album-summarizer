@@ -13,6 +13,7 @@ class Smi13(Architecture):
     """
 
     NAME = 'smi13'
+    OUTPUT_NUM: int = 1
 
     def __init__(self):
         pass
@@ -106,6 +107,7 @@ class Smi13A(Architecture):
     """
 
     NAME = 'smi13a'
+    OUTPUT_NUM: int = 3
 
     def __init__(self):
         pass
@@ -188,7 +190,7 @@ class Smi13A(Architecture):
         x = Dense(4096, activation='relu', name='fc1')(x)
         x = Dense(4096, activation='relu', name='fc2')(x)
         x = Dense(3, activation='softmax', name='predictions')(x)
-        model = Model(img_input, x, name='smi13')
+        model = Model(img_input, x, name='smi13a')
         return model
 
 
@@ -198,6 +200,7 @@ class Smi13B(Architecture):
     """
 
     NAME = 'smi13b'
+    OUTPUT_NUM: int = 1
 
     def __init__(self):
         pass
@@ -281,7 +284,7 @@ class Smi13B(Architecture):
         x = Dense(4096, activation='relu', name='fc2')(x)
         x = Dense(3, activation='softmax', name='predictions')(x)
         x = Dense(1, activation='relu', name='predictions2')(x)
-        model = Model(img_input, x, name='smi13')
+        model = Model(img_input, x, name='smi13b')
         return model
 
 

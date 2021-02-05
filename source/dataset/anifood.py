@@ -63,6 +63,7 @@ class CccafDataSet(DataSet):
     """
 
     NAME = 'cccaf'
+    OUTPUT_NUM: int = 6
 
     def __init__(self, animals: Optional[int] = None, food: Optional[int] = 1300) -> None:
         if animals == None:

@@ -66,6 +66,7 @@ class Lamem(DataSet):
     """
 
     NAME = 'lamem'
+    OUTPUT_NUM: int = 1
 
     _phases = ['train', 'test', 'val']
 

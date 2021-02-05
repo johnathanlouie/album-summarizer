@@ -13,6 +13,7 @@ class Vgg16(Architecture):
     """
 
     NAME = 'vgg16'
+    OUTPUT_NUM: int = 6
 
     def __init__(self):
         pass
@@ -31,6 +32,7 @@ class Vgg16A(Architecture):
     """
 
     NAME = 'vgg16a'
+    OUTPUT_NUM: int = 6
 
     def __init__(self):
         pass
@@ -55,6 +57,7 @@ class Vgg16B(Architecture):
     """
 
     NAME = 'vgg16b'
+    OUTPUT_NUM: int = 6
 
     def __init__(self):
         pass
