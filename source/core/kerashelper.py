@@ -120,7 +120,8 @@ class EarlyStoppingPickle(PickleAbstractClass):
         dst.stopped_epoch = src.stopped_epoch
         dst.restore_best_weights = src.restore_best_weights
         dst.best_weights = src.best_weights
-        dst.best = src.best
+        if hasattr(src, 'best'):
+            dst.best = src.best
 
     def get(self) -> EarlyStopping:
         """
