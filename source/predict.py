@@ -59,8 +59,7 @@ def main():
         if 'split' in settings:
             model.split(settings['split']).predict(images).save_json(args.results)
         else:
-            raise NotImplementedError
-            # model.predict().save_json(args.results)
+            model.split(0).predict(images).save_json(args.results)
 
 
 if __name__ == '__main__':
