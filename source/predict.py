@@ -4,8 +4,8 @@ import os.path
 from typing import Dict
 
 import aaa
-import architecture.classifier
-import architecture.rater
+import architecture.vgg16
+import architecture.smi13
 import coption.custom
 import coption.keras
 import coption.keras2
