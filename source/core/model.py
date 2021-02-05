@@ -7,14 +7,15 @@ from typing import List
 
 import keras.models
 from jl import Image, Url, mkdirs
-from keras.callbacks import CSVLogger, ReduceLROnPlateau
+from keras.callbacks import CSVLogger, EarlyStopping, ReduceLROnPlateau
 from numpy import asarray, ndarray
 
 from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
 from core.dataset import (DataSet, DataSetSplit, DataSetSplitName, Predictions,
                           PredictionsFactory)
-from core.kerashelper import (EpochObserver, EpochPickle, ModelCheckpoint2,
+from core.kerashelper import (EarlyStoppingObserver, EarlyStoppingPickle,
+                              EpochObserver, EpochPickle, ModelCheckpoint2,
                               ModelCheckpoint2Pickle,
                               ReduceLROnPlateauObserver,
                               ReduceLROnPlateauPickle, SaveKmodelObserver,
@@ -47,6 +48,9 @@ class ModelSplitName2(object):
 
     def epoch(self) -> Url:
         return "%s/epoch.dill" % self.dirname
+
+    def early(self) -> Url:
+        return '%s/early.dill' % self.dirname
 
 
 class ModelSplitName(object):
@@ -141,6 +145,8 @@ class KerasAdapter(object):
             current_epoch: int = EpochPickle.load(self._names.latest.epoch()).get()
             print('Loading %s' % self._names.latest.lr())
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.latest.lr()).get()
+            print('Loading %s' % self._names.latest.early())
+            early = EarlyStoppingPickle.load(self._names.latest.early()).get()
             print('Loading %s' % self._names.latest.mcp())
             mcp = ModelCheckpoint2.load(self._names.latest.mcp())
         else:
@@ -148,14 +154,18 @@ class KerasAdapter(object):
             current_epoch: int = EpochPickle.load(self._names.best.epoch()).get()
             print('Loading %s' % self._names.best.lr())
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.best.lr()).get()
+            print('Loading %s' % self._names.best.early())
+            early = EarlyStoppingPickle.load(self._names.best.early()).get()
             print('Loading %s' % self._names.best.mcp())
             mcp = ModelCheckpoint2.load(self._names.best.mcp())
         mcp.add_periodic_observer(SaveKmodelObserver(self._names.latest.weights()))
         mcp.add_periodic_observer(ReduceLROnPlateauObserver(self._names.latest.lr(), lr))
         mcp.add_periodic_observer(EpochObserver(self._names.latest.epoch()))
+        mcp.add_periodic_observer(EarlyStoppingObserver(self._names.latest.early(), early))
         mcp.add_improvement_observer(SaveKmodelObserver(self._names.best.weights()))
         mcp.add_improvement_observer(ReduceLROnPlateauObserver(self._names.best.lr(), lr))
         mcp.add_improvement_observer(EpochObserver(self._names.best.epoch()))
+        mcp.add_improvement_observer(EarlyStoppingObserver(self._names.best.early(), early))
 
         # Training set
         print('Loading training X')
@@ -184,6 +194,7 @@ class KerasAdapter(object):
                 lr,
                 log,
                 mcp,
+                early,
                 term,
             ],
         )
@@ -259,6 +270,10 @@ class KerasAdapter(object):
             verbose=1,
         ))
         epoch = EpochPickle(0)
+        early = EarlyStoppingPickle(EarlyStopping(
+            patience=self._patience * 2,
+            verbose=1,
+        ))
 
         # Latest snapshot
         print('Making %s' % self._names.latest.dirname)
@@ -271,6 +286,8 @@ class KerasAdapter(object):
         lr.save(self._names.latest.lr())
         print('Saving to %s' % self._names.latest.epoch())
         epoch.save(self._names.latest.epoch())
+        print('Saving to %s' % self._names.latest.early())
+        early.save(self._names.latest.early())
 
         # Best snapshot
         print('Making %s' % self._names.best.dirname)
@@ -283,6 +300,8 @@ class KerasAdapter(object):
         lr.save(self._names.best.lr())
         print('Saving to %s' % self._names.best.epoch())
         epoch.save(self._names.best.epoch())
+        print('Saving to %s' % self._names.best.early())
+        early.save(self._names.best.early())
 
     def is_saved(self) -> bool:
         """
@@ -300,6 +319,9 @@ class KerasAdapter(object):
         if not isfile(self._names.latest.epoch()):
             print('Missing %s' % self._names.latest.epoch())
             return False
+        if not isfile(self._names.latest.early()):
+            print('Missing %s' % self._names.latest.early())
+            return False
         if not isfile(self._names.best.weights()):
             print('Missing %s' % self._names.best.weights())
             return False
@@ -311,6 +333,9 @@ class KerasAdapter(object):
             return False
         if not isfile(self._names.best.epoch()):
             print('Missing %s' % self._names.best.epoch())
+            return False
+        if not isfile(self._names.best.early()):
+            print('Missing %s' % self._names.best.early())
             return False
         return True
 
