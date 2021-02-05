@@ -101,7 +101,7 @@ class EarlyStoppingPickle(PickleAbstractClass):
 
     def __init__(self, es: EarlyStopping) -> None:
         self._copyTo(es, self)
-        self.monitor_op = mcp.monitor_op.__name__
+        self.monitor_op = es.monitor_op.__name__
 
     @staticmethod
     def _copyTo(
