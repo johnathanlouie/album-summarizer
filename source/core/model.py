@@ -183,7 +183,7 @@ class KerasAdapter(object):
         callbacks.append(lr)
         callbacks.append(log)
         callbacks.append(mcp)
-        if self._total_epochs > 0:
+        if self._total_epochs == 0:
             callbacks.append(early)
         callbacks.append(term)
 
