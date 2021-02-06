@@ -9,7 +9,7 @@ from keras.models import Model
 
 class Vgg16(Architecture):
     """
-    VGG16 by Keras.
+    Untrained VGG16 for classification.
     """
 
     NAME = 'vgg16'
@@ -22,7 +22,12 @@ class Vgg16(Architecture):
         """
         Creates a keras.models.Model object.
         """
-        return VGG16(weights=None, input_tensor=Input(resolution), classes=6)
+        return VGG16(
+            include_top=True,
+            weights=None,
+            input_tensor=Input(resolution),
+            classes=6,
+        )
 
 
 class Vgg16A(Architecture):
