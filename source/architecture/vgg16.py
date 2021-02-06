@@ -30,36 +30,6 @@ class Vgg16(Architecture):
         )
 
 
-class Vgg16Pt(Architecture):
-    """
-    Pretrained VGG16 with frozen convolution blocks for classifcation.
-    """
-
-    NAME = 'vgg16pt'
-    OUTPUT_NUM: int = 6
-
-    def __init__(self):
-        pass
-
-    def create(self) -> Model:
-        """
-        Creates a keras.models.Model object.
-        """
-        base = VGG16(
-            include_top=False,
-            weights='imagenet',
-            input_shape=resolution,
-        )
-        base.trainable = False
-        x = Flatten(name='flatten')(base.output)
-        x = Dense(4096, activation='relu', name='fc1')(x)
-        x = Dense(4096, activation='relu', name='fc2')(x)
-        x = Dense(6, activation='softmax', name='predictions')(x)
-        model = Model(base.input, x, name='vgg16pt')
-        return model
-
-
-
 class Vgg16B(Architecture):
     """
     Fully manual configuration of VGG16.
@@ -113,6 +83,35 @@ class Vgg16B(Architecture):
         return model
 
 
+class Vgg16Pt(Architecture):
+    """
+    Pretrained VGG16 with frozen convolution blocks for classifcation.
+    """
+
+    NAME = 'vgg16pt'
+    OUTPUT_NUM: int = 6
+
+    def __init__(self):
+        pass
+
+    def create(self) -> Model:
+        """
+        Creates a keras.models.Model object.
+        """
+        base = VGG16(
+            include_top=False,
+            weights='imagenet',
+            input_shape=resolution,
+        )
+        base.trainable = False
+        x = Flatten(name='flatten')(base.output)
+        x = Dense(4096, activation='relu', name='fc1')(x)
+        x = Dense(4096, activation='relu', name='fc2')(x)
+        x = Dense(6, activation='softmax', name='predictions')(x)
+        model = Model(base.input, x, name='vgg16pt')
+        return model
+
+
 modelbuilder.ModelBuilder.architecture(Vgg16())
-modelbuilder.ModelBuilder.architecture(Vgg16Pt())
 modelbuilder.ModelBuilder.architecture(Vgg16B())
+modelbuilder.ModelBuilder.architecture(Vgg16Pt())
