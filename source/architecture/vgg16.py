@@ -30,13 +30,12 @@ class Vgg16(Architecture):
         )
 
 
-class Vgg16A(Architecture):
+class Vgg16Pt(Architecture):
     """
-    The convolution blocks of VGG16 are constructed by Keras.
-    The classification block is manually configured.
+    Pretrained VGG16 with frozen convolution blocks for classifcation.
     """
 
-    NAME = 'vgg16a'
+    NAME = 'vgg16pt'
     OUTPUT_NUM: int = 6
 
     def __init__(self):
@@ -46,12 +45,17 @@ class Vgg16A(Architecture):
         """
         Creates a keras.models.Model object.
         """
-        base = VGG16(include_top=False, input_shape=resolution)
+        base = VGG16(
+            include_top=False,
+            weights='imagenet',
+            input_shape=resolution,
+        )
+        base.trainable = False
         x = Flatten(name='flatten')(base.output)
         x = Dense(4096, activation='relu', name='fc1')(x)
         x = Dense(4096, activation='relu', name='fc2')(x)
         x = Dense(6, activation='softmax', name='predictions')(x)
-        model = Model(base.input, x, name='vgg16')
+        model = Model(base.input, x, name='vgg16pt')
         return model
 
 
@@ -110,5 +114,5 @@ class Vgg16B(Architecture):
 
 
 modelbuilder.ModelBuilder.architecture(Vgg16())
-modelbuilder.ModelBuilder.architecture(Vgg16A())
+modelbuilder.ModelBuilder.architecture(Vgg16Pt())
 modelbuilder.ModelBuilder.architecture(Vgg16B())
