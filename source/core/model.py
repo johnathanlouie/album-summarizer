@@ -120,9 +120,20 @@ class KerasAdapter(object):
         epochs: int,
         patience: int,
     ) -> None:
+        """
+        # Arguments
+        epochs:
+        - 0 for automatically stopping when training yields no improvements for a specified number of epochs
+        - any positive integer for a set number of epochs
+        """
         self._architecture: CompiledArchitecture = architecture
         self._data: DataSetSplit = data
-        self._names: ModelSplitName = ModelSplitName(architecture.name(), data.name(), epochs, patience)
+        self._names: ModelSplitName = ModelSplitName(
+            architecture.name(),
+            data.name(),
+            epochs,
+            patience,
+        )
         self._kmodel: keras.models.Model = None
         self._total_epochs: int = epochs
         self._patience: int = patience
@@ -158,6 +169,7 @@ class KerasAdapter(object):
             early = EarlyStoppingPickle.load(self._names.best.early()).get()
             print('Loading %s' % self._names.best.mcp())
             mcp = ModelCheckpoint2.load(self._names.best.mcp())
+
         mcp.add_periodic_observer(SaveKmodelObserver(self._names.latest.weights()))
         mcp.add_periodic_observer(ReduceLROnPlateauObserver(self._names.latest.lr(), lr))
         mcp.add_periodic_observer(EpochObserver(self._names.latest.epoch()))
@@ -166,6 +178,18 @@ class KerasAdapter(object):
         mcp.add_improvement_observer(ReduceLROnPlateauObserver(self._names.best.lr(), lr))
         mcp.add_improvement_observer(EpochObserver(self._names.best.epoch()))
         mcp.add_improvement_observer(EarlyStoppingObserver(self._names.best.early(), early))
+
+        callbacks = list()
+        callbacks.append(lr)
+        callbacks.append(log)
+        callbacks.append(mcp)
+        if self._total_epochs > 0:
+            callbacks.append(early)
+        callbacks.append(term)
+
+        total_epochs = self._total_epochs
+        if self._total_epochs == 0:
+            total_epochs = 2**64
 
         # Training set
         print('Loading training X')
@@ -185,18 +209,12 @@ class KerasAdapter(object):
         print('Training starts')
         self._kmodel.fit_generator(
             generator=seq1,
-            epochs=self._total_epochs,
+            epochs=total_epochs,
             verbose=1,
             validation_data=seq2,
             shuffle=False,
             initial_epoch=current_epoch,
-            callbacks=[
-                lr,
-                log,
-                mcp,
-                early,
-                term,
-            ],
+            callbacks=callbacks,
         )
         print('Training finished')
 
