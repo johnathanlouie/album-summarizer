@@ -350,10 +350,10 @@ class ModelCheckpoint2(Callback):
     def load(save_location: Url) -> ModelCheckpoint2:
         return ModelCheckpoint2Pickle.load(save_location).get()
 
-    def add_periodic_observer(self, obs: CheckpointObserver) -> None:
+    def on_period(self, obs: CheckpointObserver) -> None:
         self._periodic.append(obs)
 
-    def add_improvement_observer(self, obs: CheckpointObserver) -> None:
+    def on_improvement(self, obs: CheckpointObserver) -> None:
         self._best.append(obs)
 
     def on_nan_inf(self, obs: CheckpointObserver) -> None:
