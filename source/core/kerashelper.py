@@ -290,6 +290,7 @@ class ModelCheckpoint2(Callback):
         self.epochs_since_last_save: int = 0
         self._periodic: List[CheckpointObserver] = list()
         self._best: List[CheckpointObserver] = list()
+        self._naninf: List[CheckpointObserver] = list()
 
         if mode not in ['auto', 'min', 'max']:
             warnings.warn('ModelCheckpoint2 mode %s is unknown, fallback to auto mode.' % (mode), RuntimeWarning)
@@ -333,6 +334,15 @@ class ModelCheckpoint2(Callback):
             else:
                 print('\nEpoch %05d: %s did not improve from %0.5f' % (epoch + 1, self.monitor, self.best))
 
+    def on_batch_end(self, batch: int, logs: Dict = None):
+        logs = logs or {}
+        loss = logs.get('loss')
+        if loss is not None:
+            if np.isnan(loss) or np.isinf(loss):
+                for observer in self._naninf:
+                    observer.callback(self.model, batch=batch)
+
+
     def save(self, save_location: Url) -> None:
         ModelCheckpoint2Pickle(self).save(save_location)
 
@@ -345,6 +355,9 @@ class ModelCheckpoint2(Callback):
 
     def add_improvement_observer(self, obs: CheckpointObserver) -> None:
         self._best.append(obs)
+
+    def on_nan_inf(self, obs: CheckpointObserver) -> None:
+        self._naninf.append(obs)
 
 
 class TerminateOnDemand(Callback):
