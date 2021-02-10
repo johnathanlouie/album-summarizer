@@ -69,7 +69,7 @@ class ReduceLROnPlateauPickle(PickleAbstractClass):
     def _copyTo(
         src: Union[ReduceLROnPlateauPickle, ReduceLROnPlateau],
         dst: Union[ReduceLROnPlateauPickle, ReduceLROnPlateau],
-        ) -> None:
+    ) -> None:
         """
         Copies the data from one type to another.
         """
@@ -107,7 +107,7 @@ class EarlyStoppingPickle(PickleAbstractClass):
     def _copyTo(
         src: Union[EarlyStoppingPickle, EarlyStopping],
         dst: Union[EarlyStoppingPickle, EarlyStopping],
-        ) -> None:
+    ) -> None:
         """
         Copies the data from one type to another.
         """
@@ -195,7 +195,12 @@ class CheckpointObserver(object):
     def __init__(self):
         raise NotImplementedError
 
-    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+    def callback(
+        self,
+        kmodel: keras.models.Model,
+        epoch: int = None,
+        batch: int = None,
+    ) -> None:
         raise NotImplementedError
 
 
@@ -207,7 +212,12 @@ class ReduceLROnPlateauObserver(CheckpointObserver):
         self._url: Url = save_location
         self._lr: ReduceLROnPlateau = lr
 
-    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+    def callback(
+        self,
+        kmodel: keras.models.Model,
+        epoch: int = None,
+        batch: int = None,
+    ) -> None:
         ReduceLROnPlateauPickle(self._lr).save(self._url)
 
 
@@ -219,7 +229,12 @@ class EarlyStoppingObserver(CheckpointObserver):
         self._url: Url = save_location
         self._es: ReduceLROnPlateau = es
 
-    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+    def callback(
+        self,
+        kmodel: keras.models.Model,
+        epoch: int = None,
+        batch: int = None,
+    ) -> None:
         EarlyStoppingPickle(self._es).save(self._url)
 
 
@@ -230,7 +245,12 @@ class SaveKmodelObserver(CheckpointObserver):
     def __init__(self, save_location: Url):
         self._url: Url = save_location
 
-    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+    def callback(
+        self,
+        kmodel: keras.models.Model,
+        epoch: int = None,
+        batch: int = None,
+    ) -> None:
         kmodel.save_weights(self._url, overwrite=True)
 
 
@@ -241,7 +261,12 @@ class EpochObserver(CheckpointObserver):
     def __init__(self, save_location: Url) -> None:
         self._url: Url = save_location
 
-    def callback(self, kmodel: keras.models.Model, epoch: int) -> None:
+    def callback(
+        self,
+        kmodel: keras.models.Model,
+        epoch: int = None,
+        batch: int = None,
+    ) -> None:
         EpochPickle(epoch + 1).save(self._url)
 
 
@@ -292,7 +317,7 @@ class ModelCheckpoint2(Callback):
             print('\nEpoch %05d: saving model' % (epoch + 1))
             self.save(self.url)
             for observer in self._periodic:
-                observer.callback(self.model, epoch)
+                observer.callback(self.model, epoch=epoch)
         # Checks if last epoch improved the model.
         logs = logs or {}
         current = logs.get(self.monitor)
@@ -304,7 +329,7 @@ class ModelCheckpoint2(Callback):
                 self.best = current
                 self.save(self.url2)
                 for observer in self._best:
-                    observer.callback(self.model, epoch)
+                    observer.callback(self.model, epoch=epoch)
             else:
                 print('\nEpoch %05d: %s did not improve from %0.5f' % (epoch + 1, self.monitor, self.best))
 
