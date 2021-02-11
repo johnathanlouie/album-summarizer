@@ -158,14 +158,12 @@ class ModelCheckpoint2Pickle(PickleAbstractClass):
         dst.epochs_since_last_save = src.epochs_since_last_save
         dst.monitor = src.monitor
         dst.period = src.period
-        dst.url = src.url
-        dst.url2 = src.url2
 
     def get(self) -> ModelCheckpoint2:
         """
         Gets a copy of ModelCheckpoint2 based on this instance data.
         """
-        mcp = ModelCheckpoint2('', '')
+        mcp = ModelCheckpoint2()
         self._copyTo(self, mcp)
         if self.monitor_op == 'greater':
             mcp.monitor_op = np.greater
@@ -238,6 +236,23 @@ class EarlyStoppingObserver(CheckpointObserver):
         EarlyStoppingPickle(self._es).save(self._url)
 
 
+class ModelCheckpoint2Observer(CheckpointObserver):
+    """
+    """
+
+    def __init__(self, url: Url, mcp: ModelCheckpoint2):
+        self._mcp = mcp
+        self._url = url
+
+    def callback(
+        self,
+        kmodel: keras.models.Model,
+        epoch: int = None,
+        batch: int = None,
+    ) -> None:
+        ModelCheckpoint2Pickle(self._mcp).save(self._url)
+
+
 class SaveKmodelObserver(CheckpointObserver):
     """
     """
@@ -277,14 +292,10 @@ class ModelCheckpoint2(Callback):
 
     def __init__(
         self,
-        save: Url,
-        save_best: Url,
         mode: str = 'auto',
         period: int = 1,
     ):
         super(ModelCheckpoint2, self).__init__()
-        self.url: Url = save
-        self.url2: Url = save_best
         self.monitor: str = 'val_loss'
         self.period: int = period
         self.epochs_since_last_save: int = 0
@@ -316,7 +327,6 @@ class ModelCheckpoint2(Callback):
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
             print('\nEpoch %05d: saving model' % (epoch + 1))
-            self.save(self.url)
             for observer in self._periodic:
                 observer.callback(self.model, epoch=epoch)
         # Checks if last epoch improved the model.
@@ -328,7 +338,6 @@ class ModelCheckpoint2(Callback):
             if self.monitor_op(current, self.best):
                 print('\nEpoch %05d: %s improved from %0.5f to %0.5f, saving model' % (epoch + 1, self.monitor, self.best, current))
                 self.best = current
-                self.save(self.url2)
                 for observer in self._best:
                     observer.callback(self.model, epoch=epoch)
             else:
@@ -341,14 +350,6 @@ class ModelCheckpoint2(Callback):
             if np.isnan(loss) or np.isinf(loss):
                 for observer in self._naninf:
                     observer.callback(self.model, batch=batch)
-
-
-    def save(self, save_location: Url) -> None:
-        ModelCheckpoint2Pickle(self).save(save_location)
-
-    @staticmethod
-    def load(save_location: Url) -> ModelCheckpoint2:
-        return ModelCheckpoint2Pickle.load(save_location).get()
 
     def on_period(self, obs: CheckpointObserver) -> None:
         self._periodic.append(obs)

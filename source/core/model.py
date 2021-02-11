@@ -16,7 +16,7 @@ from core.dataset import (DataSet, DataSetSplit, DataSetSplitName, Predictions,
                           PredictionsFactory)
 from core.kerashelper import (EarlyStoppingObserver, EarlyStoppingPickle,
                               EpochObserver, EpochPickle, ModelCheckpoint2,
-                              ModelCheckpoint2Pickle,
+                              ModelCheckpoint2Observer, ModelCheckpoint2Pickle,
                               ReduceLROnPlateauObserver,
                               ReduceLROnPlateauPickle, SaveKmodelObserver,
                               Sequence1, TerminateOnDemand)
@@ -159,7 +159,7 @@ class KerasAdapter(object):
             print('Loading %s' % self._names.latest.early())
             early = EarlyStoppingPickle.load(self._names.latest.early()).get()
             print('Loading %s' % self._names.latest.mcp())
-            mcp = ModelCheckpoint2.load(self._names.latest.mcp())
+            mcp = ModelCheckpoint2Pickle.load(self._names.latest.mcp())
         else:
             print('Loading %s' % self._names.best.epoch())
             current_epoch: int = EpochPickle.load(self._names.best.epoch()).get()
@@ -168,16 +168,18 @@ class KerasAdapter(object):
             print('Loading %s' % self._names.best.early())
             early = EarlyStoppingPickle.load(self._names.best.early()).get()
             print('Loading %s' % self._names.best.mcp())
-            mcp = ModelCheckpoint2.load(self._names.best.mcp())
+            mcp = ModelCheckpoint2Pickle.load(self._names.best.mcp())
 
         mcp.on_period(SaveKmodelObserver(self._names.latest.weights()))
         mcp.on_period(ReduceLROnPlateauObserver(self._names.latest.lr(), lr))
         mcp.on_period(EpochObserver(self._names.latest.epoch()))
         mcp.on_period(EarlyStoppingObserver(self._names.latest.early(), early))
+        mcp.on_period(ModelCheckpoint2Observer(self._names.latest.mcp(), mcp))
         mcp.on_improvement(SaveKmodelObserver(self._names.best.weights()))
         mcp.on_improvement(ReduceLROnPlateauObserver(self._names.best.lr(), lr))
         mcp.on_improvement(EpochObserver(self._names.best.epoch()))
         mcp.on_improvement(EarlyStoppingObserver(self._names.best.early(), early))
+        mcp.on_improvement(ModelCheckpoint2Observer(self._names.best.mcp(), mcp))
 
         callbacks = list()
         callbacks.append(lr)
@@ -279,10 +281,7 @@ class KerasAdapter(object):
         # Blank model and training state
         print('Compiling architecture')
         kmodel = self._architecture.compile()
-        mcp = ModelCheckpoint2(
-            self._names.latest.mcp(),
-            self._names.best.mcp(),
-        )
+        mcp = ModelCheckpoint2Pickle(ModelCheckpoint2())
         lr = ReduceLROnPlateauPickle(ReduceLROnPlateau(
             patience=self._patience,
             verbose=1,
