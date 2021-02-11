@@ -88,6 +88,9 @@ class ModelSplitName(object):
         """
         return "%s/predictions.txt" % self.dirname()
 
+    def status(self) -> Url:
+        return '%s/status.txt' % self.dirname()
+
 
 class Evaluation(dict):
     """
