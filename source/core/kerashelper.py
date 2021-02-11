@@ -316,6 +316,39 @@ class EpochObserver(CheckpointObserver):
         EpochPickle(epoch + 1).save(self._url)
 
 
+class NanInfStatusObserver(CheckpointObserver):
+    """
+    """
+
+    def __init__(self, status: TrainingStatusData):
+        self._status = status
+
+    def callback(
+        self,
+        kmodel: keras.models.Model,
+        epoch: int = None,
+        batch: int = None,
+    ) -> None:
+        self._status.status = TrainingStatus.NANINF
+        self._status.save()
+
+
+class TerminateOnNanInfObserver(CheckpointObserver):
+    """
+    """
+
+    def __init__(self):
+        pass
+
+    def callback(
+        self,
+        kmodel: keras.models.Model,
+        epoch: int = None,
+        batch: int = None,
+    ) -> None:
+        kmodel.stop_training = True
+
+
 class ModelCheckpoint2(Callback):
     """
     Subject for CheckpointObserver.

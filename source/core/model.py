@@ -17,9 +17,11 @@ from core.dataset import (DataSet, DataSetSplit, DataSetSplitName, Predictions,
 from core.kerashelper import (EarlyStoppingObserver, EarlyStoppingPickle,
                               EpochObserver, EpochPickle, ModelCheckpoint2,
                               ModelCheckpoint2Observer, ModelCheckpoint2Pickle,
-                              ReduceLROnPlateauObserver,
+                              NanInfStatusObserver, ReduceLROnPlateauObserver,
                               ReduceLROnPlateauPickle, SaveKmodelObserver,
-                              Sequence1, TerminateOnDemand)
+                              Sequence1, TerminateOnDemand,
+                              TerminateOnNanInfObserver, TrainingStatus,
+                              TrainingStatusData)
 
 
 class ModelSplitName2(object):
