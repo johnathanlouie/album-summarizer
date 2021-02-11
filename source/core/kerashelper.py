@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import enum
 import warnings
 from typing import Any, Dict, List, Union
 
@@ -36,6 +37,36 @@ class Sequence1(Sequence):
         xx = asarray([resize_img(filename) for filename in batch_x])
         yy = asarray(batch_y)
         return xx, yy
+
+
+class TrainingStatus(enum.Enum):
+    TRAINING = 'training'
+    COMPLETE = 'complete'
+    NANINF = 'nan or inf error'
+    RESOURCE = 'resource error'
+
+
+class TrainingStatusData(object):
+    """
+    """
+
+    def __init__(self, url: Url):
+        self.status: TrainingStatus = TrainingStatus.TRAINING
+        self._url: Url = url
+
+    def save(self) -> None:
+        with open(self._url, 'w') as f:
+            f.write(self.status.value)
+
+    def is_complete(self) -> bool:
+        return self.status == TrainingStatus.COMPLETE
+
+    @classmethod
+    def load(cls, url: Url) -> TrainingStatusData:
+        with open(url) as f:
+            self = cls(url)
+            self.status = TrainingStatus(f.read())
+            return self
 
 
 class PickleAbstractClass(object):
