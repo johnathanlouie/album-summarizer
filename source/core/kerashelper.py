@@ -333,6 +333,23 @@ class NanInfStatusObserver(CheckpointObserver):
         self._status.save()
 
 
+class CompletionStatusObserver(CheckpointObserver):
+    """
+    """
+
+    def __init__(self, status: TrainingStatusData):
+        self._status = status
+
+    def callback(
+        self,
+        kmodel: keras.models.Model,
+        epoch: int = None,
+        batch: int = None,
+    ) -> None:
+        self._status.status = TrainingStatus.COMPLETE
+        self._status.save()
+
+
 class TerminateOnNanInfObserver(CheckpointObserver):
     """
     """
