@@ -189,6 +189,9 @@ class ModelCheckpoint2Pickle(PickleAbstractClass):
         dst.epochs_since_last_save = src.epochs_since_last_save
         dst.monitor = src.monitor
         dst.period = src.period
+        dst.patience = src.patience
+        dst.wait = src.wait
+        dst.total_epochs = src.total_epochs
 
     def get(self) -> ModelCheckpoint2:
         """
@@ -373,14 +376,19 @@ class ModelCheckpoint2(Callback):
 
     def __init__(
         self,
+        total_epochs: int = np.Inf,
+        monitor: str = 'val_loss',
         mode: str = 'auto',
         period: int = 1,
+        patience: int = np.Inf,
     ):
         super(ModelCheckpoint2, self).__init__()
-        self.monitor: str = 'val_loss'
+        self.monitor: str = monitor
         self.period: int = period
         self.epochs_since_last_save: int = 0
-        self._total_epochs: int = 0
+        self.patience = patience
+        self.wait = 0
+        self.total_epochs: int = total_epochs
         self._periodic: List[CheckpointObserver] = list()
         self._best: List[CheckpointObserver] = list()
         self._naninf: List[CheckpointObserver] = list()
@@ -418,17 +426,24 @@ class ModelCheckpoint2(Callback):
         if current is None:
             warnings.warn('Can save best model only with %s available, skipping.' % (self.monitor), RuntimeWarning)
         else:
+            # Improved
             if self.monitor_op(current, self.best):
                 print('\nEpoch %05d: %s improved from %0.5f to %0.5f, saving model' % (epoch + 1, self.monitor, self.best, current))
                 self.best = current
+                self.wait = 0
                 for observer in self._best:
                     observer.callback(self.model, epoch=epoch)
+            # No improvement
             else:
                 print('\nEpoch %05d: %s did not improve from %0.5f' % (epoch + 1, self.monitor, self.best))
-        if epoch + 1 >= self._total_epochs:
+                self.wait += 1
+                if self.wait >= self.patience:
+                    self.model.stop_training = True
+                    for observer in self._completion:
+                        observer.callback(self.model, epoch=epoch)
+        if epoch + 1 >= self.total_epochs:
             for observer in self._completion:
                 observer.callback(self.model, epoch=epoch)
-
 
     def on_batch_end(self, batch: int, logs: Dict = None):
         logs = logs or {}
@@ -437,9 +452,6 @@ class ModelCheckpoint2(Callback):
             if np.isnan(loss) or np.isinf(loss):
                 for observer in self._naninf:
                     observer.callback(self.model, batch=batch)
-
-    def set_total_epochs(self, epochs: int) -> None:
-        self._total_epochs = epochs
 
     def on_period(self, obs: CheckpointObserver) -> None:
         self._periodic.append(obs)
