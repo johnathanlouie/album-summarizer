@@ -377,10 +377,10 @@ class ModelCheckpoint2(Callback):
     def __init__(
         self,
         total_epochs: int = np.Inf,
+        patience: int = np.Inf,
         monitor: str = 'val_loss',
         mode: str = 'auto',
         period: int = 1,
-        patience: int = np.Inf,
     ):
         super(ModelCheckpoint2, self).__init__()
         self.monitor: str = monitor
