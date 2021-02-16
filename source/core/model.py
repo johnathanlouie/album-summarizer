@@ -345,33 +345,21 @@ class KerasAdapter(object):
         """
         Returns true if all the saved files exist.
         """
-        if not isfile(self._names.status()):
-            print('Missing %s' % self._names.status())
-            return False
-        if not isfile(self._names.latest.weights()):
-            print('Missing %s' % self._names.latest.weights())
-            return False
-        if not isfile(self._names.latest.mcp()):
-            print('Missing %s' % self._names.latest.mcp())
-            return False
-        if not isfile(self._names.latest.lr()):
-            print('Missing %s' % self._names.latest.lr())
-            return False
-        if not isfile(self._names.latest.epoch()):
-            print('Missing %s' % self._names.latest.epoch())
-            return False
-        if not isfile(self._names.best.weights()):
-            print('Missing %s' % self._names.best.weights())
-            return False
-        if not isfile(self._names.best.mcp()):
-            print('Missing %s' % self._names.best.mcp())
-            return False
-        if not isfile(self._names.best.lr()):
-            print('Missing %s' % self._names.best.lr())
-            return False
-        if not isfile(self._names.best.epoch()):
-            print('Missing %s' % self._names.best.epoch())
-            return False
+        files = [
+            self._names.status(),
+            self._names.latest.weights(),
+            self._names.latest.mcp(),
+            self._names.latest.lr(),
+            self._names.latest.epoch(),
+            self._names.best.weights(),
+            self._names.best.mcp(),
+            self._names.best.lr(),
+            self._names.best.epoch(),
+        ]
+        for filename in files:
+            if not isfile(filename):
+                print('Missing %s' % filename)
+                return False
         return True
 
     def load(self, best_snapshot: bool = False) -> None:
@@ -405,7 +393,7 @@ class ModelSplit(object):
         architecture: CompiledArchitecture,
         data: DataSetSplit,
         epochs: int,
-        patience: int
+        patience: int,
     ) -> None:
         self._architecture = architecture
         self._data = data
