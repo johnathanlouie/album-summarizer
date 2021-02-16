@@ -168,14 +168,14 @@ class KerasAdapter(object):
             print('Loading %s' % self._names.latest.lr())
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.latest.lr()).get()
             print('Loading %s' % self._names.latest.mcp())
-            mcp = ModelCheckpoint2Pickle.load(self._names.latest.mcp())
+            mcp = ModelCheckpoint2Pickle.load(self._names.latest.mcp()).get()
         else:
             print('Loading %s' % self._names.best.epoch())
             current_epoch: int = EpochPickle.load(self._names.best.epoch()).get()
             print('Loading %s' % self._names.best.lr())
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.best.lr()).get()
             print('Loading %s' % self._names.best.mcp())
-            mcp = ModelCheckpoint2Pickle.load(self._names.best.mcp())
+            mcp = ModelCheckpoint2Pickle.load(self._names.best.mcp()).get()
 
         mcp.on_period(SaveKmodelObserver(self._names.latest.weights()))
         mcp.on_period(ReduceLROnPlateauObserver(self._names.latest.lr(), lr))
@@ -298,6 +298,8 @@ class KerasAdapter(object):
         Initial settings are found here.
         """
         # Training status
+        print('Making %s' % self._names.dirname())
+        mkdirs(self._names.dirname())
         status = TrainingStatusData(self._names.status())
         status.status = TrainingStatus.TRAINING
         status.save()
