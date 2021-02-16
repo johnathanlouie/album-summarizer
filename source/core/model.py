@@ -502,8 +502,8 @@ class Model(object):
         loss: CompileOption,
         optimizer: CompileOption,
         metrics: CompileOption,
-        epochs: int = 0,
-        patience: int = 5,
+        epochs: int,
+        patience: int,
     ) -> None:
         self._architecture: CompiledArchitecture = CompiledArchitecture(
             architecture,
