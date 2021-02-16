@@ -6,16 +6,17 @@ from os.path import isfile
 from typing import List
 
 import keras.models
+import tensorflow as tf
 from jl import Image, Url, mkdirs
-from keras.callbacks import CSVLogger, EarlyStopping, ReduceLROnPlateau
+from keras.callbacks import CSVLogger, ReduceLROnPlateau
 from numpy import asarray, ndarray
 
 from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
 from core.dataset import (DataSet, DataSetSplit, DataSetSplitName, Predictions,
                           PredictionsFactory)
-from core.kerashelper import (EarlyStoppingObserver, EarlyStoppingPickle,
-                              EpochObserver, EpochPickle, ModelCheckpoint2,
+from core.kerashelper import (CompletionStatusObserver, EpochObserver,
+                              EpochPickle, ModelCheckpoint2,
                               ModelCheckpoint2Observer, ModelCheckpoint2Pickle,
                               NanInfStatusObserver, ReduceLROnPlateauObserver,
                               ReduceLROnPlateauPickle, SaveKmodelObserver,
@@ -143,15 +144,20 @@ class KerasAdapter(object):
         self._total_epochs: int = epochs
         self._patience: int = patience
         self._is_best: bool = False
+        self._status: TrainingStatusData = None
 
     def __exit__(self, exc_type, exc_value, traceback) -> bool:
         del self._kmodel
         return False
 
-    def train(self) -> None:
+    def train(self) -> TrainingStatus:
         """
         Trains the model
         """
+        if self._status.is_complete():
+            print()
+            return self._status.status
+
         # Training state
         term = TerminateOnDemand()
         log = CSVLogger(self._names.log(), append=True)
@@ -161,8 +167,6 @@ class KerasAdapter(object):
             current_epoch: int = EpochPickle.load(self._names.latest.epoch()).get()
             print('Loading %s' % self._names.latest.lr())
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.latest.lr()).get()
-            print('Loading %s' % self._names.latest.early())
-            early = EarlyStoppingPickle.load(self._names.latest.early()).get()
             print('Loading %s' % self._names.latest.mcp())
             mcp = ModelCheckpoint2Pickle.load(self._names.latest.mcp())
         else:
@@ -170,28 +174,29 @@ class KerasAdapter(object):
             current_epoch: int = EpochPickle.load(self._names.best.epoch()).get()
             print('Loading %s' % self._names.best.lr())
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.best.lr()).get()
-            print('Loading %s' % self._names.best.early())
-            early = EarlyStoppingPickle.load(self._names.best.early()).get()
             print('Loading %s' % self._names.best.mcp())
             mcp = ModelCheckpoint2Pickle.load(self._names.best.mcp())
 
         mcp.on_period(SaveKmodelObserver(self._names.latest.weights()))
         mcp.on_period(ReduceLROnPlateauObserver(self._names.latest.lr(), lr))
         mcp.on_period(EpochObserver(self._names.latest.epoch()))
-        mcp.on_period(EarlyStoppingObserver(self._names.latest.early(), early))
         mcp.on_period(ModelCheckpoint2Observer(self._names.latest.mcp(), mcp))
         mcp.on_improvement(SaveKmodelObserver(self._names.best.weights()))
         mcp.on_improvement(ReduceLROnPlateauObserver(self._names.best.lr(), lr))
         mcp.on_improvement(EpochObserver(self._names.best.epoch()))
-        mcp.on_improvement(EarlyStoppingObserver(self._names.best.early(), early))
         mcp.on_improvement(ModelCheckpoint2Observer(self._names.best.mcp(), mcp))
+        mcp.on_completion(SaveKmodelObserver(self._names.latest.weights()))
+        mcp.on_completion(ReduceLROnPlateauObserver(self._names.latest.lr(), lr))
+        mcp.on_completion(EpochObserver(self._names.latest.epoch()))
+        mcp.on_completion(ModelCheckpoint2Observer(self._names.latest.mcp(), mcp))
+        mcp.on_completion(CompletionStatusObserver(self._status))
+        mcp.on_nan_inf(NanInfStatusObserver(self._status))
+        mcp.on_nan_inf(TerminateOnNanInfObserver())
 
         callbacks = list()
         callbacks.append(lr)
         callbacks.append(log)
         callbacks.append(mcp)
-        if self._total_epochs == 0:
-            callbacks.append(early)
         callbacks.append(term)
 
         total_epochs = self._total_epochs
@@ -214,16 +219,25 @@ class KerasAdapter(object):
 
         # Training
         print('Training starts')
-        self._kmodel.fit_generator(
-            generator=seq1,
-            epochs=total_epochs,
-            verbose=1,
-            validation_data=seq2,
-            shuffle=False,
-            initial_epoch=current_epoch,
-            callbacks=callbacks,
-        )
-        print('Training finished')
+        try:
+            self._kmodel.fit_generator(
+                generator=seq1,
+                epochs=total_epochs,
+                verbose=1,
+                validation_data=seq2,
+                shuffle=False,
+                initial_epoch=current_epoch,
+                callbacks=callbacks,
+            )
+        except tf.errors.ResourceExhaustedError:
+            print('Resource exhaustion')
+            self._status.status = TrainingStatus.RESOURCE
+            self._status.save()
+            return self._status.status
+
+        if self._status.is_complete():
+            print('Training finished')
+        return self._status.status
 
     def evaluate(self, x: ndarray, y: ndarray) -> Evaluation:
         """
@@ -283,19 +297,23 @@ class KerasAdapter(object):
         Creates and saves the model file and other training state files.
         Initial settings are found here.
         """
+        # Training status
+        status = TrainingStatusData(self._names.status())
+        status.status = TrainingStatus.TRAINING
+        status.save()
+
         # Blank model and training state
         print('Compiling architecture')
         kmodel = self._architecture.compile()
-        mcp = ModelCheckpoint2Pickle(ModelCheckpoint2())
+        if self._total_epochs == 0:
+            mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(patience=10))
+        else:
+            mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(total_epochs=self._total_epochs))
         lr = ReduceLROnPlateauPickle(ReduceLROnPlateau(
             patience=self._patience,
             verbose=1,
         ))
         epoch = EpochPickle(0)
-        early = EarlyStoppingPickle(EarlyStopping(
-            patience=self._patience * 2,
-            verbose=1,
-        ))
 
         # Latest snapshot
         print('Making %s' % self._names.latest.dirname)
@@ -308,8 +326,6 @@ class KerasAdapter(object):
         lr.save(self._names.latest.lr())
         print('Saving to %s' % self._names.latest.epoch())
         epoch.save(self._names.latest.epoch())
-        print('Saving to %s' % self._names.latest.early())
-        early.save(self._names.latest.early())
 
         # Best snapshot
         print('Making %s' % self._names.best.dirname)
@@ -322,13 +338,14 @@ class KerasAdapter(object):
         lr.save(self._names.best.lr())
         print('Saving to %s' % self._names.best.epoch())
         epoch.save(self._names.best.epoch())
-        print('Saving to %s' % self._names.best.early())
-        early.save(self._names.best.early())
 
     def is_saved(self) -> bool:
         """
         Returns true if all the saved files exist.
         """
+        if not isfile(self._names.status()):
+            print('Missing %s' % self._names.status())
+            return False
         if not isfile(self._names.latest.weights()):
             print('Missing %s' % self._names.latest.weights())
             return False
@@ -340,9 +357,6 @@ class KerasAdapter(object):
             return False
         if not isfile(self._names.latest.epoch()):
             print('Missing %s' % self._names.latest.epoch())
-            return False
-        if not isfile(self._names.latest.early()):
-            print('Missing %s' % self._names.latest.early())
             return False
         if not isfile(self._names.best.weights()):
             print('Missing %s' % self._names.best.weights())
@@ -356,15 +370,13 @@ class KerasAdapter(object):
         if not isfile(self._names.best.epoch()):
             print('Missing %s' % self._names.best.epoch())
             return False
-        if not isfile(self._names.best.early()):
-            print('Missing %s' % self._names.best.early())
-            return False
         return True
 
     def load(self, best_snapshot: bool = False) -> None:
         """
         Loads the training model file and other training state files.
         """
+        self._status = TrainingStatusData.load(self._names.status())
         self._is_best = best_snapshot
         print('Compiling architecture')
         self._kmodel = self._architecture.compile()
@@ -398,7 +410,7 @@ class ModelSplit(object):
         self._epochs = epochs
         self._patience = patience
 
-    def train(self) -> None:
+    def train(self) -> TrainingStatus:
         """
         Trains the model
         """
@@ -411,7 +423,7 @@ class ModelSplit(object):
         if not kadapter.is_saved():
             kadapter.create()
         kadapter.load()
-        kadapter.train()
+        return kadapter.train()
 
     def evaluate_training_set(self) -> Evaluation:
         """
@@ -526,7 +538,10 @@ class Model(object):
         """
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
-            self.split(i).train()
+            status = self.split(i).train()
+            if status != TrainingStatus.COMPLETE:
+                return status
+        return TrainingStatus.COMPLETE
 
     def evaluate_training_set(self) -> Evaluation:
         """
