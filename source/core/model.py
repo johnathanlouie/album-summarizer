@@ -500,7 +500,7 @@ class Model(object):
         loss: CompileOption,
         optimizer: CompileOption,
         metrics: CompileOption,
-        epochs: int = 2**64,
+        epochs: int = 0,
         patience: int = 5,
     ) -> None:
         self._architecture: CompiledArchitecture = CompiledArchitecture(
