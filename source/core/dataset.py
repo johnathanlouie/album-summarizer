@@ -45,17 +45,17 @@ class DataSetXY(object):
     def __radd__(self, other: Any) -> str:
         return other + str(self)
 
-    def save(self, data: ndarray) -> None:
+    def save(self, data: ndarray, verbose: bool = True) -> None:
         """
         Saves a NumPy array as a file.
         """
-        npsave(self, data)
+        npsave(self, data, verbose)
 
-    def load(self) -> ndarray:
+    def load(self, verbose: bool = True) -> ndarray:
         """
         Loads a NumPy array from a file.
         """
-        return npload(self)
+        return npload(self, verbose)
 
     def exists(self) -> bool:
         """
