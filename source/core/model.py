@@ -154,6 +154,7 @@ class KerasAdapter(object):
         """
         Trains the model
         """
+        print('Training %s' % self._names.dirname())
         if self._status.is_complete():
             print()
             return self._status.status
@@ -345,10 +346,8 @@ class KerasAdapter(object):
         print('Compiling architecture')
         self._kmodel = self._architecture.compile()
         if best_snapshot:
-            print('Loading best snapshot')
             self._kmodel.load_weights(self._names.best.weights())
         else:
-            print('Loading weights')
             self._kmodel.load_weights(self._names.latest.weights())
 
     def delete(self) -> None:
