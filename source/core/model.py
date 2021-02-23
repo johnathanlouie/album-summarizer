@@ -163,18 +163,12 @@ class KerasAdapter(object):
         log = CSVLogger(self._names.log(), append=True)
         print('Loading training state')
         if not self._is_best:
-            print('Loading %s' % self._names.latest.epoch())
             current_epoch: int = EpochPickle.load(self._names.latest.epoch()).get()
-            print('Loading %s' % self._names.latest.lr())
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.latest.lr()).get()
-            print('Loading %s' % self._names.latest.mcp())
             mcp = ModelCheckpoint2Pickle.load(self._names.latest.mcp()).get()
         else:
-            print('Loading %s' % self._names.best.epoch())
             current_epoch: int = EpochPickle.load(self._names.best.epoch()).get()
-            print('Loading %s' % self._names.best.lr())
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.best.lr()).get()
-            print('Loading %s' % self._names.best.mcp())
             mcp = ModelCheckpoint2Pickle.load(self._names.best.mcp()).get()
 
         mcp.on_period(SaveKmodelObserver(self._names.latest.weights()))
@@ -204,13 +198,9 @@ class KerasAdapter(object):
             total_epochs = 2**64
 
         # Training set
-        print('Loading training X')
         x1 = self._data.train().x().load()
-        print('Loading training Y')
         y1 = self._data.train().y().load()
-        print('Loading validation X')
         x2 = self._data.validation().x().load()
-        print('Loading validation Y')
         y2 = self._data.validation().y().load()
         print('Training sequence')
         seq1 = Sequence1(x1, y1, 10)
@@ -255,9 +245,7 @@ class KerasAdapter(object):
         """
         Evaluates the model using the training set
         """
-        print('Loading validation X')
         x = self._data.train().x().load()
-        print('Loading validation Y')
         y = self._data.train().y().load()
         return self.evaluate(x, y)
 
@@ -265,9 +253,7 @@ class KerasAdapter(object):
         """
         Evaluates the model using the validation set
         """
-        print('Loading validation X')
         x = self._data.validation().x().load()
-        print('Loading validation Y')
         y = self._data.validation().y().load()
         return self.evaluate(x, y)
 
@@ -275,9 +261,7 @@ class KerasAdapter(object):
         """
         Evaluates the model using the test set
         """
-        print('Loading test X')
         x = self._data.test().x().load()
-        print('Loading test Y')
         y = self._data.test().y().load()
         return self.evaluate(x, y)
 
@@ -318,27 +302,17 @@ class KerasAdapter(object):
         epoch = EpochPickle(0)
 
         # Latest snapshot
-        print('Making %s' % self._names.latest.dirname)
         mkdirs(self._names.latest.dirname)
-        print('Saving to %s' % self._names.latest.weights())
         kmodel.save_weights(self._names.latest.weights())
-        print('Saving to %s' % self._names.latest.mcp())
         mcp.save(self._names.latest.mcp())
-        print('Saving to %s' % self._names.latest.lr())
         lr.save(self._names.latest.lr())
-        print('Saving to %s' % self._names.latest.epoch())
         epoch.save(self._names.latest.epoch())
 
         # Best snapshot
-        print('Making %s' % self._names.best.dirname)
         mkdirs(self._names.best.dirname)
-        print('Saving to %s' % self._names.best.weights())
         kmodel.save_weights(self._names.best.weights())
-        print('Saving to %s' % self._names.best.mcp())
         mcp.save(self._names.best.mcp())
-        print('Saving to %s' % self._names.best.lr())
         lr.save(self._names.best.lr())
-        print('Saving to %s' % self._names.best.epoch())
         epoch.save(self._names.best.epoch())
 
     def is_saved(self) -> bool:
