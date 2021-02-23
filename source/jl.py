@@ -70,20 +70,25 @@ layers = [
 ]
 
 
-def npsave(name: str, data: ArrayLike) -> None:
+def npsave(name: str, data: ArrayLike, verbose: bool = True) -> None:
     """
     Saves to a binary NumPy file.
     """
     url = "out/%s" % name
     mkdirname(url)
+    if verbose:
+        print('Saving %s.npy' % url)
     return save(url, data)
 
 
-def npload(name: str) -> ArrayLike:
+def npload(name: str, verbose: bool = True) -> ArrayLike:
     """
     Loads an array-like object from a binary NumPy file.
     """
-    return load("out/%s.npy" % name, allow_pickle=True)
+    url = 'out/%s.npy' % name
+    if verbose:
+        print('Loading %s' % url)
+    return load(url, allow_pickle=True)
 
 
 def npexists(name: str) -> bool:
