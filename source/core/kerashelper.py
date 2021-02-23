@@ -79,12 +79,16 @@ class PickleAbstractClass(object):
     def get(self) -> Any:
         raise NotImplementedError
 
-    def save(self, save_location: Url) -> None:
+    def save(self, save_location: Url, verbose: bool = True) -> None:
         mkdirname(save_location)
+        if verbose:
+            print('Saving %s' % save_location)
         dill.dump(self, open(save_location, 'wb'))
 
     @staticmethod
-    def load(save_location: Url) -> PickleAbstractClass:
+    def load(save_location: Url, verbose: bool = True) -> PickleAbstractClass:
+        if verbose:
+            print('Loading %s' % save_location)
         return dill.load(open(save_location, 'rb'))
 
 
