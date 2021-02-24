@@ -154,20 +154,22 @@ def absurl2(url: Url) -> Url:
     return url
 
 
-def mkdirname(filename: Url) -> None:
+def mkdirs(path: Url, verbose: bool = True) -> None:
+    """
+    Make all directories in a path including the child.
+    """
+    if verbose:
+        print('Making %s' % path)
+    makedirs(path, exist_ok=True)
+
+
+def mkdirname(filename: Url, verbose: bool = True) -> None:
     """
     Makes directories leading up to a file.
     The child is not included.
     """
-    name = dirname(filename)
-    makedirs(name, exist_ok=True)
-
-
-def mkdirs(path: Url) -> None:
-    """
-    Make all directories in a path including the child.
-    """
-    makedirs(path, exist_ok=True)
+    path = dirname(filename)
+    mkdirs(path, verbose)
 
 
 def resize_img(filename: Url) -> Image:
