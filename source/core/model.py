@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gc
 import json
 from enum import Enum, auto
 from os.path import isfile
@@ -8,6 +9,7 @@ from typing import List
 import keras.models
 import tensorflow as tf
 from jl import Image, Url, mkdirs
+from keras.backend import clear_session
 from keras.callbacks import CSVLogger, ReduceLROnPlateau
 from numpy import asarray, ndarray
 
@@ -146,8 +148,11 @@ class KerasAdapter(object):
         self._is_best: bool = False
         self._status: TrainingStatusData = None
 
+    def __enter__(self):
+        return self
+
     def __exit__(self, exc_type, exc_value, traceback) -> bool:
-        del self._kmodel
+        self.close()
         return False
 
     def train(self) -> TrainingStatus:
@@ -356,6 +361,13 @@ class KerasAdapter(object):
         """
         raise NotImplementedError
 
+    def close(self) -> None:
+        """
+        Clears Keras model from memory.
+        """
+        clear_session()
+        gc.collect()
+
 
 class ModelSplit(object):
     """
@@ -377,76 +389,76 @@ class ModelSplit(object):
         """
         Trains the model
         """
-        kadapter = KerasAdapter(
+        with KerasAdapter(
             self._architecture,
             self._data,
             self._epochs,
             self._patience,
-        )
-        if not kadapter.is_saved():
-            kadapter.create()
-        kadapter.load()
-        return kadapter.train()
+        ) as kadapter:
+            if not kadapter.is_saved():
+                kadapter.create()
+            kadapter.load()
+            return kadapter.train()
 
     def evaluate_training_set(self) -> Evaluation:
         """
         Measures the effectiveness of the model against the training set
         """
-        kadapter = KerasAdapter(
+        with KerasAdapter(
             self._architecture,
             self._data,
             self._epochs,
             self._patience,
-        )
-        if not kadapter.is_saved():
-            kadapter.create()
-        kadapter.load()
-        return kadapter.evaluate_training_set()
+        ) as kadapter:
+            if not kadapter.is_saved():
+                kadapter.create()
+            kadapter.load()
+            return kadapter.evaluate_training_set()
 
     def validate(self) -> Evaluation:
         """
         Measures the effectiveness of the model against the validation set
         """
-        kadapter = KerasAdapter(
+        with KerasAdapter(
             self._architecture,
             self._data,
             self._epochs,
             self._patience,
-        )
-        if not kadapter.is_saved():
-            kadapter.create()
-        kadapter.load()
-        return kadapter.validate()
+        ) as kadapter:
+            if not kadapter.is_saved():
+                kadapter.create()
+            kadapter.load()
+            return kadapter.validate()
 
     def test(self) -> Evaluation:
         """
         Measures the effectiveness of the model against the test set
         """
-        kadapter = KerasAdapter(
+        with KerasAdapter(
             self._architecture,
             self._data,
             self._epochs,
             self._patience,
-        )
-        if not kadapter.is_saved():
-            kadapter.create()
-        kadapter.load()
-        return kadapter.test()
+        ) as kadapter:
+            if not kadapter.is_saved():
+                kadapter.create()
+            kadapter.load()
+            return kadapter.test()
 
     def predict(self, images: List[Url]) -> Predictions:
         """
         Takes the input and returns an output
         """
-        kadapter = KerasAdapter(
+        with KerasAdapter(
             self._architecture,
             self._data,
             self._epochs,
             self._patience,
-        )
-        if not kadapter.is_saved():
-            kadapter.create()
-        kadapter.load()
-        return kadapter.predict(images)
+        ) as kadapter:
+            if not kadapter.is_saved():
+                kadapter.create()
+            kadapter.load()
+            return kadapter.predict(images)
 
 
 class Model(object):
