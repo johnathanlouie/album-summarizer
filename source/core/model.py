@@ -507,7 +507,7 @@ class Model(object):
             self._patience,
         )
 
-    def train(self) -> None:
+    def train(self) -> TrainingStatus:
         """
         Starts or continues training the model
         """
