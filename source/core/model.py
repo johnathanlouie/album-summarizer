@@ -159,15 +159,14 @@ class KerasAdapter(object):
         """
         Trains the model
         """
-        print('Training %s' % self._names.dirname())
+        print('Training: %s' % self._names.dirname())
         if self._status.is_complete():
-            print()
+            print('Training completed: %s' % self._names.dirname())
             return self._status.status
 
         # Training state
         term = TerminateOnDemand()
         log = CSVLogger(self._names.log(), append=True)
-        print('Loading training state')
         if not self._is_best:
             current_epoch: int = EpochPickle.load(self._names.latest.epoch()).get()
             lr: ReduceLROnPlateau = ReduceLROnPlateauPickle.load(self._names.latest.lr()).get()
@@ -208,13 +207,13 @@ class KerasAdapter(object):
         y1 = self._data.train().y().load()
         x2 = self._data.validation().x().load()
         y2 = self._data.validation().y().load()
-        print('Training sequence')
+        # print('Training sequence')
         seq1 = Sequence1(x1, y1, 10)
-        print('Validation sequence')
+        # print('Validation sequence')
         seq2 = Sequence1(x2, y2, 10)
 
         # Training
-        print('Training starts')
+        print('Training starting: %s' % self._names.dirname())
         try:
             self._kmodel.fit_generator(
                 generator=seq1,
@@ -226,13 +225,13 @@ class KerasAdapter(object):
                 callbacks=callbacks,
             )
         except tf.errors.ResourceExhaustedError:
-            print('Resource exhaustion')
+            print('\nTraining resource exhaustion: %s' % self._names.dirname())
             self._status.status = TrainingStatus.RESOURCE
             self._status.save()
             return self._status.status
 
         if self._status.is_complete():
-            print('Training finished')
+            print('Training completed: %s' % self._names.dirname())
         return self._status.status
 
     def evaluate(self, x: ndarray, y: ndarray) -> Evaluation:
@@ -288,14 +287,12 @@ class KerasAdapter(object):
         Initial settings are found here.
         """
         # Training status
-        print('Making %s' % self._names.dirname())
         mkdirs(self._names.dirname())
         status = TrainingStatusData(self._names.status())
         status.status = TrainingStatus.TRAINING
         status.save()
 
         # Blank model and training state
-        print('Compiling architecture')
         kmodel = self._architecture.compile()
         if self._total_epochs == 0:
             mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(patience=10))
@@ -348,7 +345,7 @@ class KerasAdapter(object):
         """
         self._status = TrainingStatusData.load(self._names.status())
         self._is_best = best_snapshot
-        print('Compiling architecture')
+        # print('Compiling architecture')
         self._kmodel = self._architecture.compile()
         if best_snapshot:
             self._kmodel.load_weights(self._names.best.weights())
