@@ -510,7 +510,7 @@ class Model(object):
         Starts or continues training the model
         """
         for i in range(self._dataset.splits()):
-            print("Split %d / %d" % (i + 1, self._dataset.splits()))
+            # print("Split %d / %d" % (i + 1, self._dataset.splits()))
             status = self.split(i).train()
             if status != TrainingStatus.COMPLETE:
                 return status
