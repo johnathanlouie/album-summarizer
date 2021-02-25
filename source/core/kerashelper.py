@@ -303,6 +303,7 @@ class SaveKmodelObserver(CheckpointObserver):
         epoch: int = None,
         batch: int = None,
     ) -> None:
+        print('Saving %s' % self._url)
         kmodel.save_weights(self._url, overwrite=True)
 
 
@@ -420,7 +421,7 @@ class ModelCheckpoint2(Callback):
         self.epochs_since_last_save += 1
         if self.epochs_since_last_save >= self.period:
             self.epochs_since_last_save = 0
-            print('Epoch %05d: saving model' % (epoch + 1))
+            print('Epoch %05d: Periodic' % (epoch + 1))
             for observer in self._periodic:
                 observer.callback(self.model, epoch=epoch)
         # Checks if last epoch improved the model.
@@ -431,7 +432,7 @@ class ModelCheckpoint2(Callback):
         else:
             # Improved
             if self.monitor_op(current, self.best):
-                print('Epoch %05d: %s improved from %0.5f to %0.5f, saving model' % (epoch + 1, self.monitor, self.best, current))
+                print('Epoch %05d: %s improved from %0.5f to %0.5f' % (epoch + 1, self.monitor, self.best, current))
                 self.best = current
                 self.wait = 0
                 for observer in self._best:

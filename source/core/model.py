@@ -307,6 +307,7 @@ class KerasAdapter(object):
 
         # Latest snapshot
         mkdirs(self._names.latest.dirname)
+        print('Saving %s' % self._names.latest.weights())
         kmodel.save_weights(self._names.latest.weights())
         mcp.save(self._names.latest.mcp())
         lr.save(self._names.latest.lr())
@@ -314,6 +315,7 @@ class KerasAdapter(object):
 
         # Best snapshot
         mkdirs(self._names.best.dirname)
+        print('Saving %s' % self._names.best.weights())
         kmodel.save_weights(self._names.best.weights())
         mcp.save(self._names.best.mcp())
         lr.save(self._names.best.lr())
@@ -349,8 +351,10 @@ class KerasAdapter(object):
         # print('Compiling architecture')
         self._kmodel = self._architecture.compile()
         if best_snapshot:
+            print('Loading %s' % self._names.best.weights())
             self._kmodel.load_weights(self._names.best.weights())
         else:
+            print('Loading %s' % self._names.latest.weights())
             self._kmodel.load_weights(self._names.latest.weights())
 
     def delete(self) -> None:
