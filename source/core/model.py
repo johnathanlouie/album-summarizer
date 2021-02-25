@@ -159,10 +159,11 @@ class KerasAdapter(object):
         """
         Trains the model
         """
-        print('Training: %s' % self._names.dirname())
         if self._status.is_complete():
             print('Training completed: %s' % self._names.dirname())
             return self._status.status
+        else:
+            print('Training: %s' % self._names.dirname())
 
         # Training state
         term = TerminateOnDemand()
