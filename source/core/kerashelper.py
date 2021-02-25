@@ -80,7 +80,6 @@ class PickleAbstractClass(object):
         raise NotImplementedError
 
     def save(self, save_location: Url, verbose: bool = True) -> None:
-        mkdirname(save_location)
         if verbose:
             print('Saving %s' % save_location)
         dill.dump(self, open(save_location, 'wb'))
