@@ -214,7 +214,7 @@ class KerasAdapter(object):
         seq2 = Sequence1(x2, y2, 10)
 
         # Training
-        print('Training starting: %s' % self._names.dirname())
+        print('Training starting: %s\n' % self._names.dirname())
         try:
             self._kmodel.fit_generator(
                 generator=seq1,
