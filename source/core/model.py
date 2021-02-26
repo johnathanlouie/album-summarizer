@@ -112,8 +112,11 @@ class Evaluation(dict):
             result[k] = v / len(evals)
         return result
 
-    def save_json(self, url: Url) -> None:
-        json.dump(self, open(url, 'w'))
+    def save_json(self, url: Url, verbose: bool = True) -> None:
+        if verbose:
+            print('Saving %s' % url)
+        with open(url, 'w') as f:
+            json.dump(self, f)
 
 
 class KerasAdapter(object):
