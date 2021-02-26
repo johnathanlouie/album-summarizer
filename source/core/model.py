@@ -346,6 +346,7 @@ class KerasAdapter(object):
         """
         Loads the training model file and other training state files.
         """
+        print()
         self._status = TrainingStatusData.load(self._names.status())
         self._is_best = best_snapshot
         # print('Compiling architecture')

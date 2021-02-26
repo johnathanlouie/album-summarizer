@@ -54,7 +54,9 @@ class TrainingStatusData(object):
         self.status: TrainingStatus = TrainingStatus.TRAINING
         self._url: Url = url
 
-    def save(self) -> None:
+    def save(self, verbose: bool = True) -> None:
+        if verbose:
+            print('Saving %s' % self._url)
         with open(self._url, 'w') as f:
             f.write(self.status.value)
 
@@ -62,7 +64,9 @@ class TrainingStatusData(object):
         return self.status == TrainingStatus.COMPLETE
 
     @classmethod
-    def load(cls, url: Url) -> TrainingStatusData:
+    def load(cls, url: Url, verbose: bool = True) -> TrainingStatusData:
+        if verbose:
+            print('Loading %s' % url)
         with open(url) as f:
             self = cls(url)
             self.status = TrainingStatus(f.read())
