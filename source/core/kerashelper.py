@@ -7,9 +7,8 @@ from typing import Any, Dict, List, Union
 import dill
 import keras
 import numpy as np
-from jl import Url, mkdirname, resize_img
-from keras.backend import get_value
-from keras.callbacks import Callback, EarlyStopping, ReduceLROnPlateau
+from jl import Url, resize_img
+from keras.callbacks import Callback
 from keras.utils import Sequence
 from numpy import asarray, ceil, ndarray
 
@@ -95,87 +94,6 @@ class PickleAbstractClass(object):
         return dill.load(open(save_location, 'rb'))
 
 
-class ReduceLROnPlateauPickle(PickleAbstractClass):
-    """
-    A picklable class that contains the data fields from ReduceLROnPlateau.
-    """
-
-    def __init__(self, lr: ReduceLROnPlateau) -> None:
-        self._copyTo(lr, self)
-
-    @staticmethod
-    def _copyTo(
-        src: Union[ReduceLROnPlateauPickle, ReduceLROnPlateau],
-        dst: Union[ReduceLROnPlateauPickle, ReduceLROnPlateau],
-    ) -> None:
-        """
-        Copies the data from one type to another.
-        """
-        dst.best = src.best
-        dst.cooldown = src.cooldown
-        dst.cooldown_counter = src.cooldown_counter
-        dst.factor = src.factor
-        dst.min_delta = src.min_delta
-        dst.min_lr = src.min_lr
-        dst.mode = src.mode
-        dst.monitor = src.monitor
-        dst.patience = src.patience
-        dst.verbose = src.verbose
-        dst.wait = src.wait
-
-    def get(self) -> ReduceLROnPlateau:
-        """
-        Gets a copy of ReduceLROnPlateau based on this instance data.
-        """
-        other = ReduceLROnPlateau()
-        self._copyTo(self, other)
-        return other
-
-
-class EarlyStoppingPickle(PickleAbstractClass):
-    """
-    A picklable class that contains the data fields from ReduceLROnPlateau.
-    """
-
-    def __init__(self, es: EarlyStopping) -> None:
-        self._copyTo(es, self)
-        self.monitor_op = es.monitor_op.__name__
-
-    @staticmethod
-    def _copyTo(
-        src: Union[EarlyStoppingPickle, EarlyStopping],
-        dst: Union[EarlyStoppingPickle, EarlyStopping],
-    ) -> None:
-        """
-        Copies the data from one type to another.
-        """
-        dst.monitor = src.monitor
-        dst.baseline = src.baseline
-        dst.patience = src.patience
-        dst.verbose = src.verbose
-        dst.min_delta = src.min_delta
-        dst.wait = src.wait
-        dst.stopped_epoch = src.stopped_epoch
-        dst.restore_best_weights = src.restore_best_weights
-        dst.best_weights = src.best_weights
-        if hasattr(src, 'best'):
-            dst.best = src.best
-
-    def get(self) -> EarlyStopping:
-        """
-        Gets a copy of ReduceLROnPlateau based on this instance data.
-        """
-        other = EarlyStopping()
-        self._copyTo(self, other)
-        if self.monitor_op == 'greater':
-            other.monitor_op = np.greater
-        elif self.monitor_op == 'less':
-            other.monitor_op = np.less
-        else:
-            raise Exception('monitor_op field missing')
-        return other
-
-
 class ModelCheckpoint2Pickle(PickleAbstractClass):
     """
     """
@@ -215,17 +133,6 @@ class ModelCheckpoint2Pickle(PickleAbstractClass):
         return mcp
 
 
-class EpochPickle(PickleAbstractClass):
-    """
-    """
-
-    def __init__(self, current_epoch: int) -> None:
-        self.current_epoch: int = current_epoch
-
-    def get(self) -> int:
-        return self.current_epoch
-
-
 class CheckpointObserver(object):
     """
     Observer interface for ModelCheckpoint2.
@@ -241,40 +148,6 @@ class CheckpointObserver(object):
         batch: int = None,
     ) -> None:
         raise NotImplementedError
-
-
-class ReduceLROnPlateauObserver(CheckpointObserver):
-    """
-    """
-
-    def __init__(self, save_location: Url, lr: ReduceLROnPlateau):
-        self._url: Url = save_location
-        self._lr: ReduceLROnPlateau = lr
-
-    def callback(
-        self,
-        kmodel: keras.models.Model,
-        epoch: int = None,
-        batch: int = None,
-    ) -> None:
-        ReduceLROnPlateauPickle(self._lr).save(self._url)
-
-
-class EarlyStoppingObserver(CheckpointObserver):
-    """
-    """
-
-    def __init__(self, save_location: Url, es: EarlyStopping):
-        self._url: Url = save_location
-        self._es: ReduceLROnPlateau = es
-
-    def callback(
-        self,
-        kmodel: keras.models.Model,
-        epoch: int = None,
-        batch: int = None,
-    ) -> None:
-        EarlyStoppingPickle(self._es).save(self._url)
 
 
 class ModelCheckpoint2Observer(CheckpointObserver):
@@ -309,22 +182,6 @@ class SaveKmodelObserver(CheckpointObserver):
     ) -> None:
         print('Saving %s' % self._url)
         kmodel.save_weights(self._url, overwrite=True)
-
-
-class EpochObserver(CheckpointObserver):
-    """
-    """
-
-    def __init__(self, save_location: Url) -> None:
-        self._url: Url = save_location
-
-    def callback(
-        self,
-        kmodel: keras.models.Model,
-        epoch: int = None,
-        batch: int = None,
-    ) -> None:
-        EpochPickle(epoch + 1).save(self._url)
 
 
 class NanInfStatusObserver(CheckpointObserver):

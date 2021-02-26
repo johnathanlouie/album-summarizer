@@ -17,14 +17,14 @@ from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
 from core.dataset import (DataSet, DataSetSplit, DataSetSplitName, Predictions,
                           PredictionsFactory)
-from core.kerashelper import (CompletionStatusObserver, EpochObserver,
-                              EpochPickle, ModelCheckpoint2,
+from core.epoch import EpochObserver, EpochPickle
+from core.kerashelper import (CompletionStatusObserver, ModelCheckpoint2,
                               ModelCheckpoint2Observer, ModelCheckpoint2Pickle,
-                              NanInfStatusObserver, ReduceLROnPlateauObserver,
-                              ReduceLROnPlateauPickle, SaveKmodelObserver,
+                              NanInfStatusObserver, SaveKmodelObserver,
                               Sequence1, TerminateOnDemand,
                               TerminateOnNanInfObserver, TrainingStatus,
                               TrainingStatusData)
+from core.reducelr import ReduceLROnPlateauObserver, ReduceLROnPlateauPickle
 
 
 class ModelSplitName2(object):
