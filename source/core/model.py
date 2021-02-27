@@ -1,10 +1,8 @@
-from __future__ import annotations
-
 import gc
 import json
 from enum import Enum, auto
 from os.path import isfile
-from typing import List
+from typing import Dict, List
 
 import keras.models
 import tensorflow as tf
@@ -100,19 +98,31 @@ class Evaluation(dict):
     Dictionary that holds loss/metric names as keys and scalar values.
     """
 
-    @staticmethod
-    def mean(evals: List[Evaluation]) -> Evaluation:
-        result = Evaluation()
-        for e in evals:
-            for k, v in e.items():
-                if k not in result:
-                    result[k] = 0.0
-                result[k] += v
-        for k, v in result:
-            result[k] = v / len(evals)
-        return result
+    def __init__(self):
+        super().__init__()
+        self['splits']: List[Dict[str, float]] = list()
+        self['mean'] = dict()
 
-    def save_json(self, url: Url, verbose: bool = True) -> None:
+    def append(self, resultx: Dict[str, float]) -> None:
+        self['splits'].append(resultx)
+        # New mean
+        mean = dict()
+        for e in self['splits']:
+            for k, v in e.items():
+                if k not in mean:
+                    mean[k] = 0.0
+                mean[k] += v
+        for k, v in mean:
+            mean[k] = v / len(self['splits'])
+        self['mean'] = mean
+
+    def mean(self) -> Dict[str, float]:
+        return self['mean'].copy()
+
+    def split(self, split: int) -> Dict[str, float]:
+        return self['splits'][split].copy()
+
+    def save(self, url: Url, verbose: bool = True) -> None:
         if verbose:
             print('Saving %s' % url)
         with open(url, 'w') as f:
@@ -238,7 +248,7 @@ class KerasAdapter(object):
             print('Training completed: %s' % self._names.dirname())
         return self._status.status
 
-    def evaluate(self, x: ndarray, y: ndarray) -> Evaluation:
+    def evaluate(self, x: ndarray, y: ndarray) -> Dict[str, float]:
         """
         Evaluates the model using the given x and y.
         Returns a list of metrics.
@@ -246,11 +256,11 @@ class KerasAdapter(object):
         seq = Sequence1(x, y, 10)
         results: List[float] = self._kmodel.evaluate_generator(
             generator=seq,
-            verbose=1
+            verbose=1,
         )
-        return Evaluation({metric: scalar for metric, scalar in zip(self._kmodel.metrics_names, results)})
+        return {metric: scalar for metric, scalar in zip(self._kmodel.metrics_names, results)}
 
-    def evaluate_training_set(self) -> Evaluation:
+    def evaluate_training_set(self) -> Dict[str, float]:
         """
         Evaluates the model using the training set
         """
@@ -258,7 +268,7 @@ class KerasAdapter(object):
         y = self._data.train().y().load()
         return self.evaluate(x, y)
 
-    def validate(self) -> Evaluation:
+    def validate(self) -> Dict[str, float]:
         """
         Evaluates the model using the validation set
         """
@@ -266,7 +276,7 @@ class KerasAdapter(object):
         y = self._data.validation().y().load()
         return self.evaluate(x, y)
 
-    def test(self) -> Evaluation:
+    def test(self) -> Dict[str, float]:
         """
         Evaluates the model using the test set
         """
@@ -406,7 +416,7 @@ class ModelSplit(object):
             kadapter.load()
             return kadapter.train()
 
-    def evaluate_training_set(self) -> Evaluation:
+    def evaluate_training_set(self) -> Dict[str, float]:
         """
         Measures the effectiveness of the model against the training set
         """
@@ -421,7 +431,7 @@ class ModelSplit(object):
             kadapter.load()
             return kadapter.evaluate_training_set()
 
-    def validate(self) -> Evaluation:
+    def validate(self) -> Dict[str, float]:
         """
         Measures the effectiveness of the model against the validation set
         """
@@ -436,7 +446,7 @@ class ModelSplit(object):
             kadapter.load()
             return kadapter.validate()
 
-    def test(self) -> Evaluation:
+    def test(self) -> Dict[str, float]:
         """
         Measures the effectiveness of the model against the test set
         """
@@ -528,28 +538,28 @@ class Model(object):
         """
         Evaluates the model against the data's training set
         """
-        evaluations: List[Evaluation] = list()
+        evaluation = Evaluation()
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
-            evaluations.append(self.split(i).evaluate_training_set())
-        return Evaluation.mean(evaluations)
+            evaluation.append(self.split(i).evaluate_training_set())
+        return evaluation
 
     def validate(self) -> Evaluation:
         """
         Evaluates the model against the data's validation set
         """
-        evaluations: List[Evaluation] = list()
+        evaluation = Evaluation()
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
-            evaluations.append(self.split(i).validate())
-        return Evaluation.mean(evaluations)
+            evaluation.append(self.split(i).validate())
+        return evaluation
 
     def test(self) -> Evaluation:
         """
         Evaluates the model against the data's test set
         """
-        evaluations: List[Evaluation] = list()
+        evaluation = Evaluation()
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
-            evaluations.append(self.split(i).test())
-        return Evaluation.mean(evaluations)
+            evaluation.append(self.split(i).test())
+        return evaluation
