@@ -185,6 +185,7 @@ class KerasAdapter(object):
 
         # Training state
         term = TerminateOnDemand()
+        term.clear()
         log = CSVLogger(self._names.log(), append=True)
         if not self._is_best:
             current_epoch: int = EpochPickle.load(self._names.latest.epoch()).get()

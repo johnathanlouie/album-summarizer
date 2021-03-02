@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import sys
 import warnings
 from typing import Any, Dict, List, Union
 
@@ -346,3 +347,8 @@ class TerminateOnDemand(Callback):
                 print("Manual early terminate command found in %s" % self._URL)
                 self.stopped_epoch = epoch
                 self.model.stop_training = True
+                sys.exit()
+
+    def clear(self) -> None:
+        with open(self._URL, 'w') as f:
+            f.write('')
