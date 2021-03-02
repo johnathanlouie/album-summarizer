@@ -23,8 +23,8 @@ def main():
                                 loss,
                                 optimizer,
                                 metric,
-                                0,
-                                3,
+                                epochs=0,
+                                patience=3,
                             ).train()
                         except ValueError:
                             print('Incompatible model: %s %s %s %s %s' % (

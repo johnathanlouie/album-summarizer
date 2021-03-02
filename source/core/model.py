@@ -168,6 +168,9 @@ class KerasAdapter(object):
         self.close()
         return False
 
+    def status(self) -> TrainingStatus:
+        return self._status.status
+
     def train(self) -> TrainingStatus:
         """
         Trains the model
@@ -401,6 +404,17 @@ class ModelSplit(object):
         self._epochs = epochs
         self._patience = patience
 
+    def status(self) -> TrainingStatus:
+        with KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        ) as kadapter:
+            if not kadapter.is_saved():
+                kadapter.create()
+            return kadapter.status()
+
     def train(self) -> TrainingStatus:
         """
         Trains the model
@@ -509,6 +523,13 @@ class Model(object):
             raise ValueError('Architecture and data set are not compatible')
         self._epochs: int = epochs
         self._patience: int = patience
+
+    def status(self) -> TrainingStatus:
+        for i in range(self._dataset.splits()):
+            status = self.split(i).status()
+            if status != TrainingStatus.COMPLETE:
+                return status
+        return TrainingStatus.COMPLETE
 
     def split(self, num: int) -> ModelSplit:
         """
