@@ -17,7 +17,7 @@ def main():
                 for optimizer in core.modelbuilder.ModelBuilder.OPTIMIZERS.keys():
                     for metric in core.modelbuilder.ModelBuilder.METRICS.keys():
                         try:
-                            core.modelbuilder.ModelBuilder.create(
+                            model = core.modelbuilder.ModelBuilder.create(
                                 architecture,
                                 dataset,
                                 loss,
@@ -25,7 +25,9 @@ def main():
                                 metric,
                                 epochs=0,
                                 patience=3,
-                            ).train()
+                            )
+                            if not model.is_complete():
+                                model.train()
                         except ValueError:
                             print('Incompatible model: %s %s %s %s %s' % (
                                 architecture,

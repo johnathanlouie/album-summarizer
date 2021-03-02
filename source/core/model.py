@@ -531,6 +531,9 @@ class Model(object):
                 return status
         return TrainingStatus.COMPLETE
 
+    def is_complete(self) -> bool:
+        return self.status == TrainingStatus.COMPLETE
+
     def split(self, num: int) -> ModelSplit:
         """
         Gets a specific split
