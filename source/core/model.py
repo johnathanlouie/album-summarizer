@@ -169,6 +169,8 @@ class KerasAdapter(object):
         return False
 
     def status(self) -> TrainingStatus:
+        if self._status is None:
+            self._status = TrainingStatusData.load(self._names.status())
         return self._status.status
 
     def train(self) -> TrainingStatus:
