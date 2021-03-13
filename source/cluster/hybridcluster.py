@@ -1,25 +1,27 @@
 from typing import Dict, List
 
-from core.cluster import ClusterResults, ClusterStrategy
+from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
 from jl import Url
 
 from cluster.histogram import HistogramCluster
-from cluster.sift import SiftCluster
+from cluster.sift import (SiftCluster, Similarity, Similarity1, Similarity2,
+                          Similarity3)
 
 
 class HybridCluster(ClusterStrategy):
     """
     """
 
-    def __init__(self, options: Dict[str, str]):
-        self._options = options
+    def __init__(self, similarity: Similarity):
+        self._sift = SiftCluster(similarity)
+        self._hist = HistogramCluster()
 
     def run(self, images: List[Url]) -> ClusterResults:
         """
         Clusters images.
         """
-        results1 = SiftCluster(self._options).run(images)
-        results2 = HistogramCluster(dict()).run(images)
+        results1 = self._sift.run(images)
+        results2 = self._hist.run(images)
         labels1 = results1.labels()
         labels2 = results2.labels()
         k1 = results1.k()
@@ -80,10 +82,10 @@ class HybridCluster2(HybridCluster):
         """
         Clusters images.
         """
-        results1 = HistogramCluster(dict()).run(images)
+        results1 = self._hist.run(images)
         cluster = [-1] * len(images)
         for label1, urls1 in enumerate(results1.urls()):
-            results2 = SiftCluster(self._options).run(urls1)
+            results2 = self._sift.run(urls1)
             for label2, urls2 in enumerate(results2.urls()):
                 label3 = self.combine(label1, label2, results1.k())
                 for url2 in urls2:
@@ -93,5 +95,9 @@ class HybridCluster2(HybridCluster):
         return ClusterResults(images, cluster)
 
 
-ClusterStrategy.REGISTRY['hybrid'] = HybridCluster
-ClusterStrategy.REGISTRY['hybrid2'] = HybridCluster2
+ClusterRegistry.add('hybrid1a', HybridCluster(Similarity1()))
+ClusterRegistry.add('hybrid1b', HybridCluster(Similarity2()))
+ClusterRegistry.add('hybrid1c', HybridCluster(Similarity3()))
+ClusterRegistry.add('hybrid2a', HybridCluster2(Similarity1()))
+ClusterRegistry.add('hybrid2b', HybridCluster2(Similarity2()))
+ClusterRegistry.add('hybrid2c', HybridCluster2(Similarity3()))

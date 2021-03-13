@@ -68,8 +68,6 @@ class ClusterStrategy(object):
     """
     """
 
-    REGISTRY = dict()
-
     def __init__(self) -> None:
         raise NotImplementedError
 
@@ -77,3 +75,21 @@ class ClusterStrategy(object):
         """
         """
         raise NotImplementedError
+
+
+class ClusterRegistry(object):
+    """
+    """
+
+    _REGISTRY: Dict[str, ClusterStrategy] = dict()
+
+    @classmethod
+    def add(cls, name: str, strategy: ClusterStrategy) -> None:
+        if name in cls._REGISTRY:
+            raise ValueError
+        else:
+            cls._REGISTRY[name] = strategy
+
+    @classmethod
+    def get(cls, name: str) -> ClusterStrategy:
+        return cls._REGISTRY[name]

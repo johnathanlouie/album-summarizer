@@ -1,10 +1,11 @@
 from typing import Dict, List
 
 import cv2
-from core.cluster import ClusterResults, ClusterStrategy
+from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
 from jl import Url, hsv, read_image
 from numpy import concatenate, ndarray, reshape, vstack
 from sklearn.cluster import MeanShift
+
 
 Histogram = ndarray
 
@@ -79,7 +80,7 @@ class HistogramCluster(ClusterStrategy):
     """
     """
 
-    def __init__(self, options: Dict[str, str]):
+    def __init__(self):
         pass
 
     def run(self, images: List[Url]) -> ClusterResults:
@@ -106,4 +107,4 @@ class HistogramCluster(ClusterStrategy):
         return results
 
 
-ClusterStrategy.REGISTRY['histogram'] = HistogramCluster
+ClusterRegistry.add('histogram', HistogramCluster())
