@@ -418,6 +418,9 @@ class ModelSplit(object):
                 kadapter.create()
             return kadapter.status()
 
+    def is_complete(self) -> bool:
+        return self.status() == TrainingStatus.COMPLETE
+
     def train(self) -> TrainingStatus:
         """
         Trains the model
