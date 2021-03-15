@@ -12,27 +12,26 @@ import dataset.cc
 import dataset.lamem
 
 
-def builds() -> Tuple[str, str, str, str, str]:
-    for metric in core.modelbuilder.ModelBuilder.METRICS.keys():
-        for architecture in core.modelbuilder.ModelBuilder.ARCHITECTURES.keys():
-            for dataset in core.modelbuilder.ModelBuilder.DATASETS.keys():
-                for loss in core.modelbuilder.ModelBuilder.LOSSES.keys():
-                    for optimizer in core.modelbuilder.ModelBuilder.OPTIMIZERS.keys():
-                        yield architecture, dataset, loss, optimizer, metric
+def builds() -> Tuple[str, str, str, str]:
+    for architecture in core.modelbuilder.ModelBuilder.ARCHITECTURES.keys():
+        for dataset in core.modelbuilder.ModelBuilder.DATASETS.keys():
+            for loss in core.modelbuilder.ModelBuilder.LOSSES.keys():
+                for optimizer in core.modelbuilder.ModelBuilder.OPTIMIZERS.keys():
+                    yield architecture, dataset, loss, optimizer
 
 
 def main():
-    for architecture, dataset, loss, optimizer, metric in builds():
+    for architecture, dataset, loss, optimizer in builds():
         try:
             model = core.modelbuilder.ModelBuilder.create(
                 architecture,
                 dataset,
                 loss,
                 optimizer,
-                metric,
+                'acc',
                 epochs=0,
                 patience=3,
-            )
+            ).split(0)
             if not model.is_complete():
                 model.train()
         except ValueError:
@@ -41,7 +40,7 @@ def main():
                 dataset,
                 loss,
                 optimizer,
-                metric,
+                'acc',
             ))
 
 
