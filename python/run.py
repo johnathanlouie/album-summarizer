@@ -6,6 +6,18 @@ from urllib.parse import quote
 import flask
 
 import aaa
+import architecture.smi13
+import architecture.vgg16
+import cluster.histogram
+import cluster.hybridcluster
+import cluster.sift
+import coption.custom
+import coption.keras
+import coption.keras2
+import core.modelbuilder
+import dataset.anifood
+import dataset.cc
+import dataset.lamem
 from core import modelbuilder
 from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
 from core.model import ModelSplit
@@ -69,21 +81,29 @@ if __name__ == '__main__':
         settings = flask.request.get_json()
         cluster = ClusterRegistry.get(settings['cluster'])
         model_settings = settings['model']
-        model = ModelBuilder.create(
-            model_settings['architecture'],
-            model_settings['dataset'],
-            model_settings['loss'],
-            model_settings['optimizer'],
-            model_settings['metrics'],
-            model_settings['epochs'],
-            model_settings['patience'],
-        )
-        results = main(settings['url'], cluster, model)
-        return {
-            'status': 0,
-            'message': 'OK',
-            'data': results,
-        }
+        try:
+            model = ModelBuilder.create(
+                model_settings['architecture'],
+                model_settings['dataset'],
+                model_settings['loss'],
+                model_settings['optimizer'],
+                model_settings['metrics'],
+                model_settings['epochs'],
+                model_settings['patience'],
+            )
+            results = main(settings['url'], cluster, model)
+            return {
+                'status': 0,
+                'message': 'OK',
+                'data': results,
+            }
+        except ValueError:
+            return {
+                'status': 2,
+                'message': 'Error: Incompatible architecture/Dataset',
+                'data': None,
+            }
+
 
     @app.route('/run', methods=['GET'])
     def run2():
