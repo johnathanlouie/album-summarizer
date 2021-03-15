@@ -1,29 +1,16 @@
-from argparse import ArgumentParser, Namespace
+from copy import deepcopy
 from json import dump
-from typing import Dict, List, Union
+from typing import Any, Dict, List
 from urllib.parse import quote
 
-import cv2
+import flask
 
 import aaa
-from cluster.histogram import HistogramCluster
-from cluster.hybridcluster import HybridCluster, HybridCluster2
-from cluster.sift import SiftCluster
 from core import modelbuilder
-from core.cluster import ClusterResults, ClusterStrategy
+from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
 from core.model import ModelSplit
-from jl import ImageDirectory, ListFile, Url, copy_file
-
-
-def proc_args() -> Namespace:
-    """
-    Parses program arguments.
-    """
-    parser = ArgumentParser(
-        description='A program that chooses the most representative photos from a photo album.')
-    parser.add_argument('directory', help='')
-    args = parser.parse_args()
-    return args
+from core.modelbuilder import ModelBuilder
+from jl import ImageDirectory, Url
 
 
 class ClusterRank(object):
@@ -37,11 +24,10 @@ class ClusterRank(object):
             self._results[clusterId].append({
                 'path': path,
                 'rating': rate,
-                'cluster': clusterId
+                'cluster': clusterId,
             })
         for cluster in self._results:
             cluster.sort(key=lambda x: x['rating'], reverse=True)
-        return
 
     def save_results(self, dst: Url) -> None:
         """
@@ -50,34 +36,61 @@ class ClusterRank(object):
         dst = 'electron/public/data/%s.json' % quote(dst)
         with open(dst, 'w', encoding='utf8') as f:
             dump(self._results, f, indent=4)
-        return
+
+    def json(self) -> List[List[Dict[str, Any]]]:
+        return deepcopy(self._results)
 
 
-def main2(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> None:
+def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> None:
     """
     Does all the work.
     """
-    images = ImageDirectory(directory).jpeg()
+    images = ImageDirectory(directory).jpeg(False)
     clusters = algorithm.run(images)
     rates = algorithm2.predict(images).human_readable()
     print('Ranking results....')
     cr = ClusterRank(clusters, rates)
-    print('Saving results....')
-    cr.save_results(directory)
-    return
-
-
-def main():
-    """
-    Command line shell interface.
-    """
-    args = proc_args()
-    url = args.directory
-    cluster = SiftCluster()
-    rater = modelbuilder.ModelBuilder.create_split('smi1', 'ccrc', 0, 14, 0, 0)
-    main2(url, cluster, rater)
-    return
+    # print('Saving results....')
+    # cr.save_results(directory)
+    return cr.json()
 
 
 if __name__ == '__main__':
-    main()
+    app = flask.Flask(__name__)
+
+    @app.route('/run', methods=['POST'])
+    def run():
+        if not flask.request.is_json:
+            return {
+                'status': 1,
+                'message': 'Error: Not JSON',
+                'data': None,
+            }
+        settings = flask.request.get_json()
+        cluster = ClusterRegistry.get(settings['cluster'])
+        model_settings = settings['model']
+        model = ModelBuilder.create(
+            model_settings['architecture'],
+            model_settings['dataset'],
+            model_settings['loss'],
+            model_settings['optimizer'],
+            model_settings['metrics'],
+            model_settings['epochs'],
+            model_settings['patience'],
+        )
+        results = main(settings['url'], cluster, model)
+        return {
+            'status': 0,
+            'message': 'OK',
+            'data': results,
+        }
+
+    @app.route('/run', methods=['GET'])
+    def run2():
+        return {
+            'status': 0,
+            'message': 'OK',
+            'data': None,
+        }
+
+    app.run(port=8080)
