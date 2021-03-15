@@ -91,7 +91,8 @@ if __name__ == '__main__':
                 model_settings['epochs'],
                 model_settings['patience'],
             )
-            results = main(settings['url'], cluster, model)
+            split = model.split(model_settings['split'])
+            results = main(settings['url'], cluster, split)
             return {
                 'status': 0,
                 'message': 'OK',
@@ -103,7 +104,6 @@ if __name__ == '__main__':
                 'message': 'Error: Incompatible architecture/Dataset',
                 'data': None,
             }
-
 
     @app.route('/run', methods=['GET'])
     def run2():
