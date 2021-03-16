@@ -107,7 +107,7 @@ class Directory_ extends Array {
     }
 }
 
-function viewCtrl($scope, $interval) {
+function viewCtrl($scope, $interval, $http) {
     const homeDir = os.homedir();
     $scope.cwd = Directory_.factory(homeDir);
 
@@ -237,7 +237,41 @@ function viewCtrl($scope, $interval) {
 
     function reorganize() {
         $scope.cwd.unorganize();
-        var command = `conda run -n album pythonw "${path.normalize('source/run.py')}" "${$scope.cwd.path}"`;
+        var data = {
+            model: {
+                architecture: 'smi13',
+                dataset: 'ccr',
+                loss: 'rmse',
+                optimizer: 'sgd1',
+                metrics: 'acc',
+                epochs: 0,
+                patience: 3,
+                split: 0,
+            },
+            cluster: 'sift',
+            url: $scope.cwd.path,
+        };
+        $http.post('http://localhost:8080/run', data).then(response => {
+            if (response.data.status === 0) {
+                dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
+                var json = JSON.stringify(response.data.data);
+                fs.writeFile(dataFile, json, () => { organize(true); });
+            }
+            else if (response.data.status === 2) {
+                // TODO architecture/dataset mismatch
+            }
+            else {
+                // TODO some other error
+            }
+        }).catch(() => {
+            // TODO what if internal server error
+        });
+    }
+
+    /** @deprecated */
+    function reorganize2() {
+        $scope.cwd.unorganize();
+        var command = `conda run -n album pythonw "${path.normalize('python/run.py')}" "${$scope.cwd.path}"`;
         var options = { cwd: '..', windowsHide: true };
         var proc = childProcess.exec(command, options);
         ipcRenderer.send('add-pid', proc.pid);
