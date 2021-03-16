@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from os import getcwd
 from os.path import join, normpath
 from typing import Any, List, Optional, Union
@@ -89,9 +90,6 @@ class Cc(DataSet):
     An abstract base class for the CC dataset.
     """
 
-    def __init__(self):
-        raise NotImplementedError
-
     def _relative_url(self, url: Url) -> str:
         """
         Returns the relative url of the image from the filename.
@@ -108,11 +106,12 @@ class Cc(DataSet):
         x = [self._relative_url(i) for i in x]
         return asarray(x)
 
+    @abstractmethod
     def _y(self) -> ndarray:
         """
         Returns the Y. To be implemented by subclass.
         """
-        raise NotImplementedError
+        pass
 
     def prepare(self) -> None:
         """
@@ -147,9 +146,6 @@ class CccPredictionsFactory(PredictionsFactory):
     """
     """
 
-    def __init__(self):
-        pass
-
     def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         """
@@ -163,9 +159,6 @@ class Ccc(Cc):
 
     NAME = 'ccc'
     OUTPUT_NUM: int = 6
-
-    def __init__(self):
-        pass
 
     def _y(self) -> ndarray:
         """
@@ -196,9 +189,6 @@ class CcrPredictionsFactory(PredictionsFactory):
     """
     """
 
-    def __init__(self):
-        pass
-
     def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         Returns an instance of CcrPredictions.
@@ -213,9 +203,6 @@ class Ccr(Cc):
 
     NAME = 'ccr'
     OUTPUT_NUM: int = 1
-
-    def __init__(self):
-        pass
 
     def _y(self) -> ndarray:
         """
@@ -258,9 +245,6 @@ class CcrcPredictionsFactory(PredictionsFactory):
     """
     """
 
-    def __init__(self):
-        pass
-
     def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         """
@@ -274,9 +258,6 @@ class CcrCategorical(Cc):
 
     NAME = 'ccrc'
     OUTPUT_NUM: int = 3
-
-    def __init__(self):
-        pass
 
     def _y(self) -> ndarray:
         """

@@ -3,6 +3,7 @@ from __future__ import annotations
 import enum
 import sys
 import warnings
+from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Union
 
 import dill
@@ -73,15 +74,13 @@ class TrainingStatusData(object):
             return self
 
 
-class PickleAbstractClass(object):
+class PickleAbstractClass(ABC):
     """
     """
 
-    def __init__(self):
-        raise NotImplementedError
-
+    @abstractmethod
     def get(self) -> Any:
-        raise NotImplementedError
+        pass
 
     def save(self, save_location: Url, verbose: bool = True) -> None:
         if verbose:
@@ -134,21 +133,19 @@ class ModelCheckpoint2Pickle(PickleAbstractClass):
         return mcp
 
 
-class CheckpointObserver(object):
+class CheckpointObserver(ABC):
     """
     Observer interface for ModelCheckpoint2.
     """
 
-    def __init__(self):
-        raise NotImplementedError
-
+    @abstractmethod
     def callback(
         self,
         kmodel: keras.models.Model,
         epoch: int = None,
         batch: int = None,
     ) -> None:
-        raise NotImplementedError
+        pass
 
 
 class ModelCheckpoint2Observer(CheckpointObserver):

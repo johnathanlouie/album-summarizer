@@ -15,9 +15,6 @@ class Vgg16(Architecture):
     NAME = 'vgg16'
     OUTPUT_NUM: int = 6
 
-    def __init__(self):
-        pass
-
     def create(self) -> Model:
         """
         Creates a keras.models.Model object.
@@ -37,9 +34,6 @@ class Vgg16B(Architecture):
 
     NAME = 'vgg16b'
     OUTPUT_NUM: int = 6
-
-    def __init__(self):
-        pass
 
     def create(self) -> Model:
         """
@@ -90,9 +84,6 @@ class Vgg16Pt(Architecture):
 
     NAME = 'vgg16pt'
     OUTPUT_NUM: int = 6
-
-    def __init__(self):
-        pass
 
     def create(self) -> Model:
         """

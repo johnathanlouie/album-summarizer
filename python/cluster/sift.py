@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from json import dump
 from typing import Dict, List
 
@@ -8,23 +9,23 @@ from numpy import amax, apply_along_axis, ndarray, set_printoptions, zeros
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
 
-
 set_printoptions(threshold=10000000000)
 Descriptors = ndarray
 Matrix = ndarray
 
 
-class Similarity(object):
+class Similarity(ABC):
     """
     Abstract class for computing similarity between images.
     """
 
+    @abstractmethod
     def compute(self, a: Descriptors, b: Descriptors) -> Number:
         """
         Returns a measure of how similar two images (sets of descriptors) are.
         To be implemented by subclasses.
         """
-        raise NotImplementedError
+        pass
 
 
 class Similarity1(Similarity):

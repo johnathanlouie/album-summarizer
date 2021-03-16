@@ -80,9 +80,6 @@ class HistogramCluster(ClusterStrategy):
     """
     """
 
-    def __init__(self):
-        pass
-
     def run(self, images: List[Url]) -> ClusterResults:
         """
         Clusters images.
