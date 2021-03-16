@@ -77,6 +77,14 @@ class ClusterStrategy(object):
         raise NotImplementedError
 
 
+class ClusterRegistryInsertionError(LookupError):
+    pass
+
+
+class ClusterRegistryNameError(LookupError):
+    pass
+
+
 class ClusterRegistry(object):
     """
     """
@@ -86,12 +94,12 @@ class ClusterRegistry(object):
     @classmethod
     def add(cls, name: str, strategy: ClusterStrategy) -> None:
         if name in cls._REGISTRY:
-            raise ValueError
+            raise ClusterRegistryInsertionError(name)
         else:
             cls._REGISTRY[name] = strategy
 
     @classmethod
     def get(cls, name: str) -> ClusterStrategy:
         if name not in cls._REGISTRY:
-            raise KeyError('Cluster name "%s" not found' % name)
+            raise ClusterRegistryNameError(name)
         return cls._REGISTRY[name]

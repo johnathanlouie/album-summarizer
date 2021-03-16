@@ -497,6 +497,10 @@ class ModelSplit(object):
             return kadapter.predict(images)
 
 
+class BadModelSettings(ValueError):
+    pass
+
+
 class Model(object):
     """
     A combination of a DataSet object and Architecture object.
@@ -522,11 +526,11 @@ class Model(object):
         )
         self._dataset: DataSet = dataset
         if architecture.OUTPUT_NUM == 0:
-            raise ValueError('Architecture has 0 outputs')
+            raise BadModelSettings('Architecture has 0 outputs')
         if dataset.OUTPUT_NUM == 0:
-            raise ValueError('Data set has 0 outputs')
+            raise BadModelSettings('Data set has 0 outputs')
         if architecture.OUTPUT_NUM != dataset.OUTPUT_NUM:
-            raise ValueError('Architecture and data set are not compatible')
+            raise BadModelSettings('Architecture and data set are not compatible')
         self._epochs: int = epochs
         self._patience: int = patience
 

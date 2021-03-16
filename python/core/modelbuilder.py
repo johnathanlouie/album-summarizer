@@ -3,6 +3,10 @@ from core.dataset import DataSet
 from core.model import Model
 
 
+class ModelBuilderInsertError(LookupError):
+    pass
+
+
 class ModelBuilder(object):
     """
     Builder class to create deep learning models.
@@ -42,34 +46,34 @@ class ModelBuilder(object):
     @classmethod
     def architecture(cls, architecture: Architecture) -> None:
         if architecture.NAME in cls.ARCHITECTURES:
-            raise KeyError
+            raise ModelBuilderInsertError
         else:
             cls.ARCHITECTURES[architecture.NAME] = architecture
 
     @classmethod
     def dataset(cls, dataset: DataSet) -> None:
         if dataset.NAME in cls.DATASETS:
-            raise KeyError
+            raise ModelBuilderInsertError
         else:
             cls.DATASETS[dataset.NAME] = dataset
 
     @classmethod
     def loss(cls, option: CompileOption) -> None:
         if option.name in cls.LOSSES:
-            raise KeyError
+            raise ModelBuilderInsertError
         else:
             cls.LOSSES[option.name] = option
 
     @classmethod
     def optimizer(cls, option: CompileOption) -> None:
         if option.name in cls.OPTIMIZERS:
-            raise KeyError
+            raise ModelBuilderInsertError
         else:
             cls.OPTIMIZERS[option.name] = option
 
     @classmethod
     def metric(cls, option: CompileOption) -> None:
         if option.name in cls.METRICS:
-            raise KeyError
+            raise ModelBuilderInsertError
         else:
             cls.METRICS[option.name] = option
