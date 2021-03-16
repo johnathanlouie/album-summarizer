@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 from jl import layers, npload
@@ -5,22 +6,29 @@ from keras.models import Model
 from keras.optimizers import Optimizer
 
 
-class Architecture(object):
+class Architecture(ABC):
     """
     Factory for keras.models.Model.
     """
 
-    NAME: str = ''
-    OUTPUT_NUM: int = 0
+    @property
+    @staticmethod
+    @abstractmethod
+    def NAME() -> str:
+        pass
 
-    def __init__(self):
-        raise NotImplementedError
+    @property
+    @staticmethod
+    @abstractmethod
+    def OUTPUT_NUM() -> int:
+        pass
 
+    @abstractmethod
     def create(self) -> Model:
         """
         Creates an keras.models.Model.
         """
-        raise NotImplementedError
+        pass
 
 
 class CompileOption(object):
