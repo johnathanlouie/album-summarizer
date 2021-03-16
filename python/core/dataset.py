@@ -1,4 +1,5 @@
 import json
+from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, List, Optional, Tuple, Union
 
@@ -103,7 +104,7 @@ class DataSetPhase(object):
         return True
 
 
-class Predictions(object):
+class Predictions(ABC):
     """
     An interpreter for predictions.
     """
@@ -112,10 +113,12 @@ class Predictions(object):
         self._x: ndarray = x
         self._y: ndarray = y
 
+    @abstractmethod
     def human_readable(self) -> List[Any]:
         """
+        Translates the return value from keras.models.Model.predict_generator.
         """
-        raise NotImplementedError
+        pass
 
     def save_as_list(self, url: Url) -> None:
         """
@@ -127,18 +130,16 @@ class Predictions(object):
         json.dump(self.human_readable(), open(url, 'w'))
 
 
-class PredictionsFactory(object):
+class PredictionsFactory(ABC):
     """
     """
 
-    def __init__(self):
-        raise NotImplementedError
-
+    @abstractmethod
     def predictions(self, x: ndarray, y: ndarray) -> Predictions:
         """
         Returns a concrete instance of Predictions.
         """
-        raise NotImplementedError
+        pass
 
 
 class DataSetSplitName(object):
@@ -203,22 +204,29 @@ class DataSetSplit(object):
         return DataSetSplitName(self._dataset, self._split)
 
 
-class DataSet(object):
+class DataSet(ABC):
     """
     Interface for datasets. Mainly used for hints.
     """
 
-    NAME: str = ''
-    OUTPUT_NUM: int = 0
+    @property
+    @staticmethod
+    @abstractmethod
+    def NAME() -> str:
+        pass
 
-    def __init__(self):
-        raise NotImplementedError
+    @property
+    @staticmethod
+    @abstractmethod
+    def OUTPUT_NUM() -> int:
+        pass
 
+    @abstractmethod
     def prepare(self) -> None:
         """
         Reads and convert the dataset data files into NumPy arrays for Keras.
         """
-        raise NotImplementedError
+        pass
 
     def get_split(self, num: int) -> DataSetSplit:
         """
@@ -276,12 +284,13 @@ class DataSet(object):
         """
         return to_categorical(y, num_classes=num_classes, dtype='int32')
 
+    @abstractmethod
     def _predictions_factory(self) -> PredictionsFactory:
         """
         Abstract method.
         Returns an instance of PredictionsFactory.
         """
-        raise NotImplementedError
+        pass
 
     def exists(self) -> bool:
         """
@@ -292,8 +301,9 @@ class DataSet(object):
                 return False
         return True
 
+    @abstractmethod
     def splits(self) -> int:
         """
         Returns the number of splits.
         """
-        raise NotImplementedError
+        pass
