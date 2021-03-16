@@ -220,7 +220,7 @@ class SiftCluster(ClusterStrategy):
         print('Scaling each row of the similarity matrix....')
         sm.scale()
         print('Clustering by affinity propagation....')
-        cluster = AffinityPropagation().fit_predict(sm.matrix).tolist()
+        cluster = AffinityPropagation(random_state=None).fit_predict(sm.matrix).tolist()
         return ClusterResults(images, cluster)
 
 
