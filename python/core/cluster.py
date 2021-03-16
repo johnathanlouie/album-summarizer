@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Dict, List, Union
 
 from jl import ImageDirectory, Url
@@ -64,17 +65,17 @@ class ClusterResults(object):
         return [[self._images[i] for i in cluster] for cluster in self.indices()]
 
 
-class ClusterStrategy(object):
+class ClusterStrategy(ABC):
     """
+    A clustering algorithm for images.
     """
 
-    def __init__(self) -> None:
-        raise NotImplementedError
-
+    @abstractmethod
     def run(self,  images: List[Url]) -> ClusterResults:
         """
+        Clusters a list of images.
         """
-        raise NotImplementedError
+        pass
 
 
 class ClusterRegistryInsertionError(LookupError):
