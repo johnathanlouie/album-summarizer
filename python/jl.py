@@ -452,3 +452,41 @@ def copy_file(file_: Url, directory: Url, ancestors: int = 0) -> None:
     except PermissionError:
         raise PermissionError("Copy \"%s\" to \"%s\"." % (file_, new_url))
     return
+
+
+class Resolution(object):
+    """
+    Image resolution data structure.
+    """
+
+    def __init__(self, h: int, w: Optional[int] = None, channels: int = 3):
+        super().__init__()
+        self._h = h
+        self._w = w
+        if w == None:
+            self._w = h
+        self._c = channels
+
+    def hw(self) -> Tuple[int, int]:
+        """
+        Returns the resolution in height-weight format.
+        """
+        return (self._h, self._w)
+
+    def wh(self) -> Tuple[int, int]:
+        """
+        Returns the resolution in weight-height format.
+        """
+        return (self._w, self._h)
+
+    def hwc(self) -> Tuple[int, int, int]:
+        """
+        Returns the resolution in height-weight-channels format.
+        """
+        return (self._h, self._w, self._c)
+
+    def array_hwc(self, n: int) -> Tuple[int, int, int, int]:
+        """
+        Returns the resolution in arraysize-height-weight-channels format.
+        """
+        return (n, self._h, self._w, self._c)
