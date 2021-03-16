@@ -1,5 +1,6 @@
 from copy import deepcopy
 from json import dump
+from traceback import print_exc
 from typing import Any, Dict, List
 from urllib.parse import quote
 
@@ -19,8 +20,9 @@ import dataset.anifood
 import dataset.cc
 import dataset.lamem
 from core import modelbuilder
-from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
-from core.model import ModelSplit
+from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
+                          ClusterResults, ClusterStrategy)
+from core.model import BadModelSettings, ModelSplit
 from core.modelbuilder import ModelBuilder
 from jl import ImageDirectory, Url
 
@@ -72,16 +74,16 @@ if __name__ == '__main__':
 
     @app.route('/run', methods=['POST'])
     def run():
-        if not flask.request.is_json:
-            return {
-                'status': 1,
-                'message': 'Error: Not JSON',
-                'data': None,
-            }
-        settings = flask.request.get_json()
-        cluster = ClusterRegistry.get(settings['cluster'])
-        model_settings = settings['model']
         try:
+            if not flask.request.is_json:
+                return {
+                    'status': 1,
+                    'message': 'Error: Not JSON',
+                    'data': None,
+                }
+            settings = flask.request.get_json()
+            cluster = ClusterRegistry.get(settings['cluster'])
+            model_settings = settings['model']
             model = ModelBuilder.create(
                 model_settings['architecture'],
                 model_settings['dataset'],
@@ -98,10 +100,23 @@ if __name__ == '__main__':
                 'message': 'OK',
                 'data': results,
             }
-        except ValueError:
+        except BadModelSettings:
             return {
                 'status': 2,
-                'message': 'Error: Incompatible architecture/Dataset',
+                'message': 'Error: Incompatible architecture/dataset',
+                'data': None,
+            }
+        except ClusterRegistryNameError:
+            return {
+                'status': 3,
+                'message': 'Error: Bad cluster name',
+                'data': None,
+            }
+        except:
+            print_exc()
+            return {
+                'status': 100,
+                'message': 'Error: Unknown error',
                 'data': None,
             }
 
@@ -113,4 +128,4 @@ if __name__ == '__main__':
             'data': None,
         }
 
-    app.run(port=8080)
+    app.run(port=8080, threaded=False)
