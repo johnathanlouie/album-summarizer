@@ -92,4 +92,6 @@ class ClusterRegistry(object):
 
     @classmethod
     def get(cls, name: str) -> ClusterStrategy:
+        if name not in cls._REGISTRY:
+            raise KeyError('Cluster name "%s" not found' % name)
         return cls._REGISTRY[name]
