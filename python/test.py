@@ -50,7 +50,7 @@ def main():
         if 'split' in settings:
             model.split(settings['split']).test().save_json(args.results)
         else:
-            model.test().save_json(args.results)
+            model.test().save(args.results)
 
 
 if __name__ == '__main__':
