@@ -5,15 +5,6 @@ from keras.models import Model
 from keras.optimizers import Optimizer
 
 
-def loadweights(a):
-    for i in layers:
-        w = npload(i)
-        l = a.get_layer(i)
-        l.set_weights(w)
-        l.trainable = False
-    return
-
-
 class Architecture(object):
     """
     Factory for keras.models.Model.
