@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Tuple, Union
 
-from jl import layers, npload
+from jl import Resolution, layers, npload
 from keras.models import Model
 from keras.optimizers import Optimizer
 
@@ -24,7 +24,7 @@ class Architecture(ABC):
         pass
 
     @abstractmethod
-    def create(self) -> Model:
+    def create(self, res: Resolution) -> Model:
         """
         Creates an keras.models.Model.
         """
@@ -70,13 +70,13 @@ class CompiledArchitecture(object):
         self._optimizer: CompileOption = optimizer
         self._metric: CompileOption = metric
 
-    def compile(self) -> Model:
+    def compile(self, res: Resolution) -> Model:
         """
         Creates a compiled keras.models.Model object.
         """
         # if type(m) != list or type(m) != dict:
         #     m = [m]
-        kmodel = self._architecture.create()
+        kmodel = self._architecture.create(res)
         kmodel.compile(
             loss=self._loss.value,
             optimizer=self._optimizer.value,

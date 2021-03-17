@@ -1,6 +1,6 @@
 from core import modelbuilder
 from core.architecture import Architecture
-from jl import res2 as resolution
+from jl import Resolution
 from keras.applications.vgg16 import VGG16
 from keras.engine.input_layer import Input
 from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D
@@ -15,14 +15,14 @@ class Vgg16(Architecture):
     NAME = 'vgg16'
     OUTPUT_NUM: int = 6
 
-    def create(self) -> Model:
+    def create(self, res: Resolution) -> Model:
         """
         Creates a keras.models.Model object.
         """
         return VGG16(
             include_top=True,
             weights=None,
-            input_tensor=Input(resolution),
+            input_tensor=Input(res.hwc()),
             classes=6,
         )
 
@@ -35,11 +35,11 @@ class Vgg16B(Architecture):
     NAME = 'vgg16b'
     OUTPUT_NUM: int = 6
 
-    def create(self) -> Model:
+    def create(self, res: Resolution) -> Model:
         """
         Creates a keras.models.Model object.
         """
-        img_input = Input(resolution)
+        img_input = Input(res.hwc())
         # Block 1
         x = Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv1')(img_input)
         x = Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv2')(x)
@@ -85,14 +85,14 @@ class Vgg16Pt(Architecture):
     NAME = 'vgg16pt'
     OUTPUT_NUM: int = 6
 
-    def create(self) -> Model:
+    def create(self, res: Resolution) -> Model:
         """
         Creates a keras.models.Model object.
         """
         base = VGG16(
             include_top=False,
             weights='imagenet',
-            input_shape=resolution,
+            input_shape=res.hwc(),
         )
         base.trainable = False
         x = Flatten(name='flatten')(base.output)

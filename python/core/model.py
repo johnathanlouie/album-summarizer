@@ -6,7 +6,7 @@ from typing import Dict, List
 
 import keras.models
 import tensorflow as tf
-from jl import Image, Url, mkdirs
+from jl import Image, Resolution, Url, mkdirs
 from keras.backend import clear_session
 from keras.callbacks import CSVLogger, ReduceLROnPlateau
 from numpy import asarray, ndarray
@@ -160,6 +160,8 @@ class KerasAdapter(object):
         self._patience: int = patience
         self._is_best: bool = False
         self._status: TrainingStatusData = None
+        self._res = Resolution(190)
+        self._batch = 10
 
     def __enter__(self):
         return self
@@ -228,9 +230,9 @@ class KerasAdapter(object):
         x2 = self._data.validation().x().load()
         y2 = self._data.validation().y().load()
         # print('Training sequence')
-        seq1 = Sequence1(x1, y1, 10)
+        seq1 = Sequence1(x1, y1, self._res, self._batch)
         # print('Validation sequence')
-        seq2 = Sequence1(x2, y2, 10)
+        seq2 = Sequence1(x2, y2, self._res, self._batch)
 
         # Training
         print('Training starting: %s\n' % self._names.dirname())
@@ -259,7 +261,7 @@ class KerasAdapter(object):
         Evaluates the model using the given x and y.
         Returns a list of metrics.
         """
-        seq = Sequence1(x, y, 10)
+        seq = Sequence1(x, y, self._res, self._batch)
         results: List[float] = self._kmodel.evaluate_generator(
             generator=seq,
             verbose=1,
@@ -295,7 +297,7 @@ class KerasAdapter(object):
         Predicts using the trained model
         """
         x = asarray(images)
-        seq = Sequence1(x, x, 10)
+        seq = Sequence1(x, x, self._res, self._batch)
         print('Predicting....')
         results = self._kmodel.predict_generator(generator=seq, verbose=1)
         print('Prediction finished')
@@ -313,7 +315,7 @@ class KerasAdapter(object):
         status.save()
 
         # Blank model and training state
-        kmodel = self._architecture.compile()
+        kmodel = self._architecture.compile(self._res)
         if self._total_epochs == 0:
             mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(patience=10))
         else:
@@ -369,7 +371,7 @@ class KerasAdapter(object):
         self._status = TrainingStatusData.load(self._names.status())
         self._is_best = best_snapshot
         # print('Compiling architecture')
-        self._kmodel = self._architecture.compile()
+        self._kmodel = self._architecture.compile(self._res)
         if best_snapshot:
             print('Loading %s' % self._names.best.weights())
             self._kmodel.load_weights(self._names.best.weights())

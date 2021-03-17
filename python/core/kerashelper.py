@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Union
 import dill
 import keras
 import numpy as np
-from jl import Url, resize_img
+from jl import Resolution, Url, resize_img
 from keras.callbacks import Callback
 from keras.utils import Sequence
 from numpy import asarray, ceil, ndarray
@@ -20,10 +20,11 @@ class Sequence1(Sequence):
     Generate batches of data.
     """
 
-    def __init__(self, x_set: ndarray, y_set: ndarray, batch_size: int):
+    def __init__(self, x_set: ndarray, y_set: ndarray, res: Resolution, batch_size: int):
         self.x = x_set
         self.y = y_set
         self.batch_size = batch_size
+        self._res = res
 
     def __len__(self):
         a = float(len(self.x)) / float(self.batch_size)
@@ -35,7 +36,7 @@ class Sequence1(Sequence):
         b = (idx + 1) * self.batch_size
         batch_x = self.x[a:b]
         batch_y = self.y[a:b]
-        xx = asarray([resize_img(filename) for filename in batch_x])
+        xx = asarray([resize_img(filename, self._res) for filename in batch_x])
         yy = asarray(batch_y)
         return xx, yy
 

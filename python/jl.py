@@ -37,22 +37,6 @@ NPY_RATE = 'rate'
 JSON_SIMILARITYMATRIX = 'out/sim.json'
 
 
-# h = int(640 * 1 / 4)
-# w = int(960 * 1 / 4)
-h = 190
-w = h
-res_resize = (w, h)
-res = (h, w)
-res2 = (h, w, 3)
-
-
-def res3(n: int):
-    """
-    Returns dimensions of an array of images.
-    """
-    return (n, h, w, 3)
-
-
 layers = [
     'block1_conv1',
     'block1_conv2',
@@ -100,19 +84,6 @@ def npexists(name: str) -> bool:
 
 def read_image(url: Url) -> Image:
     return cv.imread(url, cv.IMREAD_COLOR)
-
-
-def readimg(urls: List[Url]) -> ndarray:
-    """
-    Loads an array of images.
-    Images must be uniformly sized.
-    """
-    count = len(urls)
-    l = ndarray(res3(count))
-    for i, url in enumerate(urls):
-        print(url)
-        l[i] = read_image(url)
-    return l
 
 
 def readimg2(urls: List[Url]) -> List[Image]:
@@ -172,15 +143,66 @@ def mkdirname(filename: Url, verbose: bool = True) -> None:
     mkdirs(path, verbose)
 
 
-def resize_img(filename: Url) -> Image:
+class Resolution(object):
+    """
+    Image resolution data structure.
+    """
+
+    def __init__(self, h: int, w: Optional[int] = None, channels: int = 3):
+        super().__init__()
+        self._h = h
+        self._w = w
+        if w == None:
+            self._w = h
+        self._c = channels
+
+    def hw(self) -> Tuple[int, int]:
+        """
+        Returns the resolution in height-weight format.
+        """
+        return (self._h, self._w)
+
+    def wh(self) -> Tuple[int, int]:
+        """
+        Returns the resolution in weight-height format.
+        """
+        return (self._w, self._h)
+
+    def hwc(self) -> Tuple[int, int, int]:
+        """
+        Returns the resolution in height-weight-channels format.
+        """
+        return (self._h, self._w, self._c)
+
+    def array_hwc(self, n: int) -> Tuple[int, int, int, int]:
+        """
+        Returns the resolution in arraysize-height-weight-channels format.
+        """
+        return (n, self._h, self._w, self._c)
+
+
+def resize_img(image: Url, res: Resolution) -> Image:
     """
     Returns a resized image.
     """
-    if not isfile(filename):
-        raise FileNotFoundError(filename)
-    img = cv.imread(filename, cv.IMREAD_COLOR)
-    img2 = cv.resize(img, res_resize, interpolation=cv.INTER_CUBIC)
+    if not isfile(image):
+        raise FileNotFoundError(image)
+    img = cv.imread(image, cv.IMREAD_COLOR)
+    img2 = cv.resize(img, res.wh(), interpolation=cv.INTER_CUBIC)
     return img2
+
+
+def read_images(images: List[Url], res: Resolution) -> ndarray:
+    """
+    Loads an array of images.
+    Images must be uniformly sized.
+    """
+    count = len(images)
+    l = ndarray(res.array_hwc(count))
+    for i, url in enumerate(images):
+        print(url)
+        l[i] = read_image(url)
+    return l
 
 
 def class_onehot(a: List[int]) -> ndarray:
@@ -320,28 +342,26 @@ class Csv(object):
         return intize(self.get_col(n))
 
 
-def resize_imgs(src: Url, dst: Url) -> None:
+def resize_imgs(src: Url, dst: Url, res: Resolution) -> None:
     """
     Resizes the images based on the list of URLs found in the source file and outputs to the list of URLs found in the destination file.
     """
     urls1 = ListFile(src).read()
     urls2 = ListFile(dst).read()
-    resize_imgs2(urls1, urls2)
-    return
+    resize_imgs2(urls1, urls2, res)
 
 
-def resize_imgs2(src_list: List[Url], dst_list: List[Url]) -> None:
+def resize_imgs2(src_list: List[Url], dst_list: List[Url], res: Resolution) -> None:
     """
     Resizes a list of images.
     """
     for src, dst in zip(src_list, dst_list):
         print(src)
         print(dst)
-        img2 = resize_img(src)
+        img2 = resize_img(src, res)
         mkdirname(dst)
         cv.imwrite(dst, img2)
     print('done')
-    return
 
 
 def list_files(directory: Url, recursive: bool) -> List[Url]:
@@ -452,41 +472,3 @@ def copy_file(file_: Url, directory: Url, ancestors: int = 0) -> None:
     except PermissionError:
         raise PermissionError("Copy \"%s\" to \"%s\"." % (file_, new_url))
     return
-
-
-class Resolution(object):
-    """
-    Image resolution data structure.
-    """
-
-    def __init__(self, h: int, w: Optional[int] = None, channels: int = 3):
-        super().__init__()
-        self._h = h
-        self._w = w
-        if w == None:
-            self._w = h
-        self._c = channels
-
-    def hw(self) -> Tuple[int, int]:
-        """
-        Returns the resolution in height-weight format.
-        """
-        return (self._h, self._w)
-
-    def wh(self) -> Tuple[int, int]:
-        """
-        Returns the resolution in weight-height format.
-        """
-        return (self._w, self._h)
-
-    def hwc(self) -> Tuple[int, int, int]:
-        """
-        Returns the resolution in height-weight-channels format.
-        """
-        return (self._h, self._w, self._c)
-
-    def array_hwc(self, n: int) -> Tuple[int, int, int, int]:
-        """
-        Returns the resolution in arraysize-height-weight-channels format.
-        """
-        return (n, self._h, self._w, self._c)

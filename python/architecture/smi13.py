@@ -1,6 +1,6 @@
 from core import modelbuilder
 from core.architecture import Architecture
-from jl import res2 as resolution
+from jl import Resolution
 from keras.engine.input_layer import Input
 from keras.layers import (BatchNormalization, Conv2D, Dense, Flatten,
                           MaxPooling2D)
@@ -15,11 +15,11 @@ class Smi13(Architecture):
     NAME = 'smi13'
     OUTPUT_NUM: int = 1
 
-    def create(self) -> Model:
+    def create(self, res: Resolution) -> Model:
         """
         Returns a Keras Model object.
         """
-        img_input = Input(resolution)
+        img_input = Input(res.hwc())
 
         # Block 1
         x = Conv2D(
@@ -106,11 +106,11 @@ class Smi13A(Architecture):
     NAME = 'smi13a'
     OUTPUT_NUM: int = 3
 
-    def create(self) -> Model:
+    def create(self, res: Resolution) -> Model:
         """
         Returns a Keras Model object.
         """
-        img_input = Input(resolution)
+        img_input = Input(res.hwc())
 
         # Block 1
         x = Conv2D(
@@ -196,11 +196,11 @@ class Smi13B(Architecture):
     NAME = 'smi13b'
     OUTPUT_NUM: int = 1
 
-    def create(self) -> Model:
+    def create(self, res: Resolution) -> Model:
         """
         Returns a Keras Model object.
         """
-        img_input = Input(resolution)
+        img_input = Input(res.hwc())
 
         # Block 1
         x = Conv2D(
