@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, Union
 
-from jl import Resolution, layers, npload
+from jl import Resolution
 from keras.models import Model
 from keras.optimizers import Optimizer
 
