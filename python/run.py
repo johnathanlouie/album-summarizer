@@ -7,19 +7,7 @@ from urllib.parse import quote
 import flask
 
 import aaa
-import architecture.smi13
-import architecture.vgg16
-import cluster.histogram
-import cluster.hybridcluster
-import cluster.sift
-import coption.custom
-import coption.keras
-import coption.keras2
-import core.modelbuilder
-import dataset.anifood
-import dataset.cc
-import dataset.lamem
-from core import modelbuilder
+import addon
 from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
                           ClusterResults, ClusterStrategy)
 from core.model import BadModelSettings, ModelSplit

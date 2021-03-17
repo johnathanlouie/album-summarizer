@@ -4,15 +4,8 @@ import os.path
 from typing import Dict
 
 import aaa
-import architecture.vgg16
-import architecture.smi13
-import coption.custom
-import coption.keras
-import coption.keras2
+import addon
 import core.modelbuilder
-import dataset.anifood
-import dataset.cc
-import dataset.lamem
 import jl
 
 

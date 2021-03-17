@@ -1,15 +1,8 @@
 from typing import Tuple
 
 import aaa
-import architecture.smi13
-import architecture.vgg16
-import coption.custom
-import coption.keras
-import coption.keras2
+import addon
 import core.modelbuilder
-import dataset.anifood
-import dataset.cc
-import dataset.lamem
 
 
 def builds() -> Tuple[str, str, str, str]:
