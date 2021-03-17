@@ -255,7 +255,7 @@ function viewCtrl($scope, $interval, $http) {
             if (response.data.status === 0) {
                 dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
                 var json = JSON.stringify(response.data.data);
-                fs.writeFile(dataFile, json, () => { organize(true); });
+                fs.writeFile(dataFile, json, () => organize(true));
             }
             else if (response.data.status === 2) {
                 // TODO architecture/dataset mismatch
