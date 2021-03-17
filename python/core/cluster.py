@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Union
 
-from jl import ImageDirectory, Url
+from jl import ImageDirectory
+from typing2 import Url
 
 
 class ClusterResult(object):

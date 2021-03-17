@@ -4,10 +4,11 @@ from typing import Dict, List
 
 import cv2
 from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
-from jl import JSON_SIMILARITYMATRIX, NPY_DESC, Number, Url, npsave, read_image
+from jl import JSON_SIMILARITYMATRIX, NPY_DESC, npsave, read_image
 from numpy import amax, apply_along_axis, ndarray, set_printoptions, zeros
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
+from typing2 import Url, number
 
 set_printoptions(threshold=10000000000)
 Descriptors = ndarray
@@ -20,7 +21,7 @@ class Similarity(ABC):
     """
 
     @abstractmethod
-    def compute(self, a: Descriptors, b: Descriptors) -> Number:
+    def compute(self, a: Descriptors, b: Descriptors) -> number:
         """
         Returns a measure of how similar two images (sets of descriptors) are.
         To be implemented by subclasses.
@@ -56,7 +57,7 @@ class Similarity1(Similarity):
                 good.append(m)
         return good
 
-    def compute(self, a: Descriptors, b: Descriptors) -> Number:
+    def compute(self, a: Descriptors, b: Descriptors) -> number:
         """
         Returns a measure of how similar two images (sets of descriptors) are.
         """
@@ -93,7 +94,7 @@ class Similarity2(Similarity):
                 good.append(m)
         return good
 
-    def compute(self, a: Descriptors, b: Descriptors) -> Number:
+    def compute(self, a: Descriptors, b: Descriptors) -> number:
         """
         Returns a measure of how similar two images (sets of descriptors) are.
         """
@@ -108,7 +109,7 @@ class Similarity3(Similarity2):
     Returns the sum of the closeness between true matches.
     """
 
-    def compute(self, a: Descriptors, b: Descriptors) -> Number:
+    def compute(self, a: Descriptors, b: Descriptors) -> number:
         """
         Returns a measure of how similar two images (sets of descriptors) are.
         """

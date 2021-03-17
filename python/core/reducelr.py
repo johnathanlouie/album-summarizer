@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Union
 
 import keras
-from jl import Url
 from keras.callbacks import ReduceLROnPlateau
+from typing2 import Url
 
 from core.kerashelper import CheckpointObserver, PickleAbstractClass
 

@@ -5,8 +5,9 @@ from typing import Any, List, Optional, Union
 
 from core import modelbuilder
 from core.dataset import DataSet, Predictions, PredictionsFactory
-from jl import Csv, Url
+from jl import Csv
 from numpy import asarray, ndarray
+from typing2 import Url
 
 
 class CcDataFile(object):

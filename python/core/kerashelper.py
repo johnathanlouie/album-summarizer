@@ -9,10 +9,11 @@ from typing import Any, Dict, List, Union
 import dill
 import keras
 import numpy as np
-from jl import Resolution, Url, resize_img
+from jl import Resolution, resize_img
 from keras.callbacks import Callback
 from keras.utils import Sequence
 from numpy import asarray, ceil, ndarray
+from typing2 import Url
 
 
 class Sequence1(Sequence):

@@ -4,8 +4,9 @@ from typing import Any, List, Union
 
 from core import modelbuilder
 from core.dataset import DataSet, Predictions, PredictionsFactory
-from jl import ListFile, Url
+from jl import ListFile
 from numpy import asarray, ndarray
+from typing2 import Url
 
 
 class LamemDataFile(object):

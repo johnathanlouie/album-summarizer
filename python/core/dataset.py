@@ -3,10 +3,11 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, List, Optional, Tuple, Union
 
-from jl import ArrayLike, ListFile, Number, Url, npexists, npload, npsave
+from jl import ListFile, npexists, npload, npsave
 from keras.utils import to_categorical
 from numpy import ndarray
 from sklearn.model_selection import train_test_split
+from typing2 import ArrayLike, Url, number
 
 
 class XY(Enum):
@@ -238,7 +239,7 @@ class DataSet(ABC):
         self,
         xx: ArrayLike,
         yy: ArrayLike,
-        test_size: Number = 0.1,
+        test_size: number = 0.1,
         shuffle: bool = True,
     ) -> Tuple[ndarray, ndarray, ndarray, ndarray, ndarray, ndarray]:
         """

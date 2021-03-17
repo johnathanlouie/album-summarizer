@@ -4,18 +4,13 @@ from os.path import abspath, basename, dirname, isdir, isfile, join, normpath
 from random import sample
 from shutil import copy2
 from time import time
-from typing import Any, Dict, List, Optional, Tuple, Union
-
-from numpy import asarray, load, ndarray, save, zeros
+from typing import Any, List, Optional, Tuple
 
 import cv2 as cv
+from numpy import asarray, load, ndarray, save, zeros
 
+from typing2 import ArrayLike, Image, ImageArray, IntClass, OneHot, Url
 
-"""Type aliases"""
-Url = str
-ArrayLike = Union[ndarray, List[Any]]
-Image = ndarray
-Number = Union[int, float]
 
 TEXT_CLASSES = 'out/categ.txt'
 TEXT_PRED = 'out/pred.txt'
@@ -65,15 +60,15 @@ def npexists(name: str) -> bool:
     return isfile("out/%s.npy" % name)
 
 
-def read_image(url: Url) -> Image:
-    return cv.imread(url, cv.IMREAD_COLOR)
+def read_image(image: Url) -> Image:
+    return cv.imread(image, cv.IMREAD_COLOR)
 
 
-def readimg2(urls: List[Url]) -> List[Image]:
+def readimg2(images: List[Url]) -> List[Image]:
     """
     Loads a list of images.
     """
-    return [read_image(i) for i in urls]
+    return [read_image(i) for i in images]
 
 
 def hsv(img: Image) -> Image:
@@ -175,7 +170,7 @@ def resize_img(image: Url, res: Resolution) -> Image:
     return img2
 
 
-def read_images(images: List[Url], res: Resolution) -> ndarray:
+def read_images(images: List[Url], res: Resolution) -> ImageArray:
     """
     Loads an array of images.
     Images must be uniformly sized.
@@ -188,7 +183,7 @@ def read_images(images: List[Url], res: Resolution) -> ndarray:
     return l
 
 
-def class_onehot(a: List[int]) -> ndarray:
+def class_onehot(a: List[IntClass]) -> OneHot:
     """
     Converts integer representation to one hot representation.
     """

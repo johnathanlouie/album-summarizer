@@ -4,8 +4,9 @@ from typing import Any, List, Optional, Union
 
 from core import modelbuilder
 from core.dataset import DataSet, Predictions, PredictionsFactory
-from jl import ImageDirectory, Url
+from jl import ImageDirectory
 from numpy import asarray, ndarray
+from typing2 import Url
 
 from dataset.cc import CcDataFile
 

@@ -2,9 +2,10 @@ from typing import Dict, List
 
 import cv2
 from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
-from jl import Url, hsv, read_image
+from jl import hsv, read_image
 from numpy import concatenate, ndarray, reshape, vstack
 from sklearn.cluster import MeanShift
+from typing2 import Url
 
 
 Histogram = ndarray

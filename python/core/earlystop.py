@@ -4,8 +4,8 @@ from typing import Union
 
 import keras
 import numpy as np
-from jl import Url
 from keras.callbacks import EarlyStopping
+from typing2 import Url
 
 from core.kerashelper import CheckpointObserver, PickleAbstractClass
 

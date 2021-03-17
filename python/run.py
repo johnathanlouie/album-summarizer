@@ -12,7 +12,8 @@ from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
                           ClusterResults, ClusterStrategy)
 from core.model import BadModelSettings, ModelSplit
 from core.modelbuilder import ModelBuilder
-from jl import ImageDirectory, Url
+from jl import ImageDirectory
+from typing2 import Url
 
 
 class ClusterRank(object):

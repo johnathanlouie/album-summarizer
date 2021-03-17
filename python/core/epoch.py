@@ -1,5 +1,5 @@
 import keras.models
-from jl import Url
+from typing2 import Url
 
 from core.kerashelper import CheckpointObserver, PickleAbstractClass
 

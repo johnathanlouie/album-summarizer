@@ -6,10 +6,11 @@ from typing import Dict, List
 
 import keras.models
 import tensorflow as tf
-from jl import Image, Resolution, Url, mkdirs
+from jl import Resolution, mkdirs
 from keras.backend import clear_session
 from keras.callbacks import CSVLogger, ReduceLROnPlateau
 from numpy import asarray, ndarray
+from typing2 import Image, Url
 
 from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
