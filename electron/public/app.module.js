@@ -5,9 +5,11 @@ const os = require('os');
 const childProcess = require('child_process');
 const { ipcRenderer } = require('electron');
 
-const fsp = {};
-fsp.writeFile = util.promisify(fs.writeFile);
-fsp.readFile = util.promisify(fs.readFile);
+const fsp = {
+    writeFile: util.promisify(fs.writeFile),
+    readFile: util.promisify(fs.readFile),
+    readdir: util.promisify(fs.readdir),
+};
 
 class File_ {
     #path;
@@ -186,17 +188,17 @@ function viewCtrl($scope, $interval, $http) {
         }
     };
 
-    function goTo(dst) {
+    async function goTo(dst) {
         $scope.filterText = '';
-        fs.readdir(dst, { withFileTypes: true }, (err, dirEnts) => {
-            if (err) {
-                $scope.cwd = Directory_.factory(dst);
-                $scope.$apply();
-            } else {
-                $scope.cwd = Directory_.factory(dst, dirEnts, true);
-                $scope.$apply();
-            }
-        });
+        try {
+            var dirEnts = await fsp.readdir(dst, { withFileTypes: true });
+            $scope.cwd = Directory_.factory(dst, dirEnts, true);
+            $scope.$apply();
+        }
+        catch (err) {
+            $scope.cwd = Directory_.factory(dst);
+            $scope.$apply();
+        }
     }
 
     $scope.goTo = function (dst = $scope.address) {
