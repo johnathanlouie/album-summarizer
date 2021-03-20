@@ -49,6 +49,8 @@ def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> 
     Does all the work.
     """
     images = ImageDirectory(directory).jpeg(False)
+    if len(images) == 0:
+        return list()
     clusters = algorithm.run(images)
     rates = algorithm2.predict(images).human_readable()
     print('Ranking results....')
