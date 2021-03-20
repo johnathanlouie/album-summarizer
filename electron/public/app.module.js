@@ -7,6 +7,7 @@ const { ipcRenderer } = require('electron');
 
 const fsp = {};
 fsp.writeFile = util.promisify(fs.writeFile);
+fsp.readFile = util.promisify(fs.readFile);
 
 class File_ {
     #path;
@@ -296,18 +297,16 @@ function viewCtrl($scope, $interval, $http) {
 
     function organize(pythoned) {
         dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
-        fs.readFile(dataFile, (err, data) => {
-            if (err) {
-                if (pythoned) {
-                    console.error('Cannot read organized data file');
-                    $scope.isOrganizeToggled = false;
-                    $scope.loadingOverlay.hide();
-                } else {
-                    reorganize();
-                }
-            } else {
-                $scope.cwd.organize(JSON.parse(data));
+        fsp.readFile(dataFile).then(data => {
+            $scope.cwd.organize(JSON.parse(data));
+            $scope.loadingOverlay.hide();
+        }, err => {
+            if (pythoned) {
+                console.error('Cannot read organized data file');
+                $scope.isOrganizeToggled = false;
                 $scope.loadingOverlay.hide();
+            } else {
+                reorganize();
             }
         });
     }
