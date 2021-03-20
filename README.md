@@ -10,8 +10,14 @@ Note: End Users do not need to install these.
 - Pylint
 - autopep8
 
+For Windows users, Anaconda uses scripts, which are blocked by default in Windows 10. To unblock, run:
+```
+Set-ExecutionPolicy Bypass
+```
+
 Run the following in a terminal that has access to Anaconda:
 ```
+conda init <shell name>
 conda create --name album keras-gpu "tensorflow-gpu<2" autopep8 pylint dill opencv scikit-learn --yes
 ```
 
