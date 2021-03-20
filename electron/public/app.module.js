@@ -295,12 +295,14 @@ function viewCtrl($scope, $interval, $http) {
         });
     }
 
-    function organize(pythoned) {
+    async function organize(pythoned) {
         dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
-        fsp.readFile(dataFile).then(data => {
+        try {
+            var data = await fsp.readFile(dataFile);
             $scope.cwd.organize(JSON.parse(data));
             $scope.loadingOverlay.hide();
-        }, err => {
+        }
+        catch (err) {
             if (pythoned) {
                 console.error('Cannot read organized data file');
                 $scope.isOrganizeToggled = false;
@@ -308,7 +310,7 @@ function viewCtrl($scope, $interval, $http) {
             } else {
                 reorganize();
             }
-        });
+        }
     }
 
     $scope.toggleOrganize = function () {
