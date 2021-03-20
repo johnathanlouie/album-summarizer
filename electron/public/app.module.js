@@ -9,6 +9,8 @@ const fsp = {
     writeFile: util.promisify(fs.writeFile),
     readFile: util.promisify(fs.readFile),
     readdir: util.promisify(fs.readdir),
+    access: util.promisify(fs.access),
+    mkdir: util.promisify(fs.mkdir),
 };
 
 class File_ {
@@ -242,6 +244,15 @@ function viewCtrl($scope, $interval, $http) {
         $scope.screen = 'main';
     };
 
+    async function dataDir() {
+        try {
+            await fsp.access('public/data');
+        }
+        catch (err) {
+            await fsp.mkdir('public/data');
+        }
+    }
+
     async function reorganize() {
         $scope.cwd.unorganize();
         var data = {
@@ -263,6 +274,7 @@ function viewCtrl($scope, $interval, $http) {
             if (response.data.status === 0) {
                 dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
                 var json = JSON.stringify(response.data.data);
+                await dataDir();
                 await fsp.writeFile(dataFile, json);
                 organize(true);
             }
@@ -300,6 +312,7 @@ function viewCtrl($scope, $interval, $http) {
     async function organize(pythoned) {
         dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
         try {
+            await dataDir();
             var data = await fsp.readFile(dataFile);
             $scope.cwd.organize(JSON.parse(data));
             $scope.loadingOverlay.hide();
