@@ -1,8 +1,12 @@
 const fs = require('fs');
 const path = require('path');
+const util = require('util');
 const os = require('os');
 const childProcess = require('child_process');
 const { ipcRenderer } = require('electron');
+
+const fsp = {};
+fsp.writeFile = util.promisify(fs.writeFile);
 
 class File_ {
     #path;
@@ -255,7 +259,7 @@ function viewCtrl($scope, $interval, $http) {
             if (response.data.status === 0) {
                 dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
                 var json = JSON.stringify(response.data.data);
-                fs.writeFile(dataFile, json, () => organize(true));
+                fsp.writeFile(dataFile, json).then(() => organize(true));
             }
             else if (response.data.status === 2) {
                 // TODO architecture/dataset mismatch
