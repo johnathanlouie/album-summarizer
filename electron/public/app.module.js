@@ -239,7 +239,7 @@ function viewCtrl($scope, $interval, $http) {
         $scope.screen = 'main';
     };
 
-    function reorganize() {
+    async function reorganize() {
         $scope.cwd.unorganize();
         var data = {
             model: {
@@ -255,11 +255,13 @@ function viewCtrl($scope, $interval, $http) {
             cluster: 'sift',
             url: $scope.cwd.path,
         };
-        $http.post('http://localhost:8080/run', data).then(response => {
+        try {
+            var response = await $http.post('http://localhost:8080/run', data);
             if (response.data.status === 0) {
                 dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
                 var json = JSON.stringify(response.data.data);
-                fsp.writeFile(dataFile, json).then(() => organize(true));
+                await fsp.writeFile(dataFile, json);
+                organize(true);
             }
             else if (response.data.status === 2) {
                 // TODO architecture/dataset mismatch
@@ -267,9 +269,10 @@ function viewCtrl($scope, $interval, $http) {
             else {
                 // TODO some other error
             }
-        }).catch(() => {
+        }
+        catch (e) {
             // TODO what if internal server error
-        });
+        }
     }
 
     /** @deprecated */
