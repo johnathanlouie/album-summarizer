@@ -16,6 +16,11 @@
     width: 100px !important;
 }
 
+.squared-top {
+    border-top-right-radius: 0!important;
+    border-top-left-radius: 0!important;
+}
+
 .addressbar {
     display: grid;
     grid-template-areas: 'left middle right';

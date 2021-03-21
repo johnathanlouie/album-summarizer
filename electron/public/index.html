@@ -7,13 +7,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        crossorigin="anonymous">
     <link rel="stylesheet" href="bootstrap4-extensions.css">
     <link rel="stylesheet" href="styles.css">
 
     <script>window.jQuery = window.$ = require('jquery');</script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"
+        crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js" crossorigin="anonymous"></script>
     <script src="app.module.js"></script>
     <script src="core/core.module.js"></script>
@@ -248,25 +250,55 @@
                 <div class="container-fluid" ng-show="isOrganizeToggled && cwd.isOrganized">
 
                     <!-- Organized thumbnail view -->
-                    <div ng-show="view == 'thumbnails'">
+                    <div class="d-flex justify-content-around flex-wrap align-items-start"
+                        ng-show="view == 'thumbnails'">
 
-                        <!-- Cluster row -->
-                        <div ng-repeat="cluster in cwd.organization">
-                            <div class="overflow-x-auto text-nowrap mb-3">
-
-                                <!-- Thumbnails in a cluster -->
-                                <button class="btn btn-outline-dark border-transparent thumbnail-xl"
-                                    ng-repeat="image in cluster | filter : { path : filterText }"
-                                    ng-click="focusOnImage(image.path)">
-                                    <div class="img-thumbnail d-table-cell align-middle">
-                                        <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
-                                    </div>
-                                    <p class="mb-0 text-wrap text-break text-center">{{ image.path | filename }}</p>
-                                </button>
-
+                        <!-- Best thumbnail in a cluster -->
+                        <div class="card m-2" style="width: 300px;" ng-repeat-start="cluster in cwd.organization">
+                            <div class="d-block">
+                                <div class="d-table-cell align-middle text-center p-1"
+                                    style="height: 300px; width: 300px;">
+                                    <img class="mw-100 mh-100" ng-src="{{ cluster[0].path | fileUrl }}">
+                                </div>
                             </div>
-                            <hr>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item p-0">
+                                    <button class="btn btn-light btn-block rounded-0"
+                                        ng-click="focusOnImage(cluster[0].path)">
+                                        {{ cluster[0].path | filename }}
+                                    </button>
+                                </li>
+                                <li class="list-group-item p-0">
+                                    <div class="btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn btn-light btn-block squared-top"
+                                            ng-class="{ 'disabled': cluster.length < 2 }">
+                                            <input type="checkbox" ng-disabled="cluster.length < 2" ng-model="clusterExpand"> See {{ clusterExpand ? 'less' : 'more' }}
+                                        </label>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
+
+                        <!-- Other thumbnails in a cluster -->
+                        <div class="card m-2" style="width: 300px;"
+                            ng-repeat="image in cluster | filter : { path : filterText }" ng-if="!$first" ng-show="clusterExpand">
+                            <div class="d-block">
+                                <div class="d-table-cell align-middle text-center p-1"
+                                    style="height: 300px; width: 300px;">
+                                    <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
+                                </div>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item p-0">
+                                    <button class="btn btn-light btn-block rounded-0"
+                                        ng-click="focusOnImage(image.path)">
+                                        {{ cluster[0].path | filename }}
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <span class="d-none" ng-repeat-end></span>
 
                     </div>
 
