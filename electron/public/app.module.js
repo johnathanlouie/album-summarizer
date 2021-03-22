@@ -293,17 +293,19 @@ function viewCtrl($scope, $interval, $http) {
             if (response.data.status === 0) {
                 var json = JSON.stringify(response.data.data);
                 await organizedDirFile.write(json);
-                organize(true);
             }
             else if (response.data.status === 2) {
-                // TODO architecture/dataset mismatch
+                console.error('Architecture/dataset mismatch');
             }
             else {
-                // TODO some other error
+                console.error('Unknown server error');
             }
         }
         catch (e) {
-            // TODO what if internal server error
+            console.error('Internal server error');
+        }
+        finally {
+            organize(true);
         }
     }
 
