@@ -286,17 +286,6 @@ function viewCtrl($scope, $interval, $http) {
     async function reorganize() {
         $scope.cwd.unorganize();
         var data = {
-            model: {
-                architecture: 'smi13',
-                dataset: 'ccr',
-                loss: 'rmse',
-                optimizer: 'sgd1',
-                metrics: 'acc',
-                epochs: 0,
-                patience: 3,
-                split: 0,
-            },
-            cluster: 'sift',
             url: $scope.cwd.path,
         };
         try {

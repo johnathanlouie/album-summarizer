@@ -44,6 +44,22 @@ class ClusterRank(object):
         return deepcopy(self._results)
 
 
+class Settings(object):
+    """
+    """
+
+    def __init__(self):
+        self.architecture = 'smi13'
+        self.dataset = 'ccr'
+        self.loss = 'rmse'
+        self.optimizer = 'sgd1'
+        self.metrics = 'acc'
+        self.epochs = 0
+        self.patience = 3
+        self.split = 0
+        self.cluster = 'sift'
+
+
 def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> None:
     """
     Does all the work.
@@ -72,20 +88,20 @@ if __name__ == '__main__':
                     'message': 'Error: Not JSON',
                     'data': None,
                 }
-            settings = flask.request.get_json()
-            cluster = ClusterRegistry.get(settings['cluster'])
-            model_settings = settings['model']
+            directory = flask.request.get_json()['url']
+            settings = Settings()
+            cluster = ClusterRegistry.get(settings.cluster)
             model = ModelBuilder.create(
-                model_settings['architecture'],
-                model_settings['dataset'],
-                model_settings['loss'],
-                model_settings['optimizer'],
-                model_settings['metrics'],
-                model_settings['epochs'],
-                model_settings['patience'],
+                settings.architecture,
+                settings.dataset,
+                settings.loss,
+                settings.optimizer,
+                settings.metrics,
+                settings.epochs,
+                settings.patience,
             )
-            split = model.split(model_settings['split'])
-            results = main(settings['url'], cluster, split)
+            split = model.split(settings.split)
+            results = main(directory, cluster, split)
             return {
                 'status': 0,
                 'message': 'OK',
