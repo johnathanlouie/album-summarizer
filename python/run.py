@@ -1,5 +1,6 @@
+import json
+import os.path
 from copy import deepcopy
-from json import dump
 from traceback import print_exc
 from typing import Any, Dict, List
 from urllib.parse import quote
@@ -38,7 +39,7 @@ class ClusterRank(object):
         """
         dst = 'electron/public/data/%s.json' % quote(dst)
         with open(dst, 'w', encoding='utf8') as f:
-            dump(self._results, f, indent=4)
+            json.dump(self._results, f, indent=4)
 
     def json(self) -> List[List[Dict[str, Any]]]:
         return deepcopy(self._results)
@@ -47,6 +48,8 @@ class ClusterRank(object):
 class Settings(object):
     """
     """
+
+    FILENAME = 'out/settings.json'
 
     def __init__(self):
         self.architecture = 'smi13'
@@ -58,6 +61,37 @@ class Settings(object):
         self.patience = 3
         self.split = 0
         self.cluster = 'sift'
+
+    def exists(self) -> bool:
+        return os.path.isfile(self.FILENAME)
+
+    def save(self) -> None:
+        with open(self.FILENAME, 'w') as f:
+            x = {
+                'architecture': self.architecture,
+                'dataset': self.dataset,
+                'loss': self.loss,
+                'optimizer': self.optimizer,
+                'metrics': self.metrics,
+                'epochs': self.epochs,
+                'patience': self.patience,
+                'split': self.split,
+                'cluster': self.cluster,
+            }
+            json.dump(x, f)
+
+    def load(self) -> None:
+        with open(self.FILENAME) as f:
+            x = json.load(f)
+            self.architecture = x['architecture']
+            self.dataset = x['dataset']
+            self.loss = x['loss']
+            self.optimizer = x['optimizer']
+            self.metrics = x['metrics']
+            self.epochs = x['epochs']
+            self.patience = x['patience']
+            self.split = x['split']
+            self.cluster = x['cluster']
 
 
 def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> None:
@@ -90,6 +124,10 @@ if __name__ == '__main__':
                 }
             directory = flask.request.get_json()['url']
             settings = Settings()
+            if not settings.exists():
+                settings.save()
+            else:
+                settings.load()
             cluster = ClusterRegistry.get(settings.cluster)
             model = ModelBuilder.create(
                 settings.architecture,
