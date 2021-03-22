@@ -244,18 +244,33 @@ function viewCtrl($scope, $interval, $http) {
         $scope.screen = 'main';
     };
 
-    async function dataDir() {
-        try {
-            await fsp.access('public/data');
-        }
-        catch (err) {
-            await fsp.mkdir('public/data');
-        }
-    }
-
-    function organizedCache() {
-        return path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
-    }
+    /**
+     * Interface for the cached organized view for the current directory.
+     */
+    const organizedDirFile = {
+        url: function () {
+            return path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
+        },
+        mkdir: async function () {
+            try {
+                return await fsp.access('public/data');
+            }
+            catch (err) {
+                return await fsp.mkdir('public/data');
+            }
+        },
+        read: async function () {
+            await this.mkdir();
+            return await fsp.readFile(this.url());
+        },
+        /**
+         * @param {string} json Organization data
+         */
+        write: async function (json) {
+            await this.mkdir();
+            return await fsp.writeFile(this.url(), json);
+        },
+    };
 
     async function reorganize() {
         $scope.cwd.unorganize();
@@ -277,8 +292,7 @@ function viewCtrl($scope, $interval, $http) {
             var response = await $http.post('http://localhost:8080/run', data);
             if (response.data.status === 0) {
                 var json = JSON.stringify(response.data.data);
-                await dataDir();
-                await fsp.writeFile(organizedCache(), json);
+                await organizedDirFile.write(json);
                 organize(true);
             }
             else if (response.data.status === 2) {
@@ -314,8 +328,7 @@ function viewCtrl($scope, $interval, $http) {
 
     async function organize(pythoned) {
         try {
-            await dataDir();
-            var data = await fsp.readFile(organizedCache());
+            var data = await organizedDirFile.read();
             $scope.cwd.organize(JSON.parse(data));
             $scope.loadingOverlay.hide();
         }
