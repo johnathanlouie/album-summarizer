@@ -253,6 +253,10 @@ function viewCtrl($scope, $interval, $http) {
         }
     }
 
+    function organizedCache() {
+        return path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
+    }
+
     async function reorganize() {
         $scope.cwd.unorganize();
         var data = {
@@ -272,10 +276,9 @@ function viewCtrl($scope, $interval, $http) {
         try {
             var response = await $http.post('http://localhost:8080/run', data);
             if (response.data.status === 0) {
-                dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
                 var json = JSON.stringify(response.data.data);
                 await dataDir();
-                await fsp.writeFile(dataFile, json);
+                await fsp.writeFile(organizedCache(), json);
                 organize(true);
             }
             else if (response.data.status === 2) {
@@ -310,10 +313,9 @@ function viewCtrl($scope, $interval, $http) {
     }
 
     async function organize(pythoned) {
-        dataFile = path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
         try {
             await dataDir();
-            var data = await fsp.readFile(dataFile);
+            var data = await fsp.readFile(organizedCache());
             $scope.cwd.organize(JSON.parse(data));
             $scope.loadingOverlay.hide();
         }
