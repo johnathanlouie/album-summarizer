@@ -11,6 +11,7 @@ const fsp = {
     readdir: util.promisify(fs.readdir),
     access: util.promisify(fs.access),
     mkdir: util.promisify(fs.mkdir),
+    unlink: util.promisify(fs.unlink),
 };
 
 class File_ {
@@ -270,6 +271,16 @@ function viewCtrl($scope, $interval, $http) {
             await this.mkdir();
             return await fsp.writeFile(this.url(), json);
         },
+        delete: async function () {
+            await this.mkdir();
+            try {
+                await fsp.unlink(this.url());
+                return true;
+            }
+            catch (err) {
+                return false;
+            }
+        },
     };
 
     async function reorganize() {
@@ -289,6 +300,7 @@ function viewCtrl($scope, $interval, $http) {
             url: $scope.cwd.path,
         };
         try {
+            await organizedDirFile.delete();
             var response = await $http.post('http://localhost:8080/run', data);
             if (response.data.status === 0) {
                 var json = JSON.stringify(response.data.data);
@@ -302,7 +314,7 @@ function viewCtrl($scope, $interval, $http) {
             }
         }
         catch (e) {
-            console.error('Internal server error');
+            console.error(e);
         }
         finally {
             organize(true);
