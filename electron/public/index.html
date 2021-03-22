@@ -272,7 +272,8 @@
                                     <div class="btn-group-toggle" data-toggle="buttons">
                                         <label class="btn btn-light btn-block squared-top"
                                             ng-class="{ 'disabled': cluster.length < 2 }">
-                                            <input type="checkbox" ng-disabled="cluster.length < 2" ng-model="clusterExpand"> See {{ clusterExpand ? 'less' : 'more' }}
+                                            <input type="checkbox" ng-disabled="cluster.length < 2"
+                                                ng-model="clusterExpand"> See {{ clusterExpand ? 'less' : 'more' }}
                                         </label>
                                     </div>
                                 </li>
@@ -281,7 +282,8 @@
 
                         <!-- Other thumbnails in a cluster -->
                         <div class="card m-2 bg-secondary" style="width: 300px;"
-                            ng-repeat="image in cluster | filter : { path : filterText }" ng-if="!$first" ng-show="clusterExpand">
+                            ng-repeat="image in cluster | filter : { path : filterText }" ng-if="!$first"
+                            ng-show="clusterExpand">
                             <div class="d-block">
                                 <div class="d-table-cell align-middle text-center p-1"
                                     style="height: 300px; width: 300px;">
@@ -377,6 +379,26 @@
             <span class="sr-only">Loading...</span>
         </div>
         <h1 class="mt-5 text-white text-monospace">{{ loadingOverlay.timeElapsed | number : 2 }} s</h1>
+    </div>
+
+    <!-- Error popup -->
+    <div class="modal" tabindex="-1" id="errorModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Error</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Can't seem to organize right now.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="scripts.js"></script>

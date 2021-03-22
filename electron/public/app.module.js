@@ -313,8 +313,8 @@ function viewCtrl($scope, $interval, $http) {
                 console.error('Unknown server error');
             }
         }
-        catch (e) {
-            console.error(e);
+        catch (err) {
+            console.error(err);
         }
         finally {
             organize(true);
@@ -351,6 +351,7 @@ function viewCtrl($scope, $interval, $http) {
                 console.error('Cannot read organized data file');
                 $scope.isOrganizeToggled = false;
                 $scope.loadingOverlay.hide();
+                $('#errorModal').modal();
             } else {
                 reorganize();
             }
