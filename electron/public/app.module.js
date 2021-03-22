@@ -310,25 +310,6 @@ function viewCtrl($scope, $interval, $http) {
         }
     }
 
-    /** @deprecated */
-    function reorganize2() {
-        $scope.cwd.unorganize();
-        var command = `conda run -n album pythonw "${path.normalize('python/run.py')}" "${$scope.cwd.path}"`;
-        var options = { cwd: '..', windowsHide: true };
-        var proc = childProcess.exec(command, options);
-        ipcRenderer.send('add-pid', proc.pid);
-
-        proc.on('exit', (code, signal) => {
-            ipcRenderer.send('remove-pid', proc.pid);
-            if (code !== 0) {
-                // TODO error handling
-                console.error('Organize subprocess error');
-            } else {
-                organize(true);
-            }
-        });
-    }
-
     async function organize(pythoned) {
         try {
             var data = await organizedDirFile.read();
