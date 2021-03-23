@@ -332,6 +332,7 @@ function viewCtrl($scope, $interval, $http) {
             $scope.isOrganizeToggled = false;
             $scope.loadingOverlay.hide();
             $('#errorModal').modal();
+            $scope.$apply();
         }
     }
 
