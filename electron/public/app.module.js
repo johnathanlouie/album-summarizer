@@ -281,54 +281,65 @@ function viewCtrl($scope, $interval, $http) {
                 return false;
             }
         },
+        exists: async function () {
+            try {
+                await fsp.access(this.url());
+                return true;
+            }
+            catch (err) {
+                return false;
+            }
+        },
     };
 
-    async function reorganize() {
-        $scope.cwd.unorganize();
-        var data = {
-            url: $scope.cwd.path,
-        };
-        try {
-            await organizedDirFile.delete();
-            var response = await $http.post('http://localhost:8080/run', data);
-            if (response.data.status === 0) {
-                var json = JSON.stringify(response.data.data);
-                await organizedDirFile.write(json);
-            }
-            else if (response.data.status === 2) {
-                console.error('Architecture/dataset mismatch');
-            }
-            else {
-                console.error('Unknown server error');
-            }
+    /**
+     * 
+     * @param {string} dir 
+     */
+    async function queryServer(dir) {
+        var response = await $http.post('http://localhost:8080/run', { url: dir });
+        if (response.data.status === 0) {
+            return response.data.data;
         }
-        catch (err) {
-            console.error(err);
+        else if (response.data.status === 2) {
+            throw new Error('Architecture/dataset mismatch');
         }
-        finally {
-            organize(true);
+        else {
+            throw new Error('Unknown server error');
         }
     }
 
-    async function organize(pythoned) {
+    /**
+     * 
+     * @param {boolean} refresh 
+     */
+    async function organize(refresh) {
         try {
-            var data = await organizedDirFile.read();
-            $scope.cwd.organize(JSON.parse(data));
+            var data;
+            $scope.cwd.unorganize();
+            if (refresh || !await organizedDirFile.exists()) {
+                await organizedDirFile.delete();
+                data = await queryServer($scope.cwd.path);
+                var json = JSON.stringify(data);
+                await organizedDirFile.write(json);
+            }
+            else {
+                var json = await organizedDirFile.read();
+                data = JSON.parse(json);
+            }
+            $scope.cwd.organize(data);
             $scope.loadingOverlay.hide();
         }
         catch (err) {
-            if (pythoned) {
-                console.error('Cannot read organized data file');
-                $scope.isOrganizeToggled = false;
-                $scope.loadingOverlay.hide();
-                $('#errorModal').modal();
-            } else {
-                reorganize();
-            }
+            console.error(err);
+            $scope.isOrganizeToggled = false;
+            $scope.loadingOverlay.hide();
+            $('#errorModal').modal();
         }
     }
 
     $scope.toggleOrganize = function () {
+        // If user switches to organized view
         if ($scope.isOrganizeToggled) {
             $scope.loadingOverlay.show();
             organize(false);
@@ -337,7 +348,7 @@ function viewCtrl($scope, $interval, $http) {
 
     $scope.reorganize = function () {
         $scope.loadingOverlay.show();
-        reorganize();
+        organize(true);
     }
 
     $scope.isOrganizeToggled = false;
