@@ -153,7 +153,6 @@ function viewCtrl($scope, $interval, $http) {
     };
 
     $scope.loadingOverlay = {
-        _isLoading: false,
         _stopwatch: {
             _time: 0,
             _interval: null,
@@ -176,18 +175,16 @@ function viewCtrl($scope, $interval, $http) {
             }
         },
 
-        get isLoading() { return this._isLoading; },
         get timeElapsed() { return this._stopwatch.time; },
 
         show() {
             this._stopwatch.restart();
-            this._isLoading = true;
+            $('#loadingModal').modal();
         },
 
         hide() {
             this._stopwatch.stop();
-            this._isLoading = false;
-            $scope.$apply();
+            $('#loadingModal').modal('hide');
         }
     };
 
