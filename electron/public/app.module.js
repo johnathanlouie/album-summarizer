@@ -2,8 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 const os = require('os');
-const childProcess = require('child_process');
-const { ipcRenderer } = require('electron');
 
 const fsp = {
     writeFile: util.promisify(fs.writeFile),
