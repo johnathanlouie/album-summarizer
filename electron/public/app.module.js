@@ -115,7 +115,7 @@ class Directory_ extends Array {
     }
 }
 
-function viewCtrl($scope, $interval, $http) {
+function viewCtrl($scope, $http) {
     const homeDir = os.homedir();
     $scope.cwd = Directory_.factory(homeDir);
 
@@ -147,42 +147,6 @@ function viewCtrl($scope, $interval, $http) {
             this._history.push(this._current);
             this._current = this._future.pop();
             return this._current;
-        }
-    };
-
-    $scope.loadingOverlay = {
-        _stopwatch: {
-            _time: 0,
-            _interval: null,
-            get time() { return this._time; },
-            reset() { this._time = 0; },
-
-            stop() {
-                if (this._interval !== null) {
-                    $interval.cancel(this._interval);
-                    this._interval = null;
-                }
-            },
-
-            start() { this._interval = $interval(() => { this._time += .01; }, 10); },
-
-            restart() {
-                this.stop();
-                this.reset();
-                this.start();
-            }
-        },
-
-        get timeElapsed() { return this._stopwatch.time; },
-
-        show() {
-            this._stopwatch.restart();
-            $('#loadingModal').modal();
-        },
-
-        hide() {
-            this._stopwatch.stop();
-            $('#loadingModal').modal('hide');
         }
     };
 
@@ -323,12 +287,12 @@ function viewCtrl($scope, $interval, $http) {
                 data = JSON.parse(json);
             }
             $scope.cwd.organize(data);
-            $scope.loadingOverlay.hide();
+            $scope.$broadcast('LOADING_MODAL_HIDE');
         }
         catch (err) {
             console.error(err);
             $scope.isOrganizeToggled = false;
-            $scope.loadingOverlay.hide();
+            $scope.$broadcast('LOADING_MODAL_HIDE');
             $('#errorModal').modal();
             $scope.$apply();
         }
@@ -337,13 +301,13 @@ function viewCtrl($scope, $interval, $http) {
     $scope.toggleOrganize = function () {
         // If user switches to organized view
         if ($scope.isOrganizeToggled) {
-            $scope.loadingOverlay.show();
+            $scope.$broadcast('LOADING_MODAL_SHOW');
             organize(false);
         }
     };
 
     $scope.reorganize = function () {
-        $scope.loadingOverlay.show();
+        $scope.$broadcast('LOADING_MODAL_SHOW');
         organize(true);
     }
 
@@ -354,4 +318,4 @@ function viewCtrl($scope, $interval, $http) {
     $scope.goHome();
 }
 
-angular.module('app', ['core']).controller('viewCtrl', viewCtrl);
+angular.module('app', ['core', 'overlay']).controller('viewCtrl', viewCtrl);

@@ -22,6 +22,8 @@
     <script src="core/file-url/file-url.filter.js"></script>
     <script src="core/filename/filename.filter.js"></script>
     <script src="core/normalize-rating/normalize-rating.filter.js"></script>
+    <script src="overlay/overlay.module.js"></script>
+    <script src="overlay/loading-modal/loading-modal.component.js"></script>
 
 </head>
 
@@ -391,18 +393,7 @@
         </div>
     </div>
 
-    <!-- Loading overlay -->
-    <div class="modal" data-backdrop="static" data-keyboard="false" tabindex="-1" id="loadingModal">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="text-center">
-                <h1 class="mb-5 display-1 text-white">Learning...</h1>
-                <div class="spinner-border text-white" role="status" style="height: 25vh; width: 25vh;">
-                    <span class="sr-only">Loading...</span>
-                </div>
-                <h1 class="mt-5 text-white text-monospace">{{ loadingOverlay.timeElapsed | number : 2 }} s</h1>
-            </div>
-        </div>
-    </div>
+    <loading-modal></loading-modal>
 
     <script src="scripts.js"></script>
 
