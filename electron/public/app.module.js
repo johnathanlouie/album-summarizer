@@ -293,7 +293,7 @@ function viewCtrl($scope, $http) {
             console.error(err);
             $scope.isOrganizeToggled = false;
             $scope.$broadcast('LOADING_MODAL_HIDE');
-            $('#errorModal').modal();
+            $scope.$broadcast('ERROR_MODAL_SHOW');
             $scope.$apply();
         }
     }

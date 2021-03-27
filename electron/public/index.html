@@ -24,6 +24,7 @@
     <script src="core/normalize-rating/normalize-rating.filter.js"></script>
     <script src="overlay/overlay.module.js"></script>
     <script src="overlay/loading-modal/loading-modal.component.js"></script>
+    <script src="overlay/error-modal/error-modal.component.js"></script>
 
 </head>
 
@@ -373,25 +374,7 @@
 
     </div>
 
-    <!-- Error popup -->
-    <div class="modal" tabindex="-1" id="errorModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Error</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Can't seem to organize right now.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <error-modal></error-modal>
 
     <loading-modal></loading-modal>
 
