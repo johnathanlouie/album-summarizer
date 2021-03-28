@@ -278,6 +278,7 @@ function viewCtrl($scope, $http) {
             }
             $scope.cwd.organize(data);
             $scope.$broadcast('LOADING_MODAL_HIDE');
+            $scope.$apply();
         }
         catch (err) {
             console.error(err);
