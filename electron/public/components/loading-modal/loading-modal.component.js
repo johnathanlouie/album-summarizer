@@ -48,7 +48,7 @@ function LoadingCtrl($scope, $interval) {
 
 }
 
-angular.module('overlay').component('loadingModal', {
-    templateUrl: 'overlay/loading-modal/loading-modal.template.html',
+angular.module('components').component('loadingModal', {
+    templateUrl: 'components/loading-modal/loading-modal.template.html',
     controller: LoadingCtrl,
 });

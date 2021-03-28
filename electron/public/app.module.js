@@ -270,7 +270,7 @@ function viewCtrl($scope, $http) {
 
     /**
      * 
-     * @param {boolean} refresh 
+     * @param {boolean} refresh
      */
     async function organize(refresh) {
         try {
@@ -318,4 +318,4 @@ function viewCtrl($scope, $http) {
     $scope.goHome();
 }
 
-angular.module('app', ['core', 'overlay']).controller('viewCtrl', viewCtrl);
+angular.module('app', ['core', 'components']).controller('viewCtrl', viewCtrl);
