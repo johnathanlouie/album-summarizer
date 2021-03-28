@@ -1,16 +1,6 @@
-const fs = require('fs');
 const path = require('path');
-const util = require('util');
 const os = require('os');
-
-const fsp = {
-    writeFile: util.promisify(fs.writeFile),
-    readFile: util.promisify(fs.readFile),
-    readdir: util.promisify(fs.readdir),
-    access: util.promisify(fs.access),
-    mkdir: util.promisify(fs.mkdir),
-    unlink: util.promisify(fs.unlink),
-};
+const fsp = require('./fsp');
 
 class File_ {
     #path;
