@@ -9,15 +9,8 @@ function viewCtrl($scope, $http, History) {
 
     async function goTo(dst) {
         $scope.filterText = '';
-        try {
-            var dirEnts = await fsp.readdir(dst, { withFileTypes: true });
-            $scope.cwd = Directory.factory(dst, dirEnts, true);
-            $scope.$apply();
-        }
-        catch (err) {
-            $scope.cwd = Directory.factory(dst);
-            $scope.$apply();
-        }
+        $scope.cwd = await Directory.factory(dst);
+        $scope.$apply();
     }
 
     $scope.goTo = function (dst = $scope.address) {

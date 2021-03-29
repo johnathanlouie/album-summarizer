@@ -1,16 +1,27 @@
 const File = require('./file');
+const fsp = require('./fsp');
 
 class Directory extends Array {
-    #path = '';
-    #directories = null;
-    #files = null;
-    #images = null;
-    #exists = false;
-    #organization = null;
+    #path;
+    #directories;
+    #files;
+    #images;
+    #exists;
+    #organization;
 
-    static factory(path, direntArray = [], exists = false) {
-        var instance = Directory.from(direntArray.map(e => new File(e, path)));
-        instance.#path = path;
+    static async factory(url) {
+        var direntArray = [];
+        var exists = false;
+        var instance;
+        try {
+            direntArray = await fsp.readdir(url, { withFileTypes: true });
+            instance = Directory.from(direntArray.map(e => new File(e, url)));
+            exists = true;
+        }
+        catch (err) {
+            instance = new Directory();
+        }
+        instance.#path = url;
         instance.#exists = exists;
         return instance;
     }
@@ -24,21 +35,21 @@ class Directory extends Array {
     }
 
     get directories() {
-        if (this.#directories === null) {
+        if (this.#directories === undefined) {
             this.#directories = this.filter(e => e.isDirectory());
         }
         return this.#directories;
     }
 
     get files() {
-        if (this.#files === null) {
+        if (this.#files === undefined) {
             this.#files = this.filter(e => e.isFile());
         }
         return this.#files;
     }
 
     get images() {
-        if (this.#images === null) {
+        if (this.#images === undefined) {
             this.#images = this.files.filter(e => e.isImage());
         }
         return this.#images;
@@ -49,7 +60,7 @@ class Directory extends Array {
     }
 
     get isOrganized() {
-        return this.#organization !== null;
+        return this.#organization !== undefined;
     }
 
     organize(val) {
@@ -57,7 +68,7 @@ class Directory extends Array {
     }
 
     unorganize() {
-        this.#organization = null;
+        this.#organization = undefined;
     }
 
     hasDirectories() {
