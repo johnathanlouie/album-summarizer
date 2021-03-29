@@ -1,113 +1,11 @@
 const path = require('path');
 const os = require('os');
-const fsp = require('./fsp');
-
-class File_ {
-    #path;
-    #isFile;
-    #isDirectory;
-
-    constructor(dirent, dirname) {
-        this.#path = path.join(dirname, dirent.name);
-        this.#isFile = dirent.isFile();
-        this.#isDirectory = dirent.isDirectory();
-    }
-
-    get path() {
-        return this.#path;
-    }
-
-    get extension() {
-        return path.extname(this.#path);
-    }
-
-    isImage() {
-        const validExt = ['.jpeg', '.jpg', '.png', '.gif', '.bmp', '.apng', '.avif'];
-        var ext = this.extension.toLowerCase();
-        return this.isFile() && validExt.some(e => e === ext);
-    }
-
-    isFile() {
-        return this.#isFile;
-    }
-
-    isDirectory() {
-        return this.#isDirectory;
-    }
-}
-
-class Directory_ extends Array {
-    #path = '';
-    #directories = null;
-    #files = null;
-    #images = null;
-    #exists = false;
-    #organization = null;
-
-    static factory(path, direntArray = [], exists = false) {
-        var instance = Directory_.from(direntArray.map(e => new File_(e, path)));
-        instance.#path = path;
-        instance.#exists = exists;
-        return instance;
-    }
-
-    get exists() {
-        return this.#exists;
-    }
-
-    get path() {
-        return this.#path;
-    }
-
-    get directories() {
-        if (this.#directories === null) {
-            this.#directories = this.filter(e => e.isDirectory());
-        }
-        return this.#directories;
-    }
-
-    get files() {
-        if (this.#files === null) {
-            this.#files = this.filter(e => e.isFile());
-        }
-        return this.#files;
-    }
-
-    get images() {
-        if (this.#images === null) {
-            this.#images = this.files.filter(e => e.isImage());
-        }
-        return this.#images;
-    }
-
-    get organization() {
-        return this.#organization;
-    }
-
-    get isOrganized() {
-        return this.#organization !== null;
-    }
-
-    organize(val) {
-        this.#organization = val;
-    }
-
-    unorganize() {
-        this.#organization = null;
-    }
-
-    hasDirectories() {
-        return this.directories.length > 0;
-    }
-
-    hasImages() {
-        return this.images.length > 0;
-    }
-}
+const fsp = require('./lib/fsp');
+const Directory = require('./lib/directory');
 
 function viewCtrl($scope, $http) {
     const homeDir = os.homedir();
-    $scope.cwd = Directory_.factory(homeDir);
+    $scope.cwd = Directory.factory(homeDir);
 
     const history = {
         _history: [],
@@ -144,11 +42,11 @@ function viewCtrl($scope, $http) {
         $scope.filterText = '';
         try {
             var dirEnts = await fsp.readdir(dst, { withFileTypes: true });
-            $scope.cwd = Directory_.factory(dst, dirEnts, true);
+            $scope.cwd = Directory.factory(dst, dirEnts, true);
             $scope.$apply();
         }
         catch (err) {
-            $scope.cwd = Directory_.factory(dst);
+            $scope.cwd = Directory.factory(dst);
             $scope.$apply();
         }
     }
