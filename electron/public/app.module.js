@@ -3,40 +3,9 @@ const os = require('os');
 const fsp = require('./lib/fsp');
 const Directory = require('./lib/directory');
 
-function viewCtrl($scope, $http) {
+function viewCtrl($scope, $http, History) {
     const homeDir = os.homedir();
     $scope.cwd = Directory.factory(homeDir);
-
-    const history = {
-        _history: [],
-        _future: [],
-        _current: undefined,
-        get hasBack() { return this._history.length === 0; },
-        get hasNext() { return this._future.length === 0; },
-        get current() { return this._current; },
-
-        push(dir) {
-            dir = path.normalize(dir);
-            if (this._current !== dir) {
-                this._future = [];
-                if (this._current !== undefined) { this._history.push(this._current); }
-                this._current = dir;
-            }
-            return this._current;
-        },
-
-        goBack() {
-            this._future.push(this._current);
-            this._current = this._history.pop();
-            return this._current;
-        },
-
-        goForward() {
-            this._history.push(this._current);
-            this._current = this._future.pop();
-            return this._current;
-        }
-    };
 
     async function goTo(dst) {
         $scope.filterText = '';
@@ -52,35 +21,35 @@ function viewCtrl($scope, $http) {
     }
 
     $scope.goTo = function (dst = $scope.address) {
-        goTo($scope.address = history.push(dst));
+        goTo($scope.address = History.push(dst));
     };
 
     $scope.goHome = function () {
-        goTo($scope.address = history.push(homeDir));
+        goTo($scope.address = History.push(homeDir));
     };
 
     $scope.refresh = function () {
-        goTo($scope.address = history.current);
+        goTo($scope.address = History.current);
     };
 
     $scope.goParent = function () {
-        goTo($scope.address = history.push(path.dirname(history.current)));
+        goTo($scope.address = History.push(path.dirname(History.current)));
     };
 
     $scope.goBack = function () {
-        goTo($scope.address = history.goBack());
+        goTo($scope.address = History.goBack());
     };
 
     $scope.goForward = function () {
-        goTo($scope.address = history.goForward());
+        goTo($scope.address = History.goForward());
     };
 
     $scope.hasBack = function () {
-        return history.hasBack;
+        return History.hasBack;
     };
 
     $scope.hasNext = function () {
-        return history.hasNext;
+        return History.hasNext;
     };
 
     $scope.focusOnImage = function (url) {
@@ -207,4 +176,8 @@ function viewCtrl($scope, $http) {
     $scope.goHome();
 }
 
-angular.module('app', ['core', 'components']).controller('viewCtrl', viewCtrl);
+angular.module('app', [
+    'core',
+    'components',
+    'services',
+]).controller('viewCtrl', viewCtrl);
