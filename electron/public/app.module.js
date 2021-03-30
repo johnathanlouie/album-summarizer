@@ -1,7 +1,7 @@
 const path = require('path');
 const os = require('os');
-const fsp = require('./lib/fsp');
 const Directory = require('./lib/directory');
+const OrganizedDirFile = require('./lib/organize');
 
 function viewCtrl($scope, History, queryServer) {
     const homeDir = os.homedir();
@@ -55,53 +55,6 @@ function viewCtrl($scope, History, queryServer) {
     };
 
     /**
-     * Interface for the cached organized view for the current directory.
-     */
-    const organizedDirFile = {
-        url: function () {
-            return path.normalize(`public/data/${encodeURIComponent($scope.cwd.path)}.json`);
-        },
-        mkdir: async function () {
-            try {
-                return await fsp.access('public/data');
-            }
-            catch (err) {
-                return await fsp.mkdir('public/data');
-            }
-        },
-        read: async function () {
-            await this.mkdir();
-            return await fsp.readFile(this.url());
-        },
-        /**
-         * @param {string} json Organization data
-         */
-        write: async function (json) {
-            await this.mkdir();
-            return await fsp.writeFile(this.url(), json);
-        },
-        delete: async function () {
-            await this.mkdir();
-            try {
-                await fsp.unlink(this.url());
-                return true;
-            }
-            catch (err) {
-                return false;
-            }
-        },
-        exists: async function () {
-            try {
-                await fsp.access(this.url());
-                return true;
-            }
-            catch (err) {
-                return false;
-            }
-        },
-    };
-
-    /**
      * 
      * @param {boolean} refresh
      */
@@ -109,6 +62,7 @@ function viewCtrl($scope, History, queryServer) {
         try {
             var data;
             $scope.cwd.unorganize();
+            organizedDirFile = new OrganizedDirFile($scope.cwd.path);
             if (refresh || !await organizedDirFile.exists()) {
                 await organizedDirFile.delete();
                 data = await queryServer($scope.cwd.path);
