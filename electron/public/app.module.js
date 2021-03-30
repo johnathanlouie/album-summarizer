@@ -3,7 +3,7 @@ const os = require('os');
 const fsp = require('./lib/fsp');
 const Directory = require('./lib/directory');
 
-function viewCtrl($scope, $http, History) {
+function viewCtrl($scope, History, queryServer) {
     const homeDir = os.homedir();
     $scope.cwd = Directory.factory(homeDir);
 
@@ -100,23 +100,6 @@ function viewCtrl($scope, $http, History) {
             }
         },
     };
-
-    /**
-     * 
-     * @param {string} dir 
-     */
-    async function queryServer(dir) {
-        var response = await $http.post('http://localhost:8080/run', { url: dir });
-        if (response.data.status === 0) {
-            return response.data.data;
-        }
-        else if (response.data.status === 2) {
-            throw new Error('Architecture/dataset mismatch');
-        }
-        else {
-            throw new Error('Unknown server error');
-        }
-    }
 
     /**
      * 
