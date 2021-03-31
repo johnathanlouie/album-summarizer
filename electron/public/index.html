@@ -35,7 +35,7 @@
 
 <body ng-app="app" ng-controller="viewCtrl">
 
-    <div ng-show="screenView.screen == 'MAIN'">
+    <div ng-show="screenView.screen === 'MAIN'">
 
         <nav class="addressbar navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
 
@@ -213,7 +213,7 @@
 
                     <!-- Thumbnail view -->
                     <div class="d-flex justify-content-around flex-wrap align-items-start"
-                        ng-show="screenView.view == 'THUMBNAILS'">
+                        ng-show="screenView.view === 'THUMBNAILS'">
 
                         <!-- Thumbnails -->
                         <button class="btn btn-outline-dark border-transparent thumbnail-xl"
@@ -228,7 +228,7 @@
                     </div>
 
                     <!-- Details view -->
-                    <table class="table table-hover" ng-show="screenView.view == 'DETAILS'">
+                    <table class="table table-hover" ng-show="screenView.view === 'DETAILS'">
                         <colgroup>
                             <col span="1" style="width: fit-content;">
                             <col span="1" style="width: auto;">
@@ -260,7 +260,7 @@
 
                     <!-- Organized thumbnail view -->
                     <div class="d-flex justify-content-around flex-wrap align-items-start"
-                        ng-show="screenView.view == 'THUMBNAILS'">
+                        ng-show="screenView.view === 'THUMBNAILS'">
 
                         <!-- Best thumbnail in a cluster -->
                         <div class="card m-2" style="width: 300px;" ng-repeat-start="cluster in cwd.organization">
@@ -314,7 +314,7 @@
                     </div>
 
                     <!-- Organized details view -->
-                    <div ng-show="screenView.view == 'DETAILS'">
+                    <div ng-show="screenView.view === 'DETAILS'">
 
                         <div class="mb-2" ng-repeat="(clusterId, cluster) in cwd.organization">
 
@@ -364,7 +364,7 @@
     </div>
 
     <!-- Image viewer -->
-    <div class="vw-100 vh-100" ng-show="screenView.screen == 'IMAGE_VIEWER'" id="imageviewer">
+    <div class="vw-100 vh-100" ng-show="screenView.screen === 'IMAGE_VIEWER'" id="imageviewer">
 
         <!-- Button bar -->
         <nav class="navbar navbar-dark bg-dark justify-content-center" id="imageviewerButtonbar">
