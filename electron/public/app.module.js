@@ -73,7 +73,7 @@ angular.module('app', [
 
     $scope.reorganize = function () {
         organize(true);
-    }
+    };
 
     $scope.isOrganizeToggled = false;
     $scope.goHome();
