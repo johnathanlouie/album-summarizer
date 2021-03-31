@@ -76,6 +76,5 @@ angular.module('app', [
 
     $scope.isOrganizeToggled = false;
     $scope.focusedImage = 'public/image-placeholder.png';
-    $scope.view = 'thumbnails';
     $scope.goHome();
 });
