@@ -28,6 +28,7 @@
     <script src="services/services.module.js"></script>
     <script src="services/history.service.js"></script>
     <script src="services/query-server.service.js"></script>
+    <script src="services/cwd.service.js"></script>
 
 </head>
 
@@ -129,8 +130,8 @@
 
                         <!-- Organize toggle -->
                         <label class="btn" ng-class="isOrganizeToggled ? 'btn-success' : 'btn-outline-success'">
-                            <input ng-model="isOrganizeToggled" ng-change="toggleOrganize()" ng-disabled="!cwd.exists"
-                                type="checkbox">
+                            <input ng-model="isOrganizeToggled" ng-change="toggleOrganize()"
+                                ng-disabled="!cwd.regular.exists" type="checkbox">
                             <svg class="btn-icon bi bi-diagram-3 mr-1" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#diagram-3" />
                             </svg>
@@ -161,7 +162,7 @@
         </nav>
 
         <!-- CWD not found warning -->
-        <div class="container-fluid" ng-hide="cwd.exists">
+        <div class="container-fluid" ng-hide="cwd.regular.exists">
             <div class="alert alert-danger" role="alert">
                 <h4 class="alert-heading">Directory not found!</h4>
                 <p>The directory (also known as folder) was not found at the address. Check the spelling of the address
@@ -171,21 +172,22 @@
             </div>
         </div>
 
-        <div ng-show="cwd.exists">
+        <div ng-show="cwd.regular.exists">
 
             <!-- No subdirectories message -->
-            <div class="container-fluid" ng-hide="cwd.hasDirectories()">
+            <div class="container-fluid" ng-hide="cwd.regular.hasDirectories()">
                 <div class="alert alert-info" role="alert">
                     <h4 class="alert-heading">No subdirectories!</h4>
                 </div>
             </div>
 
             <!-- Directories section -->
-            <div class="d-flex justify-content-start flex-wrap align-items-start" ng-show="cwd.hasDirectories()">
+            <div class="d-flex justify-content-start flex-wrap align-items-start"
+                ng-show="cwd.regular.hasDirectories()">
 
                 <!-- Directory icons -->
                 <button class="btn btn-outline-dark border-transparent icon-lg"
-                    ng-repeat="d in cwd.directories | filter : { path : filterText }" ng-click="goTo(d.path)">
+                    ng-repeat="d in cwd.regular.directories | filter : { path : filterText }" ng-click="goTo(d.path)">
                     <svg class="bi bi-folder" fill="currentColor">
                         <use xlink:href="bootstrap-icons.svg#folder" />
                     </svg>
@@ -197,13 +199,13 @@
             <hr>
 
             <!-- No images message -->
-            <div class="container-fluid" ng-hide="cwd.hasImages()">
+            <div class="container-fluid" ng-hide="cwd.regular.hasImages()">
                 <div class="alert alert-info" role="alert">
                     <h4 class="alert-heading">No images here!</h4>
                 </div>
             </div>
 
-            <div ng-show="cwd.hasImages()">
+            <div ng-show="cwd.regular.hasImages()">
 
                 <!-- Regular gallery -->
                 <div class="container-fluid" ng-hide="isOrganizeToggled && cwd.isOrganized">
@@ -214,7 +216,7 @@
 
                         <!-- Thumbnails -->
                         <button class="btn btn-outline-dark border-transparent thumbnail-xl"
-                            ng-repeat="image in cwd.images | filter : { path : filterText }"
+                            ng-repeat="image in cwd.regular.images | filter : { path : filterText }"
                             ng-click="focusOnImage(image.path)">
                             <div class="img-thumbnail d-table-cell align-middle">
                                 <img class="mw-100 mh-100" ng-src="{{ image.path | fileUrl }}">
@@ -239,7 +241,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="image in cwd.images | filter : { path : filterText }"
+                            <tr ng-repeat="image in cwd.regular.images | filter : { path : filterText }"
                                 ng-click="focusOnImage(image.path)" style="cursor: pointer;">
                                 <td class="text-center">
                                     <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1em;">

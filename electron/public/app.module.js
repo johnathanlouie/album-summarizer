@@ -1,58 +1,44 @@
-const path = require('path');
-const os = require('os');
-const Directory = require('./lib/directory');
-const OrganizedDirFile = require('./lib/organize');
+'use strict';
 
-function viewCtrl($scope, History, queryServer) {
-    const homeDir = os.homedir();
-    $scope.cwd = Directory.factory(homeDir);
+const path = require('path');
+
+
+angular.module('app', [
+    'core',
+    'components',
+    'services',
+]).controller('viewCtrl', function ($scope, History, Cwd) {
+    $scope.cwd = Cwd;
 
     async function goTo(dst) {
+        $scope.address = dst;
         $scope.filterText = '';
-        $scope.cwd = await Directory.factory(dst);
+        await Cwd.cd(dst);
         $scope.$apply();
     }
 
-    $scope.goTo = function (dst = $scope.address) {
-        goTo($scope.address = History.push(dst));
-    };
+    $scope.goTo = function (dst = $scope.address) { goTo(History.push(dst)); };
 
-    $scope.goHome = function () {
-        goTo($scope.address = History.push(homeDir));
-    };
+    $scope.goHome = function () { goTo(History.push(Cwd.home)); };
 
-    $scope.refresh = function () {
-        goTo($scope.address = History.current);
-    };
+    $scope.refresh = function () { goTo(History.current); };
 
-    $scope.goParent = function () {
-        goTo($scope.address = History.push(path.dirname(History.current)));
-    };
+    $scope.goParent = function () { goTo(History.push(path.dirname(History.current))); };
 
-    $scope.goBack = function () {
-        goTo($scope.address = History.goBack());
-    };
+    $scope.goBack = function () { goTo(History.goBack()); };
 
-    $scope.goForward = function () {
-        goTo($scope.address = History.goForward());
-    };
+    $scope.goForward = function () { goTo(History.goForward()); };
 
-    $scope.hasBack = function () {
-        return History.hasBack;
-    };
+    $scope.hasBack = function () { return History.hasBack; };
 
-    $scope.hasNext = function () {
-        return History.hasNext;
-    };
+    $scope.hasNext = function () { return History.hasNext; };
 
     $scope.focusOnImage = function (url) {
         $scope.focusedImage = url;
         $scope.screen = 'imageViewer';
     };
 
-    $scope.unfocusImage = function () {
-        $scope.screen = 'main';
-    };
+    $scope.unfocusImage = function () { $scope.screen = 'main'; };
 
     /**
      * 
@@ -60,28 +46,18 @@ function viewCtrl($scope, History, queryServer) {
      */
     async function organize(refresh) {
         try {
-            var data;
-            $scope.cwd.unorganize();
-            organizedDirFile = new OrganizedDirFile($scope.cwd.path);
-            if (refresh || !await organizedDirFile.exists()) {
-                await organizedDirFile.delete();
-                data = await queryServer($scope.cwd.path);
-                var json = JSON.stringify(data);
-                await organizedDirFile.write(json);
-            }
-            else {
-                var json = await organizedDirFile.read();
-                data = JSON.parse(json);
-            }
-            $scope.cwd.organize(data);
+            $scope.$broadcast('LOADING_MODAL_SHOW');
+            if (refresh) { await Cwd.reorganize(); }
+            else { await Cwd.organize(); }
             $scope.$broadcast('LOADING_MODAL_HIDE');
-            $scope.$apply();
         }
         catch (err) {
             console.error(err);
             $scope.isOrganizeToggled = false;
             $scope.$broadcast('LOADING_MODAL_HIDE');
             $scope.$broadcast('ERROR_MODAL_SHOW');
+        }
+        finally {
             $scope.$apply();
         }
     }
@@ -89,13 +65,11 @@ function viewCtrl($scope, History, queryServer) {
     $scope.toggleOrganize = function () {
         // If user switches to organized view
         if ($scope.isOrganizeToggled) {
-            $scope.$broadcast('LOADING_MODAL_SHOW');
             organize(false);
         }
     };
 
     $scope.reorganize = function () {
-        $scope.$broadcast('LOADING_MODAL_SHOW');
         organize(true);
     }
 
@@ -104,10 +78,4 @@ function viewCtrl($scope, History, queryServer) {
     $scope.focusedImage = 'public/image-placeholder.png';
     $scope.view = 'thumbnails';
     $scope.goHome();
-}
-
-angular.module('app', [
-    'core',
-    'components',
-    'services',
-]).controller('viewCtrl', viewCtrl);
+});

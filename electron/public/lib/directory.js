@@ -1,5 +1,8 @@
+'use strict';
+
 const File = require('./file');
 const fsp = require('./fsp');
+
 
 class Directory extends Array {
     #path;
@@ -7,7 +10,6 @@ class Directory extends Array {
     #files;
     #images;
     #exists;
-    #organization;
 
     static async factory(url) {
         var direntArray = [];
@@ -53,22 +55,6 @@ class Directory extends Array {
             this.#images = this.files.filter(e => e.isImage());
         }
         return this.#images;
-    }
-
-    get organization() {
-        return this.#organization;
-    }
-
-    get isOrganized() {
-        return this.#organization !== undefined;
-    }
-
-    organize(val) {
-        this.#organization = val;
-    }
-
-    unorganize() {
-        this.#organization = undefined;
     }
 
     hasDirectories() {
