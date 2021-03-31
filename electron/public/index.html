@@ -29,12 +29,13 @@
     <script src="services/history.service.js"></script>
     <script src="services/query-server.service.js"></script>
     <script src="services/cwd.service.js"></script>
+    <script src="services/screen-view.service.js"></script>
 
 </head>
 
 <body ng-app="app" ng-controller="viewCtrl">
 
-    <div ng-show="screen == 'main'">
+    <div ng-show="screenView.screen == 'MAIN'">
 
         <nav class="addressbar navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3 sticky-top">
 
@@ -109,7 +110,7 @@
 
                         <!-- View icons button -->
                         <label class="btn btn-warning">
-                            <input type="radio" ng-model="view" value="thumbnails">
+                            <input type="radio" ng-model="screenView.view" value="THUMBNAILS">
                             <svg class="btn-icon bi bi-image" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#image" />
                             </svg>
@@ -117,7 +118,7 @@
 
                         <!-- View details button -->
                         <label class="btn btn-warning">
-                            <input type="radio" ng-model="view" value="details">
+                            <input type="radio" ng-model="screenView.view" value="DETAILS">
                             <svg class="btn-icon bi bi-list-task" fill="currentColor">
                                 <use xlink:href="bootstrap-icons.svg#list-task" />
                             </svg>
@@ -212,7 +213,7 @@
 
                     <!-- Thumbnail view -->
                     <div class="d-flex justify-content-around flex-wrap align-items-start"
-                        ng-show="view == 'thumbnails'">
+                        ng-show="screenView.view == 'THUMBNAILS'">
 
                         <!-- Thumbnails -->
                         <button class="btn btn-outline-dark border-transparent thumbnail-xl"
@@ -227,7 +228,7 @@
                     </div>
 
                     <!-- Details view -->
-                    <table class="table table-hover" ng-show="view == 'details'">
+                    <table class="table table-hover" ng-show="screenView.view == 'DETAILS'">
                         <colgroup>
                             <col span="1" style="width: fit-content;">
                             <col span="1" style="width: auto;">
@@ -259,7 +260,7 @@
 
                     <!-- Organized thumbnail view -->
                     <div class="d-flex justify-content-around flex-wrap align-items-start"
-                        ng-show="view == 'thumbnails'">
+                        ng-show="screenView.view == 'THUMBNAILS'">
 
                         <!-- Best thumbnail in a cluster -->
                         <div class="card m-2" style="width: 300px;" ng-repeat-start="cluster in cwd.organization">
@@ -313,7 +314,7 @@
                     </div>
 
                     <!-- Organized details view -->
-                    <div ng-show="view == 'details'">
+                    <div ng-show="screenView.view == 'DETAILS'">
 
                         <div class="mb-2" ng-repeat="(clusterId, cluster) in cwd.organization">
 
@@ -363,7 +364,7 @@
     </div>
 
     <!-- Image viewer -->
-    <div class="vw-100 vh-100" ng-show="screen == 'imageViewer'" id="imageviewer">
+    <div class="vw-100 vh-100" ng-show="screenView.screen == 'IMAGE_VIEWER'" id="imageviewer">
 
         <!-- Button bar -->
         <nav class="navbar navbar-dark bg-dark justify-content-center" id="imageviewerButtonbar">

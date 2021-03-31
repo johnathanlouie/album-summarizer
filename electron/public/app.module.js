@@ -7,8 +7,9 @@ angular.module('app', [
     'core',
     'components',
     'services',
-]).controller('viewCtrl', function ($scope, History, Cwd) {
+]).controller('viewCtrl', function ($scope, History, Cwd, ScreenView) {
     $scope.cwd = Cwd;
+    $scope.screenView = ScreenView;
 
     async function goTo(dst) {
         $scope.address = dst;
@@ -35,10 +36,10 @@ angular.module('app', [
 
     $scope.focusOnImage = function (url) {
         $scope.focusedImage = url;
-        $scope.screen = 'imageViewer';
+        ScreenView.screen = 'IMAGE_VIEWER';
     };
 
-    $scope.unfocusImage = function () { $scope.screen = 'main'; };
+    $scope.unfocusImage = function () { ScreenView.screen = 'MAIN'; };
 
     /**
      * 
@@ -74,7 +75,6 @@ angular.module('app', [
     }
 
     $scope.isOrganizeToggled = false;
-    $scope.screen = 'main';
     $scope.focusedImage = 'public/image-placeholder.png';
     $scope.view = 'thumbnails';
     $scope.goHome();
