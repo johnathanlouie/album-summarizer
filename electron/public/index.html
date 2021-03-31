@@ -30,6 +30,7 @@
     <script src="services/query-server.service.js"></script>
     <script src="services/cwd.service.js"></script>
     <script src="services/screen-view.service.js"></script>
+    <script src="services/focus-image.service.js"></script>
 
 </head>
 
@@ -375,7 +376,7 @@
 
         <!-- Image -->
         <div class="d-flex align-items-center justify-content-center bg-secondary" id="imageviewerImagecontainer">
-            <img class="img-fluid mh-100" ng-src="{{ focusedImage | fileUrl }}">
+            <img class="img-fluid mh-100" ng-src="{{ focusImage.image | fileUrl }}">
         </div>
 
     </div>
