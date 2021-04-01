@@ -1,0 +1,20 @@
+<!-- No subdirectories message -->
+<div class="container-fluid" ng-hide="cwd.regular.hasDirectories()">
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">No subdirectories!</h4>
+    </div>
+</div>
+
+<!-- Directories section -->
+<div class="d-flex justify-content-start flex-wrap align-items-start" ng-show="cwd.regular.hasDirectories()">
+
+    <!-- Directory icons -->
+    <button class="btn btn-outline-dark border-transparent icon-lg"
+        ng-repeat="d in cwd.regular.directories | filter : { path : filterText }" ng-click="goTo(d.path)">
+        <svg class="bi bi-folder" fill="currentColor">
+            <use xlink:href="bootstrap-icons.svg#folder" />
+        </svg>
+        <p class="mb-0 text-break text-center">{{ d.path | filename }}</p>
+    </button>
+
+</div>

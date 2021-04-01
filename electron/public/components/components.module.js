@@ -1,4 +1,7 @@
 'use strict';
 
 
-angular.module('components', ['components.imageViewer']);
+angular.module('components', [
+    'components.imageViewer',
+    'components.subdirectoryPanel',
+]);

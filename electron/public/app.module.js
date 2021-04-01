@@ -13,9 +13,11 @@ angular.module('app', [
     $scope.focusImage = FocusImage;
 
     async function goTo(dst) {
+        $scope.$broadcast('LOADING_MODAL_SHOW');
         $scope.address = dst;
         $scope.filterText = '';
         await Cwd.cd(dst);
+        $scope.$broadcast('LOADING_MODAL_HIDE');
         $scope.$apply();
     }
 
@@ -69,9 +71,11 @@ angular.module('app', [
         }
     };
 
-    $scope.reorganize = function () {
-        organize(true);
-    };
+    $scope.reorganize = function () { organize(true); };
+
+    $scope.$on('CHANGE_DIRECTORY', function (event, dst) {
+        $scope.goTo(dst);
+    });
 
     $scope.isOrganizeToggled = false;
     $scope.goHome();
