@@ -25,6 +25,8 @@
     <script src="components/components.module.js"></script>
     <script src="components/loading-modal/loading-modal.component.js"></script>
     <script src="components/error-modal/error-modal.component.js"></script>
+    <script src="components/image-viewer/image-viewer.module.js"></script>
+    <script src="components/image-viewer/image-viewer.component.js"></script>
     <script src="services/services.module.js"></script>
     <script src="services/history.service.js"></script>
     <script src="services/query-server.service.js"></script>
@@ -364,22 +366,7 @@
 
     </div>
 
-    <!-- Image viewer -->
-    <div class="vw-100 vh-100" ng-show="screenView.screen === 'IMAGE_VIEWER'" id="imageviewer">
-
-        <!-- Button bar -->
-        <nav class="navbar navbar-dark bg-dark justify-content-center" id="imageviewerButtonbar">
-            <button class="btn btn-primary mr-2" type="button">Back</button>
-            <button class="btn btn-primary mr-2" type="button">Next</button>
-            <button class="btn btn-danger" ng-click="unfocusImage()" type="button">Close</button>
-        </nav>
-
-        <!-- Image -->
-        <div class="d-flex align-items-center justify-content-center bg-secondary" id="imageviewerImagecontainer">
-            <img class="img-fluid mh-100" ng-src="{{ focusImage.image | fileUrl }}">
-        </div>
-
-    </div>
+    <image-viewer ng-show="screenView.screen === 'IMAGE_VIEWER'"></image-viewer>
 
     <error-modal></error-modal>
 

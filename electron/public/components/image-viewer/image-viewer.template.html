@@ -1,0 +1,15 @@
+<div class="vw-100 vh-100" id="imageviewer">
+
+    <!-- Button bar -->
+    <nav class="navbar navbar-dark bg-dark justify-content-center" id="imageviewerButtonbar">
+        <button class="btn btn-primary mr-2" type="button">Back</button>
+        <button class="btn btn-primary mr-2" type="button">Next</button>
+        <button class="btn btn-danger" ng-click="unfocusImage()" type="button">Close</button>
+    </nav>
+
+    <!-- Image -->
+    <div class="d-flex align-items-center justify-content-center bg-secondary" id="imageviewerImagecontainer">
+        <img class="img-fluid mh-100" ng-src="{{ focusImage.image | fileUrl }}">
+    </div>
+
+</div>

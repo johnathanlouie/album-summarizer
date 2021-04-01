@@ -40,8 +40,6 @@ angular.module('app', [
         ScreenView.screen = 'IMAGE_VIEWER';
     };
 
-    $scope.unfocusImage = function () { ScreenView.screen = 'MAIN'; };
-
     /**
      * 
      * @param {boolean} refresh

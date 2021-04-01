@@ -1,3 +1,4 @@
 'use strict';
 
-angular.module('components', []);
+
+angular.module('components', ['components.imageViewer']);
