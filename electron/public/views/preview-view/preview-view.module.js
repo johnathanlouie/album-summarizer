@@ -1,4 +1,4 @@
 'use strict';
 
 
-angular.module('views.previewView', []);
+angular.module('views.previewView', ['components.devtoolsNavbar']);
