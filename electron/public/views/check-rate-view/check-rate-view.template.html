@@ -1,0 +1,58 @@
+<devtools-navbar></devtools-navbar>
+
+<div class="container-fluid">
+    <form class="mb-3">
+        <div class="form-row align-items-center">
+
+            <div class="col-3">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Image URLs</span>
+                    </div>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="file1">
+                        <label class="custom-file-label" for="file1">Choose file</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">True Value</span>
+                    </div>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="file2">
+                        <label class="custom-file-label" for="file2">Choose file</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Predicted Value</span>
+                    </div>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="file3">
+                        <label class="custom-file-label" for="file3">Choose file</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-1">
+                <button class="btn btn-primary" id="loadButton">Load</button>
+            </div>
+        </div>
+    </form>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Image</th>
+                <th>True Value</th>
+                <th>Predicted Value</th>
+            </tr>
+        </thead>
+        <tbody id="table1"></tbody>
+    </table>
+</div>
