@@ -182,4 +182,44 @@ if __name__ == '__main__':
             'optimizer': list(ModelBuilder.OPTIMIZERS.keys()),
         }
 
+    @app.route('/predict/test', methods=['POST'])
+    def test():
+        try:
+            if not flask.request.is_json:
+                return {
+                    'status': 1,
+                    'message': 'Error: Not JSON',
+                    'data': None,
+                }
+            settings = flask.request.get_json()
+            model = ModelBuilder.create(
+                settings.architecture,
+                settings.dataset,
+                settings.loss,
+                settings.optimizer,
+                settings.metrics,
+                settings.epochs,
+                settings.patience,
+            )
+            split = model.split(settings.split)
+            results = split.predict_test_set()
+            return {
+                'status': 0,
+                'message': 'OK',
+                'data': results,
+            }
+        except BadModelSettings:
+            return {
+                'status': 2,
+                'message': 'Error: Incompatible architecture/dataset',
+                'data': None,
+            }
+        except:
+            print_exc()
+            return {
+                'status': 100,
+                'message': 'Error: Unknown error',
+                'data': None,
+            }
+
     app.run(port=8080, threaded=False)
