@@ -309,39 +309,44 @@ class KerasAdapter(object):
         Creates and saves the model file and other training state files.
         Initial settings are found here.
         """
-        # Training status
-        mkdirs(self._names.dirname())
-        status = TrainingStatusData(self._names.status())
-        status.status = TrainingStatus.TRAINING
-        status.save()
+        try:
+            # Training status
+            mkdirs(self._names.dirname())
+            status = TrainingStatusData(self._names.status())
+            status.status = TrainingStatus.TRAINING
+            status.save()
 
-        # Blank model and training state
-        kmodel = self._architecture.compile(self._res)
-        if self._total_epochs == 0:
-            mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(patience=10))
-        else:
-            mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(total_epochs=self._total_epochs))
-        lr = ReduceLROnPlateauPickle(ReduceLROnPlateau(
-            patience=self._patience,
-            verbose=1,
-        ))
-        epoch = EpochPickle(0)
+            # Blank model and training state
+            kmodel = self._architecture.compile(self._res)
+            if self._total_epochs == 0:
+                mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(patience=10))
+            else:
+                mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(total_epochs=self._total_epochs))
+            lr = ReduceLROnPlateauPickle(ReduceLROnPlateau(
+                patience=self._patience,
+                verbose=1,
+            ))
+            epoch = EpochPickle(0)
 
-        # Latest snapshot
-        mkdirs(self._names.latest.dirname)
-        print('Saving %s' % self._names.latest.weights())
-        kmodel.save_weights(self._names.latest.weights())
-        mcp.save(self._names.latest.mcp())
-        lr.save(self._names.latest.lr())
-        epoch.save(self._names.latest.epoch())
+            # Latest snapshot
+            mkdirs(self._names.latest.dirname)
+            print('Saving %s' % self._names.latest.weights())
+            kmodel.save_weights(self._names.latest.weights())
+            mcp.save(self._names.latest.mcp())
+            lr.save(self._names.latest.lr())
+            epoch.save(self._names.latest.epoch())
 
-        # Best snapshot
-        mkdirs(self._names.best.dirname)
-        print('Saving %s' % self._names.best.weights())
-        kmodel.save_weights(self._names.best.weights())
-        mcp.save(self._names.best.mcp())
-        lr.save(self._names.best.lr())
-        epoch.save(self._names.best.epoch())
+            # Best snapshot
+            mkdirs(self._names.best.dirname)
+            print('Saving %s' % self._names.best.weights())
+            kmodel.save_weights(self._names.best.weights())
+            mcp.save(self._names.best.mcp())
+            lr.save(self._names.best.lr())
+            epoch.save(self._names.best.epoch())
+        except tf.errors.ResourceExhaustedError:
+            print('\nTraining resource exhaustion: %s' % self._names.dirname())
+            self._status.status = TrainingStatus.RESOURCE2
+            self._status.save()
 
     def is_saved(self) -> bool:
         """
@@ -368,17 +373,22 @@ class KerasAdapter(object):
         """
         Loads the training model file and other training state files.
         """
-        print()
-        self._status = TrainingStatusData.load(self._names.status())
-        self._is_best = best_snapshot
-        # print('Compiling architecture')
-        self._kmodel = self._architecture.compile(self._res)
-        if best_snapshot:
-            print('Loading %s' % self._names.best.weights())
-            self._kmodel.load_weights(self._names.best.weights())
-        else:
-            print('Loading %s' % self._names.latest.weights())
-            self._kmodel.load_weights(self._names.latest.weights())
+        try:
+            print()
+            self._status = TrainingStatusData.load(self._names.status())
+            self._is_best = best_snapshot
+            # print('Compiling architecture')
+            self._kmodel = self._architecture.compile(self._res)
+            if best_snapshot:
+                print('Loading %s' % self._names.best.weights())
+                self._kmodel.load_weights(self._names.best.weights())
+            else:
+                print('Loading %s' % self._names.latest.weights())
+                self._kmodel.load_weights(self._names.latest.weights())
+        except tf.errors.ResourceExhaustedError:
+            print('\nTraining resource exhaustion: %s' % self._names.dirname())
+            self._status.status = TrainingStatus.RESOURCE2
+            self._status.save()
 
     def delete(self) -> None:
         """
@@ -423,6 +433,9 @@ class ModelSplit(object):
 
     def is_complete(self) -> bool:
         return self.status() == TrainingStatus.COMPLETE
+
+    def has_error(self) -> bool:
+        return self.status() not in [TrainingStatus.TRAINING, TrainingStatus.COMPLETE]
 
     def train(self) -> TrainingStatus:
         """

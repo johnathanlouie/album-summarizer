@@ -25,7 +25,25 @@ def main():
                 epochs=0,
                 patience=3,
             ).split(0)
-            if not model.is_complete():
+            if model.is_complete():
+                print('Complete model: %s %s %s %s %s' % (
+                    architecture,
+                    dataset,
+                    loss,
+                    optimizer,
+                    'acc',
+                ))
+                print()
+            elif model.has_error():
+                print('Error model: %s %s %s %s %s' % (
+                    architecture,
+                    dataset,
+                    loss,
+                    optimizer,
+                    'acc',
+                ))
+                print()
+            else:
                 model.train()
         except ValueError:
             print('Incompatible model: %s %s %s %s %s' % (

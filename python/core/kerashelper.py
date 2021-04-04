@@ -47,6 +47,7 @@ class TrainingStatus(enum.Enum):
     COMPLETE = 'complete'
     NANINF = 'nan or inf error'
     RESOURCE = 'resource error'
+    RESOURCE2 = 'resource error during load'
 
 
 class TrainingStatusData(object):
@@ -65,6 +66,9 @@ class TrainingStatusData(object):
 
     def is_complete(self) -> bool:
         return self.status == TrainingStatus.COMPLETE
+
+    def has_error(self) -> bool:
+        return self.status not in [TrainingStatus.TRAINING, TrainingStatus.COMPLETE]
 
     @classmethod
     def load(cls, url: Url, verbose: bool = True) -> TrainingStatusData:
