@@ -312,9 +312,9 @@ class KerasAdapter(object):
         try:
             # Training status
             mkdirs(self._names.dirname())
-            status = TrainingStatusData(self._names.status())
-            status.status = TrainingStatus.TRAINING
-            status.save()
+            self._status = TrainingStatusData(self._names.status())
+            self._status.status = TrainingStatus.TRAINING
+            self._status.save()
 
             # Blank model and training state
             kmodel = self._architecture.compile(self._res)
