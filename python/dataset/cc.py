@@ -1,10 +1,10 @@
 from abc import abstractmethod
 from os import getcwd
 from os.path import join, normpath
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional
 
 from core import modelbuilder
-from core.dataset import DataSet, Predictions, PredictionsFactory
+from core.dataset import DataSet, LabelTranslator
 from jl import Csv
 from numpy import asarray, ndarray
 from typing2 import Url
@@ -133,24 +133,14 @@ class Cc(DataSet):
         return 5
 
 
-class CccPredictions(Predictions):
+class CccLabelTranslator(LabelTranslator):
     """
     """
 
-    def human_readable(self) -> List[Any]:
+    def translate(self, y: List[Any]) -> List[Any]:
         """
         """
-        return CcDataFile().to_category_str(self._y)
-
-
-class CccPredictionsFactory(PredictionsFactory):
-    """
-    """
-
-    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
-        """
-        """
-        return CccPredictions(x, y)
+        return CcDataFile().to_category_str(y)
 
 
 class Ccc(Cc):
@@ -170,31 +160,21 @@ class Ccc(Cc):
         y = self.one_hot(y, 6)
         return y
 
-    def _predictions_factory(self) -> PredictionsFactory:
+    def _label_translator(self) -> LabelTranslator:
         """
         """
-        return CccPredictionsFactory()
+        return CccLabelTranslator()
 
 
-class CcrPredictions(Predictions):
+class CcrLabelTranslator(LabelTranslator):
     """
     """
 
-    def human_readable(self) -> List[Any]:
+    def translate(self, y: List[Any]) -> List[Any]:
         """
+        Translates the predicted output.
         """
-        return self._y.flatten().tolist()
-
-
-class CcrPredictionsFactory(PredictionsFactory):
-    """
-    """
-
-    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
-        """
-        Returns an instance of CcrPredictions.
-        """
-        return CcrPredictions(x, y)
+        return y
 
 
 class Ccr(Cc):
@@ -213,14 +193,14 @@ class Ccr(Cc):
         y = asarray(data_file.rating())
         return y
 
-    def _predictions_factory(self) -> PredictionsFactory:
+    def _label_translator(self) -> LabelTranslator:
         """
         Returns an instance of PredictionsFactory.
         """
-        return CcrPredictionsFactory()
+        return CcrLabelTranslator()
 
 
-class CcrcPredictions(Predictions):
+class CcrcLabelTranslator(LabelTranslator):
     """
     """
 
@@ -236,20 +216,10 @@ class CcrcPredictions(Predictions):
         rate = (x1 + x2 + x3) / total
         return rate
 
-    def human_readable(self) -> List[Any]:
+    def translate(self, y: List[Any]) -> List[Any]:
         """
         """
-        return [self._rate(i, j, k) for i, j, k in self._y]
-
-
-class CcrcPredictionsFactory(PredictionsFactory):
-    """
-    """
-
-    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
-        """
-        """
-        return CcrcPredictions(x, y)
+        return [self._rate(i, j, k) for i, j, k in y]
 
 
 class CcrCategorical(Cc):
@@ -271,11 +241,11 @@ class CcrCategorical(Cc):
         y = self.one_hot(y, 3)
         return y
 
-    def _predictions_factory(self) -> PredictionsFactory:
+    def _label_translator(self) -> LabelTranslator:
         """
         Returns an instance of PredictionsFactory.
         """
-        return CcrcPredictionsFactory()
+        return CcrcLabelTranslator()
 
 
 modelbuilder.ModelBuilder.dataset(Ccc())

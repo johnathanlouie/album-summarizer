@@ -2,11 +2,11 @@ import gc
 import json
 from enum import Enum, auto
 from os.path import isfile
-from typing import Dict, List
+from typing import Any, Dict, List, Union
 
 import keras.models
 import tensorflow as tf
-from jl import Resolution, mkdirs
+from jl import ListFile, Resolution, mkdirs
 from keras.backend import clear_session
 from keras.callbacks import CSVLogger, ReduceLROnPlateau
 from numpy import asarray, ndarray
@@ -14,8 +14,7 @@ from typing2 import Image, Url
 
 from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
-from core.dataset import (DataSet, DataSetSplit, DataSetSplitName, Predictions,
-                          PredictionsFactory)
+from core.dataset import DataSet, DataSetSplit, DataSetSplitName
 from core.epoch import EpochObserver, EpochPickle
 from core.kerashelper import (CompletionStatusObserver, ModelCheckpoint2,
                               ModelCheckpoint2Observer, ModelCheckpoint2Pickle,
@@ -128,6 +127,39 @@ class Evaluation(dict):
             print('Saving %s' % url)
         with open(url, 'w') as f:
             json.dump(self, f)
+
+
+class PredictionY(object):
+    def __init__(self, predicted: List[Any], truth: List[Any]):
+        self.predicted = predicted
+        self.truth = truth
+
+
+class Prediction(object):
+    """
+    """
+
+    def __init__(self, x: List[Any], predicted_y: List[Any], true_y: List[Any] = []) -> None:
+        self.x: List[Any] = x
+        self.y = PredictionY(predicted_y, true_y)
+
+    def get_dict(self) -> Dict[str, Union[List[Any], Dict[str, List[Any]]]]:
+        return {
+            'x': self.x,
+            'y': {
+                'predicted': self.y.predicted,
+                'truth': self.y.truth,
+            },
+        }
+
+    def save_as_list(self, url: Url) -> None:
+        """
+        Saves to a text file in human readable format.
+        """
+        ListFile(url).write(self.get_dict())
+
+    def save_json(self, url: Url) -> None:
+        json.dump(self.get_dict(), open(url, 'w'))
 
 
 class KerasAdapter(object):
@@ -293,16 +325,18 @@ class KerasAdapter(object):
         y = self._data.test().y().load()
         return self.evaluate(x, y)
 
-    def predict(self, images: List[Image]) -> Predictions:
+    def predict(self, images: List[Url]) -> Prediction:
         """
         Predicts using the trained model
         """
         x = asarray(images)
         seq = Sequence1(x, x, self._res, self._batch)
         print('Predicting....')
-        results = self._kmodel.predict_generator(generator=seq, verbose=1)
+        predictions: ndarray = self._kmodel.predict_generator(generator=seq, verbose=1)
+        predictions = predictions.tolist()
         print('Prediction finished')
-        return self._data.translate_predictions(x, results)
+        y = self._data.translate_predictions(predictions)
+        return Prediction(images, y)
 
     def create(self) -> None:
         """
@@ -497,7 +531,7 @@ class ModelSplit(object):
             kadapter.load()
             return kadapter.evaluate_test_set()
 
-    def predict(self, images: List[Url]) -> Predictions:
+    def predict(self, images: List[Url]) -> Prediction:
         """
         Takes the input and returns an output
         """

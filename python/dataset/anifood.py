@@ -1,9 +1,9 @@
 from os import getcwd
 from os.path import join, normpath
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional
 
 from core import modelbuilder
-from core.dataset import DataSet, Predictions, PredictionsFactory
+from core.dataset import DataSet, LabelTranslator
 from jl import ImageDirectory
 from numpy import asarray, ndarray
 from typing2 import Url
@@ -33,25 +33,15 @@ class FoodCollection(ImageDirectory):
         super().__init__('data/food')
 
 
-class CccafPredictions(Predictions):
+class CccafLabelTranslator(LabelTranslator):
     """
     """
 
-    def human_readable(self) -> List[Any]:
-        """
-        """
-        return CcDataFile().to_category_str(self._y)
-
-
-class CccafPredictionsFactory(PredictionsFactory):
-    """
-    """
-
-    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
+    def translate(self, y: List[Any]) -> List[Any]:
         """
         Returns an instance of CccafPredictions.
         """
-        return CccafPredictions(x, y)
+        return CcDataFile().to_category_str(y)
 
 
 class CccafDataSet(DataSet):
@@ -125,11 +115,11 @@ class CccafDataSet(DataSet):
         """
         return 5
 
-    def _predictions_factory(self) -> PredictionsFactory:
+    def _label_translator(self) -> LabelTranslator:
         """
         See base class.
         """
-        return CccafPredictionsFactory()
+        return CccafLabelTranslator()
 
 
 modelbuilder.ModelBuilder.dataset(CccafDataSet())

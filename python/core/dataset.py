@@ -1,13 +1,12 @@
-import json
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Tuple
 
-from jl import ListFile, npexists, npload, npsave
+from jl import npexists, npload, npsave
 from keras.utils import to_categorical
 from numpy import ndarray
 from sklearn.model_selection import train_test_split
-from typing2 import ArrayLike, Url, number
+from typing2 import ArrayLike, number
 
 
 class XY(Enum):
@@ -105,40 +104,14 @@ class DataSetPhase(object):
         return True
 
 
-class Predictions(ABC):
-    """
-    An interpreter for predictions.
-    """
-
-    def __init__(self, x: ndarray, y: ndarray) -> None:
-        self._x: ndarray = x
-        self._y: ndarray = y
-
-    @abstractmethod
-    def human_readable(self) -> List[Any]:
-        """
-        Translates the return value from keras.models.Model.predict_generator.
-        """
-        pass
-
-    def save_as_list(self, url: Url) -> None:
-        """
-        Saves to a text file in human readable format.
-        """
-        ListFile(url).write(self.human_readable())
-
-    def save_json(self, url: Url) -> None:
-        json.dump(self.human_readable(), open(url, 'w'))
-
-
-class PredictionsFactory(ABC):
+class LabelTranslator(ABC):
     """
     """
 
     @abstractmethod
-    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
+    def translate(self, y: List[Any]) -> List[Any]:
         """
-        Returns a concrete instance of Predictions.
+        Translates the predicted output.
         """
         pass
 
@@ -157,10 +130,10 @@ class DataSetSplit(object):
     Represents a split of a dataset for cross-validation.
     """
 
-    def __init__(self, dataset: str, split: int, predFac: PredictionsFactory) -> None:
+    def __init__(self, dataset: str, split: int, label_translator: LabelTranslator) -> None:
         self._dataset: str = dataset
         self._split: int = split
-        self._predFac: PredictionsFactory = predFac
+        self._label_translator: LabelTranslator = label_translator
 
     def _phase(self, phase: Phase) -> DataSetPhase:
         """
@@ -198,8 +171,8 @@ class DataSetSplit(object):
             return False
         return True
 
-    def translate_predictions(self, x: ndarray, y: ndarray) -> Predictions:
-        return self._predFac.predictions(x, y)
+    def translate_predictions(self, y: List[Any]) -> List[Any]:
+        return self._label_translator.translate(y)
 
     def name(self) -> DataSetSplitName:
         return DataSetSplitName(self._dataset, self._split)
@@ -233,7 +206,7 @@ class DataSet(ABC):
         """
         Gets the training, testing, and validation split for Keras.
         """
-        return DataSetSplit(self.NAME, num, self._predictions_factory())
+        return DataSetSplit(self.NAME, num, self._label_translator())
 
     def train_val_test(
         self,
@@ -286,10 +259,9 @@ class DataSet(ABC):
         return to_categorical(y, num_classes=num_classes, dtype='int32')
 
     @abstractmethod
-    def _predictions_factory(self) -> PredictionsFactory:
+    def _label_translator(self) -> LabelTranslator:
         """
-        Abstract method.
-        Returns an instance of PredictionsFactory.
+        Returns an instance of LabelTranslator.
         """
         pass
 

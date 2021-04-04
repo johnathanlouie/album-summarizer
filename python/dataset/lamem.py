@@ -1,9 +1,9 @@
 from os import getcwd
 from os.path import join, normpath
-from typing import Any, List, Union
+from typing import Any, List
 
 from core import modelbuilder
-from core.dataset import DataSet, Predictions, PredictionsFactory
+from core.dataset import DataSet, LabelTranslator
 from jl import ListFile
 from numpy import asarray, ndarray
 from typing2 import Url
@@ -38,24 +38,14 @@ class LamemDataFile(object):
         return [float(x) for x in b[:, 1]]
 
 
-class LamemPredictions(Predictions):
+class LamemLabelTranslator(LabelTranslator):
     """
     """
 
-    def human_readable(self) -> List[Any]:
+    def translate(self, y: List[Any]) -> List[Any]:
         """
         """
-        return self._y.flatten().tolist()
-
-
-class LamemPredictionsFactory(PredictionsFactory):
-    """
-    """
-
-    def predictions(self, x: ndarray, y: ndarray) -> Predictions:
-        """
-        """
-        return LamemPredictions(x, y)
+        return y
 
 
 class Lamem(DataSet):
@@ -118,10 +108,10 @@ class Lamem(DataSet):
         """
         return 5
 
-    def _predictions_factory(self) -> PredictionsFactory:
+    def _label_translator(self) -> LabelTranslator:
         """
         """
-        return LamemPredictionsFactory()
+        return LamemLabelTranslator()
 
 
 modelbuilder.ModelBuilder.dataset(Lamem())
