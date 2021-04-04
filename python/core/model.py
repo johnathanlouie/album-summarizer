@@ -338,6 +338,27 @@ class KerasAdapter(object):
         y = self._data.translate_predictions(predictions)
         return Prediction(images, y)
 
+    def predict_training_set(self) -> Prediction:
+        x = self._data.train().x().load().tolist()
+        y = self._data.train().y().load().tolist()
+        prediction = self.predict(x)
+        prediction.y.truth = y
+        return prediction
+
+    def predict_validation_set(self) -> Prediction:
+        x = self._data.validation().x().load().tolist()
+        y = self._data.validation().y().load().tolist()
+        prediction = self.predict(x)
+        prediction.y.truth = y
+        return prediction
+
+    def predict_test_set(self) -> Prediction:
+        x = self._data.test().x().load().tolist()
+        y = self._data.test().y().load().tolist()
+        prediction = self.predict(x)
+        prediction.y.truth = y
+        return prediction
+
     def create(self) -> None:
         """
         Creates and saves the model file and other training state files.
@@ -545,6 +566,51 @@ class ModelSplit(object):
                 kadapter.create()
             kadapter.load()
             return kadapter.predict(images)
+
+    def predict_training_set(self) -> Prediction:
+        """
+        Takes the input and returns an output
+        """
+        with KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        ) as kadapter:
+            if not kadapter.is_saved():
+                kadapter.create()
+            kadapter.load()
+            return kadapter.predict_training_set()
+
+    def predict_validation_set(self) -> Prediction:
+        """
+        Takes the input and returns an output
+        """
+        with KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        ) as kadapter:
+            if not kadapter.is_saved():
+                kadapter.create()
+            kadapter.load()
+            return kadapter.predict_validation_set()
+
+    def predict_test_set(self) -> Prediction:
+        """
+        Takes the input and returns an output
+        """
+        with KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        ) as kadapter:
+            if not kadapter.is_saved():
+                kadapter.create()
+            kadapter.load()
+            return kadapter.predict_test_set()
 
 
 class BadModelSettings(ValueError):
