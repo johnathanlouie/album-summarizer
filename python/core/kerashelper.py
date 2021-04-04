@@ -48,6 +48,7 @@ class TrainingStatus(enum.Enum):
     NANINF = 'nan or inf error'
     RESOURCE = 'resource error'
     RESOURCE2 = 'resource error during load'
+    BAD_SETTINGS = 'incompatible model compile options'
 
 
 class TrainingStatusData(object):

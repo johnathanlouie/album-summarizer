@@ -2,6 +2,7 @@ from typing import Tuple
 
 import aaa
 import builds
+import core.model
 import core.modelbuilder
 
 
@@ -36,7 +37,7 @@ def main():
                 ))
             else:
                 model.train()
-        except ValueError:
+        except core.model.BadModelSettings:
             print('Incompatible model: %s %s %s %s %s' % (
                 architecture,
                 dataset,

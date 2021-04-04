@@ -284,6 +284,11 @@ class KerasAdapter(object):
             self._status.status = TrainingStatus.RESOURCE
             self._status.save()
             return self._status.status
+        except ValueError as e:
+            print('\nIncompatible settings: %s\n%s' % (self._names.dirname(), e))
+            self._status.status = TrainingStatus.BAD_SETTINGS
+            self._status.save()
+            return self._status.status
 
         if self._status.is_complete():
             print('Training completed: %s' % self._names.dirname())
