@@ -277,7 +277,7 @@ class KerasAdapter(object):
         y = self._data.train().y().load()
         return self.evaluate(x, y)
 
-    def validate(self) -> Dict[str, float]:
+    def evaluate_validation_set(self) -> Dict[str, float]:
         """
         Evaluates the model using the validation set
         """
@@ -285,7 +285,7 @@ class KerasAdapter(object):
         y = self._data.validation().y().load()
         return self.evaluate(x, y)
 
-    def test(self) -> Dict[str, float]:
+    def evaluate_test_set(self) -> Dict[str, float]:
         """
         Evaluates the model using the test set
         """
@@ -467,7 +467,7 @@ class ModelSplit(object):
             kadapter.load()
             return kadapter.evaluate_training_set()
 
-    def validate(self) -> Dict[str, float]:
+    def evaluate_validation_set(self) -> Dict[str, float]:
         """
         Measures the effectiveness of the model against the validation set
         """
@@ -480,9 +480,9 @@ class ModelSplit(object):
             if not kadapter.is_saved():
                 kadapter.create()
             kadapter.load()
-            return kadapter.validate()
+            return kadapter.evaluate_validation_set()
 
-    def test(self) -> Dict[str, float]:
+    def evaluate_test_set(self) -> Dict[str, float]:
         """
         Measures the effectiveness of the model against the test set
         """
@@ -495,7 +495,7 @@ class ModelSplit(object):
             if not kadapter.is_saved():
                 kadapter.create()
             kadapter.load()
-            return kadapter.test()
+            return kadapter.evaluate_test_set()
 
     def predict(self, images: List[Url]) -> Predictions:
         """
@@ -594,22 +594,22 @@ class Model(object):
             evaluation.append(self.split(i).evaluate_training_set())
         return evaluation
 
-    def validate(self) -> Evaluation:
+    def evaluate_validation_set(self) -> Evaluation:
         """
         Evaluates the model against the data's validation set
         """
         evaluation = Evaluation()
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
-            evaluation.append(self.split(i).validate())
+            evaluation.append(self.split(i).evaluate_validation_set())
         return evaluation
 
-    def test(self) -> Evaluation:
+    def evaluate_test_set(self) -> Evaluation:
         """
         Evaluates the model against the data's test set
         """
         evaluation = Evaluation()
         for i in range(self._dataset.splits()):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
-            evaluation.append(self.split(i).test())
+            evaluation.append(self.split(i).evaluate_test_set())
         return evaluation
