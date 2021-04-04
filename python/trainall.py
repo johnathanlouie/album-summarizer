@@ -15,6 +15,7 @@ def builds() -> Tuple[str, str, str, str]:
 
 def main():
     for architecture, dataset, loss, optimizer in builds():
+        print()
         try:
             model = core.modelbuilder.ModelBuilder.create(
                 architecture,
@@ -33,7 +34,6 @@ def main():
                     optimizer,
                     'acc',
                 ))
-                print()
             elif model.has_error():
                 print('Error model: %s %s %s %s %s' % (
                     architecture,
@@ -42,7 +42,6 @@ def main():
                     optimizer,
                     'acc',
                 ))
-                print()
             else:
                 model.train()
         except ValueError:
