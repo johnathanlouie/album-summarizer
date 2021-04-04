@@ -173,4 +173,13 @@ if __name__ == '__main__':
             'data': None,
         }
 
+    @app.route('/options', methods=['GET'])
+    def get_options():
+        return {
+            'architecture': list(ModelBuilder.ARCHITECTURES.keys()),
+            'dataset': list(ModelBuilder.DATASETS.keys()),
+            'loss': list(ModelBuilder.LOSSES.keys()),
+            'optimizer': list(ModelBuilder.OPTIMIZERS.keys()),
+        }
+
     app.run(port=8080, threaded=False)
