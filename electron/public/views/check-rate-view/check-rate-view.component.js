@@ -40,7 +40,7 @@ angular.module('views.checkRateView').component('checkRateView', {
                 ));
             }
             $scope.$apply();
-        }
+        };
 
         $scope.selectedOptions = {
             phase: 'test',
