@@ -160,10 +160,11 @@ if __name__ == '__main__':
     @app.route('/options', methods=['GET'])
     def get_options():
         return {
-            'architecture': list(ModelBuilder.ARCHITECTURES.keys()),
-            'dataset': list(ModelBuilder.DATASETS.keys()),
-            'loss': list(ModelBuilder.LOSSES.keys()),
-            'optimizer': list(ModelBuilder.OPTIMIZERS.keys()),
+            'architectures': list(ModelBuilder.ARCHITECTURES.keys()),
+            'datasets': list(ModelBuilder.DATASETS.keys()),
+            'losses': list(ModelBuilder.LOSSES.keys()),
+            'optimizers': list(ModelBuilder.OPTIMIZERS.keys()),
+            'clusters': ClusterRegistry.keys(),
         }
 
     @app.route('/predict/test', methods=['POST'])

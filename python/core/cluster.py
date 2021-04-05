@@ -105,3 +105,7 @@ class ClusterRegistry(object):
         if name not in cls._REGISTRY:
             raise ClusterRegistryNameError(name)
         return cls._REGISTRY[name]
+
+    @classmethod
+    def keys(cls) -> List[str]:
+        return cls._REGISTRY.keys()
