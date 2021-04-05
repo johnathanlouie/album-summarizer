@@ -20,12 +20,8 @@ angular.module('views.checkRateView').component('checkRateView', {
     controller: ['$scope', '$http', function ($scope, $http) {
         async function getOptions() {
             var response = await $http.get('http://localhost:8080/options');
-            if (response.status !== 200) {
-            }
-            else {
-                $scope.options = response.data;
-                $scope.$apply();
-            }
+            $scope.options = response.data;
+            $scope.$apply();
         }
 
         $scope.submit = async function () {
