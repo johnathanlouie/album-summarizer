@@ -157,14 +157,6 @@ if __name__ == '__main__':
             response.status = 'Error: Unknown'
             return response
 
-    @app.route('/run', methods=['GET'])
-    def run2():
-        return {
-            'status': 0,
-            'message': 'OK',
-            'data': None,
-        }
-
     @app.route('/options', methods=['GET'])
     def get_options():
         return {
