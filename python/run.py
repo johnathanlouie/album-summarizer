@@ -186,40 +186,33 @@ if __name__ == '__main__':
     def test():
         try:
             if not flask.request.is_json:
-                return {
-                    'status': 1,
-                    'message': 'Error: Not JSON',
-                    'data': None,
-                }
+                response = flask.Response()
+                response.status_code = 400
+                response.status = 'Error: Not JSON'
+                return response
             settings = flask.request.get_json()
             model = ModelBuilder.create(
-                settings.architecture,
-                settings.dataset,
-                settings.loss,
-                settings.optimizer,
-                settings.metrics,
-                settings.epochs,
-                settings.patience,
+                settings['architecture'],
+                settings['dataset'],
+                settings['loss'],
+                settings['optimizer'],
+                settings['metrics'],
+                settings['epochs'],
+                settings['patience'],
             )
-            split = model.split(settings.split)
-            results = split.predict_test_set()
-            return {
-                'status': 0,
-                'message': 'OK',
-                'data': results,
-            }
+            split = model.split(settings['split'])
+            results = split.predict_test_set().get_dict()
+            return results
         except BadModelSettings:
-            return {
-                'status': 2,
-                'message': 'Error: Incompatible architecture/dataset',
-                'data': None,
-            }
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Incompatible architecture/dataset'
+            return response
         except:
             print_exc()
-            return {
-                'status': 100,
-                'message': 'Error: Unknown error',
-                'data': None,
-            }
+            response = flask.Response()
+            response.status_code = 500
+            response.status = 'Error: Unknown'
+            return response
 
     app.run(port=8080, threaded=False)
