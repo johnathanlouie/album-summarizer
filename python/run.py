@@ -117,11 +117,10 @@ if __name__ == '__main__':
     def run():
         try:
             if not flask.request.is_json:
-                return {
-                    'status': 1,
-                    'message': 'Error: Not JSON',
-                    'data': None,
-                }
+                response = flask.Response()
+                response.status_code = 400
+                response.status = 'Error: Not JSON'
+                return response
             directory = flask.request.get_json()['url']
             settings = Settings()
             if not settings.exists():
@@ -140,30 +139,23 @@ if __name__ == '__main__':
             )
             split = model.split(settings.split)
             results = main(directory, cluster, split)
-            return {
-                'status': 0,
-                'message': 'OK',
-                'data': results,
-            }
+            return results
         except BadModelSettings:
-            return {
-                'status': 2,
-                'message': 'Error: Incompatible architecture/dataset',
-                'data': None,
-            }
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Incompatible architecture/dataset'
+            return response
         except ClusterRegistryNameError:
-            return {
-                'status': 3,
-                'message': 'Error: Bad cluster name',
-                'data': None,
-            }
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Bad cluster name'
+            return response
         except:
             print_exc()
-            return {
-                'status': 100,
-                'message': 'Error: Unknown error',
-                'data': None,
-            }
+            response = flask.Response()
+            response.status_code = 500
+            response.status = 'Error: Unknown'
+            return response
 
     @app.route('/run', methods=['GET'])
     def run2():
