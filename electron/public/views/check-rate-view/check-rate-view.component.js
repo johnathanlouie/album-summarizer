@@ -17,25 +17,44 @@ class Prediction {
 
 angular.module('views.checkRateView').component('checkRateView', {
     templateUrl: 'views/check-rate-view/check-rate-view.template.html',
-    controller: ['$scope', '$http', function ($scope, $http) {
+    controller: ['$scope', '$http', '$rootScope', function ($scope, $http, $rootScope) {
+
         async function getOptions() {
-            var response = await $http.get('http://localhost:8080/options');
-            $scope.options = response.data;
-            $scope.$apply();
+            try {
+                $rootScope.$broadcast('LOADING_MODAL_SHOW');
+                var response = await $http.get('http://localhost:8080/options');
+                $scope.options = response.data;
+                $rootScope.$broadcast('LOADING_MODAL_HIDE');
+                $scope.$apply();
+            }
+            catch (e) {
+                $rootScope.$broadcast('LOADING_MODAL_HIDE');
+                $rootScope.$broadcast('ERROR_MODAL_SHOW');
+                $scope.$apply();
+            }
         }
 
         $scope.submit = async function () {
-            var url = `http://localhost:8080/predict/${$scope.selectedOptions.phase}`;
-            var response = await $http.post(url, $scope.selectedOptions);
-            $scope.prediction = [];
-            for (let i in response.data.x) {
-                $scope.prediction.push(new Prediction(
-                    response.data.x[i],
-                    response.data.y.predicted[i],
-                    response.data.y.truth[i],
-                ));
+            try {
+                $rootScope.$broadcast('LOADING_MODAL_SHOW');
+                var url = `http://localhost:8080/predict/${$scope.selectedOptions.phase}`;
+                var response = await $http.post(url, $scope.selectedOptions);
+                $scope.prediction = [];
+                for (let i in response.data.x) {
+                    $scope.prediction.push(new Prediction(
+                        response.data.x[i],
+                        response.data.y.predicted[i],
+                        response.data.y.truth[i],
+                    ));
+                }
+                $rootScope.$broadcast('LOADING_MODAL_HIDE');
+                $scope.$apply();
             }
-            $scope.$apply();
+            catch (e) {
+                $rootScope.$broadcast('LOADING_MODAL_HIDE');
+                $rootScope.$broadcast('ERROR_MODAL_SHOW');
+                $scope.$apply();
+            }
         };
 
         $scope.selectedOptions = {
@@ -51,5 +70,6 @@ angular.module('views.checkRateView').component('checkRateView', {
         };
 
         getOptions();
+
     }],
 });
