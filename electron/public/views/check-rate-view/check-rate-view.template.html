@@ -81,10 +81,14 @@
         </thead>
         <tbody>
             <tr ng-repeat="datum in prediction">
-                <td><img class="rate-thumbnail img-thumbnail" ng-src="{{ datum.x | fileUrl }}"></td>
+                <td class="text-center">
+                    <img class="rate-thumbnail img-thumbnail" ng-src="{{ datum.x | fileUrl }}"
+                        style="max-width: 300px; max-height: 300px;">
+                </td>
                 <td>{{ datum.y.truth }}</td>
                 <td>{{ datum.y.predicted }}</td>
             </tr>
         </tbody>
     </table>
+
 </div>
