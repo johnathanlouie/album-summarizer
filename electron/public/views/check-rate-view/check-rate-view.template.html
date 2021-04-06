@@ -17,28 +17,28 @@
             <div class="form-group col-2">
                 <label for="architectures">Architectures</label>
                 <select class="form-control" id="architectures" ng-model="selectedOptions.architecture">
-                    <option ng-repeat="architecture in options.architecture">{{ architecture }}</option>
+                    <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
                 </select>
             </div>
 
             <div class="form-group col-2">
                 <label for="datasets">Datasets</label>
                 <select class="form-control" id="datasets" ng-model="selectedOptions.dataset">
-                    <option ng-repeat="dataset in options.dataset">{{ dataset }}</option>
+                    <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
                 </select>
             </div>
 
             <div class="form-group col-2">
                 <label for="losses">Losses</label>
                 <select class="form-control" id="losses" ng-model="selectedOptions.loss">
-                    <option ng-repeat="loss in options.loss">{{ loss }}</option>
+                    <option ng-repeat="loss in options.losses">{{ loss }}</option>
                 </select>
             </div>
 
             <div class="form-group col-2">
                 <label for="optimizers">Optimizers</label>
                 <select class="form-control" id="optimizers" ng-model="selectedOptions.optimizer">
-                    <option ng-repeat="optimizer in options.optimizer">{{ optimizer }}</option>
+                    <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
                 </select>
             </div>
 
