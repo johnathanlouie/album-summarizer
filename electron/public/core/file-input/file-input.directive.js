@@ -1,12 +1,12 @@
 'use strict';
 
 
-angular.module('core.fileInput').directive('fileInput', [function () {
+angular.module('core.fileInput').directive('fileInput', ['$parse', function ($parse) {
     return {
         restrict: 'A',
         link(scope, element, attrs) {
             function onChange(event) {
-                scope[attrs.fileInput] = element.prop('files');
+                $parse(attrs.fileInput).assign(scope, element.prop('files'));
                 scope.$apply();
             }
 
