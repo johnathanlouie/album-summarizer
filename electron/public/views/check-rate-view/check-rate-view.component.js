@@ -17,22 +17,9 @@ class Prediction {
 
 angular.module('views.checkRateView').component('checkRateView', {
     templateUrl: 'views/check-rate-view/check-rate-view.template.html',
-    controller: ['$scope', '$http', '$rootScope', function ($scope, $http, $rootScope) {
+    controller: ['$scope', '$http', '$rootScope', 'Options', function ($scope, $http, $rootScope, Options) {
 
-        async function getOptions() {
-            try {
-                $rootScope.$broadcast('LOADING_MODAL_SHOW');
-                var response = await $http.get('http://localhost:8080/options');
-                $scope.options = response.data;
-                $rootScope.$broadcast('LOADING_MODAL_HIDE');
-                $scope.$apply();
-            }
-            catch (e) {
-                $rootScope.$broadcast('LOADING_MODAL_HIDE');
-                $rootScope.$broadcast('ERROR_MODAL_SHOW');
-                $scope.$apply();
-            }
-        }
+        $scope.options = Options;
 
         $scope.submit = async function () {
             try {
@@ -68,8 +55,6 @@ angular.module('views.checkRateView').component('checkRateView', {
             patience: 3,
             split: 0,
         };
-
-        getOptions();
 
     }],
 });
