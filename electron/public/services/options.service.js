@@ -11,7 +11,7 @@ angular.module('services').factory('Options', ['$rootScope', '$http', function (
         optimizers = [];
         clusters = [];
 
-        constructor() { this.load(); }
+        constructor() { this.load(false); }
 
         async load(reload) {
             if (!this.#isLoaded || reload) {
