@@ -24,7 +24,7 @@ angular.module('views.checkRateView').component('checkRateView', {
         $scope.submit = async function () {
             try {
                 $rootScope.$broadcast('LOADING_MODAL_SHOW');
-                var url = `http://localhost:8080/predict/${$scope.selectedOptions.phase}`;
+                var url = 'http://localhost:8080/predict';
                 var response = await $http.post(url, $scope.selectedOptions);
                 $scope.prediction = [];
                 for (let i in response.data.x) {

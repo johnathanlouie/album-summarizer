@@ -167,7 +167,7 @@ if __name__ == '__main__':
             'clusters': ClusterRegistry.keys(),
         }
 
-    @app.route('/predict/test', methods=['POST'])
+    @app.route('/predict', methods=['POST'])
     def test():
         try:
             if not flask.request.is_json:
@@ -186,7 +186,17 @@ if __name__ == '__main__':
                 settings['patience'],
             )
             split = model.split(settings['split'])
-            results = split.predict_test_set().get_dict()
+            if settings['phase'] == 'training':
+                results = split.predict_training_set().get_dict()
+            elif settings['phase'] == 'validation':
+                results = split.predict_validation_set().get_dict()
+            elif settings['phase'] == 'test':
+                results = split.predict_test_set().get_dict()
+            else:
+                response = flask.Response()
+                response.status_code = 400
+                response.status = 'Error: Incorrect phase'
+                return response
             return results
         except BadModelSettings:
             response = flask.Response()
