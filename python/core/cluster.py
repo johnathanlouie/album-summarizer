@@ -108,4 +108,4 @@ class ClusterRegistry(object):
 
     @classmethod
     def keys(cls) -> List[str]:
-        return cls._REGISTRY.keys()
+        return list(cls._REGISTRY.keys())
