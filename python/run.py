@@ -221,7 +221,9 @@ if __name__ == '__main__':
             settings = flask.request.get_json()
             images = ImageDirectory(settings['directory']).jpeg(False)
             cluster = ClusterRegistry.get(settings['cluster'])
-            return cluster.run(images).urls()
+            results = cluster.run(images).urls()
+            results = flask.jsonify(results)
+            return results
         except ClusterRegistryNameError:
             response = flask.Response()
             response.status_code = 400
