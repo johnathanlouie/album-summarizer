@@ -3,17 +3,17 @@
 const path = require('path');
 
 
-function OrganizerViewCtrl($scope, History, Cwd, ScreenView, FocusImage) {
+function OrganizerViewCtrl($scope, $rootScope, History, Cwd, ScreenView, FocusImage) {
     $scope.cwd = Cwd;
     $scope.screenView = ScreenView;
     $scope.focusImage = FocusImage;
 
     async function goTo(dst) {
-        $scope.$broadcast('LOADING_MODAL_SHOW');
+        $rootScope.$broadcast('LOADING_MODAL_SHOW');
         $scope.address = dst;
         $scope.filterText = '';
         await Cwd.cd(dst);
-        $scope.$broadcast('LOADING_MODAL_HIDE');
+        $rootScope.$broadcast('LOADING_MODAL_HIDE');
         $scope.$apply();
     }
 
@@ -44,16 +44,16 @@ function OrganizerViewCtrl($scope, History, Cwd, ScreenView, FocusImage) {
      */
     async function organize(refresh) {
         try {
-            $scope.$broadcast('LOADING_MODAL_SHOW');
+            $rootScope.$broadcast('LOADING_MODAL_SHOW');
             if (refresh) { await Cwd.reorganize(); }
             else { await Cwd.organize(); }
-            $scope.$broadcast('LOADING_MODAL_HIDE');
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
         }
         catch (err) {
             console.error(err);
             $scope.isOrganizeToggled = false;
-            $scope.$broadcast('LOADING_MODAL_HIDE');
-            $scope.$broadcast('ERROR_MODAL_SHOW');
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW');
         }
         finally {
             $scope.$apply();
@@ -69,7 +69,7 @@ function OrganizerViewCtrl($scope, History, Cwd, ScreenView, FocusImage) {
 
     $scope.reorganize = function () { organize(true); };
 
-    $scope.$on('CHANGE_DIRECTORY', function (event, dst) {
+    $rootScope.$on('CHANGE_DIRECTORY', function (event, dst) {
         $scope.goTo(dst);
     });
 
@@ -79,5 +79,5 @@ function OrganizerViewCtrl($scope, History, Cwd, ScreenView, FocusImage) {
 
 angular.module('views.organizerView').component('organizerView', {
     templateUrl: 'views/organizer-view/organizer-view.template.html',
-    controller: ['$scope', 'History', 'Cwd', 'ScreenView', 'FocusImage', OrganizerViewCtrl],
+    controller: ['$scope', '$rootScope', 'History', 'Cwd', 'ScreenView', 'FocusImage', OrganizerViewCtrl],
 });

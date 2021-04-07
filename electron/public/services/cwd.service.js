@@ -1,11 +1,12 @@
 'use strict';
 
-const os = require('os');
-const Directory = require('./lib/directory');
-const OrganizedDirFile = require('./lib/organize');
-
 
 angular.module('services').factory('Cwd', ['queryServer', function (queryServer) {
+
+    const os = require('os');
+    const Directory = require('./lib/directory');
+    const OrganizedDirFile = require('./lib/organize');
+
     class Cwd {
         #HOME_DIR = os.homedir();
         #dir;

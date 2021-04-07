@@ -1,5 +1,6 @@
 'use strict';
 
+
 class History {
     #history = [];
     #future = [];

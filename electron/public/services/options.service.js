@@ -2,6 +2,7 @@
 
 
 angular.module('services').factory('Options', ['$rootScope', '$http', function ($rootScope, $http) {
+
     class Options {
 
         #isLoaded = false;
@@ -44,4 +45,5 @@ angular.module('services').factory('Options', ['$rootScope', '$http', function (
     }
 
     return new Options();
+
 }]);

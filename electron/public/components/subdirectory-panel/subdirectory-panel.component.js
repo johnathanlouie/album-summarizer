@@ -3,8 +3,8 @@
 
 angular.module('components.subdirectoryPanel').component('subdirectoryPanel', {
     templateUrl: 'components/subdirectory-panel/subdirectory-panel.template.html',
-    controller: ['$scope', 'Cwd', function ($scope, Cwd) {
+    controller: ['$scope', '$rootScope', 'Cwd', function ($scope, $rootScope, Cwd) {
         $scope.cwd = Cwd;
-        $scope.goTo = function (dst) { $scope.$emit('CHANGE_DIRECTORY', dst); };
+        $scope.goTo = function (dst) { $rootScope.$broadcast('CHANGE_DIRECTORY', dst); };
     }],
 });
