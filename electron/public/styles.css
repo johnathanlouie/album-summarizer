@@ -1,3 +1,8 @@
+.img-max-300 {
+    max-height: 300px !important;
+    max-width: 300px !important;
+}
+
 .thumbnail-xl div {
     height: 300px !important;
     width: 300px !important;

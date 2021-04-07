@@ -2,38 +2,32 @@
 
 <div class="container-fluid">
 
-    <form class="mb-3">
-        <div class="form-row align-items-center">
+    <form class="mb-3" ng-submit="submit()">
+        <div class="form-row align-items-end">
 
-            <div class="col-5">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Image URLs</span>
-                    </div>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="file1">
-                        <label class="custom-file-label" for="file1">Choose file</label>
-                    </div>
-                </div>
+            <div class="form-group col-auto">
+                <label for="clusterSelector">Clustering Algorithm</label>
+                <select class="form-control" id="clusterSelector" ng-model="requestParameters.cluster">
+                    <option ng-repeat="option in options.clusters">{{ option }}</option>
+                </select>
             </div>
 
-            <div class="col-5">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Cluster List</span>
-                    </div>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="file2">
-                        <label class="custom-file-label" for="file2">Choose file</label>
-                    </div>
-                </div>
+            <div class="form-group col-auto">
+                <label for="fileSelector">Directory</label>
+                <input class="form-control" ng-model="requestParameters.directory" type="text" id="fileSelector">
             </div>
 
-            <div class="col-2">
-                <button class="btn btn-primary" id="loadButton">Load</button>
+            <div class="form-group col-auto">
+                <button class="btn btn-primary" type="submit">Cluster</button>
             </div>
+
         </div>
     </form>
 
-    <div id="p1"></div>
+    <div class="card mb-3" ng-repeat="cluster in clusters">
+        <h5 class="card-header text-center">{{ $index }}</h5>
+        <div class="card-body">
+            <img class="img-thumbnail img-max-300" ng-src="{{ image }}" ng-repeat="image in cluster">
+        </div>
+    </div>
 </div>

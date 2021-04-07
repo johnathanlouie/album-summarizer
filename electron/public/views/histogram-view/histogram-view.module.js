@@ -1,4 +1,8 @@
 'use strict';
 
 
-angular.module('views.histogramView', ['components.devtoolsNavbar']);
+angular.module('views.histogramView', [
+    'components.devtoolsNavbar',
+    'services',
+    'core.fileInput',
+]);
