@@ -168,7 +168,7 @@ if __name__ == '__main__':
         }
 
     @app.route('/predict', methods=['POST'])
-    def test():
+    def predict():
         try:
             if not flask.request.is_json:
                 response = flask.Response()
@@ -202,6 +202,30 @@ if __name__ == '__main__':
             response = flask.Response()
             response.status_code = 400
             response.status = 'Error: Incompatible architecture/dataset'
+            return response
+        except:
+            print_exc()
+            response = flask.Response()
+            response.status_code = 500
+            response.status = 'Error: Unknown'
+            return response
+
+    @app.route('/cluster', methods=['POST'])
+    def cluster():
+        try:
+            if not flask.request.is_json:
+                response = flask.Response()
+                response.status_code = 400
+                response.status = 'Error: Not JSON'
+                return response
+            settings = flask.request.get_json()
+            images = ImageDirectory(settings['directory']).jpeg(False)
+            cluster = ClusterRegistry.get(settings['cluster'])
+            return cluster.run(images).urls()
+        except ClusterRegistryNameError:
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Unknown clustering algorithm'
             return response
         except:
             print_exc()
