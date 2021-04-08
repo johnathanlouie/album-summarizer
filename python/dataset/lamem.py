@@ -4,6 +4,7 @@ from typing import Any, List
 
 from core import modelbuilder
 from core.dataset import DataSet, LabelTranslator
+from core.modeltype import OutputType
 from jl import ListFile
 from numpy import asarray, ndarray
 from typing2 import Url
@@ -54,7 +55,8 @@ class Lamem(DataSet):
     """
 
     NAME = 'lamem'
-    OUTPUT_NUM: int = 1
+    OUTPUT_TYPE: OutputType = OutputType.SCALAR
+    CLASSES = None
 
     _phases = ['train', 'test', 'val']
 

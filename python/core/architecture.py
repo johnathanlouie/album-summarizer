@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Union
+from typing import Any, Callable, Dict, Optional, Union
 
 from jl import Resolution
 from keras.models import Model
 from keras.optimizers import Optimizer
+
+from core.modeltype import OutputType
 
 
 class Architecture(ABC):
@@ -20,11 +22,11 @@ class Architecture(ABC):
     @property
     @staticmethod
     @abstractmethod
-    def OUTPUT_NUM() -> int:
+    def OUTPUT_TYPE() -> OutputType:
         pass
 
     @abstractmethod
-    def create(self, res: Resolution) -> Model:
+    def create(self, res: Resolution, classes: Optional[int]) -> Model:
         """
         Creates an keras.models.Model.
         """
@@ -70,13 +72,13 @@ class CompiledArchitecture(object):
         self._optimizer: CompileOption = optimizer
         self._metric: CompileOption = metric
 
-    def compile(self, res: Resolution) -> Model:
+    def compile(self, res: Resolution, classes: Optional[int]) -> Model:
         """
         Creates a compiled keras.models.Model object.
         """
         # if type(m) != list or type(m) != dict:
         #     m = [m]
-        kmodel = self._architecture.create(res)
+        kmodel = self._architecture.create(res, classes)
         kmodel.compile(
             loss=self._loss.value,
             optimizer=self._optimizer.value,

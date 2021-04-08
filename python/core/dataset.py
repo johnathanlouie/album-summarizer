@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, List, Tuple
+from typing import Any, List, Optional, Tuple
 
 from jl import npexists, npload, npsave
 from keras.utils import to_categorical
 from numpy import ndarray
 from sklearn.model_selection import train_test_split
 from typing2 import ArrayLike, number
+
+from core.modeltype import OutputType
 
 
 class XY(Enum):
@@ -130,9 +132,10 @@ class DataSetSplit(object):
     Represents a split of a dataset for cross-validation.
     """
 
-    def __init__(self, dataset: str, split: int, label_translator: LabelTranslator) -> None:
+    def __init__(self, dataset: str, split: int, classes: Optional[int], label_translator: LabelTranslator) -> None:
         self._dataset: str = dataset
         self._split: int = split
+        self.classes: Optional[int] = classes
         self._label_translator: LabelTranslator = label_translator
 
     def _phase(self, phase: Phase) -> DataSetPhase:
@@ -192,7 +195,13 @@ class DataSet(ABC):
     @property
     @staticmethod
     @abstractmethod
-    def OUTPUT_NUM() -> int:
+    def OUTPUT_TYPE() -> OutputType:
+        pass
+
+    @property
+    @staticmethod
+    @abstractmethod
+    def CLASSES() -> Optional[int]:
         pass
 
     @abstractmethod
@@ -206,7 +215,7 @@ class DataSet(ABC):
         """
         Gets the training, testing, and validation split for Keras.
         """
-        return DataSetSplit(self.NAME, num, self._label_translator())
+        return DataSetSplit(self.NAME, num, self.CLASSES, self._label_translator())
 
     def train_val_test(
         self,

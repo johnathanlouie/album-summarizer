@@ -5,6 +5,7 @@ from typing import Any, List, Optional
 
 from core import modelbuilder
 from core.dataset import DataSet, LabelTranslator
+from core.modeltype import OutputType
 from jl import Csv
 from numpy import asarray, ndarray
 from typing2 import Url
@@ -151,7 +152,8 @@ class Ccc(Cc):
     """
 
     NAME = 'ccc'
-    OUTPUT_NUM: int = 6
+    OUTPUT_TYPE: OutputType = OutputType.ONE_HOT
+    CLASSES: int = 6
 
     def _y(self) -> ndarray:
         """
@@ -185,7 +187,8 @@ class Ccr(Cc):
     """
 
     NAME = 'ccr'
-    OUTPUT_NUM: int = 1
+    OUTPUT_TYPE: OutputType = OutputType.SCALAR
+    CLASSES = None
 
     def _y(self) -> ndarray:
         """
@@ -230,7 +233,8 @@ class CcrCategorical(Cc):
     """
 
     NAME = 'ccrc'
-    OUTPUT_NUM: int = 3
+    OUTPUT_TYPE: OutputType = OutputType.ONE_HOT
+    CLASSES = 3
 
     def _y(self) -> ndarray:
         """

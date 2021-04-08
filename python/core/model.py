@@ -379,7 +379,7 @@ class KerasAdapter(object):
             self._status.save()
 
             # Blank model and training state
-            kmodel = self._architecture.compile(self._res)
+            kmodel = self._architecture.compile(self._res, self._data.classes)
             if self._total_epochs == 0:
                 mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(patience=10))
             else:
@@ -648,11 +648,7 @@ class Model(object):
             metrics,
         )
         self._dataset: DataSet = dataset
-        if architecture.OUTPUT_NUM == 0:
-            raise BadModelSettings('Architecture has 0 outputs')
-        if dataset.OUTPUT_NUM == 0:
-            raise BadModelSettings('Data set has 0 outputs')
-        if architecture.OUTPUT_NUM != dataset.OUTPUT_NUM:
+        if architecture.OUTPUT_TYPE != dataset.OUTPUT_TYPE:
             raise BadModelSettings('Architecture and data set are not compatible')
         self._epochs: int = epochs
         self._patience: int = patience

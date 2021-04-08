@@ -4,6 +4,7 @@ from typing import Any, List, Optional
 
 from core import modelbuilder
 from core.dataset import DataSet, LabelTranslator
+from core.modeltype import OutputType
 from jl import ImageDirectory
 from numpy import asarray, ndarray
 from typing2 import Url
@@ -51,7 +52,8 @@ class CccafDataSet(DataSet):
     """
 
     NAME = 'cccaf'
-    OUTPUT_NUM: int = 6
+    CLASSES: int = 6
+    OUTPUT_TYPE: OutputType = OutputType.ONE_HOT
 
     def __init__(self, animals: Optional[int] = None, food: Optional[int] = 1300) -> None:
         if animals == None:

@@ -1,5 +1,8 @@
+from typing import Optional
+
 from core import modelbuilder
 from core.architecture import Architecture
+from core.modeltype import OutputType
 from jl import Resolution
 from keras.engine.input_layer import Input
 from keras.layers import (BatchNormalization, Conv2D, Dense, Flatten,
@@ -13,9 +16,9 @@ class Smi13(Architecture):
     """
 
     NAME = 'smi13'
-    OUTPUT_NUM: int = 1
+    OUTPUT_TYPE: OutputType = OutputType.SCALAR
 
-    def create(self, res: Resolution) -> Model:
+    def create(self, res: Resolution, classes: Optional[int]) -> Model:
         """
         Returns a Keras Model object.
         """
@@ -104,9 +107,9 @@ class Smi13A(Architecture):
     """
 
     NAME = 'smi13a'
-    OUTPUT_NUM: int = 3
+    OUTPUT_TYPE: OutputType = OutputType.ONE_HOT
 
-    def create(self, res: Resolution) -> Model:
+    def create(self, res: Resolution, classes: Optional[int]) -> Model:
         """
         Returns a Keras Model object.
         """
@@ -194,9 +197,9 @@ class Smi13B(Architecture):
     """
 
     NAME = 'smi13b'
-    OUTPUT_NUM: int = 1
+    OUTPUT_TYPE: OutputType = OutputType.SCALAR
 
-    def create(self, res: Resolution) -> Model:
+    def create(self, res: Resolution, classes: Optional[int]) -> Model:
         """
         Returns a Keras Model object.
         """

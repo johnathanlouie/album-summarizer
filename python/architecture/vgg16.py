@@ -1,5 +1,8 @@
+from typing import Optional
+
 from core import modelbuilder
 from core.architecture import Architecture
+from core.modeltype import OutputType
 from jl import Resolution
 from keras.applications.vgg16 import VGG16
 from keras.engine.input_layer import Input
@@ -13,17 +16,19 @@ class Vgg16(Architecture):
     """
 
     NAME = 'vgg16'
-    OUTPUT_NUM: int = 6
+    OUTPUT_TYPE: OutputType = OutputType.ONE_HOT
 
-    def create(self, res: Resolution) -> Model:
+    def create(self, res: Resolution, classes: Optional[int]) -> Model:
         """
         Creates a keras.models.Model object.
         """
+        if classes == None:
+            raise ValueError('Classes cannot be None')
         return VGG16(
             include_top=True,
             weights=None,
             input_tensor=Input(res.hwc()),
-            classes=6,
+            classes=classes,
         )
 
 
@@ -33,7 +38,7 @@ class Vgg16B(Architecture):
     """
 
     NAME = 'vgg16b'
-    OUTPUT_NUM: int = 6
+    OUTPUT_TYPE: OutputType = OutputType.ONE_HOT
 
     LAYERS = [
         'block1_conv1',
@@ -51,10 +56,12 @@ class Vgg16B(Architecture):
         'block5_conv3'
     ]
 
-    def create(self, res: Resolution) -> Model:
+    def create(self, res: Resolution, classes: Optional[int]) -> Model:
         """
         Creates a keras.models.Model object.
         """
+        if classes == None:
+            raise ValueError('Classes cannot be None')
         img_input = Input(res.hwc())
         # Block 1
         x = Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv1')(img_input)
@@ -88,7 +95,7 @@ class Vgg16B(Architecture):
         x = Flatten(name='flatten')(x)
         x = Dense(4096, activation='relu', name='fc1')(x)
         x = Dense(4096, activation='relu', name='fc2')(x)
-        x = Dense(6, activation='softmax', name='predictions')(x)
+        x = Dense(classes, activation='softmax', name='predictions')(x)
         model = Model(img_input, x, name='vgg16')
         return model
 
@@ -99,12 +106,14 @@ class Vgg16Pt(Architecture):
     """
 
     NAME = 'vgg16pt'
-    OUTPUT_NUM: int = 6
+    OUTPUT_TYPE: OutputType = OutputType.ONE_HOT
 
-    def create(self, res: Resolution) -> Model:
+    def create(self, res: Resolution, classes: Optional[int]) -> Model:
         """
         Creates a keras.models.Model object.
         """
+        if classes == None:
+            raise ValueError('Classes cannot be None')
         base = VGG16(
             include_top=False,
             weights='imagenet',
@@ -114,7 +123,7 @@ class Vgg16Pt(Architecture):
         x = Flatten(name='flatten')(base.output)
         x = Dense(4096, activation='relu', name='fc1')(x)
         x = Dense(4096, activation='relu', name='fc2')(x)
-        x = Dense(6, activation='softmax', name='predictions')(x)
+        x = Dense(classes, activation='softmax', name='predictions')(x)
         model = Model(base.input, x, name='vgg16pt')
         return model
 
