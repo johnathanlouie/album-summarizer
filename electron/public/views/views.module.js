@@ -7,6 +7,4 @@ angular.module('views', [
     'views.checkRateView',
     'views.histogramView',
     'views.labelDataView',
-    'views.previewView',
-    'views.siftSimilarityView',
 ]);
