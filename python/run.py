@@ -187,11 +187,11 @@ if __name__ == '__main__':
             )
             split = model.split(settings['split'])
             if settings['phase'] == 'training':
-                results = split.predict_training_set().get_dict()
+                results = split.predict_training_set(False).get_dict()
             elif settings['phase'] == 'validation':
-                results = split.predict_validation_set().get_dict()
+                results = split.predict_validation_set(False).get_dict()
             elif settings['phase'] == 'test':
-                results = split.predict_test_set().get_dict()
+                results = split.predict_test_set(False).get_dict()
             else:
                 response = flask.Response()
                 response.status_code = 400

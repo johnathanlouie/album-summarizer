@@ -330,37 +330,39 @@ class KerasAdapter(object):
         y = self._data.test().y().load()
         return self.evaluate(x, y)
 
-    def predict(self, images: List[Url]) -> Prediction:
+    def predict(self, images: List[Url], simple: bool) -> Prediction:
         """
         Predicts using the trained model
         """
         x = asarray(images)
         seq = Sequence1(x, x, self._res, self._batch)
-        print('Predicting....')
         predictions: ndarray = self._kmodel.predict_generator(generator=seq, verbose=1)
-        predictions = predictions.tolist()
-        print('Prediction finished')
-        y = self._data.translate_predictions(predictions)
+        if simple:
+            if predictions.ndim == 2 and predictions.shape[1] == 1:
+                predictions.flatten()
+        y = predictions.tolist()
+        if simple:
+            y = self._data.translate_predictions(y)
         return Prediction(images, y)
 
-    def predict_training_set(self) -> Prediction:
+    def predict_training_set(self, simple: bool) -> Prediction:
         x = self._data.train().x().load().tolist()
         y = self._data.train().y().load().tolist()
-        prediction = self.predict(x)
+        prediction = self.predict(x, simple)
         prediction.y.truth = y
         return prediction
 
-    def predict_validation_set(self) -> Prediction:
+    def predict_validation_set(self, simple: bool) -> Prediction:
         x = self._data.validation().x().load().tolist()
         y = self._data.validation().y().load().tolist()
-        prediction = self.predict(x)
+        prediction = self.predict(x, simple)
         prediction.y.truth = y
         return prediction
 
-    def predict_test_set(self) -> Prediction:
+    def predict_test_set(self, simple: bool) -> Prediction:
         x = self._data.test().x().load().tolist()
         y = self._data.test().y().load().tolist()
-        prediction = self.predict(x)
+        prediction = self.predict(x, simple)
         prediction.y.truth = y
         return prediction
 
@@ -557,7 +559,7 @@ class ModelSplit(object):
             kadapter.load()
             return kadapter.evaluate_test_set()
 
-    def predict(self, images: List[Url]) -> Prediction:
+    def predict(self, images: List[Url], simple: bool) -> Prediction:
         """
         Takes the input and returns an output
         """
@@ -570,9 +572,9 @@ class ModelSplit(object):
             if not kadapter.is_saved():
                 kadapter.create()
             kadapter.load()
-            return kadapter.predict(images)
+            return kadapter.predict(images, simple)
 
-    def predict_training_set(self) -> Prediction:
+    def predict_training_set(self, simple: bool) -> Prediction:
         """
         Takes the input and returns an output
         """
@@ -585,9 +587,9 @@ class ModelSplit(object):
             if not kadapter.is_saved():
                 kadapter.create()
             kadapter.load()
-            return kadapter.predict_training_set()
+            return kadapter.predict_training_set(simple)
 
-    def predict_validation_set(self) -> Prediction:
+    def predict_validation_set(self, simple: bool) -> Prediction:
         """
         Takes the input and returns an output
         """
@@ -600,9 +602,9 @@ class ModelSplit(object):
             if not kadapter.is_saved():
                 kadapter.create()
             kadapter.load()
-            return kadapter.predict_validation_set()
+            return kadapter.predict_validation_set(simple)
 
-    def predict_test_set(self) -> Prediction:
+    def predict_test_set(self, simple: bool) -> Prediction:
         """
         Takes the input and returns an output
         """
@@ -615,7 +617,7 @@ class ModelSplit(object):
             if not kadapter.is_saved():
                 kadapter.create()
             kadapter.load()
-            return kadapter.predict_test_set()
+            return kadapter.predict_test_set(simple)
 
 
 class BadModelSettings(ValueError):
