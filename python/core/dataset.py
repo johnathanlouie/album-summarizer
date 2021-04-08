@@ -289,3 +289,7 @@ class DataSet(ABC):
         Returns the number of splits.
         """
         pass
+
+    @staticmethod
+    def key_guide() -> Optional[List[str]]:
+        return None

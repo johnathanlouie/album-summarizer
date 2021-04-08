@@ -20,13 +20,22 @@ class CcDataFile(object):
 
     URL = 'data/cc/data.csv'
 
+    CLASSES = [
+        'environment',
+        'people',
+        'object',
+        'hybrid',
+        'animal',
+        'food',
+    ]
+
     categories = {
         'environment': 0,
         'people': 1,
         'object': 2,
         'hybrid': 3,
         'animal': 4,
-        'food': 5
+        'food': 5,
     }
 
     def __init__(self, url: Optional[Url] = None) -> None:
@@ -169,6 +178,10 @@ class Ccc(Cc):
         """
         return CccLabelTranslator()
 
+    @staticmethod
+    def key_guide() -> Optional[List[str]]:
+        return CcDataFile.CLASSES.copy()
+
 
 class CcrLabelTranslator(LabelTranslator):
     """
@@ -252,6 +265,10 @@ class CcrCategorical(Cc):
         Returns an instance of PredictionsFactory.
         """
         return CcrcLabelTranslator()
+
+    @staticmethod
+    def key_guide() -> Optional[List[str]]:
+        return ['bad', 'average', 'good']
 
 
 modelbuilder.ModelBuilder.dataset(Ccc())

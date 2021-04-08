@@ -123,5 +123,9 @@ class CccafDataSet(DataSet):
         """
         return CccafLabelTranslator()
 
+    @staticmethod
+    def key_guide() -> Optional[List[str]]:
+        return CcDataFile.CLASSES.copy()
+
 
 modelbuilder.ModelBuilder.dataset(CccafDataSet())
