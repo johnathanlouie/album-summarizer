@@ -41,7 +41,7 @@ class ClusterRank(object):
         with open(dst, 'w', encoding='utf8') as f:
             json.dump(self._results, f, indent=4)
 
-    def json(self) -> List[List[Dict[str, Any]]]:
+    def jsonable(self) -> List[List[Dict[str, Any]]]:
         return deepcopy(self._results)
 
 
@@ -105,9 +105,7 @@ def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> 
     rates = algorithm2.predict(images).human_readable()
     print('Ranking results....')
     cr = ClusterRank(clusters, rates)
-    # print('Saving results....')
-    # cr.save_results(directory)
-    return cr.json()
+    return cr.jsonable()
 
 
 if __name__ == '__main__':
