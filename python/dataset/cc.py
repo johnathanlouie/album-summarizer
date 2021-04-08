@@ -50,6 +50,8 @@ class CcDataFile(object):
         """
         Converts categories from integer to string representation.
         """
+        if type(e) is not int:
+            raise ValueError("Type Error: Got type %s instead of int" % type(e))
         for k, v in self.categories.items():
             if e == v:
                 return k
