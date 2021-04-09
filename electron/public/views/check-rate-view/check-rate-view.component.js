@@ -1,6 +1,45 @@
 'use strict';
 
 
+function maxIndex(a) {
+    return a.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+}
+
+
+class OneHotValue {
+    #value;
+    #name;
+    isMax;
+
+    constructor(value, name, isMax) {
+        if (typeof value !== 'number') { throw new TypeError(value); }
+        this.#name = name;
+        this.#value = value;
+        this.isMax = isMax;
+    }
+
+    get name() { return this.#name; }
+    get cssWidth() { return { width: `${this.percentage}%` }; }
+    get value() { return this.#value; }
+    get percentage() { return this.#value * 100; }
+}
+
+
+class OneHot {
+    arr;
+    ans;
+
+    constructor(arr, keyGuide) {
+        if (!Array.isArray(arr)) { console.error(arr); throw new TypeError(); }
+        if (!Array.isArray(keyGuide)) { console.error(keyGuide); throw new TypeError(); }
+        this.ans = maxIndex(arr);
+        this.arr = arr.map((v, i) => new OneHotValue(v, keyGuide[i], i === this.ans));
+    }
+
+    get label() { return this.arr[this.ans].name; }
+}
+
+
 class Prediction {
     x;
     y = {
@@ -8,12 +47,19 @@ class Prediction {
         truth: undefined,
     };
 
-    constructor(x, yPred, yTruth) {
+    constructor(x, yPred, yTruth, keyGuide) {
         this.x = x;
-        this.y.predicted = yPred;
-        this.y.truth = yTruth;
+        if (keyGuide === null) {
+            this.y.truth = yTruth;
+            this.y.predicted = yPred;
+        }
+        else {
+            this.y.truth = new OneHot(yTruth, keyGuide);
+            this.y.predicted = new OneHot(yPred, keyGuide);
+        }
     }
 }
+
 
 angular.module('views.checkRateView').component('checkRateView', {
     templateUrl: 'views/check-rate-view/check-rate-view.template.html',
@@ -25,19 +71,23 @@ angular.module('views.checkRateView').component('checkRateView', {
             try {
                 $rootScope.$broadcast('LOADING_MODAL_SHOW');
                 var url = 'http://localhost:8080/predict';
-                var response = await $http.post(url, $scope.selectedOptions);
                 $scope.prediction = [];
-                for (let i in response.data.x) {
+                $scope.keyGuide = null;
+                var response = await $http.post(url, $scope.selectedOptions);
+                $scope.keyGuide = response.data.keyGuide;
+                for (let i in response.data.prediction.x) {
                     $scope.prediction.push(new Prediction(
-                        response.data.x[i],
-                        response.data.y.predicted[i],
-                        response.data.y.truth[i],
+                        response.data.prediction.x[i],
+                        response.data.prediction.y.predicted[i],
+                        response.data.prediction.y.truth[i],
+                        response.data.keyGuide,
                     ));
                 }
                 $rootScope.$broadcast('LOADING_MODAL_HIDE');
                 $scope.$apply();
             }
             catch (e) {
+                console.error(e);
                 $rootScope.$broadcast('LOADING_MODAL_HIDE');
                 $rootScope.$broadcast('ERROR_MODAL_SHOW');
                 $scope.$apply();
@@ -46,8 +96,8 @@ angular.module('views.checkRateView').component('checkRateView', {
 
         $scope.selectedOptions = {
             phase: 'test',
-            architecture: 'smi13',
-            dataset: 'ccr',
+            architecture: 'vgg16',
+            dataset: 'ccc',
             loss: 'rmse',
             optimizer: 'sgd1',
             metrics: 'acc',

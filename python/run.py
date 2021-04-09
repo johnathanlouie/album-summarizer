@@ -184,6 +184,7 @@ if __name__ == '__main__':
                 settings['patience'],
             )
             split = model.split(settings['split'])
+            key_guide = ModelBuilder.DATASETS[settings['dataset']].key_guide()
             if settings['phase'] == 'training':
                 results = split.predict_training_set(False).get_dict()
             elif settings['phase'] == 'validation':
@@ -195,7 +196,10 @@ if __name__ == '__main__':
                 response.status_code = 400
                 response.status = 'Error: Incorrect phase'
                 return response
-            return results
+            return flask.jsonify({
+                'keyGuide': key_guide,
+                'prediction': results,
+            })
         except BadModelSettings:
             response = flask.Response()
             response.status_code = 400

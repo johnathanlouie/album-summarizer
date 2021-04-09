@@ -85,8 +85,26 @@
                     <img class="rate-thumbnail img-thumbnail" ng-src="{{ datum.x | fileUrl }}"
                         style="max-width: 300px; max-height: 300px;">
                 </td>
-                <td>{{ datum.y.truth }}</td>
-                <td>{{ datum.y.predicted }}</td>
+                <td>
+                    <div ng-if="keyGuide === null">{{ datum.y.truth }}</div>
+                    <div ng-if="keyGuide !== null">{{ datum.y.truth.label }}</div>
+                </td>
+                <td>
+                    <div ng-if="keyGuide === null">{{ datum.y.predicted }}</div>
+                    <div class="row" ng-repeat="oneHotValue in datum.y.predicted.arr" ng-if="keyGuide !== null">
+                        <div class="col-3">{{ oneHotValue.name }}</div>
+                        <div class="col-9">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar"
+                                    ng-class="oneHotValue.isMax ? 'bg-success' : 'bg-info'"
+                                    ng-style="oneHotValue.cssWidth" aria-valuenow="{{ oneHotValue.percentage }}"
+                                    aria-valuemin="0" aria-valuemax="100">
+                                    {{ oneHotValue.percentage | number : 2 }}%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
             </tr>
         </tbody>
     </table>
