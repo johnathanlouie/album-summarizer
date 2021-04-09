@@ -186,7 +186,7 @@ class Smi13A(Architecture):
         x = Flatten(name='flatten')(x)
         x = Dense(4096, activation='relu', name='fc1')(x)
         x = Dense(4096, activation='relu', name='fc2')(x)
-        x = Dense(3, activation='softmax', name='predictions')(x)
+        x = Dense(classes, activation='softmax', name='predictions')(x)
         model = Model(img_input, x, name='smi13a')
         return model
 
