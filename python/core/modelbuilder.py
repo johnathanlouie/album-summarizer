@@ -1,3 +1,5 @@
+from typing import Dict
+
 from core.architecture import Architecture, CompileOption
 from core.dataset import DataSet
 from core.model import Model
@@ -13,11 +15,11 @@ class ModelBuilder(object):
     New architectures, data sets, and compile options are added here.
     """
 
-    ARCHITECTURES = dict()
-    DATASETS = dict()
-    LOSSES = dict()
-    OPTIMIZERS = dict()
-    METRICS = dict()
+    ARCHITECTURES: Dict[str, Architecture] = dict()
+    DATASETS: Dict[str, DataSet] = dict()
+    LOSSES: Dict[str, CompileOption] = dict()
+    OPTIMIZERS: Dict[str, CompileOption] = dict()
+    METRICS: Dict[str, CompileOption] = dict()
 
     @classmethod
     def create(
