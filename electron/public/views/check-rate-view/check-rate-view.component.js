@@ -75,6 +75,9 @@ angular.module('views.checkRateView').component('checkRateView', {
                 $scope.keyGuide = null;
                 var response = await $http.post(url, $scope.selectedOptions);
                 $scope.keyGuide = response.data.keyGuide;
+                if ($scope.keyGuide === null) {
+                    response.data.prediction.y.predicted = _.flatten(response.data.prediction.y.predicted);
+                }
                 for (let i in response.data.prediction.x) {
                     $scope.prediction.push(new Prediction(
                         response.data.prediction.x[i],

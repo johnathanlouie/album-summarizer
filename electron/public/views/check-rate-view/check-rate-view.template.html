@@ -74,9 +74,9 @@
     <table class="table table-striped">
         <thead class="thead-dark">
             <tr>
-                <th>Image</th>
-                <th>True Value</th>
-                <th>Predicted Value</th>
+                <th class="w-25">Image</th>
+                <th class="w-25">True Value</th>
+                <th class="w-50">Predicted Value</th>
             </tr>
         </thead>
         <tbody>
@@ -92,8 +92,8 @@
                 <td>
                     <div ng-if="keyGuide === null">{{ datum.y.predicted }}</div>
                     <div class="row" ng-repeat="oneHotValue in datum.y.predicted.arr" ng-if="keyGuide !== null">
-                        <div class="col-3">{{ oneHotValue.name }}</div>
-                        <div class="col-9">
+                        <div class="col-2">{{ oneHotValue.name }}</div>
+                        <div class="col-10">
                             <div class="progress">
                                 <div class="progress-bar" role="progressbar"
                                     ng-class="oneHotValue.isMax ? 'bg-success' : 'bg-info'"
