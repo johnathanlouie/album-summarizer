@@ -22,8 +22,8 @@ class Vgg16(Architecture):
         """
         Creates a keras.models.Model object.
         """
-        if classes == None:
-            raise ValueError('Classes cannot be None')
+        if type(classes) is not int:
+            raise ValueError(classes)
         return VGG16(
             include_top=True,
             weights=None,
@@ -60,8 +60,8 @@ class Vgg16B(Architecture):
         """
         Creates a keras.models.Model object.
         """
-        if classes == None:
-            raise ValueError('Classes cannot be None')
+        if type(classes) is not int:
+            raise ValueError(classes)
         img_input = Input(res.hwc())
         # Block 1
         x = Conv2D(64, (3, 3), activation='relu', padding='same', name='block1_conv1')(img_input)
@@ -112,8 +112,8 @@ class Vgg16Pt(Architecture):
         """
         Creates a keras.models.Model object.
         """
-        if classes == None:
-            raise ValueError('Classes cannot be None')
+        if type(classes) is not int:
+            raise ValueError(classes)
         base = VGG16(
             include_top=False,
             weights='imagenet',
