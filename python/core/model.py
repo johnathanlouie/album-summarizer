@@ -440,7 +440,7 @@ class KerasAdapter(object):
             self._status = TrainingStatusData.load(self._names.status())
             self._is_best = best_snapshot
             # print('Compiling architecture')
-            self._kmodel = self._architecture.compile(self._res)
+            self._kmodel = self._architecture.compile(self._res, self._data.classes)
             if best_snapshot:
                 print('Loading %s' % self._names.best.weights())
                 self._kmodel.load_weights(self._names.best.weights())
