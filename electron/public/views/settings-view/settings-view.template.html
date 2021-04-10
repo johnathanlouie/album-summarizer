@@ -1,0 +1,29 @@
+<devtools-navbar></devtools-navbar>
+
+<div class="container">
+    <h1 class="display-2 pb-3">Settings</h1>
+    <h1>MongoDB Settings</h1>
+    <form ng-submit="update()">
+        <div class="form-row">
+            <div class="form-group col-8">
+                <label for="hostname">Hostname/IP Address</label>
+                <input class="form-control" ng-model="settings.hostname" type="text" id="hostname">
+            </div>
+            <div class="form-group col">
+                <label for="port">Port</label>
+                <input class="form-control" ng-model="settings.port" type="number" id="port">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col">
+                <label for="username">Username</label>
+                <input class="form-control" ng-model="settings.username" type="text" id="username">
+            </div>
+            <div class="form-group col">
+                <label for="password">Password</label>
+                <input class="form-control" ng-model="settings.password" type="password" id="password">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>

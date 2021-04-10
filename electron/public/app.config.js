@@ -11,5 +11,6 @@ angular.module('app').config(['$routeProvider', function ($routeProvider) {
         when('/devtools/label-data', { template: '<label-data-view></label-data-view>' }).
         when('/devtools/preview', { template: '<preview-view></preview-view>' }).
         when('/devtools/sift-similarity', { template: '<sift-similarity-view></sift-similarity-view>' }).
+        when('/settings', { template: '<settings-view></settings-view>' }).
         otherwise('/menu');
 }]);

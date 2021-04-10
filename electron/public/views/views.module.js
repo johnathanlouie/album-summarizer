@@ -7,4 +7,5 @@ angular.module('views', [
     'views.checkRateView',
     'views.histogramView',
     'views.labelDataView',
+    'views.settingsView',
 ]);
