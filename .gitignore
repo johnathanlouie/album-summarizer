@@ -340,3 +340,4 @@ nbproject/private/
 /data/
 /out/
 /electron/public/data/
+electron/mongodb.json
