@@ -1,7 +1,7 @@
 'use strict';
 
 const File = require('./file');
-const fsp = require('./fsp');
+const fs = require('fs');
 
 
 class Directory extends Array {
@@ -16,7 +16,7 @@ class Directory extends Array {
         var exists = false;
         var instance;
         try {
-            direntArray = await fsp.readdir(url, { withFileTypes: true });
+            direntArray = await fs.promises.readdir(url, { withFileTypes: true });
             instance = Directory.from(direntArray.map(e => new File(e, url)));
             exists = true;
         }

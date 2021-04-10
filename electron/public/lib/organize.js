@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const fsp = require('./fsp');
+const fs = require('fs');
 
 /**
  * Interface for the cached organized view for the current directory.
@@ -19,16 +19,16 @@ class OrganizedDirFile {
 
     async mkdir() {
         try {
-            return await fsp.access('public/data');
+            return await fs.promises.access('public/data');
         }
         catch (err) {
-            return await fsp.mkdir('public/data');
+            return await fs.promises.mkdir('public/data');
         }
     }
 
     async read() {
         await this.mkdir();
-        return await fsp.readFile(this.url());
+        return await fs.promises.readFile(this.url());
     }
 
     /**
@@ -36,13 +36,13 @@ class OrganizedDirFile {
      */
     async write(json) {
         await this.mkdir();
-        return await fsp.writeFile(this.url(), json);
+        return await fs.promises.writeFile(this.url(), json);
     }
 
     async delete() {
         await this.mkdir();
         try {
-            await fsp.unlink(this.url());
+            await fs.promises.unlink(this.url());
             return true;
         }
         catch (err) {
@@ -52,7 +52,7 @@ class OrganizedDirFile {
 
     async exists() {
         try {
-            await fsp.access(this.url());
+            await fs.promises.access(this.url());
             return true;
         }
         catch (err) {
