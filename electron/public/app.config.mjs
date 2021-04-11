@@ -1,7 +1,4 @@
-const angular = require('angular');
-
-
-angular.module('app').config(['$routeProvider', function ($routeProvider) {
+function configFn($routeProvider) {
     $routeProvider.when('/', { template: '<organizer-view></organizer-view>' });
     $routeProvider.when('/organizer', { template: '<organizer-view></organizer-view>' });
     $routeProvider.when('/menu', { template: '<menu-view></menu-view>' });
@@ -12,4 +9,9 @@ angular.module('app').config(['$routeProvider', function ($routeProvider) {
     $routeProvider.when('/devtools/sift-similarity', { template: '<sift-similarity-view></sift-similarity-view>' });
     $routeProvider.when('/settings', { template: '<settings-view></settings-view>' });
     $routeProvider.otherwise('/menu');
-}]);
+}
+
+configFn.$inject = ['$routeProvider'];
+
+
+export default configFn;
