@@ -1,4 +1,4 @@
-'use strict';
+const angular = require('angular');
 
 
 angular.module('views.labelDataView').component('labelDataView', {

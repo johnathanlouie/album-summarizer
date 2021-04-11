@@ -1,3 +1,4 @@
+const angular = require('angular');
 import history from './history.service.mjs';
 import cwd from './cwd.service.mjs';
 import screenView from './screen-view.service.mjs';

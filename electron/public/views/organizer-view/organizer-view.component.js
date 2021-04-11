@@ -1,4 +1,4 @@
-'use strict';
+const angular = require('angular');
 
 const path = require('path');
 

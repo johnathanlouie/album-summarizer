@@ -1,3 +1,4 @@
+const angular = require('angular');
 import fileUrl from './file-url.filter.mjs';
 import filename from './filename.filter.mjs';
 import normalizeRating from './normalize-rating.filter.mjs';

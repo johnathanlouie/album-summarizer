@@ -1,3 +1,4 @@
+const angular = require('angular');
 import fileInput from './file-input.directive.mjs';
 
 
