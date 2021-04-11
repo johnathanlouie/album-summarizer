@@ -3,7 +3,7 @@ const ngRoute = require('angular-route');
 
 
 angular.module('app', [
-    ngRoute,
+    'ngRoute',
     'components',
     'services',
     'views',
