@@ -1,7 +1,4 @@
-'use strict';
-
-
-angular.module('core.fileInput').directive('fileInput', ['$parse', function ($parse) {
+function fileInput($parse) {
     return {
         restrict: 'A',
         link(scope, element, attrs) {
@@ -13,4 +10,9 @@ angular.module('core.fileInput').directive('fileInput', ['$parse', function ($pa
             element.on('change', onChange);
         },
     };
-}]);
+}
+
+fileInput.$inject = ['$parse'];
+
+
+export default fileInput;
