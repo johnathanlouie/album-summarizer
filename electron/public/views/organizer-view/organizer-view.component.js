@@ -3,39 +3,39 @@
 const path = require('path');
 
 
-function OrganizerViewCtrl($scope, $rootScope, History, Cwd, ScreenView, FocusImage) {
-    $scope.cwd = Cwd;
-    $scope.screenView = ScreenView;
-    $scope.focusImage = FocusImage;
+function OrganizerViewCtrl($scope, $rootScope, history, cwd, screenView, focusImage) {
+    $scope.cwd = cwd;
+    $scope.screenView = screenView;
+    $scope.focusImage = focusImage;
 
     async function goTo(dst) {
         $rootScope.$broadcast('LOADING_MODAL_SHOW');
         $scope.address = dst;
         $scope.filterText = '';
-        await Cwd.cd(dst);
+        await cwd.cd(dst);
         $rootScope.$broadcast('LOADING_MODAL_HIDE');
         $scope.$apply();
     }
 
-    $scope.goTo = function (dst = $scope.address) { goTo(History.push(dst)); };
+    $scope.goTo = function (dst = $scope.address) { goTo(history.push(dst)); };
 
-    $scope.goHome = function () { goTo(History.push(Cwd.home)); };
+    $scope.goHome = function () { goTo(history.push(cwd.home)); };
 
-    $scope.refresh = function () { goTo(History.current); };
+    $scope.refresh = function () { goTo(history.current); };
 
-    $scope.goParent = function () { goTo(History.push(path.dirname(History.current))); };
+    $scope.goParent = function () { goTo(history.push(path.dirname(history.current))); };
 
-    $scope.goBack = function () { goTo(History.goBack()); };
+    $scope.goBack = function () { goTo(history.goBack()); };
 
-    $scope.goForward = function () { goTo(History.goForward()); };
+    $scope.goForward = function () { goTo(history.goForward()); };
 
-    $scope.hasBack = function () { return History.hasBack; };
+    $scope.hasBack = function () { return history.hasBack; };
 
-    $scope.hasNext = function () { return History.hasNext; };
+    $scope.hasNext = function () { return history.hasNext; };
 
     $scope.focusOnImage = function (url) {
-        FocusImage.image = url;
-        ScreenView.screen = 'IMAGE_VIEWER';
+        focusImage.image = url;
+        screenView.screen = 'IMAGE_VIEWER';
     };
 
     /**
@@ -45,8 +45,8 @@ function OrganizerViewCtrl($scope, $rootScope, History, Cwd, ScreenView, FocusIm
     async function organize(refresh) {
         try {
             $rootScope.$broadcast('LOADING_MODAL_SHOW');
-            if (refresh) { await Cwd.reorganize(); }
-            else { await Cwd.organize(); }
+            if (refresh) { await cwd.reorganize(); }
+            else { await cwd.organize(); }
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
         }
         catch (err) {
@@ -79,5 +79,5 @@ function OrganizerViewCtrl($scope, $rootScope, History, Cwd, ScreenView, FocusIm
 
 angular.module('views.organizerView').component('organizerView', {
     templateUrl: 'views/organizer-view/organizer-view.template.html',
-    controller: ['$scope', '$rootScope', 'History', 'Cwd', 'ScreenView', 'FocusImage', OrganizerViewCtrl],
+    controller: ['$scope', '$rootScope', 'history', 'cwd', 'screenView', 'focusImage', OrganizerViewCtrl],
 });

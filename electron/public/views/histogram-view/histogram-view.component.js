@@ -3,11 +3,11 @@
 
 angular.module('views.histogramView').component('histogramView', {
     templateUrl: 'views/histogram-view/histogram-view.template.html',
-    controller: ['$scope', '$http', '$rootScope', 'Options', function ($scope, $http, $rootScope, Options) {
+    controller: ['$scope', '$http', '$rootScope', 'options', function ($scope, $http, $rootScope, options) {
 
         const os = require('os');
         const path = require('path');
-        $scope.options = Options;
+        $scope.options = options;
 
         $scope.submit = async function () {
             try {

@@ -1,10 +1,10 @@
 import history from './history.service.mjs';
 import cwd from './cwd.service.mjs';
-import screenView from './cwd.service.mjs';
-import queryServer from './cwd.service.mjs';
-import options from './cwd.service.mjs';
-import mongoDb from './cwd.service.mjs';
-import focusImage from './cwd.service.mjs';
+import screenView from './screen-view.service.mjs';
+import queryServer from './query-server.service.mjs';
+import options from './options.service.mjs';
+import mongoDb from './mongodb.service.mjs';
+import focusImage from './focus-image.service.mjs';
 
 
 const module = angular.module('services', []);

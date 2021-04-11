@@ -63,9 +63,9 @@ class Prediction {
 
 angular.module('views.checkRateView').component('checkRateView', {
     templateUrl: 'views/check-rate-view/check-rate-view.template.html',
-    controller: ['$scope', '$http', '$rootScope', 'Options', function ($scope, $http, $rootScope, Options) {
+    controller: ['$scope', '$http', '$rootScope', 'options', function ($scope, $http, $rootScope, options) {
 
-        $scope.options = Options;
+        $scope.options = options;
 
         $scope.submit = async function () {
             try {

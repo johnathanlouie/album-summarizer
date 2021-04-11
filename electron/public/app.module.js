@@ -6,6 +6,6 @@ angular.module('app', [
     'components',
     'services',
     'views',
-]).controller('appCtrl', function ($scope, ScreenView) {
-    $scope.screenView = ScreenView;
+]).controller('appCtrl', function ($scope, screenView) {
+    $scope.screenView = screenView;
 });
