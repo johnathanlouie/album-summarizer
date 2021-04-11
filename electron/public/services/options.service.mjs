@@ -1,7 +1,4 @@
-'use strict';
-
-
-angular.module('services').factory('Options', ['$rootScope', '$http', function ($rootScope, $http) {
+function f($rootScope, $http) {
 
     class Options {
 
@@ -46,4 +43,10 @@ angular.module('services').factory('Options', ['$rootScope', '$http', function (
 
     return new Options();
 
-}]);
+}
+
+
+f.$inject = ['$rootScope', '$http'];
+
+
+export default f;
