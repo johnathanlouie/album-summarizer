@@ -1,3 +1,6 @@
+const path = require('path');
+
+
 class File {
     #path;
     #isFile;
@@ -32,4 +35,5 @@ class File {
     }
 }
 
-module.exports = File;
+
+export default File;

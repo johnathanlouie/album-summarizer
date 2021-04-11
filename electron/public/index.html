@@ -20,45 +20,43 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
-    <script src="jquery3-extensions.js"></script>
-    <script src="app.module.js"></script>
-    <script src="app.config.js"></script>
-    <script src="core/core.module.js"></script>
-    <script src="core/file-input/file-input.module.js"></script>
-    <script src="core/file-input/file-input.directive.js"></script>
-    <script src="core/file-url/file-url.filter.js"></script>
-    <script src="core/filename/filename.filter.js"></script>
-    <script src="core/normalize-rating/normalize-rating.filter.js"></script>
-    <script src="services/services.module.js"></script>
-    <script src="services/history.service.js"></script>
-    <script src="services/query-server.service.js"></script>
-    <script src="services/cwd.service.js"></script>
-    <script src="services/screen-view.service.js"></script>
-    <script src="services/focus-image.service.js"></script>
-    <script src="services/options.service.js"></script>
-    <script src="services/mongodb.service.js"></script>
-    <script src="components/components.module.js"></script>
-    <script src="components/loading-modal/loading-modal.component.js"></script>
-    <script src="components/error-modal/error-modal.component.js"></script>
-    <script src="components/image-viewer/image-viewer.module.js"></script>
-    <script src="components/image-viewer/image-viewer.component.js"></script>
-    <script src="components/subdirectory-panel/subdirectory-panel.module.js"></script>
-    <script src="components/subdirectory-panel/subdirectory-panel.component.js"></script>
-    <script src="components/devtools-navbar/devtools-navbar.module.js"></script>
-    <script src="components/devtools-navbar/devtools-navbar.component.js"></script>
-    <script src="views/views.module.js"></script>
-    <script src="views/organizer-view/organizer-view.module.js"></script>
-    <script src="views/organizer-view/organizer-view.component.js"></script>
-    <script src="views/menu-view/menu-view.module.js"></script>
-    <script src="views/menu-view/menu-view.component.js"></script>
-    <script src="views/check-rate-view/check-rate-view.module.js"></script>
-    <script src="views/check-rate-view/check-rate-view.component.js"></script>
-    <script src="views/histogram-view/histogram-view.module.js"></script>
-    <script src="views/histogram-view/histogram-view.component.js"></script>
-    <script src="views/label-data-view/label-data-view.module.js"></script>
-    <script src="views/label-data-view/label-data-view.component.js"></script>
-    <script src="views/settings-view/settings-view.module.js"></script>
-    <script src="views/settings-view/settings-view.component.js"></script>
+    <script type="module">
+        import './app.module.js';
+        import './app.config.js';
+        import './core/core.module.mjs';
+        import './core/file-input/file-input.module.js';
+        import './core/file-input/file-input.directive.js';
+        import './core/filename/filename.filter.js';
+        import './core/normalize-rating/normalize-rating.filter.js';
+        import './services/services.module.mjs';
+        import './services/query-server.service.js';
+        import './services/screen-view.service.js';
+        import './services/focus-image.service.js';
+        import './services/options.service.js';
+        import './services/mongodb.service.js';
+        import './components/components.module.js';
+        import './components/loading-modal/loading-modal.component.js';
+        import './components/error-modal/error-modal.component.js';
+        import './components/image-viewer/image-viewer.module.js';
+        import './components/image-viewer/image-viewer.component.js';
+        import './components/subdirectory-panel/subdirectory-panel.module.js';
+        import './components/subdirectory-panel/subdirectory-panel.component.js';
+        import './components/devtools-navbar/devtools-navbar.module.js';
+        import './components/devtools-navbar/devtools-navbar.component.js';
+        import './views/views.module.js';
+        import './views/organizer-view/organizer-view.module.js';
+        import './views/organizer-view/organizer-view.component.js';
+        import './views/menu-view/menu-view.module.js';
+        import './views/menu-view/menu-view.component.js';
+        import './views/check-rate-view/check-rate-view.module.js';
+        import './views/check-rate-view/check-rate-view.component.js';
+        import './views/histogram-view/histogram-view.module.js';
+        import './views/histogram-view/histogram-view.component.js';
+        import './views/label-data-view/label-data-view.module.js';
+        import './views/label-data-view/label-data-view.component.js';
+        import './views/settings-view/settings-view.module.js';
+        import './views/settings-view/settings-view.component.js';
+    </script>
 
 </head>
 

@@ -1,7 +1,6 @@
-'use strict';
-
 const path = require('path');
 const fs = require('fs');
+
 
 /**
  * Interface for the cached organized view for the current directory.
@@ -61,4 +60,5 @@ class OrganizedDirFile {
     }
 }
 
-module.exports = OrganizedDirFile;
+
+export default OrganizedDirFile;

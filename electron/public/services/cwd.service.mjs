@@ -1,11 +1,9 @@
-'use strict';
+const os = require('os');
+import Directory from '../lib/directory.mjs';
+import OrganizedDirFile from '../lib/organize.mjs';
 
 
-angular.module('services').factory('Cwd', ['queryServer', function (queryServer) {
-
-    const os = require('os');
-    const Directory = require('./lib/directory');
-    const OrganizedDirFile = require('./lib/organize');
+function cwd(queryServer) {
 
     class Cwd {
         #HOME_DIR = os.homedir();
@@ -57,7 +55,13 @@ angular.module('services').factory('Cwd', ['queryServer', function (queryServer)
         get path() { return this.#path; }
 
         get home() { return this.#HOME_DIR; }
+
     }
 
     return new Cwd();
-}]);
+}
+
+cwd.$inject = ['queryServer'];
+
+
+export default cwd;

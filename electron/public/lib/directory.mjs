@@ -1,7 +1,5 @@
-'use strict';
-
-const File = require('./file');
 const fs = require('fs');
+import File from './file.mjs';
 
 
 class Directory extends Array {
@@ -66,4 +64,5 @@ class Directory extends Array {
     }
 }
 
-module.exports = Directory;
+
+export default Directory;

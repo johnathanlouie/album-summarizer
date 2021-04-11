@@ -1,4 +1,4 @@
-'use strict';
+const path = require('path');
 
 
 class History {
@@ -33,4 +33,5 @@ class History {
     }
 }
 
-angular.module('services').factory('History', History);
+
+export default History;
