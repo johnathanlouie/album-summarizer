@@ -18,4 +18,4 @@ module.factory('mongoDb', mongoDb);
 module.factory('focusImage', focusImage);
 
 
-export default module;
+export default module.name;

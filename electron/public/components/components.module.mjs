@@ -15,4 +15,4 @@ const module = angular.module('components', [
 ]);
 
 
-export default module;
+export default module.name;

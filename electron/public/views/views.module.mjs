@@ -1,7 +1,7 @@
 const angular = require('angular');
 
 
-angular.module('views', [
+const module = angular.module('views', [
     'views.organizerView',
     'views.menuView',
     'views.checkRateView',
@@ -9,3 +9,6 @@ angular.module('views', [
     'views.labelDataView',
     'views.settingsView',
 ]);
+
+
+export default module.name;

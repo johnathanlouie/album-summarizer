@@ -1,12 +1,13 @@
 const angular = require('angular');
 import controller from './image-viewer.controller.mjs';
+import core from '../../core/core.module.mjs';
 
 
-const module = angular.module('components.imageViewer', ['core', 'services']);
+const module = angular.module('components.imageViewer', [core, 'services']);
 module.component('imageViewer', {
     templateUrl: 'components/image-viewer/image-viewer.template.html',
     controller: controller,
 });
 
 
-export default module;
+export default module.name;

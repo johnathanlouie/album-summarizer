@@ -11,4 +11,4 @@ module.filter('filename', filename);
 module.filter('normalizeRating', normalizeRating);
 
 
-export default module;
+export default module.name;
