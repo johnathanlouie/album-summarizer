@@ -1,27 +1,39 @@
-function controllerFn($scope, $rootScope, mongoDb) {
+function controllerFn($scope, $rootScope, mongoDbSettings) {
 
-    async function getSettings() {
+    function load() {
         try {
-            $scope.settings = await mongoDb.settings();
+            $scope.settings = mongoDbSettings;
+            if (!mongoDbSettings.isLoaded) {
+                mongoDbSettings.load();
+            }
         }
-        catch (e) { $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error while loading MongoDB settings file.', 'Error: MongoDB'); }
-        $scope.$apply();
+        catch (e) {
+            console.warn(e);
+            $scope.toast2 = e;
+            $('#toast2').toast('show');
+        }
     }
 
-    $scope.update = async function () {
+    $scope.update = function () {
         try {
-            await $scope.settings.save();
+            mongoDbSettings.save();
             $('#toast1').toast('show');
-            $scope.$apply();
         }
-        catch (e) { $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Cannot write to MongoDB settings file.', 'Error: MongoDB'); }
+        catch (e) {
+            console.error(e);
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Cannot write to MongoDB settings file.', 'Error: MongoDB');
+        }
     }
 
-    getSettings();
+    $('#toast1').on('show.bs.toast', function () { $scope.toastShow1 = true; });
+    $('#toast1').on('hidden.bs.toast', function () { $scope.toastShow1 = false; });
+    $('#toast2').on('show.bs.toast', function () { $scope.toastShow2 = true; });
+    $('#toast2').on('hidden.bs.toast', function () { $scope.toastShow2 = false; });
+    load();
 
 }
 
-controllerFn.$inject = ['$scope', '$rootScope', 'mongoDb'];
+controllerFn.$inject = ['$scope', '$rootScope', 'mongoDbSettings'];
 
 
 export default controllerFn;
