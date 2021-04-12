@@ -1,6 +1,6 @@
-const angular = require('angular');
-
-
-angular.module('views.menuView').component('menuView', {
+const componentDef = {
     templateUrl: 'views/menu-view/menu-view.template.html',
-});
+};
+
+
+export default componentDef;
