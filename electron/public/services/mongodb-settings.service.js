@@ -26,7 +26,7 @@ class Settings {
 
     get uri() {
         if (this.username || this.password) {
-            return `mongodb://${this.username}:${this.password}@${this.hostname}:${this.port}`;
+            return `mongodb://${encodeURIComponent(this.username)}:${encodeURIComponent(this.password)}@${this.hostname}:${this.port}`;
         }
         return `mongodb://${this.hostname}:${this.port}`;
     }
