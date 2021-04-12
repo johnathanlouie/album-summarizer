@@ -9,4 +9,4 @@ module.component('errorModal', {
 });
 
 
-export default module;
+export default module.name;

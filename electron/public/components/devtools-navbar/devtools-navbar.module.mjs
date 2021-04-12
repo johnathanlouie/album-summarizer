@@ -6,4 +6,4 @@ const module = angular.module('components.devtoolsNavbar', []);
 module.component('devtoolsNavbar', componentOptions);
 
 
-export default module;
+export default module.name;

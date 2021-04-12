@@ -6,4 +6,4 @@ const module = angular.module('core.fileInput', []);
 module.directive('fileInput', fileInput);
 
 
-export default module;
+export default module.name;

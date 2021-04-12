@@ -9,4 +9,4 @@ const component = module.component('loadingModal', {
 });
 
 
-export default module;
+export default module.name;
