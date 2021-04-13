@@ -35,15 +35,16 @@ function controllerFn($scope, $rootScope, mongoDb) {
 
     $scope.upload = async function () {
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW');
+            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Uploading...');
             await mongoDb.insertMany(DATA, $scope.db, $scope.collection);
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
         }
         catch (e) {
             console.error(e);
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Something happened while uploading to MongoDB.', 'Error: MongoDB Upload');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Upload', 'Something happened while uploading to MongoDB.');
         }
+        $scope.$apply();
     };
 
 }

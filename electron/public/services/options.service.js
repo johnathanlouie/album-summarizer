@@ -15,7 +15,7 @@ function serviceFn($rootScope, $http) {
             if (!this.#isLoaded || reload) {
                 try {
                     this.#isLoaded = false;
-                    $rootScope.$broadcast('LOADING_MODAL_SHOW');
+                    $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Deep Learning Options', 'Retrieving...');
                     this.architectures = [];
                     this.datasets = [];
                     this.losses = [];
@@ -33,7 +33,7 @@ function serviceFn($rootScope, $http) {
                 catch (e) {
                     console.error(e);
                     $rootScope.$broadcast('LOADING_MODAL_HIDE');
-                    $rootScope.$broadcast('ERROR_MODAL_SHOW');
+                    $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: Deep Learning Options', '');
                 }
                 $rootScope.$apply();
             }

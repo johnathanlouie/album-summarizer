@@ -7,7 +7,7 @@ function controllerFn($scope, $rootScope, history, cwd, screenView, focusImage) 
     $scope.focusImage = focusImage;
 
     async function goTo(dst) {
-        $rootScope.$broadcast('LOADING_MODAL_SHOW');
+        $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Directory Change', 'Loading...');
         $scope.address = dst;
         $scope.filterText = '';
         await cwd.cd(dst);
@@ -42,7 +42,7 @@ function controllerFn($scope, $rootScope, history, cwd, screenView, focusImage) 
      */
     async function organize(refresh) {
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW');
+            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Smart Organizer', 'Organizing...');
             if (refresh) { await cwd.reorganize(); }
             else { await cwd.organize(); }
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
@@ -51,7 +51,7 @@ function controllerFn($scope, $rootScope, history, cwd, screenView, focusImage) 
             console.error(err);
             $scope.isOrganizeToggled = false;
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', err, 'Error: Smart Organizer', 'Failed to organize.');
         }
         finally {
             $scope.$apply();
@@ -67,7 +67,7 @@ function controllerFn($scope, $rootScope, history, cwd, screenView, focusImage) 
 
     $scope.reorganize = function () { organize(true); };
 
-    $rootScope.$on('CHANGE_DIRECTORY', function (event, dst) {
+    $scope.$on('CHANGE_DIRECTORY', function (event, dst) {
         $scope.goTo(dst);
     });
 

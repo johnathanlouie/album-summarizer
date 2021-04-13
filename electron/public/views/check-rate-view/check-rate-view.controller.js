@@ -64,7 +64,7 @@ function controllerFn($scope, $http, $rootScope, options) {
 
     $scope.submit = async function () {
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW');
+            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Deep Learning', 'Predicting...');
             var url = 'http://localhost:8080/predict';
             $scope.prediction = [];
             $scope.keyGuide = null;
@@ -87,7 +87,7 @@ function controllerFn($scope, $http, $rootScope, options) {
         catch (e) {
             console.error(e);
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: Deep Learning', '');
             $scope.$apply();
         }
     };

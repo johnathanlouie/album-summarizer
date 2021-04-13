@@ -21,7 +21,7 @@ function controllerFn($scope, $rootScope, mongoDbSettings) {
         }
         catch (e) {
             console.error(e);
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Cannot write to MongoDB settings file.', 'Error: MongoDB');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB', 'Cannot write to MongoDB settings file.');
         }
     }
 

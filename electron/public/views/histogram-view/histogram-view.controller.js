@@ -8,7 +8,7 @@ function controllerFn($scope, $http, $rootScope, options) {
 
     $scope.submit = async function () {
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW');
+            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Cluster Algorithms', 'Clustering...');
             $scope.clusters = [];
             var url = 'http://localhost:8080/cluster';
             var response = await $http.post(url, $scope.requestParameters);
@@ -18,7 +18,7 @@ function controllerFn($scope, $http, $rootScope, options) {
         catch (e) {
             console.error(e);
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: Clustering Algorithms', '');
         }
         $scope.$apply();
     };
