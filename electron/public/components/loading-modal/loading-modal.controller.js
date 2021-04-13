@@ -1,4 +1,4 @@
-function controller($scope, $rootScope, $interval) {
+function controller($scope, $interval) {
 
     var loadingOverlay = {
         _stopwatch: {
@@ -40,13 +40,23 @@ function controller($scope, $rootScope, $interval) {
         },
     };
 
-    $rootScope.$on('LOADING_MODAL_SHOW', () => { loadingOverlay.show(); });
-    $rootScope.$on('LOADING_MODAL_HIDE', () => { loadingOverlay.hide(); });
+    $scope.$on('LOADING_MODAL_SHOW', function (event, title, status) {
+        $scope.title = title;
+        $scope.status = status;
+        loadingOverlay.show();
+    });
+
+    $scope.$on('LOADING_MODAL_HIDE', function () {
+        $scope.title = '';
+        $scope.status = '';
+        loadingOverlay.hide();
+    });
+
     $scope.timeElapsed = function () { return loadingOverlay.timeElapsed; };
 
 }
 
-controller.$inject = ['$scope', '$rootScope', '$interval'];
+controller.$inject = ['$scope', '$interval'];
 
 
 export default controller;
