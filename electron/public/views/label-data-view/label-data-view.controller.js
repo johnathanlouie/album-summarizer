@@ -1,67 +1,64 @@
 function controllerFn($scope) {
-    function keyEventHandler(event) {
+
+    function keyHandler(event) {
         switch (event.key) {
             case "1":
-                event.preventDefault();
-                $("#a1").prop("checked", true);
+                $scope.category = 'environment';
                 break;
             case "2":
-                event.preventDefault();
-                $("#a2").prop("checked", true);
+                $scope.category = 'people';
                 break;
             case "3":
-                event.preventDefault();
-                $("#a3").prop("checked", true);
+                $scope.category = 'object';
                 break;
             case "4":
-                event.preventDefault();
-                $("#a4").prop("checked", true);
+                $scope.category = 'hybrid';
                 break;
             case "5":
-                event.preventDefault();
-                $("#a5").prop("checked", true);
+                $scope.category = 'animal';
                 break;
             case "6":
-                event.preventDefault();
-                $("#a6").prop("checked", true);
-                break;
-            case "Enter":
-                event.preventDefault();
-                $("#form1").submit();
+                $scope.category = 'food';
                 break;
             case "+":
-                event.preventDefault();
-                $("#counter").val(function (index, value) {
-                    return parseInt(value, 10) + 1;
-                });
-                $("#counter").change();
+                if ($scope.rating < 3) { $scope.rating++; }
                 break;
             case "-":
-                event.preventDefault();
-                $("#counter").val(function (index, value) {
-                    return parseInt(value, 10) - 1;
-                });
-                $("#counter").change();
+                if ($scope.rating > 1) { $scope.rating--; }
+                break;
+            case "Enter":
+                $scope.submit();
                 break;
         }
+        $scope.$apply();
     }
 
-    function rateEventHandler(event) {
-        switch ($("#counter").number()) {
+    $(document).keydown(keyHandler);
+
+    this.$onDestroy = function () {
+        $(document).off('keydown', keyHandler);
+    };
+
+    $scope.ratingText = function () {
+        switch ($scope.rating) {
             case 1:
-                $("#ratingText").text("Worse Than Average");
-                break;
+                return 'Worse Than Average';
             case 2:
-                $("#ratingText").text("Average");
-                break;
+                return 'Average';
             case 3:
-                $("#ratingText").text("Better Than Average");
-                break;
+                return 'Better Than Average';
+            default:
+                return 'Error: Unknown value'
         }
-    }
+    };
 
-    $("body").keypress(keyEventHandler);
-    $("#counter").change(rateEventHandler);
+    $scope.submit = function (event) { };
+
+    $scope.category = 'hybrid';
+    $scope.image = 'image-placeholder.png';
+    $scope.rating = 2;
+    $scope.id = '####';
+
 }
 
 controllerFn.$inject = ['$scope'];
