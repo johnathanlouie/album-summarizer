@@ -1,64 +1,48 @@
-const fs = require('fs');
+const mongodb = require('mongodb');
 
 
-class Settings {
+function serviceFn(mongoDbSettings) {
 
-    hostname = 'localhost';
-    port = 27017;
-    username = '';
-    password = '';
-    #loaded = false;
+    class MongoDb {
 
-    async exists() {
-        try {
-            await fs.promises.access('mongodb.json');
-            return true;
+        #client;
+
+        constructor() {
+            if (!mongoDbSettings.isLoaded) {
+                mongoDbSettings.load();
+            }
+            this.#client = new mongodb.MongoClient(mongoDbSettings.uri(), {
+                useNewUrlParser: true,
+                useUnifiedTopology: true,
+            });
         }
-        catch (e) { return false; }
-    }
 
-    async save() {
-        await fs.promises.writeFile('mongodb.json', JSON.stringify(this));
-        this.#loaded = true;
-    }
+        async connect() { await this.#client.connect(); }
 
-    async load() {
-        this.#loaded = false;
-        var json = await fs.promises.readFile('mongodb.json');
-        var obj = JSON.parse(json);
-        this.hostname = obj.hostname;
-        this.username = obj.username;
-        this.password = obj.password;
-        this.#loaded = true;
-    }
+        async close() { await this.#client.close(); }
 
-    get uri() {
-        if (this.username || this.password) {
-            return `mongodb://${this.username}:${this.password}@${this.hostname}:${this.port}`;
+        /**
+         * 
+         * @param {*} docs Documents to insert.
+         * @param {string} db The name of the database we want to use. If not provided, use database name from connection string.
+         * @param {string} collection The collection name we wish to access.
+         */
+        async insertMany(docs, db, collection) {
+            try {
+                await this.connect();
+                let insertWriteOpResult = await this.#client.db(db).collection(collection).insertMany(docs);
+                if (insertWriteOpResult.result.ok !== 1) { throw new Error(); }
+            }
+            finally { await this.close(); }
         }
-        return `mongodb://${this.hostname}:${this.port}`;
+
     }
 
-    get isLoaded() { return this.#loaded; }
+    return new MongoDb();
 
 }
 
-
-class MongoDB {
-
-    #settings = new Settings();
-
-    async settings() {
-        if (this.#settings.isLoaded) { return this.#settings; }
-        else if (await this.#settings.exists()) { await this.#settings.load(); }
-        else { await this.#settings.save(); }
-        return this.#settings;
-    }
-
-}
-
-
-function serviceFn() { return new MongoDB(); }
+serviceFn.$inject = ['mongoDbSettings'];
 
 
 export default serviceFn;

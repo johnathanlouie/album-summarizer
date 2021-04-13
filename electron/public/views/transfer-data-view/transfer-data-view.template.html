@@ -1,3 +1,52 @@
 <devtools-navbar></devtools-navbar>
 
-<div class="container"></div>
+<div class="container">
+
+    <form class="mb-2" ng-submit="load()">
+        <div class="form-row">
+            <div class="custom-file col">
+                <input class="custom-file-input" file-input="file1" type="file" id="csvInput">
+                <label class="custom-file-label" for="csvInput">{{ file1[0].name || 'Choose file' }}</label>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Load</button>
+            </div>
+        </div>
+    </form>
+
+    <form class="mb-2" ng-submit="upload()">
+        <div class="form-row">
+            <div class="col">
+                <input class="form-control" ng-model="db" type="text" placeholder="Database">
+            </div>
+            <div class="col">
+                <input class="form-control" ng-model="collection" type="text" placeholder="Collection">
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Upload</button>
+            </div>
+        </div>
+    </form>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Image</th>
+                <th scope="col">Rating</th>
+                <th scope="col">Class</th>
+                <th scope="col">Labeled</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="doc in data">
+                <th scope="row">{{ doc._id }}</th>
+                <td>{{ doc.image }}</td>
+                <td>{{ doc.rating }}</td>
+                <td>{{ doc.class }}</td>
+                <td>{{ doc.isLabeled }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>

@@ -24,7 +24,7 @@ class Settings {
         this.#loaded = true;
     }
 
-    get uri() {
+    uri() {
         if (this.username || this.password) {
             return `mongodb://${encodeURIComponent(this.username)}:${encodeURIComponent(this.password)}@${this.hostname}:${this.port}`;
         }
