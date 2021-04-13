@@ -26,6 +26,8 @@ function controllerFn($scope, $rootScope, mongoDb) {
     let DATA;
 
     $scope.load = function () {
+        DATA = null;
+        $scope.data = null;
         if ($scope.file1.length > 0) {
             let csv = parse(fs.readFileSync($scope.file1[0].path));
             DATA = csv.map(row => new DeepLearningData(row[4], row[0], row[1], row[2], row[3]));
