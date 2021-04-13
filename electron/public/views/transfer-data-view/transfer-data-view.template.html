@@ -14,7 +14,7 @@
         </div>
     </form>
 
-    <form class="mb-2" ng-submit="upload()">
+    <div class="mb-2">
         <div class="form-row">
             <div class="col">
                 <input class="form-control" ng-model="db" type="text" placeholder="Database">
@@ -23,10 +23,13 @@
                 <input class="form-control" ng-model="collection" type="text" placeholder="Collection">
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Upload</button>
+                <button class="btn btn-primary" ng-click="download()">Download</button>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" ng-click="upload()">Upload</button>
             </div>
         </div>
-    </form>
+    </div>
 
     <table class="table table-bordered">
         <thead>

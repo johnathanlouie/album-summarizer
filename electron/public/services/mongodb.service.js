@@ -36,6 +36,15 @@ function serviceFn(mongoDbSettings) {
             finally { await this.close(); }
         }
 
+        async getAll(db, collection) {
+            try {
+                await this.connect();
+                let documents = await this.#client.db(db).collection(collection).find().toArray();
+                return documents;
+            }
+            finally { await this.close(); }
+        }
+
     }
 
     return new MongoDb();

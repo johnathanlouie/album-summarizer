@@ -49,6 +49,23 @@ function controllerFn($scope, $rootScope, mongoDb) {
         $scope.$apply();
     };
 
+    $scope.download = async function () {
+        DATA = null;
+        $scope.data = null;
+        try {
+            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Downloading...');
+            DATA = await mongoDb.getAll($scope.db, $scope.collection);
+            $scope.data = angular.copy(DATA);
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+        }
+        catch (e) {
+            console.error(e);
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Upload', 'Something happened while downloading to MongoDB.');
+        }
+        $scope.$apply();
+    };
+
 }
 
 controllerFn.$inject = ['$scope', '$rootScope', 'mongoDb'];
