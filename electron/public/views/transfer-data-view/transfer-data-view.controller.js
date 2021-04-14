@@ -86,6 +86,12 @@ function controllerFn($scope, $rootScope, mongoDb) {
             });
     };
 
+    $scope.removeIds = function () {
+        for (let i of $scope.data) {
+            delete i._id;
+        }
+    };
+
     $scope.newData = {
         filepath: path.join(os.homedir(), 'Pictures'),
         recursive: true,
