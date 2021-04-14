@@ -54,6 +54,12 @@ function serviceFn(mongoDbSettings) {
             }
         }
 
+        async collections() {
+            await this.connect();
+            let collections = await this.#db.collections();
+            return collections.map(c => c.collectionName);
+        }
+
     }
 
     return new MongoDb();

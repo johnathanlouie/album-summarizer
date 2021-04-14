@@ -21,7 +21,7 @@
     <form class="mb-2" ng-submit="export()">
         <div class="form-row">
             <div class="col">
-                <input class="form-control" ng-model="exportPath" type="text" placeholder="Filepath">
+                <input class="form-control" ng-model="exportPath" type="text" placeholder="Filepath" required>
             </div>
             <div class="col-auto">
                 <button class="btn btn-primary" type="submit">Export</button>
@@ -31,19 +31,29 @@
 
     <h2>MongoDB</h2>
 
-    <div class="mb-2">
+    <form class="mb-2" ng-submit="download()">
         <div class="form-row">
-            <div class="col">
-                <input class="form-control" ng-model="collection" type="text" placeholder="Collection">
+            <div class="col mb-2">
+                <select class="custom-select" ng-model="collectionPull">
+                    <option ng-repeat="c in collections">{{ c }}</option>
+                </select>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" ng-click="download()">Pull</button>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary" ng-click="upload()">Push</button>
+                <button class="btn btn-primary" type="submit">Pull</button>
             </div>
         </div>
-    </div>
+    </form>
+
+    <form class="mb-2" ng-submit="upload()">
+        <div class="form-row">
+            <div class="col">
+                <input class="form-control" ng-model="collectionPush" type="text" placeholder="Collection" required>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Push</button>
+            </div>
+        </div>
+    </form>
 
     <h2>Data</h2>
 
