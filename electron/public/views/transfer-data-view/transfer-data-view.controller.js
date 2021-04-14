@@ -4,7 +4,6 @@ const process = require('process');
 const path = require('path');
 const parseCsv = require('csv-parse/lib/sync');
 const stringifyCsv = require('csv-stringify/lib/sync');
-const mongodb = require('mongodb');
 
 
 function controllerFn($scope, $rootScope, mongoDb) {

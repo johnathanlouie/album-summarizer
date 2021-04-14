@@ -1,82 +1,124 @@
 <devtools-navbar></devtools-navbar>
 
-<div class="container">
+<div class="container-fluid">
 
-    <h3>New Data</h3>
+    <div class="row">
+        <div class="col">
+            <h1>Source</h1>
+        </div>
+        <div class="col">
+            <h1>Destination</h1>
+        </div>
+    </div>
 
-    <form class="mb-2" ng-submit="getImages()">
-        <div class="form-row">
-            <div class="col">
-                <input class="form-control" ng-model="newData.filepath" type="text" placeholder="Filepath" required>
-            </div>
-            <div class="col-auto">
-                <div class="btn-group-toggle" data-toggle="buttons">
-                    <label class="btn"
-                        ng-class="{ 'btn-primary': newData.recursive, 'btn-secondary': !newData.recursive, 'active': newData.recursive }">
-                        <input type="checkbox" ng-model="newData.recursive"> Recursive
-                    </label>
+    <div class="row">
+        <div class="col-6">
+
+            <h6>Create unlabeled data</h6>
+
+            <form class="mb-2" ng-submit="getImages()">
+                <div class="form-row">
+                    <div class="col">
+                        <input class="form-control" ng-model="newData.filepath" type="text" placeholder="Directory"
+                            required>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-group-toggle" data-toggle="buttons">
+                            <label class="btn"
+                                ng-class="{ 'btn-info': newData.recursive, 'btn-secondary': !newData.recursive, 'active': newData.recursive }">
+                                <input type="checkbox" ng-model="newData.recursive"> Recursive
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" type="submit">Load</button>
+                    </div>
                 </div>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Load</button>
-            </div>
+            </form>
+
         </div>
-    </form>
+    </div>
 
-    <h3>Import CSV File</h3>
+    <div class="row">
+        <div class="col">
 
-    <form class="mb-2" ng-submit="load()">
-        <div class="form-row">
-            <div class="custom-file col">
-                <input class="custom-file-input" file-input="file1" type="file" id="csvInput" required>
-                <label class="custom-file-label" for="csvInput">{{ file1[0].name || 'Choose file' }}</label>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Load</button>
-            </div>
+            <h6>Import CSV file</h6>
+
+            <form class="mb-2" ng-submit="load()">
+                <div class="form-row">
+                    <div class="custom-file col">
+                        <input class="custom-file-input" file-input="file1" type="file" id="csvInput" required>
+                        <label class="custom-file-label" for="csvInput">{{ file1[0].name || 'Choose file' }}</label>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" type="submit">Load</button>
+                    </div>
+                </div>
+            </form>
+
         </div>
-    </form>
+        <div class="col">
 
-    <h3>Export to CSV File</h3>
+            <h6>Export to CSV file</h6>
 
-    <form class="mb-2" ng-submit="export()">
-        <div class="form-row">
-            <div class="col">
-                <input class="form-control" ng-model="exportPath" type="text" placeholder="Filepath" required>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Export</button>
-            </div>
+            <form class="mb-2" ng-submit="export()">
+                <fieldset ng-disabled="!data">
+                    <div class="form-row">
+                        <div class="col">
+                            <input class="form-control" ng-model="exportPath" type="text" placeholder="Filepath"
+                                required>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary" type="submit">Export</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+
         </div>
-    </form>
+    </div>
 
-    <h3>MongoDB</h3>
+    <div class="row">
+        <div class="col">
 
-    <form class="mb-2" ng-submit="download()">
-        <div class="form-row">
-            <div class="col mb-2">
-                <select class="custom-select" ng-model="collectionPull">
-                    <option ng-repeat="c in collections">{{ c }}</option>
-                </select>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Load</button>
-            </div>
+            <h6>From MongoDB</h6>
+
+            <form class="mb-2" ng-submit="download()">
+                <div class="form-row">
+                    <div class="col mb-2">
+                        <select class="custom-select" ng-model="collectionPull">
+                            <option ng-repeat="c in collections">{{ c }}</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" type="submit">Load</button>
+                    </div>
+                </div>
+            </form>
+
         </div>
-    </form>
+        <div class="col">
 
-    <form class="mb-2" ng-submit="upload()">
-        <div class="form-row">
-            <div class="col">
-                <input class="form-control" ng-model="collectionPush" type="text" placeholder="Collection" required>
-            </div>
-            <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Export</button>
-            </div>
+            <h6>Insert into MongoDB</h6>
+
+            <form class="mb-2" ng-submit="upload()">
+                <fieldset ng-disabled="!data">
+                    <div class="form-row">
+                        <div class="col">
+                            <input class="form-control" ng-model="collectionPush" type="text" placeholder="Collection"
+                                required>
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary" type="submit">Export</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+
         </div>
-    </form>
+    </div>
 
-    <h3>Data</h3>
+    <h1>Data</h1>
 
     <div class="table-responsive">
         <table class="table table-bordered">
