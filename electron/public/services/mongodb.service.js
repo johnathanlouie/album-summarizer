@@ -32,9 +32,8 @@ function serviceFn(mongoDbSettings) {
         }
 
         /**
-         * 
-         * @param {*} docs Documents to insert.
-         * @param {string} db The name of the database we want to use. If not provided, use database name from connection string.
+         * Inserts an array of documents.
+         * @param {Object[]} docs Documents to insert.
          * @param {string} collection The collection name we wish to access.
          */
         async insertMany(docs, collection) {
@@ -43,6 +42,11 @@ function serviceFn(mongoDbSettings) {
             if (insertWriteOpResult.result.ok !== 1) { throw new Error(); }
         }
 
+        /**
+         * Gets all documents from a collection.
+         * @param {string} collection The collection name we wish to access.
+         * @returns {Object[]}
+         */
         async getAll(collection) {
             await this.connect();
             let cursor = this.#db.collection(collection).find();
