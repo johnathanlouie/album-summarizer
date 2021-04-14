@@ -92,6 +92,7 @@ function controllerFn($scope, $rootScope, mongoDb) {
                 $scope.unlabeledData = data[0];
                 $scope.unlabeledData.rating = 2;
                 $scope.unlabeledData.class = 'hybrid';
+                $scope.unlabeledData.collection = $scope.selectedCollection;
                 $rootScope.$broadcast('LOADING_MODAL_HIDE');
             }
         }
@@ -105,7 +106,32 @@ function controllerFn($scope, $rootScope, mongoDb) {
 
     $scope.getUnlabeledData = getUnlabeledData;
 
-    $scope.submit = async function (event) { getUnlabeledData(); };
+    async function updateOne() {
+        try {
+            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Updating...');
+            await mongoDb.findOneAndUpdate(
+                $scope.unlabeledData.collection,
+                { _id: $scope.unlabeledData._id },
+                {
+                    rating: $scope.unlabeledData.rating,
+                    class: $scope.unlabeledData.class,
+                    isLabeled: true,
+                },
+            );
+        }
+        catch (e) {
+            console.error(e);
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Query', 'Something happened while updating one document from MongoDB.');
+        }
+    }
+
+    $scope.submit = async function (event) {
+        await updateOne();
+        await getUnlabeledData();
+    };
+
+    $scope.isNullData = function () { return $scope.unlabeledData === nullData; }
 
     $scope.unlabeledData = nullData;
     $scope.dbCollections = null;

@@ -93,6 +93,11 @@ function serviceFn(mongoDbSettings) {
             }
         }
 
+        async findOneAndUpdate(collection, filter, update) {
+            update = { $set: update };
+            if ((await this.#db.collection(collection).findOneAndUpdate(filter, update)).ok !== 1) { throw new Error(); }
+        }
+
     }
 
     return new MongoDb();
