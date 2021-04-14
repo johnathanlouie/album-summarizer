@@ -2,6 +2,8 @@
 
 <div class="container">
 
+    <h2>Import CSV File</h2>
+
     <form class="mb-2" ng-submit="load()">
         <div class="form-row">
             <div class="custom-file col">
@@ -9,10 +11,25 @@
                 <label class="custom-file-label" for="csvInput">{{ file1[0].name || 'Choose file' }}</label>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Load</button>
+                <button class="btn btn-primary" type="submit">Import</button>
             </div>
         </div>
     </form>
+
+    <h2>Export to CSV File</h2>
+
+    <form class="mb-2" ng-submit="export()">
+        <div class="form-row">
+            <div class="col">
+                <input class="form-control" ng-model="exportPath" type="text" placeholder="Filepath">
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Export</button>
+            </div>
+        </div>
+    </form>
+
+    <h2>MongoDB</h2>
 
     <div class="mb-2">
         <div class="form-row">
@@ -20,13 +37,15 @@
                 <input class="form-control" ng-model="collection" type="text" placeholder="Collection">
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" ng-click="download()">Download</button>
+                <button class="btn btn-primary" ng-click="download()">Pull</button>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" ng-click="upload()">Upload</button>
+                <button class="btn btn-primary" ng-click="upload()">Push</button>
             </div>
         </div>
     </div>
+
+    <h2>Data</h2>
 
     <table class="table table-bordered">
         <thead>

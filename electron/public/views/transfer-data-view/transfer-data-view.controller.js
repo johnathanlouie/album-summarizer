@@ -1,5 +1,8 @@
 const fs = require('fs');
-const parse = require('csv-parse/lib/sync');
+const process = require('process');
+const path = require('path');
+const parseCsv = require('csv-parse/lib/sync');
+const stringifyCsv = require('csv-stringify/lib/sync');
 const angular = require('angular');
 
 
@@ -11,7 +14,7 @@ function controllerFn($scope, $rootScope, mongoDb) {
         DATA = null;
         $scope.data = null;
         if ($scope.file1.length > 0) {
-            DATA = parse(fs.readFileSync($scope.file1[0].path), {
+            DATA = parseCsv(fs.readFileSync($scope.file1[0].path), {
                 columns: ['image', 'rating', 'class', 'isLabeled', '_id'],
                 cast: function (value, context) {
                     switch (context.column) {
@@ -59,6 +62,20 @@ function controllerFn($scope, $rootScope, mongoDb) {
         }
         $scope.$apply();
     };
+
+    $scope.export = function () {
+        fs.writeFileSync($scope.exportPath, stringifyCsv(DATA, {
+            columns: [
+                { key: 'image' },
+                { key: 'rating' },
+                { key: 'class' },
+                { key: 'isLabeled' },
+                { key: '_id' },
+            ],
+        }));
+    };
+
+    $scope.exportPath = path.join(process.cwd(), 'export.csv');
 
 }
 
