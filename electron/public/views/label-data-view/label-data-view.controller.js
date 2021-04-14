@@ -1,4 +1,4 @@
-function controllerFn($scope) {
+function controllerFn($scope, $rootScope, mongoDb) {
 
     function keyHandler(event) {
         switch (event.key) {
@@ -40,7 +40,7 @@ function controllerFn($scope) {
     };
 
     $scope.ratingText = function () {
-        switch ($scope.rating) {
+        switch ($scope.unlabeledData.rating) {
             case 1:
                 return 'Worse Than Average';
             case 2:
@@ -52,16 +52,69 @@ function controllerFn($scope) {
         }
     };
 
-    $scope.submit = function (event) { };
+    async function getMongoCollections() {
+        $scope.dbCollections = null;
+        $scope.selectedCollection = null;
+        try {
+            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Retrieving list...');
+            $scope.dbCollections = await mongoDb.collections();
+            if ($scope.dbCollections.length > 0) {
+                $scope.selectedCollection = $scope.dbCollections[0];
+            }
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+        }
+        catch (e) {
+            console.error(e);
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Query', 'Something happened while retrieving collections from MongoDB.');
+        }
+        $scope.$apply();
+    }
 
-    $scope.category = 'hybrid';
-    $scope.image = 'image-placeholder.png';
-    $scope.rating = 2;
-    $scope.id = '####';
+    const nullData = {
+        class: 'hybrid',
+        image: 'image-placeholder.png',
+        rating: 2,
+        _id: '####',
+    };
+
+    async function getUnlabeledData() {
+        $scope.unlabeledData = nullData;
+        try {
+            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Querying...');
+            let data = await mongoDb.sample({ isLabeled: false }, 1, $scope.selectedCollection);
+            if (data.length === 0) {
+                $scope.unlabeledData = nullData;
+                $rootScope.$broadcast('LOADING_MODAL_HIDE');
+                $rootScope.$broadcast('ERROR_MODAL_SHOW', null, 'Notice: MongoDB Query', 'All data points in this collection were labeled.');
+            }
+            else {
+                $scope.unlabeledData = data[0];
+                $scope.unlabeledData.rating = 2;
+                $scope.unlabeledData.class = 'hybrid';
+                $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            }
+        }
+        catch (e) {
+            console.error(e);
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Query', 'Something happened while getting an unlabeled document from MongoDB.');
+        }
+        $scope.$apply();
+    }
+
+    $scope.getUnlabeledData = getUnlabeledData;
+
+    $scope.submit = async function (event) { getUnlabeledData(); };
+
+    $scope.unlabeledData = nullData;
+    $scope.dbCollections = null;
+    $scope.selectedCollection = null;
+    getMongoCollections();
 
 }
 
-controllerFn.$inject = ['$scope'];
+controllerFn.$inject = ['$scope', '$rootScope', 'mongoDb'];
 
 
 export default controllerFn;

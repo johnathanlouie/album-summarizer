@@ -70,6 +70,21 @@ function serviceFn(mongoDbSettings) {
             return collections.map(c => c.collectionName);
         }
 
+        async findOne(query, collection) {
+            await this.connect();
+            return await this.#db.collection(collection).findOne(query);
+        }
+
+        async sample(query, count, collection) {
+            await this.connect();
+            let cursor = this.#db.collection(collection).aggregate([
+                { $sample: { size: count } },
+                { $match: query },
+            ]);
+            if (cursor === null) { throw new Error(); }
+            return await cursor.toArray();
+        }
+
     }
 
     return new MongoDb();
