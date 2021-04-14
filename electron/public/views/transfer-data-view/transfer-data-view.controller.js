@@ -37,6 +37,7 @@ function controllerFn($scope, $rootScope, mongoDb) {
         try {
             $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Uploading...');
             await mongoDb.insertMany($scope.data, $scope.collectionPush);
+            await getMongoCollections();
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
         }
         catch (e) {
@@ -92,21 +93,21 @@ function controllerFn($scope, $rootScope, mongoDb) {
         }
     };
 
+    async function getMongoCollections() {
+        $scope.collections = await mongoDb.collections();
+        if ($scope.collections.length > 0) {
+            $scope.collectionPull = $scope.collections[0];
+        }
+        $scope.$apply();
+    }
+
     $scope.newData = {
         filepath: path.join(os.homedir(), 'Pictures'),
         recursive: true,
     };
 
     $scope.exportPath = path.join(process.cwd(), 'export.csv');
-
-    mongoDb.collections().then(x => {
-        $scope.collections = x;
-        if ($scope.collections.length > 0) {
-            $scope.collectionPull = $scope.collections[0];
-        }
-        $scope.$apply();
-    });
-
+    getMongoCollections();
     $scope.data = null;
 
 }
