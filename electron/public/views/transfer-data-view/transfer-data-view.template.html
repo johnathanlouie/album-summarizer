@@ -2,21 +2,42 @@
 
 <div class="container">
 
-    <h2>Import CSV File</h2>
+    <h3>New Data</h3>
 
-    <form class="mb-2" ng-submit="load()">
+    <form class="mb-2" ng-submit="getImages()">
         <div class="form-row">
-            <div class="custom-file col">
-                <input class="custom-file-input" file-input="file1" type="file" id="csvInput">
-                <label class="custom-file-label" for="csvInput">{{ file1[0].name || 'Choose file' }}</label>
+            <div class="col">
+                <input class="form-control" ng-model="newData.filepath" type="text" placeholder="Filepath" required>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Import</button>
+                <div class="btn-group-toggle" data-toggle="buttons">
+                    <label class="btn"
+                        ng-class="{ 'btn-primary': newData.recursive, 'btn-secondary': !newData.recursive, 'active': newData.recursive }">
+                        <input type="checkbox" ng-model="newData.recursive"> Recursive
+                    </label>
+                </div>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Load</button>
             </div>
         </div>
     </form>
 
-    <h2>Export to CSV File</h2>
+    <h3>Import CSV File</h3>
+
+    <form class="mb-2" ng-submit="load()">
+        <div class="form-row">
+            <div class="custom-file col">
+                <input class="custom-file-input" file-input="file1" type="file" id="csvInput" required>
+                <label class="custom-file-label" for="csvInput">{{ file1[0].name || 'Choose file' }}</label>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Load</button>
+            </div>
+        </div>
+    </form>
+
+    <h3>Export to CSV File</h3>
 
     <form class="mb-2" ng-submit="export()">
         <div class="form-row">
@@ -29,7 +50,7 @@
         </div>
     </form>
 
-    <h2>MongoDB</h2>
+    <h3>MongoDB</h3>
 
     <form class="mb-2" ng-submit="download()">
         <div class="form-row">
@@ -39,7 +60,7 @@
                 </select>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Pull</button>
+                <button class="btn btn-primary" type="submit">Load</button>
             </div>
         </div>
     </form>
@@ -50,32 +71,34 @@
                 <input class="form-control" ng-model="collectionPush" type="text" placeholder="Collection" required>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Push</button>
+                <button class="btn btn-primary" type="submit">Export</button>
             </div>
         </div>
     </form>
 
-    <h2>Data</h2>
+    <h3>Data</h3>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">ID</th>
-                <th scope="col">Image</th>
-                <th scope="col">Rating</th>
-                <th scope="col">Class</th>
-                <th scope="col">Labeled</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="doc in data">
-                <th scope="row">{{ doc._id }}</th>
-                <td>{{ doc.image }}</td>
-                <td>{{ doc.rating }}</td>
-                <td>{{ doc.class }}</td>
-                <td>{{ doc.isLabeled }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="col-auto" scope="col">ID</th>
+                    <th class="col" scope="col">Image</th>
+                    <th class="col-auto" scope="col">Rating</th>
+                    <th class="col-auto" scope="col">Class</th>
+                    <th class="col-auto" scope="col">Labeled</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="doc in data track by $index">
+                    <th scope="row">{{ doc._id }}</th>
+                    <td class="text-break">{{ doc.image }}</td>
+                    <td>{{ doc.rating }}</td>
+                    <td>{{ doc.class }}</td>
+                    <td>{{ doc.isLabeled }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
 </div>

@@ -1,41 +1,43 @@
 const fs = require('fs');
+const os = require('os');
 const process = require('process');
 const path = require('path');
 const parseCsv = require('csv-parse/lib/sync');
 const stringifyCsv = require('csv-stringify/lib/sync');
-const angular = require('angular');
+const mongodb = require('mongodb');
 
 
 function controllerFn($scope, $rootScope, mongoDb) {
 
-    let DATA;
-
     $scope.load = function () {
-        DATA = null;
         $scope.data = null;
         if ($scope.file1.length > 0) {
-            DATA = parseCsv(fs.readFileSync($scope.file1[0].path), {
-                columns: ['image', 'rating', 'class', 'isLabeled', '_id'],
-                cast: function (value, context) {
-                    switch (context.column) {
-                        case 'rating':
-                        case '_id':
-                            return Number(value);
-                        case 'isLabeled':
-                            return Boolean(value);
-                        default:
-                            return value;
-                    }
-                },
-            });
-            $scope.data = angular.copy(DATA);
+            try {
+                $scope.data = parseCsv(fs.readFileSync($scope.file1[0].path), {
+                    columns: ['image', 'rating', 'class', 'isLabeled', '_id'],
+                    cast: function (value, context) {
+                        switch (context.column) {
+                            case 'rating':
+                                return Number(value);
+                            case 'isLabeled':
+                                return Boolean(value);
+                            default:
+                                return value;
+                        }
+                    },
+                });
+            }
+            catch (e) {
+                console.error(e);
+                $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: CSV', 'Loading or parsing error.');
+            }
         }
     };
 
     $scope.upload = async function () {
         try {
             $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Uploading...');
-            await mongoDb.insertMany(DATA, $scope.collectionPush);
+            await mongoDb.insertMany($scope.data, $scope.collectionPush);
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
         }
         catch (e) {
@@ -47,12 +49,10 @@ function controllerFn($scope, $rootScope, mongoDb) {
     };
 
     $scope.download = async function () {
-        DATA = null;
         $scope.data = null;
         try {
             $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Downloading...');
-            DATA = await mongoDb.getAll($scope.collectionPull);
-            $scope.data = angular.copy(DATA);
+            $scope.data = await mongoDb.getAll($scope.collectionPull);
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
         }
         catch (e) {
@@ -64,7 +64,7 @@ function controllerFn($scope, $rootScope, mongoDb) {
     };
 
     $scope.export = function () {
-        fs.writeFileSync($scope.exportPath, stringifyCsv(DATA, {
+        fs.writeFileSync($scope.exportPath, stringifyCsv($scope.data, {
             columns: [
                 { key: 'image' },
                 { key: 'rating' },
@@ -75,7 +75,25 @@ function controllerFn($scope, $rootScope, mongoDb) {
         }));
     };
 
+    $scope.getImages = function () {
+        $scope.data = null;
+        $scope.data = fs.readdirSync($scope.newData.filepath, { withFileTypes: true }).
+            filter(f => f.isFile() && ['.jpg', '.jpeg'].includes(path.extname(f.name).toLowerCase())).
+            map(f => {
+                return {
+                    image: path.join($scope.newData.filepath, f.name),
+                    isLabeled: false,
+                };
+            });
+    };
+
+    $scope.newData = {
+        filepath: path.join(os.homedir(), 'Pictures'),
+        recursive: true,
+    };
+
     $scope.exportPath = path.join(process.cwd(), 'export.csv');
+
     mongoDb.collections().then(x => {
         $scope.collections = x;
         if ($scope.collections.length > 0) {
@@ -83,6 +101,8 @@ function controllerFn($scope, $rootScope, mongoDb) {
         }
         $scope.$apply();
     });
+
+    $scope.data = null;
 
 }
 
