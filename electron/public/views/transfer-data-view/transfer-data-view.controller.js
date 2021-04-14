@@ -3,24 +3,6 @@ const parse = require('csv-parse/lib/sync');
 const angular = require('angular');
 
 
-class DeepLearningData {
-
-    _id;
-    image;
-    rating;
-    class;
-    isLabeled;
-
-    constructor(_id, image, rating, class_, isLabeled) {
-        this._id = Number(_id);
-        this.image = image;
-        this.rating = Number(rating);
-        this.class = class_;
-        this.isLabeled = Boolean(isLabeled);
-    }
-
-}
-
 function controllerFn($scope, $rootScope, mongoDb) {
 
     let DATA;
@@ -29,8 +11,20 @@ function controllerFn($scope, $rootScope, mongoDb) {
         DATA = null;
         $scope.data = null;
         if ($scope.file1.length > 0) {
-            let csv = parse(fs.readFileSync($scope.file1[0].path));
-            DATA = csv.map(row => new DeepLearningData(row[4], row[0], row[1], row[2], row[3]));
+            DATA = parse(fs.readFileSync($scope.file1[0].path), {
+                columns: ['image', 'rating', 'class', 'isLabeled', '_id'],
+                cast: function (value, context) {
+                    switch (context.column) {
+                        case 'rating':
+                        case '_id':
+                            return Number(value);
+                        case 'isLabeled':
+                            return Boolean(value);
+                        default:
+                            return value;
+                    }
+                },
+            });
             $scope.data = angular.copy(DATA);
         }
     };
