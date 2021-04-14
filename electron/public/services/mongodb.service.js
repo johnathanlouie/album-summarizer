@@ -77,12 +77,20 @@ function serviceFn(mongoDbSettings) {
 
         async sample(query, count, collection) {
             await this.connect();
-            let cursor = this.#db.collection(collection).aggregate([
-                { $sample: { size: count } },
-                { $match: query },
-            ]);
-            if (cursor === null) { throw new Error(); }
-            return await cursor.toArray();
+            let cursor;
+            try {
+                cursor = this.#db.collection(collection).aggregate([
+                    { $sample: { size: count } },
+                    { $match: query },
+                ]);
+                if (cursor === null) { throw new Error(); }
+                return await cursor.toArray();
+            }
+            finally {
+                if (cursor !== null) {
+                    cursor.close();
+                }
+            }
         }
 
     }
