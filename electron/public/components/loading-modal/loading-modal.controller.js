@@ -40,8 +40,7 @@ function controller($scope, $interval) {
         },
     };
 
-    $scope.$on('LOADING_MODAL_SHOW', function (event, title, status) {
-        $scope.title = title;
+    $scope.$on('LOADING_MODAL_SHOW', function (event, status) {
         $scope.status = status;
         loadingOverlay.show();
     });
