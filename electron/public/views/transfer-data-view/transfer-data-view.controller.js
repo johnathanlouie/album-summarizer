@@ -38,7 +38,7 @@ function controllerFn($scope, $rootScope, mongoDb) {
     $scope.upload = async function () {
         try {
             $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Uploading...');
-            await mongoDb.insertMany(DATA, $scope.db, $scope.collection);
+            await mongoDb.insertMany(DATA, $scope.collection);
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
         }
         catch (e) {
@@ -54,7 +54,7 @@ function controllerFn($scope, $rootScope, mongoDb) {
         $scope.data = null;
         try {
             $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Downloading...');
-            DATA = await mongoDb.getAll($scope.db, $scope.collection);
+            DATA = await mongoDb.getAll($scope.collection);
             $scope.data = angular.copy(DATA);
             $rootScope.$broadcast('LOADING_MODAL_HIDE');
         }

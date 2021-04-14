@@ -6,6 +6,7 @@ function serviceFn(mongoDbSettings) {
     class MongoDb {
 
         #client;
+        #db;
 
         constructor() {
             if (!mongoDbSettings.isLoaded) {
@@ -17,9 +18,18 @@ function serviceFn(mongoDbSettings) {
             });
         }
 
-        async connect() { await this.#client.connect(); }
+        async connect() {
+            if (!this.#client.isConnected()) {
+                this.#client = await this.#client.connect();
+                this.#db = this.#client.db('albumsummarizer');
+            }
+        }
 
-        async close() { await this.#client.close(); }
+        async close() {
+            if (this.#client.isConnected()) {
+                await this.#client.close();
+            }
+        }
 
         /**
          * 
@@ -27,22 +37,21 @@ function serviceFn(mongoDbSettings) {
          * @param {string} db The name of the database we want to use. If not provided, use database name from connection string.
          * @param {string} collection The collection name we wish to access.
          */
-        async insertMany(docs, db, collection) {
-            try {
-                await this.connect();
-                let insertWriteOpResult = await this.#client.db(db).collection(collection).insertMany(docs);
-                if (insertWriteOpResult.result.ok !== 1) { throw new Error(); }
-            }
-            finally { await this.close(); }
+        async insertMany(docs, collection) {
+            await this.connect();
+            let insertWriteOpResult = await this.#db.collection(collection).insertMany(docs);
+            if (insertWriteOpResult.result.ok !== 1) { throw new Error(); }
         }
 
-        async getAll(db, collection) {
+        async getAll(collection) {
+            await this.connect();
+            let cursor = this.#db.collection(collection).find();
             try {
-                await this.connect();
-                let documents = await this.#client.db(db).collection(collection).find().toArray();
-                return documents;
+                return await cursor.toArray();
             }
-            finally { await this.close(); }
+            finally {
+                cursor.close();
+            }
         }
 
     }
