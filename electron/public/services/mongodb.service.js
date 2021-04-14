@@ -5,7 +5,10 @@ function serviceFn(mongoDbSettings) {
 
     class MongoDb {
 
+        /** @type {mongodb.MongoClient} */
         #client;
+
+        /** @type {mongodb.Db} */
         #db;
 
         constructor() {
