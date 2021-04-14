@@ -1,13 +1,16 @@
 const fs = require('fs');
 
 
-class Settings {
+class MongoDbSettings {
 
     hostname = 'localhost';
     port = 27017;
     username = '';
     password = '';
     #loaded = false;
+
+    static $inject = [];
+    constructor() { }
 
     save() {
         fs.writeFileSync('mongodb.json', JSON.stringify(this));
@@ -35,7 +38,5 @@ class Settings {
 
 }
 
-function serviceFn() { return new Settings(); }
 
-
-export default serviceFn;
+export default MongoDbSettings;
