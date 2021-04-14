@@ -33,11 +33,14 @@ function serviceFn(mongoDbSettings) {
 
         /**
          * Inserts an array of documents.
-         * @param {Object[]} docs Documents to insert.
+         * @param {Array.<Object>} docs Documents to insert.
          * @param {string} collection The collection name we wish to access.
          */
         async insertMany(docs, collection) {
             await this.connect();
+            for (let i in docs) {
+                docs[i]._id = mongodb.ObjectID(docs[i]._id);
+            }
             let insertWriteOpResult = await this.#db.collection(collection).insertMany(docs);
             if (insertWriteOpResult.result.ok !== 1) { throw new Error(); }
         }
@@ -45,7 +48,7 @@ function serviceFn(mongoDbSettings) {
         /**
          * Gets all documents from a collection.
          * @param {string} collection The collection name we wish to access.
-         * @returns {Object[]}
+         * @returns {Array.<Object>}
          */
         async getAll(collection) {
             await this.connect();
