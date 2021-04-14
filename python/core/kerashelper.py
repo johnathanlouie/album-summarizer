@@ -43,6 +43,7 @@ class Sequence1(Sequence):
 
 
 class TrainingStatus(enum.Enum):
+    PENDING = 'pending'
     TRAINING = 'training'
     COMPLETE = 'complete'
     NANINF = 'nan or inf error'
