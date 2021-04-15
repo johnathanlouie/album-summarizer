@@ -6,6 +6,8 @@ const fs = require('fs');
  * Interface for the cached organized view for the current directory.
  */
 class OrganizedDirFile {
+
+    /** @type {string} */
     #dir;
 
     constructor(dir) {
@@ -17,17 +19,14 @@ class OrganizedDirFile {
     }
 
     async mkdir() {
-        try {
-            return await fs.promises.access('public/data');
-        }
-        catch (err) {
-            return await fs.promises.mkdir('public/data');
+        if (!fs.existsSync('public/data')) {
+            await fs.promises.mkdir('public/data');
         }
     }
 
     async read() {
         await this.mkdir();
-        return await fs.promises.readFile(this.url());
+        return await fs.promises.readFile(this.url(), 'utf8');
     }
 
     /**
@@ -35,18 +34,12 @@ class OrganizedDirFile {
      */
     async write(json) {
         await this.mkdir();
-        return await fs.promises.writeFile(this.url(), json);
+        await fs.promises.writeFile(this.url(), json);
     }
 
     async delete() {
         await this.mkdir();
-        try {
-            await fs.promises.unlink(this.url());
-            return true;
-        }
-        catch (err) {
-            return false;
-        }
+        await fs.promises.unlink(this.url());
     }
 
     exists() {
