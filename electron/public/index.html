@@ -24,9 +24,9 @@
 
 <body ng-app="app" ng-controller="appCtrl">
 
-    <ng-view></ng-view>
+    <ng-view ng-hide="!isMain()"></ng-view>
 
-    <image-viewer ng-show="screenView.screen === 'IMAGE_VIEWER'"></image-viewer>
+    <image-viewer ng-show="isImage()"></image-viewer>
 
     <error-modal></error-modal>
 
