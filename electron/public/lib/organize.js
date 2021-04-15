@@ -49,14 +49,8 @@ class OrganizedDirFile {
         }
     }
 
-    async exists() {
-        try {
-            await fs.promises.access(this.url());
-            return true;
-        }
-        catch (err) {
-            return false;
-        }
+    exists() {
+        return fs.existsSync(this.url());
     }
 }
 

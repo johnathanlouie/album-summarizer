@@ -39,7 +39,7 @@ class CwdService {
      */
     async #organize(refresh) {
         this.#organization = null;
-        if (refresh || !await this.#dirFile.exists()) {
+        if (refresh || !this.#dirFile.exists()) {
             await this.#dirFile.delete();
             var data = await this.#queryServer(this.#path);
             this.#organization = data;
