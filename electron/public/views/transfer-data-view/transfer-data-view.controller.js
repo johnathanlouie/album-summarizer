@@ -110,12 +110,10 @@ class Controller {
         this.#scope.data = null;
         this.#scope.data = fs.readdirSync(this.#scope.newData.filepath, { withFileTypes: true }).
             filter(f => f.isFile() && ['.jpg', '.jpeg'].includes(path.extname(f.name).toLowerCase())).
-            map(f => {
-                return {
-                    image: path.join(this.#scope.newData.filepath, f.name),
-                    isLabeled: false,
-                };
-            });
+            map(f => ({
+                image: path.join(this.#scope.newData.filepath, f.name),
+                isLabeled: false,
+            }));
     }
 
     removeIds() {
