@@ -26,7 +26,7 @@ class CwdService {
         this.#path = dst;
         this.#organization = null;
         this.#dirFile = new OrganizedDirFile(dst);
-        this.#dir = await Directory.factory(dst);
+        this.#dir = new Directory(dst);
     }
 
     async goHome() { await this.cd(this.#HOME_DIR); }

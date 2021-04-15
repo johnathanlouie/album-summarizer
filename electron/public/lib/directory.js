@@ -2,28 +2,27 @@ const fs = require('fs');
 import File from './file.js';
 
 
-class Directory extends Array {
+class Directory {
+
     #path;
     #directories;
     #files;
     #images;
-    #exists;
+    #exists = false;
 
-    static async factory(url) {
-        var direntArray = [];
-        var exists = false;
-        var instance;
+    /**
+     * @param {string} filepath The path of the directory
+     */
+    constructor(filepath) {
         try {
-            direntArray = await fs.promises.readdir(url, { withFileTypes: true });
-            instance = Directory.from(direntArray.map(e => new File(e, url)));
-            exists = true;
+            let fileArray = fs.readdirSync(filepath, { withFileTypes: true }).
+                map(e => new File(e, filepath));
+            this.#directories = fileArray.filter(e => e.isDirectory());
+            this.#files = fileArray.filter(e => e.isFile());
+            this.#images = this.#files.filter(e => e.isImage());
+            this.#exists = true;
         }
-        catch (err) {
-            instance = new Directory();
-        }
-        instance.#path = url;
-        instance.#exists = exists;
-        return instance;
+        catch { }
     }
 
     get exists() {
@@ -35,23 +34,14 @@ class Directory extends Array {
     }
 
     get directories() {
-        if (this.#directories === undefined) {
-            this.#directories = this.filter(e => e.isDirectory());
-        }
         return this.#directories;
     }
 
     get files() {
-        if (this.#files === undefined) {
-            this.#files = this.filter(e => e.isFile());
-        }
         return this.#files;
     }
 
     get images() {
-        if (this.#images === undefined) {
-            this.#images = this.files.filter(e => e.isImage());
-        }
         return this.#images;
     }
 
@@ -62,6 +52,7 @@ class Directory extends Array {
     hasImages() {
         return this.images.length > 0;
     }
+
 }
 
 
