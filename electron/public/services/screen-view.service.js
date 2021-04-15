@@ -1,16 +1,30 @@
-const MAIN = 'MAIN';
-const IMAGE = 'IMAGE_VIEWER';
-const THUMBNAILS = 'THUMBNAILS';
-const DETAILS = 'DETAILS';
+class Screen {
 
+    static MAIN = 'MAIN';
+    static IMAGE = 'IMAGE_VIEWER';
 
-function serviceFn() {
-    class ScreenView {
-        screen = MAIN;
-        view = THUMBNAILS;
+}
+
+class View {
+
+    static THUMBNAILS = 'THUMBNAILS';
+    static DETAILS = 'DETAILS';
+
+}
+
+class ScreenView {
+
+    screen;
+    view;
+
+    static $inject = [];
+    constructor() {
+        this.screen = Screen.MAIN;
+        this.view = View.THUMBNAILS;
     }
-    return new ScreenView();
+
 }
 
 
-export default serviceFn;
+export default ScreenView;
+export { Screen, View };
