@@ -205,7 +205,10 @@ class KerasAdapter(object):
 
     def status(self) -> TrainingStatus:
         if self._status is None:
-            self._status = TrainingStatusData.load(self._names.status())
+            try:
+                self._status = TrainingStatusData.load(self._names.status())
+            except:
+                return TrainingStatus.PENDING
         return self._status.status
 
     def train(self) -> TrainingStatus:
@@ -489,15 +492,13 @@ class ModelSplit(object):
             self._epochs,
             self._patience,
         ) as kadapter:
-            if not kadapter.is_saved():
-                kadapter.create()
             return kadapter.status()
 
     def is_complete(self) -> bool:
         return self.status() == TrainingStatus.COMPLETE
 
     def has_error(self) -> bool:
-        return self.status() not in [TrainingStatus.TRAINING, TrainingStatus.COMPLETE]
+        return self.status() not in [TrainingStatus.TRAINING, TrainingStatus.COMPLETE, TrainingStatus.PENDING]
 
     def train(self) -> TrainingStatus:
         """
