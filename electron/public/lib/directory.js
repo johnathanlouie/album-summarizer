@@ -5,9 +5,16 @@ import File from './file.js';
 class Directory {
 
     #path;
+
+    /** @type {Array.<File>} */
     #directories;
+
+    /** @type {Array.<File>} */
     #files;
+
+    /** @type {Array.<File>} */
     #images;
+
     #exists = false;
 
     /**
@@ -15,6 +22,7 @@ class Directory {
      */
     constructor(filepath) {
         try {
+            this.#path = filepath;
             let fileArray = fs.readdirSync(filepath, { withFileTypes: true }).
                 map(e => new File(e, filepath));
             this.#directories = fileArray.filter(e => e.isDirectory());
