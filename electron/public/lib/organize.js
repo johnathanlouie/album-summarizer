@@ -18,28 +18,28 @@ class OrganizedDirFile {
         return path.normalize(`public/data/${encodeURIComponent(this.#dir)}.json`);
     }
 
-    async mkdir() {
+    mkdir() {
         if (!fs.existsSync('public/data')) {
-            await fs.promises.mkdir('public/data');
+            fs.mkdirSync('public/data');
         }
     }
 
-    async read() {
-        await this.mkdir();
-        return await fs.promises.readFile(this.url(), 'utf8');
+    read() {
+        this.mkdir();
+        return fs.readFileSync(this.url(), 'utf8');
     }
 
     /**
      * @param {string} json Organization data
      */
-    async write(json) {
-        await this.mkdir();
-        await fs.promises.writeFile(this.url(), json);
+    write(json) {
+        this.mkdir();
+        fs.writeFileSync(this.url(), json);
     }
 
-    async delete() {
-        await this.mkdir();
-        await fs.promises.unlink(this.url());
+    delete() {
+        this.mkdir();
+        fs.unlinkSync(this.url());
     }
 
     exists() {

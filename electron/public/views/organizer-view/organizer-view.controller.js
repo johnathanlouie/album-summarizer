@@ -23,13 +23,10 @@ class Controller {
         $scope.screenView = screenView;
         $scope.focusImage = focusImage;
 
-        async function goTo(dst) {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Directory Change');
+        function goTo(dst) {
             $scope.address = dst;
             $scope.filterText = '';
-            await cwd.cd(dst);
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $scope.$apply();
+            cwd.cd(dst);
         }
 
         $scope.goTo = function (dst = $scope.address) { goTo(history.push(dst)); };

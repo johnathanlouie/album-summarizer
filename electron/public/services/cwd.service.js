@@ -22,16 +22,16 @@ class CwdService {
         this.#queryServer = queryServer;
     }
 
-    async cd(dst) {
+    cd(dst) {
         this.#path = dst;
         this.#organization = null;
         this.#dirFile = new OrganizedDirFile(dst);
         this.#dir = new Directory(dst);
     }
 
-    async goHome() { await this.cd(this.#HOME_DIR); }
+    async goHome() { this.cd(this.#HOME_DIR); }
 
-    async refresh() { await this.cd(this.#path); }
+    async refresh() { this.cd(this.#path); }
 
     /**
      * 
@@ -40,14 +40,14 @@ class CwdService {
     async #organize(refresh) {
         this.#organization = null;
         if (refresh || !this.#dirFile.exists()) {
-            await this.#dirFile.delete();
+            this.#dirFile.delete();
             var data = await this.#queryServer(this.#path);
             this.#organization = data;
             var json = JSON.stringify(data);
             this.#dirFile.write(json);
         }
         else {
-            var json = await this.#dirFile.read();
+            var json = this.#dirFile.read();
             this.#organization = JSON.parse(json);
         }
     }
