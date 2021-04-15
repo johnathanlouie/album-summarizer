@@ -5,9 +5,15 @@ import OrganizedDirFile from '../lib/organize.js';
 
 class CwdService {
     #HOME_DIR = os.homedir();
+
+    /** @type {Directory} */
     #dir;
+
+    /** @type {string} */
     #path;
     #organization;
+
+    /** @type {OrganizedDirFile} */
     #dirFile;
     #queryServer;
 
