@@ -27,4 +27,4 @@ class ScreenView {
 
 
 export default ScreenView;
-export { Screen, View };
+export { Screen, View, ScreenView };
