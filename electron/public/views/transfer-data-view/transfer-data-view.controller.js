@@ -24,18 +24,18 @@ class Controller {
         this.#$scope = $scope;
         this.#$rootScope = $rootScope;
         this.#mongoDb = mongoDb;
-        $scope.load = () => this.load();
-        $scope.upload = () => this.upload();
-        $scope.download = () => this.download();
-        $scope.export = () => this.export();
-        $scope.getImages = () => this.getImages();
-        $scope.removeIds = () => this.removeIds();
         $scope.newData = {
             filepath: path.join(os.homedir(), 'Pictures'),
             recursive: true,
         };
         $scope.exportPath = path.join(process.cwd(), 'export.csv');
         $scope.data = null;
+        $scope.load = () => this.load();
+        $scope.upload = () => this.upload();
+        $scope.download = () => this.download();
+        $scope.export = () => this.export();
+        $scope.getImages = () => this.getImages();
+        $scope.removeIds = () => this.removeIds();
         this.getMongoCollections();
     }
 
