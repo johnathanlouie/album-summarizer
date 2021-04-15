@@ -1,6 +1,6 @@
-function serviceFn() {
-    return { image: 'public/image-placeholder.png' };
+class FocusImageService {
+    image = 'public/image-placeholder.png';
 }
 
 
-export default serviceFn;
+export default FocusImageService;
