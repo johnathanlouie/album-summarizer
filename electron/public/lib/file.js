@@ -1,11 +1,17 @@
 const path = require('path');
+const fs = require('fs');
 
 
 class File {
+
     #path;
     #isFile;
     #isDirectory;
 
+    /**
+     * @param {fs.Dirent} dirent Data object from fs.promises.readdir
+     * @param {string} dirname The path leading up to this file
+     */
     constructor(dirent, dirname) {
         this.#path = path.join(dirname, dirent.name);
         this.#isFile = dirent.isFile();
@@ -33,6 +39,7 @@ class File {
     isDirectory() {
         return this.#isDirectory;
     }
+
 }
 
 
