@@ -32,7 +32,7 @@ class QueryServerService {
      * @returns {Promise.<Array.<Array.<RunReturnObject>>>}
      */
     async run(dir) {
-        return (await $http.post('http://localhost:8080/run', { url: dir })).data;
+        return (await this.#http.post('http://localhost:8080/run', { url: dir })).data;
     }
 
 }
