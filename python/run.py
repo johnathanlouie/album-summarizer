@@ -94,7 +94,7 @@ class Settings(object):
             self.cluster = x['cluster']
 
 
-def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> None:
+def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> List[List[Dict[str, Any]]]:
     """
     Does all the work.
     """
