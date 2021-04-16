@@ -45,11 +45,6 @@ class RouteManager {
             '<menu-view></menu-view>',
         ),
         new Route(
-            'Organizer',
-            '/organizer',
-            '<organizer-view></organizer-view>',
-        ),
-        new Route(
             'Settings',
             '/settings',
             '<settings-view></settings-view>',
@@ -75,6 +70,14 @@ class RouteManager {
             '<transfer-data-view></transfer-data-view>',
         ),
     ];
+
+    static menu1() {
+        return RouteManager.ROUTES.filter(e => !(e.isDevTool() || e.isMenu()));
+    }
+
+    static menu2() {
+        return RouteManager.ROUTES.filter(e => e.isDevTool());
+    }
 
 }
 
