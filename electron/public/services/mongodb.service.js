@@ -56,7 +56,7 @@ class MongoDbService {
     /**
      * Gets all documents from a collection.
      * @param {string} collection The collection name we wish to access.
-     * @returns {Array.<Object>}
+     * @returns {Promise.<Array.<Object>>}
      */
     async getAll(collection) {
         await this.connect();
@@ -79,7 +79,7 @@ class MongoDbService {
      * Fetches the first document that matches the query
      * @param {Object} query Query for find operation
      * @param {string} collection The collection name we wish to access
-     * @returns {Object}
+     * @returns {Promise.<Object>}
      */
     async findOne(query, collection) {
         await this.connect();
@@ -91,7 +91,7 @@ class MongoDbService {
      * @param {Object} query Query for find operation
      * @param {number} count Number of samples to return
      * @param {string} collection The collection name we wish to access
-     * @returns {Array.<Object>}
+     * @returns {Promise.<Array.<Object>>}
      */
     async sample(query, count, collection) {
         await this.connect();
