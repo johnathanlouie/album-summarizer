@@ -4,21 +4,22 @@ import HistoryService from '../../services/cwd.service.js';
 import CwdService from '../../services/cwd.service.js';
 import ScreenViewService from '../../services/cwd.service.js';
 import FocusImageService from '../../services/cwd.service.js';
+import ModalService from '../../services/modal.service.js';
 
 
 class Controller {
 
-    static $inject = ['$scope', '$rootScope', 'history', 'cwd', 'screenView', 'focusImage'];
+    static $inject = ['$scope', 'history', 'cwd', 'screenView', 'focusImage', 'modal'];
 
     /**
      * @param {angular.IScope} $scope 
-     * @param {angular.IRootScopeService} $rootScope 
      * @param {HistoryService} history 
      * @param {CwdService} cwd 
      * @param {ScreenViewService} screenView 
      * @param {FocusImageService} focusImage 
+     * @param {ModalService} modal
      */
-    constructor($scope, $rootScope, history, cwd, screenView, focusImage) {
+    constructor($scope, history, cwd, screenView, focusImage, modal) {
         $scope.cwd = cwd;
         $scope.screenView = screenView;
         $scope.focusImage = focusImage;
@@ -56,16 +57,16 @@ class Controller {
          */
         async function organize(refresh) {
             try {
-                $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Smart Organizer', 'Organizing...');
+                modal.showLoading('ORGANIZING...');
                 if (refresh) { await cwd.reorganize(); }
                 else { await cwd.organize(); }
-                $rootScope.$broadcast('LOADING_MODAL_HIDE');
+                modal.hideLoading();
             }
             catch (err) {
                 console.error(err);
                 $scope.isOrganizeToggled = false;
-                $rootScope.$broadcast('LOADING_MODAL_HIDE');
-                $rootScope.$broadcast('ERROR_MODAL_SHOW', err, 'Error: Smart Organizer', 'Failed to organize.');
+                modal.hideLoading();
+                modal.showError(err, 'ERROR: Smart Organizer', 'Error while organizing');
             }
             finally {
                 $scope.$apply();

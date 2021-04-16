@@ -1,21 +1,30 @@
+const angular = require('angular');
 const os = require('os');
 const path = require('path');
+import ModalService from '../../services/modal.service.js';
+import OptionsService from '../../services/options.service.js';
 
 
-function controllerFn($scope, $http, $rootScope, options) {
+/**
+ * @param {angular.IScope} $scope 
+ * @param {angular.IHttpService} $http 
+ * @param {OptionsService} options 
+ * @param {ModalService} modal 
+ */
+function controllerFn($scope, $http, options, modal) {
 
     $scope.options = options;
 
     async function loadOptions() {
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Deep Learning Options', 'Retrieving...');
+            modal.showLoading('RETRIEVING...');
             await options.load();
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            modal.hideLoading();
         }
         catch (e) {
             console.error(e);
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: Deep Learning Options', '');
+            modal.hideLoading();
+            modal.showError(e, 'ERROR: Deep Learning', 'Error while fetching compile options');
         }
         $scope.$apply();
     }
@@ -24,17 +33,17 @@ function controllerFn($scope, $http, $rootScope, options) {
 
     $scope.submit = async function () {
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Cluster Algorithms', 'Clustering...');
+            modal.showLoading('CLUSTERING...');
             $scope.clusters = [];
             var url = 'http://localhost:8080/cluster';
             var response = await $http.post(url, $scope.requestParameters);
             $scope.clusters = response.data;
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            modal.hideLoading();
         }
         catch (e) {
             console.error(e);
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: Clustering Algorithms', '');
+            modal.hideLoading();
+            modal.showError(e, 'ERROR: Clustering Algorithms', 'Error while clustering');
         }
         $scope.$apply();
     };
@@ -48,7 +57,7 @@ function controllerFn($scope, $http, $rootScope, options) {
 
 }
 
-controllerFn.$inject = ['$scope', '$http', '$rootScope', 'options'];
+controllerFn.$inject = ['$scope', '$http', 'options', 'modal'];
 
 
 export default controllerFn;

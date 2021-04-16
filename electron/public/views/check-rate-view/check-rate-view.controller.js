@@ -1,4 +1,6 @@
+const angular = require('angular');
 import OptionsService from '../../services/options.service.js';
+import ModalService from '../../services/modal.service.js';
 
 
 function maxIndex(a) {
@@ -61,26 +63,26 @@ class Prediction {
 }
 
 /**
- * 
- * @param {*} $scope 
- * @param {*} $http 
- * @param {*} $rootScope 
+ * @param {angular.IScope} $scope 
+ * @param {angular.IHttpService} $http 
+ * @param {angular.IRootScopeService} $rootScope 
  * @param {OptionsService} options 
+ * @param {ModalService} modal
  */
-function controllerFn($scope, $http, $rootScope, options) {
+function controllerFn($scope, $http, $rootScope, options, modal) {
 
     $scope.options = options;
 
     async function loadOptions() {
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Deep Learning Options', 'Retrieving...');
+            modal.showLoading('RETRIEVING...');
             await options.load();
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            modal.hideLoading();
         }
         catch (e) {
             console.error(e);
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: Deep Learning Options', '');
+            modal.hideLoading();
+            modal.showError(e, 'ERROR: Deep Learning', 'Error during fetching compile options');
         }
         $scope.$apply();
     }
@@ -89,7 +91,7 @@ function controllerFn($scope, $http, $rootScope, options) {
 
     $scope.submit = async function () {
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Deep Learning', 'Predicting...');
+            modal.showLoading('PREDICTING...');
             var url = 'http://localhost:8080/predict';
             $scope.prediction = [];
             $scope.keyGuide = null;
@@ -106,13 +108,13 @@ function controllerFn($scope, $http, $rootScope, options) {
                     response.data.keyGuide,
                 ));
             }
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            modal.hideLoading();
             $scope.$apply();
         }
         catch (e) {
             console.error(e);
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: Deep Learning', '');
+            modal.hideLoading();
+            modal.showError(e, 'ERROR: Deep Learning', 'Error during prediction');
             $scope.$apply();
         }
     };
@@ -131,7 +133,7 @@ function controllerFn($scope, $http, $rootScope, options) {
 
 }
 
-controllerFn.$inject = ['$scope', '$http', '$rootScope', 'options'];
+controllerFn.$inject = ['$scope', '$http', '$rootScope', 'options', 'modal'];
 
 
 export default controllerFn;

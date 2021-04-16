@@ -1,4 +1,14 @@
-function controllerFn($scope, $rootScope, mongoDbSettings) {
+const angular = require('angular');
+import ModalService from '../../services/modal.service.js';
+import MongoDbSettingsService from '../../services/mongodb-settings.service.js';
+
+
+/**
+ * @param {angular.IScope} $scope 
+ * @param {MongoDbSettingsService} mongoDbSettings 
+ * @param {ModalService} modal 
+ */
+function controllerFn($scope, mongoDbSettings, modal) {
 
     function load() {
         try {
@@ -21,7 +31,7 @@ function controllerFn($scope, $rootScope, mongoDbSettings) {
         }
         catch (e) {
             console.error(e);
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB', 'Cannot write to MongoDB settings file.');
+            modal.showError(e, 'ERROR: Settings File', 'Cannot write to MongoDB settings file');
         }
     }
 
@@ -33,7 +43,7 @@ function controllerFn($scope, $rootScope, mongoDbSettings) {
 
 }
 
-controllerFn.$inject = ['$scope', '$rootScope', 'mongoDbSettings'];
+controllerFn.$inject = ['$scope', 'mongoDbSettings', 'modal'];
 
 
 export default controllerFn;

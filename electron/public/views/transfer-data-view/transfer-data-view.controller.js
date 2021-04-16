@@ -6,24 +6,26 @@ const parseCsv = require('csv-parse/lib/sync');
 const stringifyCsv = require('csv-stringify/lib/sync');
 const angular = require('angular');
 import MongoDbService from '../../services/mongodb.service.js';
+import ModalService from '../../services/modal.service.js';
 
 
 class Controller {
 
-    /** @type {angular.IScope} */
     #scope;
-
-    /** @type {angular.IRootScopeService} */
-    #rootScope;
-
-    /** @type {MongoDbService} */
     #mongoDb;
+    #modal;
 
-    static $inject = ['$scope', '$rootScope', 'mongoDb'];
-    constructor($scope, $rootScope, mongoDb) {
+    static $inject = ['$scope', 'mongoDb', 'modal'];
+
+    /**
+     * @param {angular.IScope} $scope 
+     * @param {MongoDbService} mongoDb 
+     * @param {ModalService} modal
+     */
+    constructor($scope, mongoDb, modal) {
         this.#scope = $scope;
-        this.#rootScope = $rootScope;
         this.#mongoDb = mongoDb;
+        this.#modal = modal;
         this.#scope.newData = {
             filepath: path.join(os.homedir(), 'Pictures'),
             recursive: true,
@@ -59,22 +61,22 @@ class Controller {
             }
             catch (e) {
                 console.error(e);
-                this.#rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: CSV', 'Loading or parsing error.');
+                this.#modal.showError(e, 'ERROR: CSV', 'Loading or parsing error');
             }
         }
     }
 
     async writeMongoDb() {
         try {
-            this.#rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Uploading...');
+            this.#modal.showLoading('UPLOADING...');
             await this.#mongoDb.insertMany(this.#scope.data, this.#scope.collectionPush);
             await this.getMongoCollections();
-            this.#rootScope.$broadcast('LOADING_MODAL_HIDE');
+            this.#modal.hideLoading();
         }
         catch (e) {
             console.error(e);
-            this.#rootScope.$broadcast('LOADING_MODAL_HIDE');
-            this.#rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Query', 'Something happened while uploading to MongoDB.');
+            this.#modal.hideLoading();
+            this.#modal.showError(e, 'ERROR: MongoDB', 'Error while inserting many');
         }
         this.#scope.$apply();
     }
@@ -82,14 +84,14 @@ class Controller {
     async readMongoDb() {
         this.#scope.data = null;
         try {
-            this.#rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Downloading...');
+            this.#modal.showLoading('RETRIEVING...');
             this.#scope.data = await this.#mongoDb.getAll(this.#scope.collectionPull);
-            this.#rootScope.$broadcast('LOADING_MODAL_HIDE');
+            this.#modal.hideLoading();
         }
         catch (e) {
             console.error(e);
-            this.#rootScope.$broadcast('LOADING_MODAL_HIDE');
-            this.#rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Query', 'Something happened while downloading from MongoDB.');
+            this.#modal.hideLoading();
+            this.#modal.showError(e, 'ERROR: MongoDB', 'Error while fetching collection');
         }
         this.#scope.$apply();
     }

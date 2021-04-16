@@ -1,4 +1,14 @@
-function controllerFn($scope, $rootScope, mongoDb) {
+const angular = require('angular');
+import ModalService from '../../services/modal.service.js';
+import MongoDbService from '../../services/mongodb.service.js';
+
+
+/**
+ * @param {angular.IScope} $scope 
+ * @param {MongoDbService} mongoDb 
+ * @param {ModalService} modal 
+ */
+function controllerFn($scope, mongoDb, modal) {
 
     function keyHandler(event) {
         switch (event.key) {
@@ -56,17 +66,17 @@ function controllerFn($scope, $rootScope, mongoDb) {
         $scope.dbCollections = null;
         $scope.selectedCollection = null;
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Retrieving list...');
+            modal.showLoading('RETRIEVING...');
             $scope.dbCollections = await mongoDb.collections();
             if ($scope.dbCollections.length > 0) {
                 $scope.selectedCollection = $scope.dbCollections[0];
             }
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            modal.hideLoading();
         }
         catch (e) {
             console.error(e);
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Query', 'Something happened while retrieving collections from MongoDB.');
+            modal.hideLoading();
+            modal.showError(e, 'ERROR: MongoDB', 'Error while fetching collections');
         }
         $scope.$apply();
     }
@@ -81,25 +91,25 @@ function controllerFn($scope, $rootScope, mongoDb) {
     async function getUnlabeledData() {
         $scope.unlabeledData = nullData;
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Querying...');
+            modal.showLoading('RETRIEVING...');
             let data = await mongoDb.sample({ isLabeled: false }, 1, $scope.selectedCollection);
             if (data.length === 0) {
                 $scope.unlabeledData = nullData;
-                $rootScope.$broadcast('LOADING_MODAL_HIDE');
-                $rootScope.$broadcast('ERROR_MODAL_SHOW', null, 'Notice: MongoDB Query', 'All data points in this collection were labeled.');
+                modal.hideLoading();
+                modal.showError(null, 'NOTICE: MongoDB', 'All data points in this collection were labeled');
             }
             else {
                 $scope.unlabeledData = data[0];
                 $scope.unlabeledData.rating = 2;
                 $scope.unlabeledData.class = 'hybrid';
                 $scope.unlabeledData.collection = $scope.selectedCollection;
-                $rootScope.$broadcast('LOADING_MODAL_HIDE');
+                modal.hideLoading();
             }
         }
         catch (e) {
             console.error(e);
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Query', 'Something happened while getting an unlabeled document from MongoDB.');
+            modal.hideLoading();
+            modal.showError(e, 'ERROR: MongoDB', 'Error while fetching an unlabeled document from MongoDB');
         }
         $scope.$apply();
     }
@@ -108,7 +118,7 @@ function controllerFn($scope, $rootScope, mongoDb) {
 
     async function updateOne() {
         try {
-            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Updating...');
+            modal.showLoading('UPDATING...');
             await mongoDb.findOneAndUpdate(
                 $scope.unlabeledData.collection,
                 { _id: $scope.unlabeledData._id },
@@ -121,8 +131,8 @@ function controllerFn($scope, $rootScope, mongoDb) {
         }
         catch (e) {
             console.error(e);
-            $rootScope.$broadcast('LOADING_MODAL_HIDE');
-            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: MongoDB Query', 'Something happened while updating one document from MongoDB.');
+            modal.hideLoading();
+            modal.showError(e, 'ERROR: MongoDB', 'Error while updating an document');
         }
     }
 
@@ -140,7 +150,7 @@ function controllerFn($scope, $rootScope, mongoDb) {
 
 }
 
-controllerFn.$inject = ['$scope', '$rootScope', 'mongoDb'];
+controllerFn.$inject = ['$scope', 'mongoDb', 'modal'];
 
 
 export default controllerFn;
