@@ -7,6 +7,7 @@ import Options from './options.service.js';
 import MongoDb from './mongodb.service.js';
 import FocusImage from './focus-image.service.js';
 import MongoDbSettings from './mongodb-settings.service.js';
+import Modal from './modal.service.js';
 
 
 const module = angular.module('services', []);
@@ -18,6 +19,7 @@ module.factory('options', Options);
 module.factory('mongoDb', MongoDb);
 module.factory('focusImage', FocusImage);
 module.factory('mongoDbSettings', MongoDbSettings);
+module.factory('modal', Modal);
 
 
 export default module.name;
