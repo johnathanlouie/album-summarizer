@@ -1,8 +1,9 @@
+import RouteManager from '../../lib/routes.js';
+
+
 function controllerFn($scope, $location) {
-    $scope.isCheckRate = function () { return $location.path() === '/devtools/check-rate'; };
-    $scope.isHist = function () { return $location.path() === '/devtools/histogram'; };
-    $scope.isRate = function () { return $location.path() === '/devtools/label-data'; };
-    $scope.isTransfer = function () { return $location.path() === '/devtools/data-transfer'; };
+    $scope.routes = function () { return RouteManager.menu2() };
+    $scope.isActive = function (route) { return $location.path() === route; };
 }
 
 controllerFn.$inject = ['$scope', '$location'];
