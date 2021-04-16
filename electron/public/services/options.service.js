@@ -34,7 +34,6 @@ class Options {
     constructor($rootScope, queryServer) {
         this.#$rootScope = $rootScope;
         this.#queryServer = queryServer;
-        this.load(false);
     }
 
     clear() {
@@ -53,23 +52,13 @@ class Options {
     async load(reload) {
         if (!this.#isLoaded || reload) {
             this.clear();
-            try {
-                this.#$rootScope.$broadcast('LOADING_MODAL_SHOW', 'Deep Learning Options', 'Retrieving...');
-                var response = await this.#queryServer.options();
-                this.architectures = response.architectures;
-                this.datasets = response.datasets;
-                this.losses = response.losses;
-                this.optimizers = response.optimizers;
-                this.clusters = response.clusters;
-                this.#isLoaded = true;
-                this.#$rootScope.$broadcast('LOADING_MODAL_HIDE');
-            }
-            catch (e) {
-                console.error(e);
-                this.#$rootScope.$broadcast('LOADING_MODAL_HIDE');
-                this.#$rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: Deep Learning Options', '');
-            }
-            this.#$rootScope.$apply();
+            var response = await this.#queryServer.options();
+            this.architectures = response.architectures;
+            this.datasets = response.datasets;
+            this.losses = response.losses;
+            this.optimizers = response.optimizers;
+            this.clusters = response.clusters;
+            this.#isLoaded = true;
         }
     }
 

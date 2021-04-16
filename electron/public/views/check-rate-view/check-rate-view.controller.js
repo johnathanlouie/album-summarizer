@@ -1,3 +1,6 @@
+import OptionsService from '../../services/options.service.js';
+
+
 function maxIndex(a) {
     return a.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
 }
@@ -57,10 +60,32 @@ class Prediction {
     }
 }
 
-
+/**
+ * 
+ * @param {*} $scope 
+ * @param {*} $http 
+ * @param {*} $rootScope 
+ * @param {OptionsService} options 
+ */
 function controllerFn($scope, $http, $rootScope, options) {
 
     $scope.options = options;
+
+    async function loadOptions() {
+        try {
+            $rootScope.$broadcast('LOADING_MODAL_SHOW', 'Deep Learning Options', 'Retrieving...');
+            await options.load();
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+        }
+        catch (e) {
+            console.error(e);
+            $rootScope.$broadcast('LOADING_MODAL_HIDE');
+            $rootScope.$broadcast('ERROR_MODAL_SHOW', e, 'Error: Deep Learning Options', '');
+        }
+        $scope.$apply();
+    }
+
+    loadOptions();
 
     $scope.submit = async function () {
         try {
