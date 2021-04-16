@@ -10,7 +10,8 @@ class Controller {
      * @param {angular.IScope} $scope 
      */
     constructor($scope) {
-        $scope.routes = RouteManager;
+        $scope.routes1 = () => RouteManager.menu1();
+        $scope.routes2 = () => RouteManager.menu2();
     }
 
 }
