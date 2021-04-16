@@ -1,6 +1,7 @@
 const os = require('os');
 import Directory from '../lib/directory.js';
 import OrganizedDirFile from '../lib/organize.js';
+import QueryServerService from './query-server.service.js';
 
 
 class CwdService {
@@ -18,6 +19,10 @@ class CwdService {
     #queryServer;
 
     static $inject = ['queryServer'];
+
+    /**
+     * @param {QueryServerService} queryServer
+     */
     constructor(queryServer) {
         this.#queryServer = queryServer;
     }
@@ -41,7 +46,7 @@ class CwdService {
         this.#organization = null;
         if (refresh || !this.#dirFile.exists()) {
             this.#dirFile.delete();
-            var data = await this.#queryServer(this.#path);
+            var data = await this.#queryServer.run(this.#path);
             this.#organization = data;
             var json = JSON.stringify(data);
             this.#dirFile.write(json);

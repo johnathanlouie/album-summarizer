@@ -1,18 +1,41 @@
-function serviceFn($http) {
+const angular = require('angular');
+
+
+/**
+ * A data object returned by the python server
+ * @typedef {Object} RunReturnObject
+ * @property {string} path
+ * @property {number} rating
+ * @property {number} cluster
+ */
+
+
+/**
+ * An interface to the python server
+ */
+class QueryServerService {
+
+    #http;
+
+    static $inject = ['$http'];
 
     /**
-     * 
-     * @param {string} dir 
+     * @param {angular.IHttpService} $http 
      */
-    async function queryServer(dir) {
-        var response = await $http.post('http://localhost:8080/run', { url: dir });
-        return response.data.data;
+    constructor($http) {
+        this.#http = $http;
     }
 
-    return queryServer;
+    /**
+     * Rates and clusters images
+     * @param {string} dir Filepath of the directory of images to rate and cluster
+     * @returns {Promise.<Array.<Array.<RunReturnObject>>>}
+     */
+    async run(dir) {
+        return (await $http.post('http://localhost:8080/run', { url: dir })).data;
+    }
+
 }
 
-serviceFn.$inject = ['$http'];
 
-
-export default serviceFn;
+export default QueryServerService;
