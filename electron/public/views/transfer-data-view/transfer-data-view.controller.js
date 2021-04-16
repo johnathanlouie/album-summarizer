@@ -30,16 +30,16 @@ class Controller {
         };
         this.#scope.exportPath = path.join(process.cwd(), 'export.csv');
         this.#scope.data = null;
-        this.#scope.load = () => this.load();
-        this.#scope.upload = () => this.upload();
-        this.#scope.download = () => this.download();
-        this.#scope.export = () => this.export();
+        this.#scope.load = () => this.readCsv();
+        this.#scope.upload = () => this.writeMongoDb();
+        this.#scope.download = () => this.readMongoDb();
+        this.#scope.export = () => this.writeCsv();
         this.#scope.getImages = () => this.getImages();
         this.#scope.removeIds = () => this.removeIds();
         this.getMongoCollections();
     }
 
-    load() {
+    readCsv() {
         this.#scope.data = null;
         if (this.#scope.file1.length > 0) {
             try {
@@ -64,7 +64,7 @@ class Controller {
         }
     }
 
-    async upload() {
+    async writeMongoDb() {
         try {
             this.#rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Uploading...');
             await this.#mongoDb.insertMany(this.#scope.data, this.#scope.collectionPush);
@@ -79,7 +79,7 @@ class Controller {
         this.#scope.$apply();
     }
 
-    async download() {
+    async readMongoDb() {
         this.#scope.data = null;
         try {
             this.#rootScope.$broadcast('LOADING_MODAL_SHOW', 'MongoDB', 'Downloading...');
@@ -94,7 +94,7 @@ class Controller {
         this.#scope.$apply();
     }
 
-    export() {
+    writeCsv() {
         fs.writeFileSync(this.#scope.exportPath, stringifyCsv(this.#scope.data, {
             columns: [
                 { key: 'image' },
@@ -116,12 +116,16 @@ class Controller {
             }));
     }
 
+    /** Removes the _id property of documents so they can be inserted into MongoDB */
     removeIds() {
         for (let i of this.#scope.data) {
             delete i._id;
         }
     }
 
+    /**
+     * Gets the names of all the collections in MongoDB so the user can select which collection to pull from
+     */
     async getMongoCollections() {
         this.#scope.collections = await this.#mongoDb.collections();
         if (this.#scope.collections.length > 0) {
