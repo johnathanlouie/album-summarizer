@@ -11,11 +11,23 @@ const angular = require('angular');
 
 
 /**
+ * Compile options for the deep learning model
+ * @typedef {Object} OptionsReturnObject
+ * @property {Array.<string>} architectures
+ * @property {Array.<string>} datasets
+ * @property {Array.<string>} losses
+ * @property {Array.<string>} optimizers
+ * @property {Array.<string>} clusters
+ */
+
+
+/**
  * An interface to the python server
  */
 class QueryServerService {
 
     #http;
+    #serverUrl = 'http://localhost:8080';
 
     static $inject = ['$http'];
 
@@ -32,7 +44,15 @@ class QueryServerService {
      * @returns {Promise.<Array.<Array.<RunReturnObject>>>}
      */
     async run(dir) {
-        return (await this.#http.post('http://localhost:8080/run', { url: dir })).data;
+        return (await this.#http.post(`${this.#serverUrl}/run`, { url: dir })).data;
+    }
+
+    /**
+     * Fetches compile options for the model
+     * @returns {Promise.<OptionsReturnObject>}
+     */
+    async options() {
+        return (await this.#$http.get(`${this.#serverUrl}/options`)).data;
     }
 
 }
