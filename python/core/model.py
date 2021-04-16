@@ -1,5 +1,6 @@
 import gc
 import json
+import os
 from enum import Enum, auto
 from os.path import isfile
 from typing import Any, Dict, List, Union
@@ -55,6 +56,15 @@ class ModelSplitName2(object):
     def early(self) -> Url:
         return '%s/early.dill' % self.dirname
 
+    def list_all(self) -> List[Url]:
+        return [
+            self.weights(),
+            self.mcp(),
+            self.lr(),
+            self.epoch(),
+            self.early(),
+        ]
+
 
 class ModelSplitName(object):
     """
@@ -91,6 +101,13 @@ class ModelSplitName(object):
 
     def status(self) -> Url:
         return '%s/status.txt' % self.dirname()
+
+    def list_all(self) -> List[Url]:
+        return [
+            self.status(),
+            self.log(),
+            self.predictions(),
+        ] + self.best.list_all() + self.latest.list_all()
 
 
 class Evaluation(dict):
@@ -455,11 +472,24 @@ class KerasAdapter(object):
             self._status.status = TrainingStatus.RESOURCE2
             self._status.save()
 
-    def delete(self) -> None:
+    def delete(self, keep_history: bool) -> None:
         """
         Deletes the model file and other training state files.
         """
-        raise NotImplementedError
+        if keep_history:
+            files = self._names.best.list_all() + self._names.latest.list_all()
+        else:
+            files = self._names.list_all()
+        for f in files:
+            try:
+                os.remove(f)
+            except:
+                pass
+        if keep_history:
+            os.rmdir(self._names.best.dirname())
+            os.rmdir(self._names.latest.dirname())
+        else:
+            os.rmdir(self._names.dirname())
 
     def close(self) -> None:
         """
