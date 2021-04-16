@@ -69,6 +69,11 @@ class RouteManager {
             '/devtools/data-transfer',
             '<transfer-data-view></transfer-data-view>',
         ),
+        new Route(
+            'Check Status',
+            '/devtools/check-status',
+            '<status-view></status-view>',
+        ),
     ];
 
     static menu1() {
