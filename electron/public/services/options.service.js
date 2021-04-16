@@ -1,44 +1,66 @@
 const angular = require('angular');
+import QueryServerService from './query-server.service.js';
 
 
 class Options {
 
     #isLoaded = false;
+
+    /** @type {Array.<string>} */
     architectures = [];
+
+    /** @type {Array.<string>} */
     datasets = [];
+
+    /** @type {Array.<string>} */
     losses = [];
+
+    /** @type {Array.<string>} */
     optimizers = [];
+
+    /** @type {Array.<string>} */
     clusters = [];
 
-    /** @type angular.IRootScopeService */
     #$rootScope;
+    #queryServer;
 
-    /** @type angular.IHttpService */
-    #$http;
+    static $inject = ['$rootScope', 'queryServer'];
 
-    static $inject = ['$rootScope', '$http'];
-    constructor($rootScope, $http) {
+    /**
+     * 
+     * @param {angular.IRootScopeService} $rootScope 
+     * @param {QueryServerService} queryServer 
+     */
+    constructor($rootScope, queryServer) {
         this.#$rootScope = $rootScope;
-        this.#$http = $http;
+        this.#queryServer = queryServer;
         this.load(false);
     }
 
+    clear() {
+        this.#isLoaded = false;
+        this.architectures = [];
+        this.datasets = [];
+        this.losses = [];
+        this.optimizers = [];
+        this.clusters = [];
+    }
+
+    /**
+     * Fetches compile options for the deep learning model
+     * @param {boolean} reload Forces a refresh
+     */
     async load(reload) {
         if (!this.#isLoaded || reload) {
+            this.clear();
             try {
-                this.#isLoaded = false;
                 this.#$rootScope.$broadcast('LOADING_MODAL_SHOW', 'Deep Learning Options', 'Retrieving...');
-                this.architectures = [];
-                this.datasets = [];
-                this.losses = [];
-                this.optimizers = [];
-                this.clusters = [];
-                var response = await this.#$http.get('http://localhost:8080/options');
-                this.architectures = response.data.architectures;
-                this.datasets = response.data.datasets;
-                this.losses = response.data.losses;
-                this.optimizers = response.data.optimizers;
-                this.clusters = response.data.clusters;
+                var response = await this.#queryServer.options();
+                this.architectures = response.architectures;
+                this.datasets = response.datasets;
+                this.losses = response.losses;
+                this.optimizers = response.optimizers;
+                this.clusters = response.clusters;
                 this.#isLoaded = true;
                 this.#$rootScope.$broadcast('LOADING_MODAL_HIDE');
             }

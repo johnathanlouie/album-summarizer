@@ -52,7 +52,7 @@ class QueryServerService {
      * @returns {Promise.<OptionsReturnObject>}
      */
     async options() {
-        return (await this.#$http.get(`${this.#serverUrl}/options`)).data;
+        return (await this.#http.get(`${this.#serverUrl}/options`)).data;
     }
 
 }
