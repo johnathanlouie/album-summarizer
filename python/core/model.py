@@ -482,17 +482,27 @@ class KerasAdapter(object):
             files = self._names.list_all()
         for f in files:
             try:
+                print("DELETE FILE: %s" % f)
                 os.remove(f)
             except:
                 pass
-        try:
-            if keep_history:
+        if keep_history:
+            try:
+                print("DELETE DIRECTORY: %s" % f)
                 os.rmdir(self._names.best.dirname())
+            except:
+                pass
+            try:
+                print("DELETE DIRECTORY: %s" % f)
                 os.rmdir(self._names.latest.dirname())
-            else:
+            except:
+                pass
+        else:
+            try:
+                print("DELETE DIRECTORY: %s" % f)
                 os.rmdir(self._names.dirname())
-        except:
-            pass
+            except:
+                pass
 
     def close(self) -> None:
         """
