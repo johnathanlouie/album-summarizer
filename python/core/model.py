@@ -485,11 +485,14 @@ class KerasAdapter(object):
                 os.remove(f)
             except:
                 pass
-        if keep_history:
-            os.rmdir(self._names.best.dirname())
-            os.rmdir(self._names.latest.dirname())
-        else:
-            os.rmdir(self._names.dirname())
+        try:
+            if keep_history:
+                os.rmdir(self._names.best.dirname())
+                os.rmdir(self._names.latest.dirname())
+            else:
+                os.rmdir(self._names.dirname())
+        except:
+            pass
 
     def close(self) -> None:
         """
@@ -649,6 +652,15 @@ class ModelSplit(object):
                 kadapter.create()
             kadapter.load()
             return kadapter.predict_test_set(simple)
+
+    def delete(self, keep_history: bool) -> None:
+        with KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        ) as kadapter:
+            kadapter.delete(keep_history)
 
 
 class BadModelSettings(ValueError):
