@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import os
 import sys
 import warnings
 from abc import ABC, abstractmethod
@@ -71,6 +72,9 @@ class TrainingStatusData(object):
 
     def has_error(self) -> bool:
         return self.status not in [TrainingStatus.TRAINING, TrainingStatus.COMPLETE]
+
+    def delete(self) -> None:
+        os.remove(self._url)
 
     @classmethod
     def load(cls, url: Url, verbose: bool = True) -> TrainingStatusData:
