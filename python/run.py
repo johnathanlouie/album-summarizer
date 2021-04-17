@@ -280,8 +280,10 @@ if __name__ == '__main__':
                     'dataset': dataset,
                     'loss': loss,
                     'optimizer': optimizer,
+                    'metrics': 'acc',
                     'epochs': 0,
                     'patience': 3,
+                    'split': 0,
                 }
                 try:
                     model = ModelBuilder.create(
