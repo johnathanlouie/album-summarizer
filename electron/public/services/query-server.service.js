@@ -130,6 +130,14 @@ class QueryServerService {
         return (await this.#http.get(`${this.#serverUrl}/evaluate/all/0`)).data;
     }
 
+    /**
+     * @param {ModelDescription} model
+     * @returns {Promise.<EvaluationReturnObject>}
+     */
+    async evaluate(model) {
+        return (await this.#http.post(`${this.#serverUrl}/evaluate`, model)).data;
+    }
+
 }
 
 

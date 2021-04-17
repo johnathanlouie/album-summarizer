@@ -1,3 +1,34 @@
 <devtools-navbar></devtools-navbar>
 
-<div class="container-fluid"></div>
+<div class="container-fluid">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Model</th>
+                <th scope="col">Status</th>
+                <th scope="col">Training</th>
+                <th scope="col">Validation</th>
+                <th scope="col">Test</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="eval in evaluations">
+                <td>
+                    <pre>{{ eval.model | json }}</pre>
+                </td>
+                <td>
+                    <pre>{{ eval.status }}</pre>
+                </td>
+                <td>
+                    <pre>{{ eval.training | json }}</pre>
+                </td>
+                <td>
+                    <pre>{{ eval.validation | json }}</pre>
+                </td>
+                <td>
+                    <pre>{{ eval.test | json }}</pre>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

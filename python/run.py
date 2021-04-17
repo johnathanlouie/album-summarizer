@@ -96,14 +96,14 @@ class Settings(object):
             self.cluster = x['cluster']
 
 
-class Evaluation(object):
-    def __init__(self, model, status, training=None, validation=None, test=None):
-        super().__init__()
-        self.model = model
-        self.status = status
-        self.training = training
-        self.validation = validation
-        self.test = test
+def Evaluation(model, status, training=None, validation=None, test=None):
+    return {
+        'model': model,
+        'status': status,
+        'training': training,
+        'validation': validation,
+        'test': test,
+    }
 
 
 def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> List[List[Dict[str, Any]]]:
@@ -270,6 +270,44 @@ if __name__ == '__main__':
             response.status = 'Error: Unknown'
             return response
 
+    @app.route('/evaluate', methods=['POST'])
+    def evaluate():
+        if not flask.request.is_json:
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Not JSON'
+            return response
+        try:
+            settings = flask.request.get_json()
+            model = ModelBuilder.create(
+                settings['architecture'],
+                settings['dataset'],
+                settings['loss'],
+                settings['optimizer'],
+                settings['metrics'],
+                settings['epochs'],
+                settings['patience'],
+            )
+            split = model.split(settings['split'])
+            status = str(split.status())
+            if split.is_complete():
+                training = split.evaluate_training_set()
+                validation = split.evaluate_validation_set()
+                test = split.evaluate_test_set()
+                return flask.jsonify(Evaluation(settings, status, training, validation, test))
+            else:
+                return flask.jsonify(Evaluation(settings, status))
+        except ModelStateMissingError:
+            return flask.jsonify(Evaluation(settings, 'model state missing'))
+        except BadModelSettings:
+            return flask.jsonify(Evaluation(settings, 'incompatible'))
+        except:
+            print_exc()
+            response = flask.Response()
+            response.status_code = 500
+            response.status = 'Error: Unknown'
+            return response
+
     @app.route('/evaluate/all/0', methods=['GET'])
     def evaluate_all_0():
         try:
@@ -296,7 +334,7 @@ if __name__ == '__main__':
                         3,
                     )
                     split = model.split(0)
-                    status = split.status()
+                    status = str(split.status())
                     if split.is_complete():
                         training = split.evaluate_training_set()
                         validation = split.evaluate_validation_set()
