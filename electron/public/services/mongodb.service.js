@@ -122,6 +122,15 @@ class MongoDbService {
         if ((await this.#db.collection(collection).findOneAndUpdate(filter, update)).ok !== 1) { throw new Error(); }
     }
 
+    /**
+     * Inserts data into MongoDB
+     * @param {string} collection The name of the collection
+     * @param {Object} doc Data to be inserted
+     */
+    async insertOne(collection, doc) {
+        if ((await this.#db.collection(collection).insertOne(doc)).result.ok !== 1) { throw new Error(); }
+    }
+
 }
 
 
