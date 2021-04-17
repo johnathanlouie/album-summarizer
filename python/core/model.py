@@ -179,6 +179,14 @@ class Prediction(object):
         json.dump(self.get_dict(), open(url, 'w'))
 
 
+class TrainingIncompleteException(RuntimeError):
+    pass
+
+
+class ModelStatusMissingError(FileNotFoundError):
+    pass
+
+
 class KerasAdapter(object):
     """
     Wrapper class that encapsulates how the model and training state is saved and loaded.
@@ -562,6 +570,8 @@ class ModelSplit(object):
         """
         Measures the effectiveness of the model against the training set
         """
+        if not self.is_complete():
+            raise TrainingIncompleteException()
         with KerasAdapter(
             self._architecture,
             self._data,
@@ -569,7 +579,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                kadapter.create()
+                raise ModelStatusMissingError()
             kadapter.load()
             return kadapter.evaluate_training_set()
 
@@ -577,6 +587,8 @@ class ModelSplit(object):
         """
         Measures the effectiveness of the model against the validation set
         """
+        if not self.is_complete():
+            raise TrainingIncompleteException()
         with KerasAdapter(
             self._architecture,
             self._data,
@@ -584,7 +596,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                kadapter.create()
+                raise ModelStatusMissingError()
             kadapter.load()
             return kadapter.evaluate_validation_set()
 
@@ -592,6 +604,8 @@ class ModelSplit(object):
         """
         Measures the effectiveness of the model against the test set
         """
+        if not self.is_complete():
+            raise TrainingIncompleteException()
         with KerasAdapter(
             self._architecture,
             self._data,
@@ -599,7 +613,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                kadapter.create()
+                raise ModelStatusMissingError()
             kadapter.load()
             return kadapter.evaluate_test_set()
 
@@ -607,6 +621,8 @@ class ModelSplit(object):
         """
         Takes the input and returns an output
         """
+        if not self.is_complete():
+            raise TrainingIncompleteException()
         with KerasAdapter(
             self._architecture,
             self._data,
@@ -614,7 +630,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                kadapter.create()
+                raise ModelStatusMissingError()
             kadapter.load()
             return kadapter.predict(images, simple)
 
@@ -622,6 +638,8 @@ class ModelSplit(object):
         """
         Takes the input and returns an output
         """
+        if not self.is_complete():
+            raise TrainingIncompleteException()
         with KerasAdapter(
             self._architecture,
             self._data,
@@ -629,7 +647,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                kadapter.create()
+                raise ModelStatusMissingError()
             kadapter.load()
             return kadapter.predict_training_set(simple)
 
@@ -637,6 +655,8 @@ class ModelSplit(object):
         """
         Takes the input and returns an output
         """
+        if not self.is_complete():
+            raise TrainingIncompleteException()
         with KerasAdapter(
             self._architecture,
             self._data,
@@ -644,7 +664,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                kadapter.create()
+                raise ModelStatusMissingError()
             kadapter.load()
             return kadapter.predict_validation_set(simple)
 
@@ -652,6 +672,8 @@ class ModelSplit(object):
         """
         Takes the input and returns an output
         """
+        if not self.is_complete():
+            raise TrainingIncompleteException()
         with KerasAdapter(
             self._architecture,
             self._data,
@@ -659,7 +681,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                kadapter.create()
+                raise ModelStatusMissingError()
             kadapter.load()
             return kadapter.predict_test_set(simple)
 
