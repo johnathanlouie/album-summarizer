@@ -1,6 +1,7 @@
 const angular = require('angular');
 import OptionsService from '../../services/options.service.js';
 import ModalService from '../../services/modal.service.js';
+import QueryServerService from '../../services/query-server.service.js';
 
 
 function maxIndex(a) {
@@ -64,12 +65,11 @@ class Prediction {
 
 /**
  * @param {angular.IScope} $scope 
- * @param {angular.IHttpService} $http 
- * @param {angular.IRootScopeService} $rootScope 
  * @param {OptionsService} options 
  * @param {ModalService} modal
+ * @param {QueryServerService} queryServer
  */
-function controllerFn($scope, $http, $rootScope, options, modal) {
+function controllerFn($scope, options, modal, queryServer) {
 
     $scope.options = options;
 
@@ -92,20 +92,19 @@ function controllerFn($scope, $http, $rootScope, options, modal) {
     $scope.submit = async function () {
         try {
             modal.showLoading('PREDICTING...');
-            var url = 'http://localhost:8080/predict';
             $scope.prediction = [];
             $scope.keyGuide = null;
-            var response = await $http.post(url, $scope.selectedOptions);
-            $scope.keyGuide = response.data.keyGuide;
+            var response = await queryServer.predict($scope.selectedOptions);
+            $scope.keyGuide = response.keyGuide;
             if ($scope.keyGuide === null) {
-                response.data.prediction.y.predicted = _.flatten(response.data.prediction.y.predicted);
+                response.prediction.y.predicted = _.flatten(response.prediction.y.predicted);
             }
-            for (let i in response.data.prediction.x) {
+            for (let i in response.prediction.x) {
                 $scope.prediction.push(new Prediction(
-                    response.data.prediction.x[i],
-                    response.data.prediction.y.predicted[i],
-                    response.data.prediction.y.truth[i],
-                    response.data.keyGuide,
+                    response.prediction.x[i],
+                    response.prediction.y.predicted[i],
+                    response.prediction.y.truth[i],
+                    response.keyGuide,
                 ));
             }
             modal.hideLoading();
@@ -133,7 +132,7 @@ function controllerFn($scope, $http, $rootScope, options, modal) {
 
 }
 
-controllerFn.$inject = ['$scope', '$http', '$rootScope', 'options', 'modal'];
+controllerFn.$inject = ['$scope', 'options', 'modal', 'queryServer'];
 
 
 export default controllerFn;

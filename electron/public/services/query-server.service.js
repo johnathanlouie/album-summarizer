@@ -2,6 +2,33 @@ const angular = require('angular');
 
 
 /**
+ * Model settings
+ * @typedef {Object} ModelDescription
+ * @property {string} phase
+ * @property {string} architecture
+ * @property {string} dataset
+ * @property {string} loss
+ * @property {string} optimizer
+ * @property {string} metrics
+ * @property {number} epochs
+ * @property {number} patience
+ * @property {number} split
+ */
+
+
+/**
+ * Prediction results
+ * @typedef {Object} PredictReturnObject
+ * @property {Object} prediction
+ * @property {Array.<string>} prediction.x
+ * @property {Object} prediction.y
+ * @property {Array.<string> | Array.<number>} prediction.y.predicted
+ * @property {Array.<string> | Array.<number>} prediction.y.truth
+ * @property {Array.<string>} keyGuide
+ */
+
+
+/**
  * A data object returned by the python server
  * @typedef {Object} RunReturnObject
  * @property {string} path
@@ -53,6 +80,15 @@ class QueryServerService {
      */
     async options() {
         return (await this.#http.get(`${this.#serverUrl}/options`)).data;
+    }
+
+    /**
+     * Classifies or rates the model's training, validation, or test set
+     * @param {ModelDescription} model Data object that describes that model to use
+     * @returns {Promise.<PredictReturnObject>}
+     */
+    async predict(model) {
+        return (await this.#http.post(`${this.#serverUrl}/predict`, model)).data;
     }
 
 }
