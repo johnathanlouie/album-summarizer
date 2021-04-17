@@ -9,6 +9,7 @@ import flask
 
 import aaa
 import addon
+from builds import builds
 from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
                           ClusterResults, ClusterStrategy)
 from core.model import (BadModelSettings, ModelSplit, ModelStateMissingError,
@@ -93,6 +94,16 @@ class Settings(object):
             self.patience = x['patience']
             self.split = x['split']
             self.cluster = x['cluster']
+
+
+class Evaluation(object):
+    def __init__(self, model, status, training=None, validation=None, test=None):
+        super().__init__()
+        self.model = model
+        self.status = status
+        self.training = training
+        self.validation = validation
+        self.test = test
 
 
 def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> List[List[Dict[str, Any]]]:
@@ -252,6 +263,50 @@ if __name__ == '__main__':
             response.status_code = 400
             response.status = 'Error: Unknown clustering algorithm'
             return response
+        except:
+            print_exc()
+            response = flask.Response()
+            response.status_code = 500
+            response.status = 'Error: Unknown'
+            return response
+
+    @app.route('/evaluate/all/0', methods=['GET'])
+    def evaluate_all_0():
+        try:
+            results = []
+            for architecture, dataset, loss, optimizer in builds():
+                settings = {
+                    'architecture': architecture,
+                    'dataset': dataset,
+                    'loss': loss,
+                    'optimizer': optimizer,
+                    'epochs': 0,
+                    'patience': 3,
+                }
+                try:
+                    model = ModelBuilder.create(
+                        architecture,
+                        dataset,
+                        loss,
+                        optimizer,
+                        'acc',
+                        0,
+                        3,
+                    )
+                    split = model.split(0)
+                    status = split.status()
+                    if split.is_complete():
+                        training = split.evaluate_training_set()
+                        validation = split.evaluate_validation_set()
+                        test = split.evaluate_test_set()
+                        results.append(Evaluation(settings, status, training, validation, test))
+                    else:
+                        results.append(Evaluation(settings, status))
+                except ModelStateMissingError:
+                    results.append(Evaluation(settings, 'model state missing'))
+                except BadModelSettings:
+                    results.append(Evaluation(settings, 'incompatible'))
+            return flask.jsonify(results)
         except:
             print_exc()
             response = flask.Response()
