@@ -183,7 +183,7 @@ class TrainingIncompleteException(RuntimeError):
     pass
 
 
-class ModelStatusMissingError(FileNotFoundError):
+class ModelStateMissingError(FileNotFoundError):
     pass
 
 
@@ -579,7 +579,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                raise ModelStatusMissingError()
+                raise ModelStateMissingError()
             kadapter.load()
             return kadapter.evaluate_training_set()
 
@@ -596,7 +596,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                raise ModelStatusMissingError()
+                raise ModelStateMissingError()
             kadapter.load()
             return kadapter.evaluate_validation_set()
 
@@ -613,7 +613,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                raise ModelStatusMissingError()
+                raise ModelStateMissingError()
             kadapter.load()
             return kadapter.evaluate_test_set()
 
@@ -630,7 +630,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                raise ModelStatusMissingError()
+                raise ModelStateMissingError()
             kadapter.load()
             return kadapter.predict(images, simple)
 
@@ -647,7 +647,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                raise ModelStatusMissingError()
+                raise ModelStateMissingError()
             kadapter.load()
             return kadapter.predict_training_set(simple)
 
@@ -664,7 +664,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                raise ModelStatusMissingError()
+                raise ModelStateMissingError()
             kadapter.load()
             return kadapter.predict_validation_set(simple)
 
@@ -681,7 +681,7 @@ class ModelSplit(object):
             self._patience,
         ) as kadapter:
             if not kadapter.is_saved():
-                raise ModelStatusMissingError()
+                raise ModelStateMissingError()
             kadapter.load()
             return kadapter.predict_test_set(simple)
 

@@ -11,7 +11,8 @@ import aaa
 import addon
 from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
                           ClusterResults, ClusterStrategy)
-from core.model import BadModelSettings, ModelSplit
+from core.model import (BadModelSettings, ModelSplit, ModelStateMissingError,
+                        TrainingIncompleteException)
 from core.modelbuilder import ModelBuilder
 from jl import ImageDirectory
 from typing2 import Url
@@ -138,6 +139,16 @@ if __name__ == '__main__':
             split = model.split(settings.split)
             results = main(directory, cluster, split)
             return results
+        except TrainingIncompleteException:
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Training incomplete'
+            return response
+        except ModelStateMissingError:
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Model state missing'
+            return response
         except BadModelSettings:
             response = flask.Response()
             response.status_code = 400
@@ -200,6 +211,16 @@ if __name__ == '__main__':
                 'keyGuide': key_guide,
                 'prediction': results,
             })
+        except TrainingIncompleteException:
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Training incomplete'
+            return response
+        except ModelStateMissingError:
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Model state missing'
+            return response
         except BadModelSettings:
             response = flask.Response()
             response.status_code = 400
