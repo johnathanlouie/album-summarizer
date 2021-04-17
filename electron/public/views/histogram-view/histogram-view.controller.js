@@ -3,15 +3,16 @@ const os = require('os');
 const path = require('path');
 import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
+import QueryServerService from '../../services/query-server.service.js';
 
 
 /**
  * @param {angular.IScope} $scope 
- * @param {angular.IHttpService} $http 
  * @param {OptionsService} options 
  * @param {ModalService} modal 
+ * @param {QueryServerService} queryServer
  */
-function controllerFn($scope, $http, options, modal) {
+function controllerFn($scope, options, modal, queryServer) {
 
     $scope.options = options;
 
@@ -35,9 +36,10 @@ function controllerFn($scope, $http, options, modal) {
         try {
             modal.showLoading('CLUSTERING...');
             $scope.clusters = [];
-            var url = 'http://localhost:8080/cluster';
-            var response = await $http.post(url, $scope.requestParameters);
-            $scope.clusters = response.data;
+            $scope.clusters = await queryServer.cluster(
+                $scope.requestParameters.cluster,
+                $scope.requestParameters.directory,
+            );
             modal.hideLoading();
         }
         catch (e) {
@@ -57,7 +59,7 @@ function controllerFn($scope, $http, options, modal) {
 
 }
 
-controllerFn.$inject = ['$scope', '$http', 'options', 'modal'];
+controllerFn.$inject = ['$scope', 'options', 'modal', 'queryServer'];
 
 
 export default controllerFn;

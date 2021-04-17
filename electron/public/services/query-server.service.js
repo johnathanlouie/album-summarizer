@@ -49,6 +49,14 @@ const angular = require('angular');
 
 
 /**
+ * Which clustering algorithm to use on which directory
+ * @typedef {Object} ClusterParameters
+ * @property {string} cluster
+ * @property {string} directory
+ */
+
+
+/**
  * An interface to the python server
  */
 class QueryServerService {
@@ -89,6 +97,19 @@ class QueryServerService {
      */
     async predict(model) {
         return (await this.#http.post(`${this.#serverUrl}/predict`, model)).data;
+    }
+
+    /**
+     * Clusters the images in a directory
+     * @param {string} algorithm 
+     * @param {string} directory 
+     * @returns {Promise.<Array.<Array.<string>>>}
+     */
+    async cluster(algorithm, directory) {
+        return (await this.#http.post(`${this.#serverUrl}/cluster`, {
+            cluster: algorithm,
+            directory: directory,
+        })).data;
     }
 
 }
