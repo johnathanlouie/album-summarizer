@@ -118,6 +118,7 @@ class MongoDbService {
      * @param {Object} update The operations to be performed on the document
      */
     async findOneAndUpdate(collection, filter, update) {
+        await this.connect();
         update = { $set: update };
         if ((await this.#db.collection(collection).findOneAndUpdate(filter, update)).ok !== 1) { throw new Error(); }
     }
@@ -128,6 +129,7 @@ class MongoDbService {
      * @param {Object} doc Data to be inserted
      */
     async insertOne(collection, doc) {
+        await this.connect();
         if ((await this.#db.collection(collection).insertOne(doc)).result.ok !== 1) { throw new Error(); }
     }
 
