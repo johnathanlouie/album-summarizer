@@ -57,6 +57,17 @@ const angular = require('angular');
 
 
 /**
+ * Evaluation and status of a deep learning model
+ * @typedef {Object} EvaluationReturnObject
+ * @property {ModelDescription} model
+ * @property {string} status
+ * @property {?Object} training
+ * @property {?Object} validation
+ * @property {?Object} test
+ */
+
+
+/**
  * An interface to the python server
  */
 class QueryServerService {
@@ -110,6 +121,13 @@ class QueryServerService {
             cluster: algorithm,
             directory: directory,
         })).data;
+    }
+
+    /**
+     * @returns {Promise.<Array.<EvaluationReturnObject>>}
+     */
+    async evaluateAll() {
+        return (await this.#http.get(`${this.#serverUrl}/evaluate/all/0`)).data;
     }
 
 }
