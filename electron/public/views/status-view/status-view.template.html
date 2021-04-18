@@ -1,6 +1,23 @@
 <devtools-navbar></devtools-navbar>
 
 <div class="container-fluid">
+
+    <div class="form-row">
+        <div class="col">
+            <div class="spinner-grow text-warning" role="status" ng-if="isRunning">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <div class="col-auto">
+            <div class="btn-group-toggle" data-toggle="buttons">
+                <label class="btn"
+                    ng-class="{ 'btn-info': keepGoing, 'btn-secondary': !keepGoing, 'active': keepGoing }">
+                    <input type="checkbox" ng-model="keepGoing"> Recursive
+                </label>
+            </div>
+        </div>
+    </div>
+
     <table class="table">
         <thead>
             <tr>
@@ -31,4 +48,5 @@
             </tr>
         </tbody>
     </table>
+
 </div>
