@@ -52,29 +52,13 @@ class Controller {
         $scope.progressBar = progressBar;
 
         async function doAll() {
-            for (let a of options.architectures) {
-                for (let d of options.datasets) {
-                    for (let l of options.losses) {
-                        for (let o of options.optimizers) {
-                            let model = {
-                                architecture: a,
-                                dataset: d,
-                                loss: l,
-                                optimizer: o,
-                                metrics: 'acc',
-                                epochs: 0,
-                                patience: 3,
-                                split: 0,
-                            };
-                            if (!isEvaluated(model)) {
-                                $scope.$apply();
-                                let result = await queryServer.evaluate(model);
-                                await mongoDb.insertOne('evaluations', result);
-                                $scope.evaluations.push(result);
-                                $scope.$apply();
-                            }
-                        }
-                    }
+            for (let model of options.models()) {
+                if (!isEvaluated(model)) {
+                    $scope.$apply();
+                    let result = await queryServer.evaluate(model);
+                    await mongoDb.insertOne('evaluations', result);
+                    $scope.evaluations.push(result);
+                    $scope.$apply();
                 }
             }
         }

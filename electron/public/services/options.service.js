@@ -62,7 +62,27 @@ class Options {
         }
     }
 
-}
+    *models() {
+        for (let a of options.architectures) {
+            for (let d of options.datasets) {
+                for (let l of options.losses) {
+                    for (let o of options.optimizers) {
+                        yield {
+                            architecture: a,
+                            dataset: d,
+                            loss: l,
+                            optimizer: o,
+                            metrics: 'acc',
+                            epochs: 0,
+                            patience: 3,
+                            split: 0,
+                        };
+                    }
+                }
+            }
+        }
+    }
 
+}
 
 export default Options;
