@@ -25,8 +25,6 @@ class Controller {
         this.#queryServer = queryServer;
         this.#modal = modal;
 
-        $scope.keepGoing = true;
-
         async function loadOptions() {
             await options.load();
         }
@@ -63,9 +61,6 @@ class Controller {
                 for (let d of options.datasets) {
                     for (let l of options.losses) {
                         for (let o of options.optimizers) {
-                            if (!$scope.keepGoing) {
-                                return;
-                            }
                             let model = {
                                 architecture: a,
                                 dataset: d,
