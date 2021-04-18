@@ -1,4 +1,5 @@
 const angular = require('angular');
+const _ = require('lodash');
 import QueryServerService from '../../services/query-server.service.js';
 import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
@@ -33,16 +34,10 @@ class Controller {
             $scope.evaluations = await mongoDb.getAll('evaluations');
         }
 
-        function isEqual(a, b) {
-            for (let i in a) {
-                if (a[i] !== b[i]) { return false; }
-            }
-            return true;
-        }
 
         function isEvaluated(model) {
             for (let i of $scope.evaluations) {
-                if (isEqual(i.model, model)) { return true; }
+                if (_.isEqual(i.model, model)) { return true; }
             }
             return false;
         }
