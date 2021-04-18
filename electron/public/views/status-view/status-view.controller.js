@@ -72,12 +72,10 @@ class Controller {
                                 split: 0,
                             };
                             if (!isEvaluated(model)) {
-                                $scope.isRunning = true;
                                 $scope.$apply();
                                 let result = await queryServer.evaluate(model);
                                 await mongoDb.insertOne('evaluations', result);
                                 $scope.evaluations.push(result);
-                                $scope.isRunning = false;
                                 $scope.$apply();
                             }
                         }
