@@ -2,18 +2,11 @@
 
 <div class="container-fluid">
 
-    <div class="form-row">
+    <div class="form-row mb-2">
         <div class="col">
-            <div class="spinner-grow text-warning" role="status" ng-if="isRunning">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-        <div class="col-auto">
-            <div class="btn-group-toggle" data-toggle="buttons">
-                <label class="btn"
-                    ng-class="{ 'btn-info': keepGoing, 'btn-secondary': !keepGoing, 'active': keepGoing }">
-                    <input type="checkbox" ng-model="keepGoing"> Recursive
-                </label>
+            <div class="progress" ng-if="isRunning">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                    ng-style="progressBar.style()">{{ progressBar.current() }} / {{ progressBar.total() }}</div>
             </div>
         </div>
     </div>

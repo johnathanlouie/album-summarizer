@@ -49,6 +49,15 @@ class Controller {
             return false;
         }
 
+        let progressBar = {
+            total() { return options.architectures.length * options.datasets.length * options.losses.length * options.optimizers.length; },
+            current() { return $scope.evaluations.length; },
+            percentage() { return Math.round(this.current() / this.total() * 100); },
+            style() { return { width: `${this.percentage()}%` }; },
+        };
+
+        $scope.progressBar = progressBar;
+
         async function doAll() {
             for (let a of options.architectures) {
                 for (let d of options.datasets) {
@@ -83,9 +92,8 @@ class Controller {
         }
 
         async function init() {
-            console.log('load screen');
-            modal.showLoading('RETRIEVING...');
             try {
+                modal.showLoading('RETRIEVING...');
                 await Promise.all([getEvaluated(), loadOptions()]);
                 modal.hideLoading();
                 await doAll();
