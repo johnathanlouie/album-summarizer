@@ -22,7 +22,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="eval in evaluations | filter : {status: 'TrainingStatus.COMPLETE'}">
+            <tr ng-repeat="eval in evaluations | filter : {status: 'TrainingStatus.COMPLETE'} | orderBy : 'test.accuracy' : true">
                 <td>
                     <pre>{{ eval.model | json }}</pre>
                 </td>
