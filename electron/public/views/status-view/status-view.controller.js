@@ -11,6 +11,8 @@ class Controller {
     #scope;
     #queryServer;
     #modal;
+    #options;
+    #mongoDb;
 
     static $inject = ['$scope', 'queryServer', 'modal', 'options', 'mongoDb'];
 
@@ -25,24 +27,10 @@ class Controller {
         this.#scope = $scope;
         this.#queryServer = queryServer;
         this.#modal = modal;
+        this.#options = options;
+        this.#mongoDb = mongoDb;
 
         $scope.evaluations = [];
-
-        async function loadOptions() {
-            await options.load();
-        }
-
-        async function getEvaluated() {
-            $scope.evaluations = await mongoDb.getAll('evaluations');
-        }
-
-
-        function isEvaluated(model) {
-            for (let i of $scope.evaluations) {
-                if (_.isEqual(i.model, model)) { return true; }
-            }
-            return false;
-        }
 
         let progressBar = {
             total() { return options.modelCount(); },
@@ -53,36 +41,7 @@ class Controller {
 
         $scope.progressBar = progressBar;
 
-        async function doAll() {
-            for (let model of options.models()) {
-                if (!isEvaluated(model)) {
-                    try {
-                        let result = await queryServer.evaluate(model);
-                        await mongoDb.insertOne('evaluations', result);
-                        $scope.evaluations.push(result);
-                        $scope.$apply();
-                    }
-                    catch (e) {
-                        console.error(e);
-                    }
-                }
-            }
-        }
-
-        async function init() {
-            try {
-                modal.showLoading('RETRIEVING...');
-                await Promise.all([getEvaluated(), loadOptions()]);
-                modal.hideLoading();
-                await doAll();
-            } catch (e) {
-                console.error(e);
-                modal.hideLoading();
-                modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
-            }
-        }
-
-        init();
+        this.init();
     }
 
     async evaluateAll() {
@@ -90,6 +49,50 @@ class Controller {
         this.#scope.evaluations = await this.#queryServer.evaluateAll();
         this.#modal.hideLoading();
         this.#scope.$apply();
+    }
+
+    async doAll() {
+        for (let model of this.#options.models()) {
+            if (!this.isEvaluated(model)) {
+                try {
+                    let result = await this.#queryServer.evaluate(model);
+                    await this.#mongoDb.insertOne('evaluations', result);
+                    this.#scope.evaluations.push(result);
+                    this.#scope.$apply();
+                }
+                catch (e) {
+                    console.error(e);
+                }
+            }
+        }
+    }
+
+    async loadOptions() {
+        await this.#options.load();
+    }
+
+    async getEvaluated() {
+        this.#scope.evaluations = await this.#mongoDb.getAll('evaluations');
+    }
+
+    isEvaluated(model) {
+        for (let i of this.#scope.evaluations) {
+            if (_.isEqual(i.model, model)) { return true; }
+        }
+        return false;
+    }
+
+    async init() {
+        try {
+            this.#modal.showLoading('RETRIEVING...');
+            await Promise.all([this.getEvaluated(), this.loadOptions()]);
+            this.#modal.hideLoading();
+            await this.doAll();
+        } catch (e) {
+            console.error(e);
+            this.#modal.hideLoading();
+            this.#modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
+        }
     }
 
 }
