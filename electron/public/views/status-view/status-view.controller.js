@@ -14,6 +14,8 @@ class Controller {
     #options;
     #mongoDb;
 
+    #quit = false;
+
     static $inject = ['$scope', 'queryServer', 'modal', 'options', 'mongoDb'];
 
     /**
@@ -44,6 +46,8 @@ class Controller {
         this.init();
     }
 
+    $onDestroy() { this.#quit = true; }
+
     async evaluateAll() {
         this.#modal.showLoading('EVALUATING...');
         this.#scope.evaluations = await this.#queryServer.evaluateAll();
@@ -53,6 +57,7 @@ class Controller {
 
     async doAll() {
         for (let model of this.#options.models()) {
+            if (this.#quit) { return; }
             if (!this.isEvaluated(model)) {
                 try {
                     let result = await this.#queryServer.evaluate(model);
