@@ -26,6 +26,8 @@ class Controller {
         this.#queryServer = queryServer;
         this.#modal = modal;
 
+        $scope.evaluations = [];
+
         async function loadOptions() {
             await options.load();
         }
