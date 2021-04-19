@@ -54,11 +54,15 @@ class Controller {
         async function doAll() {
             for (let model of options.models()) {
                 if (!isEvaluated(model)) {
-                    $scope.$apply();
-                    let result = await queryServer.evaluate(model);
-                    await mongoDb.insertOne('evaluations', result);
-                    $scope.evaluations.push(result);
-                    $scope.$apply();
+                    try {
+                        let result = await queryServer.evaluate(model);
+                        await mongoDb.insertOne('evaluations', result);
+                        $scope.evaluations.push(result);
+                        $scope.$apply();
+                    }
+                    catch (e) {
+                        console.error(e);
+                    }
                 }
             }
         }
