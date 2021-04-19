@@ -63,10 +63,10 @@ class Options {
     }
 
     *models() {
-        for (let a of options.architectures) {
-            for (let d of options.datasets) {
-                for (let l of options.losses) {
-                    for (let o of options.optimizers) {
+        for (let a of this.architectures) {
+            for (let d of this.datasets) {
+                for (let l of this.losses) {
+                    for (let o of this.optimizers) {
                         yield {
                             architecture: a,
                             dataset: d,
@@ -81,6 +81,13 @@ class Options {
                 }
             }
         }
+    }
+
+    modelCount() {
+        return this.architectures.length *
+            this.datasets.length *
+            this.losses.length *
+            this.optimizers.length;
     }
 
 }

@@ -43,7 +43,7 @@ class Controller {
         }
 
         let progressBar = {
-            total() { return options.architectures.length * options.datasets.length * options.losses.length * options.optimizers.length; },
+            total() { return options.modelCount(); },
             current() { return $scope.evaluations.length; },
             percentage() { return Math.round(this.current() / this.total() * 100); },
             style() { return { width: `${this.percentage()}%` }; },
