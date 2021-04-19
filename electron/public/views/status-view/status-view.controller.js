@@ -6,6 +6,22 @@ import OptionsService from '../../services/options.service.js';
 import MongoDbService from '../../services/mongodb.service.js';
 
 
+class Evaluations {
+
+    arr = [];
+
+    add(e) { this.arr.push(e); }
+
+    isEvaluated(model) {
+        for (let i of this.arr) {
+            if (_.isEqual(i.model, model)) { return true; }
+        }
+        return false;
+    }
+
+}
+
+
 class Controller {
 
     #scope;
@@ -14,6 +30,7 @@ class Controller {
     #options;
     #mongoDb;
 
+    #evaluations;
     #quit = false;
 
     static $inject = ['$scope', 'queryServer', 'modal', 'options', 'mongoDb'];
@@ -32,11 +49,12 @@ class Controller {
         this.#options = options;
         this.#mongoDb = mongoDb;
 
-        $scope.evaluations = [];
+        this.#evaluations = new Evaluations();
+        $scope.evaluations = this.#evaluations;
 
         let progressBar = {
             total() { return options.modelCount(); },
-            current() { return $scope.evaluations.length; },
+            current() { return $scope.evaluations.arr.length; },
             percentage() { return Math.round(this.current() / this.total() * 100); },
             style() { return { width: `${this.percentage()}%` }; },
         };
@@ -50,7 +68,7 @@ class Controller {
 
     async evaluateAll() {
         this.#modal.showLoading('EVALUATING...');
-        this.#scope.evaluations = await this.#queryServer.evaluateAll();
+        this.#evaluations.arr = await this.#queryServer.evaluateAll();
         this.#modal.hideLoading();
         this.#scope.$apply();
     }
@@ -58,11 +76,11 @@ class Controller {
     async doAll() {
         for (let model of this.#options.models()) {
             if (this.#quit) { return; }
-            if (!this.isEvaluated(model)) {
+            if (!this.#evaluations.isEvaluated(model)) {
                 try {
                     let result = await this.#queryServer.evaluate(model);
                     await this.#mongoDb.insertOne('evaluations', result);
-                    this.#scope.evaluations.push(result);
+                    this.#evaluations.add(result);
                     this.#scope.$apply();
                 }
                 catch (e) {
@@ -77,14 +95,7 @@ class Controller {
     }
 
     async getEvaluated() {
-        this.#scope.evaluations = await this.#mongoDb.getAll('evaluations');
-    }
-
-    isEvaluated(model) {
-        for (let i of this.#scope.evaluations) {
-            if (_.isEqual(i.model, model)) { return true; }
-        }
-        return false;
+        this.#evaluations.arr = await this.#mongoDb.getAll('evaluations');
     }
 
     async init() {
