@@ -90,6 +90,8 @@ class Options {
             this.optimizers.length;
     }
 
+    get isLoaded() { return this.#isLoaded; }
+
 }
 
 export default Options;
