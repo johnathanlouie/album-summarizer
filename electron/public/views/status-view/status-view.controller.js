@@ -10,6 +10,8 @@ class Evaluations {
 
     arr = [];
 
+    isLoaded = false;
+
     add(e) { this.arr.push(e); }
 
     isEvaluated(model) {
@@ -49,6 +51,7 @@ class Controller {
         this.#options = options;
         this.#mongoDb = mongoDb;
 
+        $scope.optionsLoaded = () => options.isLoaded;
         this.#evaluations = new Evaluations();
         $scope.evaluations = this.#evaluations;
 
@@ -60,8 +63,9 @@ class Controller {
         };
 
         $scope.progressBar = progressBar;
+        $scope.retry = () => this.retry();
 
-        this.init();
+        this.preInit();
     }
 
     $onDestroy() { this.#quit = true; }
@@ -95,14 +99,32 @@ class Controller {
     }
 
     async getEvaluated() {
-        this.#evaluations.arr = await this.#mongoDb.getAll('evaluations');
+        if (!this.#evaluations.isLoaded) {
+            this.#evaluations.arr = await this.#mongoDb.getAll('evaluations');
+            this.#evaluations.isLoaded = true;
+        }
     }
 
-    async init() {
+    async preInit() {
         try {
             this.#modal.showLoading('RETRIEVING...');
             await Promise.all([this.getEvaluated(), this.loadOptions()]);
             this.#modal.hideLoading();
+            this.init();
+        }
+        catch (e) {
+            this.#modal.hideLoading();
+            $('#staticBackdrop').modal();
+        }
+    }
+
+    retry() {
+        $('#staticBackdrop').modal('hide');
+        this.preInit();
+    }
+
+    async init() {
+        try {
             await this.doAll();
         } catch (e) {
             console.error(e);
