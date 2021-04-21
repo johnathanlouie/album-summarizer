@@ -114,21 +114,24 @@ class Controller {
         };
 
         $scope.progressBar = progressBar;
-        $scope.retry = () => this.retry();
+        $scope.retry = () => this.#retry();
 
-        this.preInit();
+        this.#preInit();
     }
 
     $onDestroy() { this.#quit = true; }
 
-    async evaluateAll() {
+    /**
+     * @deprecated
+     */
+    async #evaluateAll() {
         this.#modal.showLoading('EVALUATING...');
         this.#evaluations.arr = await this.#queryServer.evaluateAll();
         this.#modal.hideLoading();
         this.#scope.$apply();
     }
 
-    async doAll() {
+    async #evaluate() {
         this.#scope.progressBar.state = 'running';
         for (let model of this.#options.models()) {
             if (this.#quit) { return; }
@@ -163,24 +166,24 @@ class Controller {
         this.#scope.$apply();
     }
 
-    async loadOptions() {
+    async #loadOptions() {
         await this.#options.load();
     }
 
-    async getEvaluated() {
+    async #getEvaluated() {
         if (!this.#evaluations.isLoaded) {
             this.#evaluations.arr = await this.#mongoDb.getAll('evaluations');
             this.#evaluations.isLoaded = true;
         }
     }
 
-    async preInit() {
+    async #preInit() {
         try {
             this.#modal.showLoading('RETRIEVING...');
-            await Promise.all([this.getEvaluated(), this.loadOptions()]);
+            await Promise.all([this.#getEvaluated(), this.#loadOptions()]);
             this.#modal.hideLoading();
             this.#scope.$apply();
-            this.doAll();
+            this.#evaluate();
         }
         catch (e) {
             console.error(e);
@@ -189,9 +192,9 @@ class Controller {
         }
     }
 
-    retry() {
+    #retry() {
         $('#staticBackdrop').modal('hide');
-        this.preInit();
+        this.#preInit();
     }
 
 }
