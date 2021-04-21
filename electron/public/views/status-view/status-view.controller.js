@@ -113,6 +113,7 @@ class Controller {
             this.init();
         }
         catch (e) {
+            console.error(e);
             this.#modal.hideLoading();
             $('#staticBackdrop').modal();
         }
