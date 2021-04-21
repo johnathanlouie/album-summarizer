@@ -25,7 +25,7 @@ function controllerFn($scope, options, modal, queryServer) {
         catch (e) {
             console.error(e);
             modal.hideLoading();
-            modal.showError(e, 'ERROR: Deep Learning', 'Error while fetching compile options');
+            $('#staticBackdrop').modal();
         }
         $scope.$apply();
     }
@@ -56,6 +56,11 @@ function controllerFn($scope, options, modal, queryServer) {
     };
 
     $scope.clusters = [];
+
+    $scope.retry = function () {
+        $('#staticBackdrop').modal('hide');
+        loadOptions();
+    };
 
 }
 
