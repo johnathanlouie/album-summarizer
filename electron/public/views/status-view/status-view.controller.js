@@ -1,5 +1,6 @@
 const angular = require('angular');
 const _ = require('lodash');
+const mongodb = require('mongodb');
 import QueryServerService from '../../services/query-server.service.js';
 import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
@@ -89,6 +90,11 @@ class Controller {
                 }
                 catch (e) {
                     console.error(e);
+                    if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
+                        this.#modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
+                        return;
+                    }
+                    throw e;
                 }
             }
         }
