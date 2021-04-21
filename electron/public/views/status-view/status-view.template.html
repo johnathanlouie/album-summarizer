@@ -7,7 +7,7 @@
             <div class="progress">
                 <div class="progress-bar"
                     ng-class="{ 'progress-bar-striped': progressBar.state === 'running', 'progress-bar-animated': progressBar.state === 'running', 'bg-success': progressBar.state === 'complete', 'bg-danger': progressBar.state === 'stopped' }"
-                    role="progressbar" ng-style="progressBar.style()">{{ progressBar.current() }} / {{
+                    role="progressbar" ng-style="progressBar.style()">{{ progressBar.current }} / {{
                     progressBar.total() }}</div>
             </div>
         </div>

@@ -106,9 +106,12 @@ class Controller {
         $scope.evaluations = this.#evaluations;
 
         let progressBar = {
-            total() { return options.modelCount(); },
-            current() { return $scope.evaluations.arr.length; },
-            percentage() { return Math.round(this.current() / this.total() * 100); },
+            total() { return options.modelCount() || 0; },
+            current: 0,
+            percentage() {
+                if (this.total() === 0) { return 0; }
+                return Math.round(this.current / this.total() * 100);
+            },
             style() { return { width: `${this.percentage()}%` }; },
             state: 'stopped',
         };
@@ -133,6 +136,8 @@ class Controller {
 
     async #evaluate() {
         this.#scope.progressBar.state = 'running';
+        this.#scope.progressBar.current = 0;
+        this.#scope.$apply();
         for (let model of this.#options.models()) {
             if (this.#quit) { return; }
             if (!this.#evaluations.isEvaluated(model)) {
@@ -140,6 +145,7 @@ class Controller {
                     let result = await this.#queryServer.evaluate(model);
                     await this.#mongoDb.insertOne('evaluations', result);
                     this.#evaluations.add(result);
+                    this.#scope.progressBar.current++;
                     this.#scope.$apply();
                 }
                 catch (e) {
@@ -160,6 +166,9 @@ class Controller {
                         return;
                     }
                 }
+            }
+            else {
+                this.#scope.progressBar.current++;
             }
         }
         this.#scope.progressBar.state = 'complete';
