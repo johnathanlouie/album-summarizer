@@ -80,6 +80,7 @@ class Controller {
             current() { return $scope.evaluations.arr.length; },
             percentage() { return Math.round(this.current() / this.total() * 100); },
             style() { return { width: `${this.percentage()}%` }; },
+            state: 'stopped',
         };
 
         $scope.progressBar = progressBar;
@@ -98,6 +99,7 @@ class Controller {
     }
 
     async doAll() {
+        this.#scope.progressBar.state = 'running';
         for (let model of this.#options.models()) {
             if (this.#quit) { return; }
             if (!this.#evaluations.isEvaluated(model)) {
@@ -110,6 +112,7 @@ class Controller {
                 catch (e) {
                     console.error(e);
                     if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
+                        this.#scope.progressBar.state = 'stopped';
                         this.#modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
                         this.#scope.$apply();
                         return;
@@ -118,6 +121,7 @@ class Controller {
                         // Ignore 500 errors
                     }
                     else {
+                        this.#scope.progressBar.state = 'stopped';
                         this.#modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
                         this.#scope.$apply();
                         return;
@@ -125,6 +129,8 @@ class Controller {
                 }
             }
         }
+        this.#scope.progressBar.state = 'complete';
+        this.#scope.$apply();
     }
 
     async loadOptions() {
