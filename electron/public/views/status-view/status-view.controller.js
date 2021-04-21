@@ -7,6 +7,36 @@ import OptionsService from '../../services/options.service.js';
 import MongoDbService from '../../services/mongodb.service.js';
 
 
+class Model {
+
+    /** @type {string} */
+    architecture;
+
+    /** @type {string} */
+    dataset;
+
+    /** @type {string} */
+    loss;
+
+    /** @type {string} */
+    optimizer;
+
+    /** @type {string} */
+    metrics;
+
+    /** @type {number} */
+    epochs;
+
+    /** @type {number} */
+    patience;
+
+    /** @type {number} */
+    split;
+
+}
+
+
+
 class Evaluations {
 
     arr = [];
