@@ -11,6 +11,78 @@
         </div>
     </div>
 
+    <div class="row mb-2">
+
+        <div class="col">
+
+            <div class="row">
+                <div class="col-auto">Architecture</div>
+                <div class="col">
+                    <select class="form-control" id="architectures" ng-model="search.model.architecture">
+                        <option></option>
+                        <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-auto">Dataset</div>
+                <div class="col">
+                    <select class="form-control" id="datasets" ng-model="search.model.dataset">
+                        <option></option>
+                        <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-auto">Loss</div>
+                <div class="col">
+                    <select class="form-control" id="losses" ng-model="search.model.loss">
+                        <option></option>
+                        <option ng-repeat="loss in options.losses">{{ loss }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-auto">Optimizer</div>
+                <div class="col">
+                    <select class="form-control" id="optimizers" ng-model="search.model.optimizer">
+                        <option></option>
+                        <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col">
+            <select class="form-control" ng-model="search.status">
+                <option></option>
+                <option ng-repeat="status in evaluations.statuses()">{{ status }}</option>
+            </select>
+        </div>
+
+        <div class="col">
+            <select class="form-control" ng-model="sort.phase">
+                <option>training.accuracy</option>
+                <option>validation.accuracy</option>
+                <option>test.accuracy</option>
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <div class="btn-group-toggle" data-toggle="buttons">
+                <label class="btn"
+                    ng-class="{ 'btn-info': sort.reverse, 'btn-secondary': !sort.reverse, 'active': sort.reverse }">
+                    <input type="checkbox" ng-model="sort.reverse"> Reverse
+                </label>
+            </div>
+        </div>
+
+    </div>
+
     <table class="table">
         <thead>
             <tr>
@@ -22,8 +94,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr
-                ng-repeat="eval in evaluations.arr | filter : {status: 'TrainingStatus.COMPLETE'} | orderBy : 'test.accuracy' : true">
+            <tr ng-repeat="eval in evaluations.arr | filter : search | orderBy : sort.phase : sort.reverse">
                 <td>
                     <pre>{{ eval.model | json }}</pre>
                 </td>

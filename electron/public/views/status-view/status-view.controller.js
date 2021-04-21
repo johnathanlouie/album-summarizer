@@ -22,6 +22,8 @@ class Evaluations {
         return false;
     }
 
+    statuses() { return _.uniq(this.arr.map(e => e.status)); }
+
 }
 
 
@@ -35,6 +37,19 @@ class Controller {
 
     #evaluations;
     #quit = false;
+    #search = {
+        model: {
+            architecture: '',
+            dataset: '',
+            loss: '',
+            optimizer: '',
+        },
+        status: 'TrainingStatus.COMPLETE',
+    };
+    #sort = {
+        phase: 'test.accuracy',
+        reverse: true,
+    };
 
     static $inject = ['$scope', 'queryServer', 'modal', 'options', 'mongoDb'];
 
@@ -51,6 +66,10 @@ class Controller {
         this.#modal = modal;
         this.#options = options;
         this.#mongoDb = mongoDb;
+
+        $scope.options = options;
+        $scope.search = this.#search;
+        $scope.sort = this.#sort;
 
         $scope.optionsLoaded = () => options.isLoaded;
         this.#evaluations = new Evaluations();
@@ -124,6 +143,7 @@ class Controller {
             this.#modal.showLoading('RETRIEVING...');
             await Promise.all([this.getEvaluated(), this.loadOptions()]);
             this.#modal.hideLoading();
+            this.#scope.$apply();
             this.doAll();
         }
         catch (e) {
