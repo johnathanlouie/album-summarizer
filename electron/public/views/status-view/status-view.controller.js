@@ -92,9 +92,17 @@ class Controller {
                     console.error(e);
                     if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
                         this.#modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
+                        this.#scope.$apply();
                         return;
                     }
-                    throw e;
+                    else if (e.status === 500) {
+                        // Ignore 500 errors
+                    }
+                    else {
+                        this.#modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
+                        this.#scope.$apply();
+                        return;
+                    }
                 }
             }
         }
@@ -116,7 +124,7 @@ class Controller {
             this.#modal.showLoading('RETRIEVING...');
             await Promise.all([this.getEvaluated(), this.loadOptions()]);
             this.#modal.hideLoading();
-            this.init();
+            this.doAll();
         }
         catch (e) {
             console.error(e);
@@ -128,16 +136,6 @@ class Controller {
     retry() {
         $('#staticBackdrop').modal('hide');
         this.preInit();
-    }
-
-    async init() {
-        try {
-            await this.doAll();
-        } catch (e) {
-            console.error(e);
-            this.#modal.hideLoading();
-            this.#modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
-        }
     }
 
 }
