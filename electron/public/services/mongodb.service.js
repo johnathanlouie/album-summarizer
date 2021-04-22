@@ -124,6 +124,17 @@ class MongoDbService {
     }
 
     /**
+     * Finds a document and replace it in one atomic operation
+     * @param {string} collection The name of the collection
+     * @param {Object} filter A filter object to select the document to update
+     * @param {Object} replacement The document that replaces the matching document
+     */
+    async findOneAndReplace(collection, filter, replacement) {
+        await this.connect();
+        if ((await this.#db.collection(collection).findOneAndReplace(filter, replacement)).ok !== 1) { throw new Error(); }
+    }
+
+    /**
      * Inserts data into MongoDB
      * @param {string} collection The name of the collection
      * @param {Object} doc Data to be inserted
