@@ -70,6 +70,38 @@ class Evaluations {
 }
 
 
+class ProgressBar {
+
+    total = 0;
+    current = 0;
+    #state = 'stopped';
+
+    stop() { this.#state = 'stopped'; }
+    run() { this.#state = 'running'; }
+    complete() { this.#state = 'complete'; }
+
+    percentage() {
+        if (this.total === 0) { return 0; }
+        return Math.round(this.current / this.total * 100);
+    }
+
+    style() { return { width: `${this.percentage()}%` }; }
+
+    classes() {
+        switch (this.#state) {
+            case 'running':
+                return ['progress-bar-striped', 'progress-bar-animated'];
+            case 'complete':
+                return ['bg-success'];
+            case 'stopped':
+                return ['bg-danger'];
+        }
+        throw new Error();
+    }
+
+}
+
+
 class Controller {
 
     #scope;
@@ -78,7 +110,7 @@ class Controller {
     #options;
     #mongoDb;
 
-    #evaluations;
+    #evaluations = new Evaluations();
     #quit = false;
     #search = {
         model: {
@@ -93,6 +125,7 @@ class Controller {
         phase: 'test.accuracy',
         reverse: true,
     };
+    #progressBar = new ProgressBar();
 
     static $inject = ['$scope', 'queryServer', 'modal', 'options', 'mongoDb'];
 
@@ -114,22 +147,10 @@ class Controller {
         $scope.search = this.#search;
         $scope.sort = this.#sort;
 
+        $scope.progressBar = this.#progressBar;
         $scope.optionsLoaded = () => options.isLoaded;
-        this.#evaluations = new Evaluations();
         $scope.evaluations = this.#evaluations;
 
-        let progressBar = {
-            total() { return options.modelCount() || 0; },
-            current: 0,
-            percentage() {
-                if (this.total() === 0) { return 0; }
-                return Math.round(this.current / this.total() * 100);
-            },
-            style() { return { width: `${this.percentage()}%` }; },
-            state: 'stopped',
-        };
-
-        $scope.progressBar = progressBar;
         $scope.retry = () => this.#retry();
 
         this.#preInit();
@@ -148,8 +169,9 @@ class Controller {
     }
 
     async #evaluate() {
-        this.#scope.progressBar.state = 'running';
-        this.#scope.progressBar.current = 0;
+        this.#progressBar.run();
+        this.#progressBar.current = 0;
+        this.#progressBar.total = this.#options.modelCount();
         this.#scope.$apply();
         for (let model of this.#options.models()) {
             if (this.#quit) { return; }
@@ -158,13 +180,13 @@ class Controller {
                     let result = await this.#queryServer.evaluate(model);
                     await this.#mongoDb.insertOne('evaluations', result);
                     this.#evaluations.add(result);
-                    this.#scope.progressBar.current++;
+                    this.#progressBar.current++;
                     this.#scope.$apply();
                 }
                 catch (e) {
                     console.error(e);
                     if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
-                        this.#scope.progressBar.state = 'stopped';
+                        this.#progressBar.stop();
                         this.#modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
                         this.#scope.$apply();
                         return;
@@ -173,7 +195,7 @@ class Controller {
                         // Ignore 500 errors
                     }
                     else {
-                        this.#scope.progressBar.state = 'stopped';
+                        this.#progressBar.stop();
                         this.#modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
                         this.#scope.$apply();
                         return;
@@ -181,10 +203,10 @@ class Controller {
                 }
             }
             else {
-                this.#scope.progressBar.current++;
+                this.#progressBar.current++;
             }
         }
-        this.#scope.progressBar.state = 'complete';
+        this.#progressBar.complete();
         this.#scope.$apply();
     }
 
