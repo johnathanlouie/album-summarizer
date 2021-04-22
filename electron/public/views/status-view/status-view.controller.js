@@ -36,7 +36,6 @@ class Model {
 }
 
 
-
 class Evaluations {
 
     arr = [];
@@ -44,6 +43,8 @@ class Evaluations {
     isLoaded = false;
 
     add(e) { this.arr.push(e); }
+
+    replace(i, e) { this.arr[i] = e; }
 
     /**
      * @param {Model} model
@@ -152,6 +153,7 @@ class Controller {
         $scope.evaluations = this.#evaluations;
 
         $scope.retry = () => this.#retry();
+        $scope.reevaluatePending = () => this.#reevaluatePending();
 
         this.#preInit();
     }
@@ -180,6 +182,47 @@ class Controller {
                     let result = await this.#queryServer.evaluate(model);
                     await this.#mongoDb.insertOne('evaluations', result);
                     this.#evaluations.add(result);
+                    this.#progressBar.current++;
+                    this.#scope.$apply();
+                }
+                catch (e) {
+                    console.error(e);
+                    if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
+                        this.#progressBar.stop();
+                        this.#modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
+                        this.#scope.$apply();
+                        return;
+                    }
+                    else if (e.status === 500) {
+                        // Ignore 500 errors
+                    }
+                    else {
+                        this.#progressBar.stop();
+                        this.#modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
+                        this.#scope.$apply();
+                        return;
+                    }
+                }
+            }
+            else {
+                this.#progressBar.current++;
+            }
+        }
+        this.#progressBar.complete();
+        this.#scope.$apply();
+    }
+
+    async #reevaluatePending() {
+        this.#progressBar.run();
+        this.#progressBar.current = 0;
+        this.#progressBar.total = this.#options.modelCount();
+        for (let [i, e] of this.#evaluations.arr.entries()) {
+            if (this.#quit) { return; }
+            if (e.status === 'TrainingStatus.PENDING') {
+                try {
+                    let result = await this.#queryServer.evaluate(e.model);
+                    await this.#mongoDb.findOneAndReplace('evaluations', { model: result.model }, result);
+                    this.#evaluations.replace(i, result);
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
