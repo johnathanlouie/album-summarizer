@@ -45,11 +45,24 @@ class Evaluations {
 
     add(e) { this.arr.push(e); }
 
-    isEvaluated(model) {
+    /**
+     * @param {Model} model
+     * @returns {?Object}
+     */
+    fetch(model) {
         for (let i of this.arr) {
-            if (_.isEqual(i.model, model)) { return true; }
+            if (_.isEqual(i.model, model)) { return i; }
         }
-        return false;
+        return null;
+    }
+
+    /**
+     * 
+     * @param {Model} model 
+     * @returns {boolean}
+     */
+    contains(model) {
+        return this.fetch(model) !== null;
     }
 
     statuses() { return _.uniq(this.arr.map(e => e.status)); }
@@ -140,7 +153,7 @@ class Controller {
         this.#scope.$apply();
         for (let model of this.#options.models()) {
             if (this.#quit) { return; }
-            if (!this.#evaluations.isEvaluated(model)) {
+            if (!this.#evaluations.contains(model)) {
                 try {
                     let result = await this.#queryServer.evaluate(model);
                     await this.#mongoDb.insertOne('evaluations', result);
