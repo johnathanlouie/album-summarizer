@@ -1,4 +1,5 @@
 const angular = require('angular');
+const _ = require('lodash');
 import ModalService from '../../services/modal.service.js';
 import MongoDbService from '../../services/mongodb.service.js';
 
@@ -67,10 +68,8 @@ function controllerFn($scope, mongoDb, modal) {
         $scope.selectedCollection = null;
         try {
             modal.showLoading('RETRIEVING...');
-            $scope.dbCollections = await mongoDb.collections();
-            if ($scope.dbCollections.length > 0) {
-                $scope.selectedCollection = $scope.dbCollections[0];
-            }
+            let col = await mongoDb.collections();
+            $scope.dbCollections = _.pull(col, 'evaluations');
             modal.hideLoading();
         }
         catch (e) {

@@ -6,14 +6,15 @@
         <div class="form-row">
             <div class="input-group col">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="collectionSelect">MongoDB Collection</label>
+                    <label class="input-group-text" for="collectionSelect">Username</label>
                 </div>
-                <select class="custom-select" ng-model="selectedCollection" id="collectionSelect">
+                <select class="custom-select" ng-model="selectedCollection" id="collectionSelect" required>
+                    <option></option>
                     <option ng-repeat="c in dbCollections">{{ c }}</option>
                 </select>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Select Collections</button>
+                <button class="btn btn-primary" type="submit">Select User</button>
             </div>
         </div>
     </form>
