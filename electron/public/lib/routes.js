@@ -21,11 +21,15 @@ class Route {
     }
 
     isMenu() {
-        return this.path.startsWith('/menu');
+        return this.path === '/menu';
     }
 
     isRoot() {
-        return this.path.startsWith('/');
+        return this.path === '/';
+    }
+
+    isLoad() {
+        return this.path === '/';
     }
 
 }
@@ -35,8 +39,13 @@ class RouteManager {
 
     static ROUTES = [
         new Route(
-            'Organizer',
+            'Loading',
             '/',
+            '<loading-view></loading-view>',
+        ),
+        new Route(
+            'Organizer',
+            '/organizer',
             '<organizer-view></organizer-view>',
         ),
         new Route(
@@ -77,7 +86,7 @@ class RouteManager {
     ];
 
     static menu1() {
-        return RouteManager.ROUTES.filter(e => !(e.isDevTool() || e.isMenu()));
+        return RouteManager.ROUTES.filter(e => !(e.isDevTool() || e.isMenu() || e.isRoot()));
     }
 
     static menu2() {

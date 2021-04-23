@@ -7,6 +7,7 @@ import organizerView from './organizer-view/organizer-view.module.js';
 import settingsView from './settings-view/settings-view.module.js';
 import transferDataView from './transfer-data-view/transfer-data-view.module.js';
 import statusView from './status-view/status-view.module.js';
+import loadingView from './loading-view/loading-view.module.js';
 
 
 const module = angular.module('views', [
@@ -18,6 +19,7 @@ const module = angular.module('views', [
     settingsView,
     transferDataView,
     statusView,
+    loadingView,
 ]);
 
 
