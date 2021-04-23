@@ -1,6 +1,7 @@
 <devtools-navbar></devtools-navbar>
 
-<div class="container-fluid">
+<div class="container" ng-show="selectUserScreen"
+    style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
 
     <form class="mb-5" ng-submit="getUnlabeledData()">
         <div class="form-row">
@@ -18,6 +19,14 @@
             </div>
         </div>
     </form>
+
+</div>
+
+<div class="container-fluid" ng-hide="selectUserScreen">
+
+    <div class="float-right">
+        <button type="button" class="btn btn-primary" ng-click="selectUserScreen = true">Change<br>User</button>
+    </div>
 
     <div class="row">
 
@@ -88,5 +97,6 @@
         </form>
 
     </div>
+
 
 </div>

@@ -11,6 +11,8 @@ import MongoDbService from '../../services/mongodb.service.js';
  */
 function controllerFn($scope, mongoDb, modal) {
 
+    $scope.selectUserScreen = true;
+
     function keyHandler(event) {
         switch (event.key) {
             case "1":
@@ -98,6 +100,7 @@ function controllerFn($scope, mongoDb, modal) {
                 modal.showError(null, 'NOTICE: MongoDB', 'All data points in this collection were labeled');
             }
             else {
+                $scope.selectUserScreen = false;
                 $scope.unlabeledData = data[0];
                 $scope.unlabeledData.rating = 2;
                 $scope.unlabeledData.class = 'hybrid';
