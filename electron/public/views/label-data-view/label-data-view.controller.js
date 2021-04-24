@@ -2,16 +2,19 @@ const angular = require('angular');
 const _ = require('lodash');
 import ModalService from '../../services/modal.service.js';
 import MongoDbService from '../../services/mongodb.service.js';
+import UsersService from '../../services/users.service.js';
 
 
 /**
  * @param {angular.IScope} $scope 
  * @param {MongoDbService} mongoDb 
  * @param {ModalService} modal 
+ * @param {UsersService} users 
  */
-function controllerFn($scope, mongoDb, modal) {
+function controllerFn($scope, mongoDb, modal, users) {
 
     $scope.selectUserScreen = true;
+    $scope.users = users;
 
     function keyHandler(event) {
         switch (event.key) {
@@ -66,18 +69,16 @@ function controllerFn($scope, mongoDb, modal) {
     };
 
     async function getMongoCollections() {
-        $scope.dbCollections = null;
         $scope.selectedCollection = null;
         try {
             modal.showLoading('RETRIEVING...');
-            let col = await mongoDb.collections();
-            $scope.dbCollections = _.pull(col, 'evaluations');
+            await users.load();
             modal.hideLoading();
         }
         catch (e) {
             console.error(e);
             modal.hideLoading();
-            modal.showError(e, 'ERROR: MongoDB', 'Error while fetching collections');
+            modal.showError(e, 'ERROR: MongoDB', 'Error while fetching users');
         }
         $scope.$apply();
     }
@@ -146,13 +147,12 @@ function controllerFn($scope, mongoDb, modal) {
     $scope.isNullData = function () { return $scope.unlabeledData === nullData; }
 
     $scope.unlabeledData = nullData;
-    $scope.dbCollections = null;
     $scope.selectedCollection = null;
     getMongoCollections();
 
 }
 
-controllerFn.$inject = ['$scope', 'mongoDb', 'modal'];
+controllerFn.$inject = ['$scope', 'mongoDb', 'modal', 'users'];
 
 
 export default controllerFn;

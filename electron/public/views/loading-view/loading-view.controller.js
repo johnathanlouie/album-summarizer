@@ -5,6 +5,7 @@ import QueryServerService from '../../services/query-server.service.js';
 import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
 import MongoDbService from '../../services/mongodb.service.js';
+import UsersService from '../../services/users.service.js';
 
 
 class Controller {
@@ -15,8 +16,9 @@ class Controller {
     #options;
     #mongoDb;
     #location;
+    #users;
 
-    static $inject = ['$scope', '$location', 'queryServer', 'modal', 'options', 'mongoDb'];
+    static $inject = ['$scope', '$location', 'queryServer', 'modal', 'options', 'mongoDb', 'users'];
 
     /**
      * @param {angular.IScope} $scope 
@@ -25,14 +27,17 @@ class Controller {
      * @param {ModalService} modal
      * @param {OptionsService} options
      * @param {MongoDbService} mongoDb
+     * @param {MongoDbService} mongoDb
+     * @param {UsersService} users
      */
-    constructor($scope, $location, queryServer, modal, options, mongoDb) {
+    constructor($scope, $location, queryServer, modal, options, mongoDb, users) {
         this.#scope = $scope;
         this.#location = $location;
         this.#queryServer = queryServer;
         this.#modal = modal;
         this.#options = options;
         this.#mongoDb = mongoDb;
+        this.#users = users;
 
         $scope.status = 'CONNECTING';
         $scope.connectionFailed = false;
@@ -47,7 +52,10 @@ class Controller {
         try {
             this.#scope.status = 'CONNECTING';
             this.#scope.connectionFailed = false;
-            await Promise.all([this.#mongoDb.connect(), this.#options.load()]);
+            await Promise.all([
+                this.#options.load(),
+                this.#users.load(),
+            ]);
             this.#location.path('/organizer');
         }
         catch (e) {
