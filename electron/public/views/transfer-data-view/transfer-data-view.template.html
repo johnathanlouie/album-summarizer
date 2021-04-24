@@ -81,13 +81,13 @@
     <div class="row">
         <div class="col">
 
-            <h6>From MongoDB</h6>
+            <h6>Load from existing users</h6>
 
             <form class="mb-2" ng-submit="download()">
                 <div class="form-row">
                     <div class="col mb-2">
                         <select class="custom-select" ng-model="collectionPull">
-                            <option ng-repeat="c in collections">{{ c }}</option>
+                            <option ng-repeat="c in users.users">{{ c }}</option>
                         </select>
                     </div>
                     <div class="col-auto">
@@ -99,7 +99,7 @@
         </div>
         <div class="col">
 
-            <h6>Insert into MongoDB</h6>
+            <h6>Create a new user</h6>
 
             <form class="mb-2" ng-submit="upload()">
                 <fieldset ng-disabled="!data">

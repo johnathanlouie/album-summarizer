@@ -5,6 +5,8 @@ import MongoDbService from './mongodb.service.js';
 class UsersService {
 
     #mongoDb;
+
+    /** @type {Array.<string>} */
     #users = [];
     #isLoaded = false;
 
@@ -12,7 +14,7 @@ class UsersService {
 
     /**
      * 
-     * @param {MongoDbService} $mongoDb 
+     * @param {MongoDbService} mongoDb 
      */
     constructor(mongoDb) {
         this.#mongoDb = mongoDb;

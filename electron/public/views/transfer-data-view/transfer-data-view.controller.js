@@ -7,6 +7,7 @@ const stringifyCsv = require('csv-stringify/lib/sync');
 const angular = require('angular');
 import MongoDbService from '../../services/mongodb.service.js';
 import ModalService from '../../services/modal.service.js';
+import UsersService from '../../services/users.service.js';
 
 
 class Controller {
@@ -14,18 +15,23 @@ class Controller {
     #scope;
     #mongoDb;
     #modal;
+    #users;
 
-    static $inject = ['$scope', 'mongoDb', 'modal'];
+    static $inject = ['$scope', 'mongoDb', 'modal', 'users'];
 
     /**
      * @param {angular.IScope} $scope 
      * @param {MongoDbService} mongoDb 
      * @param {ModalService} modal
+     * @param {UsersService} users
      */
-    constructor($scope, mongoDb, modal) {
+    constructor($scope, mongoDb, modal, users) {
         this.#scope = $scope;
         this.#mongoDb = mongoDb;
         this.#modal = modal;
+        this.#users = users;
+
+        $scope.users = users;
         this.#scope.newData = {
             filepath: path.join(os.homedir(), 'Pictures'),
             recursive: true,
@@ -129,9 +135,18 @@ class Controller {
      * Gets the names of all the collections in MongoDB so the user can select which collection to pull from
      */
     async getMongoCollections() {
-        this.#scope.collections = await this.#mongoDb.collections();
-        if (this.#scope.collections.length > 0) {
-            this.#scope.collectionPull = this.#scope.collections[0];
+        try {
+            this.#modal.showLoading('RETRIEVING...');
+            await this.#users.load();
+            if (this.#users.users.length > 0) {
+                this.#scope.collectionPull = this.#users.users[0];
+            }
+            this.#modal.hideLoading();
+        }
+        catch (e) {
+            console.error(e);
+            this.#modal.hideLoading();
+            this.#modal.showError(e, 'ERROR: MongoDB', 'Error while fetching users');
         }
         this.#scope.$apply();
     }
