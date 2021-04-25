@@ -19,12 +19,17 @@ class MongoDbSettings {
 
     load() {
         this.#loaded = false;
-        var json = fs.readFileSync('mongodb.json');
-        var obj = JSON.parse(json);
-        this.hostname = obj.hostname;
-        this.username = obj.username;
-        this.password = obj.password;
-        this.#loaded = true;
+        if (fs.existsSync()) {
+            var json = fs.readFileSync('mongodb.json');
+            var obj = JSON.parse(json);
+            this.hostname = obj.hostname;
+            this.username = obj.username;
+            this.password = obj.password;
+            this.#loaded = true;
+        }
+        else {
+            this.save();
+        }
     }
 
     uri() {
