@@ -111,7 +111,7 @@ class Controller {
     #options;
     #mongoDb;
 
-    #evaluations = new Evaluations();
+    static #evaluations = new Evaluations();
     #quit = false;
     #search = {
         model: {
@@ -150,7 +150,7 @@ class Controller {
 
         $scope.progressBar = this.#progressBar;
         $scope.optionsLoaded = () => options.isLoaded;
-        $scope.evaluations = this.#evaluations;
+        $scope.evaluations = Controller.#evaluations;
 
         $scope.retry = () => this.#retry();
         $scope.reevaluatePending = () => this.#reevaluatePending();
@@ -165,7 +165,7 @@ class Controller {
      */
     async #evaluateAll() {
         this.#modal.showLoading('EVALUATING...');
-        this.#evaluations.arr = await this.#queryServer.evaluateAll();
+        Controller.#evaluations.arr = await this.#queryServer.evaluateAll();
         this.#modal.hideLoading();
         this.#scope.$apply();
     }
@@ -177,11 +177,11 @@ class Controller {
         this.#scope.$apply();
         for (let model of this.#options.models()) {
             if (this.#quit) { return; }
-            if (!this.#evaluations.contains(model)) {
+            if (!Controller.#evaluations.contains(model)) {
                 try {
                     let result = await this.#queryServer.evaluate(model);
                     await this.#mongoDb.insertOne('evaluations', result);
-                    this.#evaluations.add(result);
+                    Controller.#evaluations.add(result);
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
@@ -216,13 +216,13 @@ class Controller {
         this.#progressBar.run();
         this.#progressBar.current = 0;
         this.#progressBar.total = this.#options.modelCount();
-        for (let [i, e] of this.#evaluations.arr.entries()) {
+        for (let [i, e] of Controller.#evaluations.arr.entries()) {
             if (this.#quit) { return; }
             if (e.status === 'TrainingStatus.PENDING') {
                 try {
                     let result = await this.#queryServer.evaluate(e.model);
                     await this.#mongoDb.findOneAndReplace('evaluations', { model: result.model }, result);
-                    this.#evaluations.replace(i, result);
+                    Controller.#evaluations.replace(i, result);
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
@@ -258,9 +258,9 @@ class Controller {
     }
 
     async #getEvaluated() {
-        if (!this.#evaluations.isLoaded) {
-            this.#evaluations.arr = await this.#mongoDb.getAll('evaluations');
-            this.#evaluations.isLoaded = true;
+        if (!Controller.#evaluations.isLoaded) {
+            Controller.#evaluations.arr = await this.#mongoDb.getAll('evaluations');
+            Controller.#evaluations.isLoaded = true;
         }
     }
 
