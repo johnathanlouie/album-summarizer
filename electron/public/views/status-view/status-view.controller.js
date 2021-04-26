@@ -36,6 +36,37 @@ class Model {
 }
 
 
+class Metrics {
+
+    /** @type {number} */
+    accuracy;
+
+    /** @type {number} */
+    loss;
+
+}
+
+
+class Evaluation {
+
+    /** @type {Model} */
+    model;
+
+    /** @type {string} */
+    status;
+
+    /** @type {Metrics} */
+    training;
+
+    /** @type {Metrics} */
+    validation;
+
+    /** @type {Metrics} */
+    test;
+
+}
+
+
 class Evaluations {
 
     arr = [];
