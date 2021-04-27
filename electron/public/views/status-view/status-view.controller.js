@@ -7,7 +7,7 @@ import OptionsService from '../../services/options.service.js';
 import MongoDbService from '../../services/mongodb.service.js';
 
 
-class Model {
+class ModelDescription {
 
     /** @type {string} */
     architecture;
@@ -35,7 +35,7 @@ class Model {
 
     /**
      * 
-     * @param {Model} model 
+     * @param {ModelDescription} model 
      */
     static toString(model) {
         return `${model.architecture}-${model.dataset}-${model.loss}-${model.optimizer}-${model.metrics}-${model.epochs}-${model.patience}-${model.split}`;
@@ -57,7 +57,7 @@ class Metrics {
 
 class Evaluation {
 
-    /** @type {Model} */
+    /** @type {ModelDescription} */
     model;
 
     /** @type {string} */
@@ -77,7 +77,7 @@ class Evaluation {
 
 class Evaluations {
 
-    /** @type {Map.<Model, Evaluation>} */
+    /** @type {Map.<ModelDescription, Evaluation>} */
     #container = new Map();
 
     isLoaded = false;
@@ -87,16 +87,16 @@ class Evaluations {
      * @param {Evaluation} evaluation 
      */
     set(evaluation) {
-        this.#container.set(Model.toString(evaluation.model), evaluation);
+        this.#container.set(ModelDescription.toString(evaluation.model), evaluation);
     }
 
     /**
      * 
-     * @param {Model} model 
+     * @param {ModelDescription} model 
      * @returns {boolean}
      */
     has(model) {
-        return this.#container.has(Model.toString(model));
+        return this.#container.has(ModelDescription.toString(model));
     }
 
     statuses() {
