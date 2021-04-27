@@ -98,20 +98,6 @@ class Controller {
 
     $onDestroy() { this.#quit = true; }
 
-    /**
-     * @deprecated
-     */
-    async #evaluateAll() {
-        this.#modal.showLoading('EVALUATING...');
-        this.#evaluations.isLoaded = false;
-        for (let i of await this.#queryServer.evaluateAll()) {
-            this.#evaluations.set(i);
-        }
-        this.#evaluations.isLoaded = true;
-        this.#modal.hideLoading();
-        this.#scope.$apply();
-    }
-
     async #evaluate() {
         this.#progressBar.run();
         this.#progressBar.current = 0;
@@ -199,20 +185,10 @@ class Controller {
         await this.#options.load();
     }
 
-    async #getEvaluated() {
-        if (!this.#evaluations.isLoaded) {
-            let x = await this.#mongoDb.getAll('evaluations');
-            for (let i of x) {
-                this.#evaluations.set(i);
-            }
-            this.#evaluations.isLoaded = true;
-        }
-    }
-
     async #preInit() {
         try {
             this.#modal.showLoading('RETRIEVING...');
-            await Promise.all([this.#getEvaluated(), this.#loadOptions()]);
+            await Promise.all([this.#evaluations.fromMongoDb(), this.#loadOptions()]);
             this.#modal.hideLoading();
             this.#scope.$apply();
             this.#evaluate();

@@ -1,4 +1,5 @@
 const _ = require('lodash');
+import MongoDbService from './mongodb.service.js';
 
 
 class ModelDescription {
@@ -71,10 +72,21 @@ class Evaluation {
 
 class Evaluations {
 
+    mongoDb;
+
     /** @type {Map.<ModelDescription, Evaluation>} */
     #container = new Map();
 
-    isLoaded = false;
+    #isLoaded = false;
+
+    static $inject = ['mongoDb'];
+
+    /**
+     * @param {MongoDbService} mongoDb
+     */
+    constructor(mongoDb) {
+        this.mongoDb = mongoDb;
+    }
 
     /**
      * 
@@ -99,6 +111,15 @@ class Evaluations {
 
     toArray() {
         return Array.from(this.#container.values());
+    }
+
+    async fromMongoDb() {
+        if (!this.#isLoaded) {
+            for (let i of await this.mongoDb.getAll('evaluations')) {
+                this.set(i);
+            }
+            this.#isLoaded = true;
+        }
     }
 
 }
