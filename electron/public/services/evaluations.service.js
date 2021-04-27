@@ -92,14 +92,26 @@ class Evaluations {
      * 
      * @param {Evaluation} evaluation 
      */
-    async set(evaluation) {
-        if (this.#container.has(evaluation.model)) {
-            await this.#mongoDb.findOneAndReplace('evaluations', { model: evaluation.model }, evaluation);
-        }
-        else {
-            await this.#mongoDb.insertOne('evaluations', evaluation);
-        }
+    #set(evaluation) {
         this.#container.set(ModelDescription.toString(evaluation.model), evaluation);
+    }
+
+    /**
+     * 
+     * @param {Evaluation} evaluation 
+     */
+    async add(evaluation) {
+        await this.#mongoDb.insertOne('evaluations', evaluation);
+        this.#set(evaluation);
+    }
+
+    /**
+     * 
+     * @param {Evaluation} evaluation 
+     */
+    async update(evaluation) {
+        await this.#mongoDb.findOneAndReplace('evaluations', { model: evaluation.model }, evaluation);
+        this.#set(evaluation);
     }
 
     /**
@@ -122,7 +134,7 @@ class Evaluations {
     async fromMongoDb() {
         if (!this.#isLoaded) {
             for (let i of await this.#mongoDb.getAll('evaluations')) {
-                this.set(i);
+                this.#set(i);
             }
             this.#isLoaded = true;
         }

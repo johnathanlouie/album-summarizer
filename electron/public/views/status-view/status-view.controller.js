@@ -107,7 +107,7 @@ class Controller {
             if (this.#quit) { return; }
             if (!this.#evaluations.has(model)) {
                 try {
-                    await this.#evaluations.set(await this.#queryServer.evaluate(model));
+                    await this.#evaluations.add(await this.#queryServer.evaluate(model));
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
@@ -146,7 +146,7 @@ class Controller {
             if (this.#quit) { return; }
             if (evaluation.status === 'TrainingStatus.PENDING') {
                 try {
-                    await this.#evaluations.set(await this.#queryServer.evaluate(evaluation.model));
+                    await this.#evaluations.update(await this.#queryServer.evaluate(evaluation.model));
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
