@@ -1,113 +1,10 @@
 const angular = require('angular');
-const _ = require('lodash');
 const mongodb = require('mongodb');
 import QueryServerService from '../../services/query-server.service.js';
 import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
 import MongoDbService from '../../services/mongodb.service.js';
-
-
-class ModelDescription {
-
-    /** @type {string} */
-    architecture;
-
-    /** @type {string} */
-    dataset;
-
-    /** @type {string} */
-    loss;
-
-    /** @type {string} */
-    optimizer;
-
-    /** @type {string} */
-    metrics;
-
-    /** @type {number} */
-    epochs;
-
-    /** @type {number} */
-    patience;
-
-    /** @type {number} */
-    split;
-
-    /**
-     * 
-     * @param {ModelDescription} model 
-     */
-    static toString(model) {
-        return `${model.architecture}-${model.dataset}-${model.loss}-${model.optimizer}-${model.metrics}-${model.epochs}-${model.patience}-${model.split}`;
-    }
-
-}
-
-
-class Metrics {
-
-    /** @type {number} */
-    accuracy;
-
-    /** @type {number} */
-    loss;
-
-}
-
-
-class Evaluation {
-
-    /** @type {ModelDescription} */
-    model;
-
-    /** @type {string} */
-    status;
-
-    /** @type {Metrics} */
-    training;
-
-    /** @type {Metrics} */
-    validation;
-
-    /** @type {Metrics} */
-    test;
-
-}
-
-
-class Evaluations {
-
-    /** @type {Map.<ModelDescription, Evaluation>} */
-    #container = new Map();
-
-    isLoaded = false;
-
-    /**
-     * 
-     * @param {Evaluation} evaluation 
-     */
-    set(evaluation) {
-        this.#container.set(ModelDescription.toString(evaluation.model), evaluation);
-    }
-
-    /**
-     * 
-     * @param {ModelDescription} model 
-     * @returns {boolean}
-     */
-    has(model) {
-        return this.#container.has(ModelDescription.toString(model));
-    }
-
-    statuses() {
-        return _.uniq(this.toArray().map(e => e.status));
-    }
-
-    toArray() {
-        return Array.from(this.#container.values());
-    }
-
-}
+import EvaluationsService from '../../services/evaluations.service.js';
 
 
 class ProgressBar {
@@ -149,8 +46,8 @@ class Controller {
     #modal;
     #options;
     #mongoDb;
+    #evaluations;
 
-    static #evaluations = new Evaluations();
     #quit = false;
     #search = {
         model: {
@@ -167,7 +64,7 @@ class Controller {
     };
     #progressBar = new ProgressBar();
 
-    static $inject = ['$scope', 'queryServer', 'modal', 'options', 'mongoDb'];
+    static $inject = ['$scope', 'queryServer', 'modal', 'options', 'mongoDb', 'evaluations'];
 
     /**
      * @param {angular.IScope} $scope 
@@ -175,13 +72,15 @@ class Controller {
      * @param {ModalService} modal
      * @param {OptionsService} options
      * @param {MongoDbService} mongoDb
+     * @param {EvaluationsService} evaluations
      */
-    constructor($scope, queryServer, modal, options, mongoDb) {
+    constructor($scope, queryServer, modal, options, mongoDb, evaluations) {
         this.#scope = $scope;
         this.#queryServer = queryServer;
         this.#modal = modal;
         this.#options = options;
         this.#mongoDb = mongoDb;
+        this.#evaluations = evaluations;
 
         $scope.options = options;
         $scope.search = this.#search;
@@ -189,7 +88,7 @@ class Controller {
 
         $scope.progressBar = this.#progressBar;
         $scope.optionsLoaded = () => options.isLoaded;
-        $scope.evaluations = Controller.#evaluations;
+        $scope.evaluations = this.#evaluations;
 
         $scope.retry = () => this.#retry();
         $scope.reevaluatePending = () => this.#reevaluatePending();
@@ -204,11 +103,11 @@ class Controller {
      */
     async #evaluateAll() {
         this.#modal.showLoading('EVALUATING...');
-        Controller.#evaluations.isLoaded = false;
+        this.#evaluations.isLoaded = false;
         for (let i of await this.#queryServer.evaluateAll()) {
-            Controller.#evaluations.set(i);
+            this.#evaluations.set(i);
         }
-        Controller.#evaluations.isLoaded = true;
+        this.#evaluations.isLoaded = true;
         this.#modal.hideLoading();
         this.#scope.$apply();
     }
@@ -220,11 +119,11 @@ class Controller {
         this.#scope.$apply();
         for (let model of this.#options.models()) {
             if (this.#quit) { return; }
-            if (!Controller.#evaluations.has(model)) {
+            if (!this.#evaluations.has(model)) {
                 try {
                     let result = await this.#queryServer.evaluate(model);
                     await this.#mongoDb.insertOne('evaluations', result);
-                    Controller.#evaluations.set(result);
+                    this.#evaluations.set(result);
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
@@ -259,13 +158,13 @@ class Controller {
         this.#progressBar.run();
         this.#progressBar.current = 0;
         this.#progressBar.total = this.#options.modelCount();
-        for (let eval_ of Controller.#evaluations.toArray()) {
+        for (let eval_ of this.#evaluations.toArray()) {
             if (this.#quit) { return; }
             if (eval_.status === 'TrainingStatus.PENDING') {
                 try {
                     let result = await this.#queryServer.evaluate(eval_.model);
                     await this.#mongoDb.findOneAndReplace('evaluations', { model: eval_.model }, result);
-                    Controller.#evaluations.set(result);
+                    this.#evaluations.set(result);
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
@@ -301,12 +200,12 @@ class Controller {
     }
 
     async #getEvaluated() {
-        if (!Controller.#evaluations.isLoaded) {
+        if (!this.#evaluations.isLoaded) {
             let x = await this.#mongoDb.getAll('evaluations');
             for (let i of x) {
-                Controller.#evaluations.set(i);
+                this.#evaluations.set(i);
             }
-            Controller.#evaluations.isLoaded = true;
+            this.#evaluations.isLoaded = true;
         }
     }
 
