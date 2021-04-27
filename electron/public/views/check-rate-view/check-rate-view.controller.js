@@ -120,10 +120,10 @@ function controllerFn($scope, options, modal, queryServer) {
 
     $scope.selectedOptions = {
         phase: 'test',
-        architecture: 'vgg16',
-        dataset: 'ccc',
-        loss: 'rmse',
-        optimizer: 'sgd1',
+        architecture: 'smi13a',
+        dataset: 'ccrc',
+        loss: 'bce',
+        optimizer: 'sgd',
         metrics: 'acc',
         epochs: 0,
         patience: 3,
