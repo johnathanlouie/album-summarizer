@@ -144,6 +144,16 @@ class MongoDbService {
         if ((await this.#db.collection(collection).insertOne(doc)).result.ok !== 1) { throw new Error(); }
     }
 
+    /**
+     * 
+     * @param {string} collection 
+     * @param {Object} filter 
+     */
+    async deleteOne(collection, filter) {
+        await this.connect();
+        if ((await this.#db.collection(collection).deleteOne(filter)).result.ok !== 1) { throw new Error(); }
+    }
+
 }
 
 
