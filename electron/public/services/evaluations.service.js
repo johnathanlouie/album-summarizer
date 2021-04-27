@@ -72,7 +72,7 @@ class Evaluation {
 
 class Evaluations {
 
-    mongoDb;
+    #mongoDb;
 
     /** @type {Map.<ModelDescription, Evaluation>} */
     #container = new Map();
@@ -85,7 +85,7 @@ class Evaluations {
      * @param {MongoDbService} mongoDb
      */
     constructor(mongoDb) {
-        this.mongoDb = mongoDb;
+        this.#mongoDb = mongoDb;
     }
 
     /**
@@ -115,7 +115,7 @@ class Evaluations {
 
     async fromMongoDb() {
         if (!this.#isLoaded) {
-            for (let i of await this.mongoDb.getAll('evaluations')) {
+            for (let i of await this.#mongoDb.getAll('evaluations')) {
                 this.set(i);
             }
             this.#isLoaded = true;
