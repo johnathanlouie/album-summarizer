@@ -92,7 +92,13 @@ class Evaluations {
      * 
      * @param {Evaluation} evaluation 
      */
-    set(evaluation) {
+    async set(evaluation) {
+        if (this.#container.has(evaluation.model)) {
+            await this.#mongoDb.findOneAndReplace('evaluations', { model: evaluation.model }, evaluation);
+        }
+        else {
+            await this.#mongoDb.insertOne('evaluations', evaluation);
+        }
         this.#container.set(ModelDescription.toString(evaluation.model), evaluation);
     }
 

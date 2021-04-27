@@ -107,9 +107,7 @@ class Controller {
             if (this.#quit) { return; }
             if (!this.#evaluations.has(model)) {
                 try {
-                    let result = await this.#queryServer.evaluate(model);
-                    await this.#mongoDb.insertOne('evaluations', result);
-                    this.#evaluations.set(result);
+                    await this.#evaluations.set(await this.#queryServer.evaluate(model));
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
@@ -144,13 +142,11 @@ class Controller {
         this.#progressBar.run();
         this.#progressBar.current = 0;
         this.#progressBar.total = this.#options.modelCount();
-        for (let eval_ of this.#evaluations.toArray()) {
+        for (let evaluation of this.#evaluations.toArray()) {
             if (this.#quit) { return; }
-            if (eval_.status === 'TrainingStatus.PENDING') {
+            if (evaluation.status === 'TrainingStatus.PENDING') {
                 try {
-                    let result = await this.#queryServer.evaluate(eval_.model);
-                    await this.#mongoDb.findOneAndReplace('evaluations', { model: eval_.model }, result);
-                    this.#evaluations.set(result);
+                    await this.#evaluations.set(await this.#queryServer.evaluate(evaluation.model));
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
