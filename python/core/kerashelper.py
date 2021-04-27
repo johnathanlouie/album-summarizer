@@ -51,6 +51,7 @@ class TrainingStatus(enum.Enum):
     RESOURCE = 'resource error'
     RESOURCE2 = 'resource error during load'
     BAD_SETTINGS = 'incompatible model compile options'
+    STATE_MISSING = 'training state missing'
 
 
 class TrainingStatusData(object):

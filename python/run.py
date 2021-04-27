@@ -12,6 +12,7 @@ import addon
 from builds import builds
 from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
                           ClusterResults, ClusterStrategy)
+from core.kerashelper import TrainingStatus
 from core.model import (BadModelSettings, ModelSplit, ModelStateMissingError,
                         TrainingIncompleteException)
 from core.modelbuilder import ModelBuilder
@@ -298,9 +299,9 @@ if __name__ == '__main__':
             else:
                 return flask.jsonify(Evaluation(settings, status))
         except ModelStateMissingError:
-            return flask.jsonify(Evaluation(settings, 'model state missing'))
+            return flask.jsonify(Evaluation(settings, str(TrainingStatus.STATE_MISSING)))
         except BadModelSettings:
-            return flask.jsonify(Evaluation(settings, 'incompatible'))
+            return flask.jsonify(Evaluation(settings, str(TrainingStatus.BAD_SETTINGS)))
         except:
             print_exc()
             response = flask.Response()
