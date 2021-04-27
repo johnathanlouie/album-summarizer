@@ -18,7 +18,7 @@ class Controller {
     #mongoDb;
     #location;
     #users;
-    evaluations;
+    #evaluations;
 
     static $inject = ['$scope', '$location', 'queryServer', 'modal', 'options', 'mongoDb', 'users', 'evaluations'];
 
@@ -41,7 +41,7 @@ class Controller {
         this.#options = options;
         this.#mongoDb = mongoDb;
         this.#users = users;
-        this.evaluations = evaluations;
+        this.#evaluations = evaluations;
 
         $scope.status = 'CONNECTING';
         $scope.connectionFailed = false;
@@ -59,7 +59,7 @@ class Controller {
             await Promise.all([
                 this.#options.load(),
                 this.#users.load(),
-                this.evaluations.fromMongoDb(),
+                this.#evaluations.fromMongoDb(),
             ]);
             this.#location.path('/organizer');
         }
