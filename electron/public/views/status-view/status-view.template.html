@@ -98,21 +98,21 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="eval in evaluations.arr | filter : search | orderBy : sort.phase : sort.reverse">
+            <tr ng-repeat="eval_ in evaluations.toArray() | filter : search | orderBy : sort.phase : sort.reverse">
                 <td>
-                    <pre>{{ eval.model | json }}</pre>
+                    <pre>{{ eval_.model | json }}</pre>
                 </td>
                 <td>
-                    <pre>{{ eval.status }}</pre>
+                    <pre>{{ eval_.status }}</pre>
                 </td>
                 <td>
-                    <pre>{{ eval.training | json }}</pre>
+                    <pre>{{ eval_.training | json }}</pre>
                 </td>
                 <td>
-                    <pre>{{ eval.validation | json }}</pre>
+                    <pre>{{ eval_.validation | json }}</pre>
                 </td>
                 <td>
-                    <pre>{{ eval.test | json }}</pre>
+                    <pre>{{ eval_.test | json }}</pre>
                 </td>
             </tr>
         </tbody>

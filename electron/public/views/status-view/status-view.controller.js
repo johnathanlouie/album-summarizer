@@ -33,6 +33,14 @@ class Model {
     /** @type {number} */
     split;
 
+    /**
+     * 
+     * @param {Model} model 
+     */
+    static toString(model) {
+        return `${model.architecture}-${model.dataset}-${model.loss}-${model.optimizer}-${model.metrics}-${model.epochs}-${model.patience}-${model.split}`;
+    }
+
 }
 
 
@@ -69,23 +77,17 @@ class Evaluation {
 
 class Evaluations {
 
-    arr = [];
+    /** @type {Map.<Model, Evaluation>} */
+    #container = new Map();
 
     isLoaded = false;
 
-    add(e) { this.arr.push(e); }
-
-    replace(i, e) { this.arr[i] = e; }
-
     /**
-     * @param {Model} model
-     * @returns {?Object}
+     * 
+     * @param {Evaluation} evaluation 
      */
-    fetch(model) {
-        for (let i of this.arr) {
-            if (_.isEqual(i.model, model)) { return i; }
-        }
-        return null;
+    set(evaluation) {
+        this.#container.set(Model.toString(evaluation.model), evaluation);
     }
 
     /**
@@ -93,11 +95,17 @@ class Evaluations {
      * @param {Model} model 
      * @returns {boolean}
      */
-    contains(model) {
-        return this.fetch(model) !== null;
+    has(model) {
+        return this.#container.has(Model.toString(model));
     }
 
-    statuses() { return _.uniq(this.arr.map(e => e.status)); }
+    statuses() {
+        return _.uniq(this.toArray().map(e => e.status));
+    }
+
+    toArray() {
+        return Array.from(this.#container.values());
+    }
 
 }
 
@@ -196,7 +204,11 @@ class Controller {
      */
     async #evaluateAll() {
         this.#modal.showLoading('EVALUATING...');
-        Controller.#evaluations.arr = await this.#queryServer.evaluateAll();
+        Controller.#evaluations.isLoaded = false;
+        for (let i of await this.#queryServer.evaluateAll()) {
+            Controller.#evaluations.set(i);
+        }
+        Controller.#evaluations.isLoaded = true;
         this.#modal.hideLoading();
         this.#scope.$apply();
     }
@@ -208,11 +220,11 @@ class Controller {
         this.#scope.$apply();
         for (let model of this.#options.models()) {
             if (this.#quit) { return; }
-            if (!Controller.#evaluations.contains(model)) {
+            if (!Controller.#evaluations.has(model)) {
                 try {
                     let result = await this.#queryServer.evaluate(model);
                     await this.#mongoDb.insertOne('evaluations', result);
-                    Controller.#evaluations.add(result);
+                    Controller.#evaluations.set(result);
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
@@ -247,13 +259,13 @@ class Controller {
         this.#progressBar.run();
         this.#progressBar.current = 0;
         this.#progressBar.total = this.#options.modelCount();
-        for (let [i, e] of Controller.#evaluations.arr.entries()) {
+        for (let eval_ of Controller.#evaluations.toArray()) {
             if (this.#quit) { return; }
-            if (e.status === 'TrainingStatus.PENDING') {
+            if (eval_.status === 'TrainingStatus.PENDING') {
                 try {
-                    let result = await this.#queryServer.evaluate(e.model);
-                    await this.#mongoDb.findOneAndReplace('evaluations', { model: result.model }, result);
-                    Controller.#evaluations.replace(i, result);
+                    let result = await this.#queryServer.evaluate(eval_.model);
+                    await this.#mongoDb.findOneAndReplace('evaluations', { model: eval_.model }, result);
+                    Controller.#evaluations.set(result);
                     this.#progressBar.current++;
                     this.#scope.$apply();
                 }
@@ -290,7 +302,10 @@ class Controller {
 
     async #getEvaluated() {
         if (!Controller.#evaluations.isLoaded) {
-            Controller.#evaluations.arr = await this.#mongoDb.getAll('evaluations');
+            let x = await this.#mongoDb.getAll('evaluations');
+            for (let i of x) {
+                Controller.#evaluations.set(i);
+            }
             Controller.#evaluations.isLoaded = true;
         }
     }
