@@ -140,6 +140,19 @@ class Evaluations {
         }
     }
 
+    async removeMongoDbDuplicates() {
+        let copy = new Map();
+        for (let evaluation of await this.#mongoDb.getAll('evaluations')) {
+            if (copy.has(ModelDescription.toString(evaluation.model))) {
+                console.log(evaluation);
+                await this.#mongoDb.deleteOne('evaluations', evaluation);
+            }
+            else {
+                copy.set(ModelDescription.toString(evaluation.model), evaluation);
+            }
+        }
+    }
+
 }
 
 

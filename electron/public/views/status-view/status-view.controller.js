@@ -91,12 +91,27 @@ class Controller {
         $scope.evaluations = this.#evaluations;
 
         $scope.retry = () => this.#retry();
+        $scope.removeMongoDbDuplicates = () => this.removeMongoDbDuplicates();
         $scope.reevaluatePending = () => this.#reevaluatePending();
 
         this.#preInit();
     }
 
     $onDestroy() { this.#quit = true; }
+
+    async removeMongoDbDuplicates() {
+        try {
+            this.#modal.showLoading('DELETING...');
+            await this.#evaluations.removeMongoDbDuplicates();
+            this.#modal.hideLoading();
+        }
+        catch (e) {
+            console.error(e);
+            this.#modal.hideLoading();
+            this.#modal.showError(e, 'ERROR: MongoDB', 'Error while deleting duplicates');
+        }
+        this.#scope.$apply();
+    }
 
     async #evaluate() {
         this.#progressBar.run();
