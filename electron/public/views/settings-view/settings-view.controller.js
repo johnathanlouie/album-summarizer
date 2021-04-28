@@ -21,37 +21,32 @@ class SettingsViewController {
         this.settings = settings;
         this.modal = modal;
 
-        $scope.serverSettings = this.settings.server;
-        $scope.settings = this.settings.mongodb;
-
-        function load() {
-            try {
-                mongoDbSettings.load();
-            }
-            catch (e) {
-                console.warn(e);
-                $scope.toast2 = e;
-                $('#toast2').toast('show');
-            }
-        }
-
-        $scope.update = function () {
-            try {
-                mongoDbSettings.save();
-                $('#toast1').toast('show');
-            }
-            catch (e) {
-                console.error(e);
-                modal.showError(e, 'ERROR: Settings File', 'Cannot write to MongoDB settings file');
-            }
-        }
+        $scope.settings = this.settings;
+        $scope.save = () => this.save();
 
         $('#toast1').on('show.bs.toast', function () { $scope.toastShow1 = true; });
         $('#toast1').on('hidden.bs.toast', function () { $scope.toastShow1 = false; });
         $('#toast2').on('show.bs.toast', function () { $scope.toastShow2 = true; });
         $('#toast2').on('hidden.bs.toast', function () { $scope.toastShow2 = false; });
-        load();
+        this.exists();
 
+    }
+
+    save() {
+        try {
+            this.settings.save();
+            $('#toast1').toast('show');
+        }
+        catch (e) {
+            console.error(e);
+            modal.showError(e, 'ERROR: Settings File', 'Cannot write to settings file');
+        }
+    }
+
+    exists() {
+        if (!this.settings.exists()) {
+            $('#toast2').toast('show');
+        }
     }
 
 }

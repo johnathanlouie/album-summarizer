@@ -4,41 +4,42 @@
 
     <h1 class="display-2 pb-3">Settings</h1>
 
-    <h1>MongoDB Settings</h1>
+    <form ng-submit="save()">
 
-    <form ng-submit="update()">
+        <h1>MongoDB</h1>
+
         <div class="form-row">
             <div class="form-group col-8">
-                <label for="hostname">Hostname/IP Address</label>
-                <input class="form-control" ng-model="settings.hostname" type="text" id="hostname">
+                <label for="mongodbHostname">Hostname/IP Address</label>
+                <input class="form-control" ng-model="settings.mongodb.hostname" type="text" id="mongodbHostname">
             </div>
             <div class="form-group col">
-                <label for="port">Port</label>
-                <input class="form-control" ng-model="settings.port" type="number" id="port">
+                <label for="mongodbPort">Port</label>
+                <input class="form-control" ng-model="settings.mongodb.port" type="number" id="mongodbPort">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group col">
-                <label for="username">Username</label>
-                <input class="form-control" ng-model="settings.username" type="text" id="username">
+                <label for="mongodbUsername">Username</label>
+                <input class="form-control" ng-model="settings.mongodb.username" type="text" id="mongodbUsername">
             </div>
             <div class="form-group col">
-                <label for="password">Password</label>
-                <input class="form-control" ng-model="settings.password" type="password" id="password">
+                <label for="mongodbPassword">Password</label>
+                <input class="form-control" ng-model="settings.mongodb.password" type="password" id="mongodbPassword">
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">Update</button>
-    </form>
 
-    <h1>Server Settings</h1>
+        <h1>Server</h1>
 
-    <form>
         <div class="form-row">
-            <div class="form-group">
+            <div class="form-group col">
                 <label for="serverUrl">URL</label>
-                <input type="text" class="form-control" id="serverUrl" ng-model="serverSettings.url">
+                <input type="text" class="form-control" id="serverUrl" ng-model="settings.server.url">
             </div>
         </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+
     </form>
 
     <div style="position: absolute; top: 0; right: 0;">
@@ -46,26 +47,26 @@
         <div class="toast" role="status" aria-live="polite" aria-atomic="true" id="toast1" data-delay="5000"
             data-autohide="true" ng-show="toastShow1">
             <div class="toast-header bg-success text-white">
-                <strong class="mr-auto">MongoDB</strong>
+                <strong class="mr-auto">Settings</strong>
                 <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="toast-body">
-                MongoDB settings successfully saved!
+                Settings successfully saved!
             </div>
         </div>
 
         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="toast2" data-delay="5000"
             data-autohide="true" ng-show="toastShow2">
             <div class="toast-header bg-info text-white">
-                <strong class="mr-auto">MongoDB</strong>
+                <strong class="mr-auto">Settings</strong>
                 <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="toast-body">
-                {{ toast2 }}
+                Settings file missing. Loaded default settings.
             </div>
         </div>
 
