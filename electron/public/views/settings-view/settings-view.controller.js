@@ -1,14 +1,18 @@
 const angular = require('angular');
 import ModalService from '../../services/modal.service.js';
 import MongoDbSettingsService from '../../services/mongodb-settings.service.js';
+import QueryServerService from '../../services/query-server.service.js';
 
 
 /**
  * @param {angular.IScope} $scope 
  * @param {MongoDbSettingsService} mongoDbSettings 
  * @param {ModalService} modal 
+ * @param {QueryServerService} queryServer 
  */
-function controllerFn($scope, mongoDbSettings, modal) {
+function controllerFn($scope, mongoDbSettings, modal, queryServer) {
+
+    $scope.queryServerSettings = queryServer.settings;
 
     function load() {
         try {
@@ -43,7 +47,7 @@ function controllerFn($scope, mongoDbSettings, modal) {
 
 }
 
-controllerFn.$inject = ['$scope', 'mongoDbSettings', 'modal'];
+controllerFn.$inject = ['$scope', 'mongoDbSettings', 'modal', 'queryServer'];
 
 
 export default controllerFn;

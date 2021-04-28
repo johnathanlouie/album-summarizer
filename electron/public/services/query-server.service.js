@@ -1,4 +1,5 @@
 const angular = require('angular');
+const fs = require('fs');
 
 
 /**
@@ -67,13 +68,41 @@ const angular = require('angular');
  */
 
 
+class SettingsFile {
+
+    serverUrl = 'http://localhost:8080';
+    #loaded = false;
+
+    save() {
+        fs.writeFileSync('server.json', JSON.stringify(this));
+        this.#loaded = true;
+    }
+
+    load() {
+        this.#loaded = false;
+        if (fs.existsSync()) {
+            var json = fs.readFileSync('server.json');
+            var obj = JSON.parse(json);
+            this.serverUrl = obj.serverUrl;
+            this.#loaded = true;
+        }
+        else {
+            this.save();
+        }
+    }
+
+    get isLoaded() { return this.#loaded; }
+
+}
+
+
 /**
  * An interface to the python server
  */
 class QueryServerService {
 
     #http;
-    #serverUrl = 'http://localhost:8080';
+    settings = new SettingsFile();
 
     static $inject = ['$http'];
 
@@ -82,7 +111,12 @@ class QueryServerService {
      */
     constructor($http) {
         this.#http = $http;
+        if (!this.settings.isLoaded) {
+            this.settings.load();
+        }
     }
+
+    get #serverUrl() { return this.settings.serverUrl; }
 
     /**
      * Rates and clusters images

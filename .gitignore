@@ -341,3 +341,4 @@ nbproject/private/
 /out/
 /electron/public/data/
 electron/mongodb.json
+electron/server.json
