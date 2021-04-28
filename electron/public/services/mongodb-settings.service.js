@@ -10,25 +10,30 @@ class MongoDbSettings {
     #loaded = false;
 
     static $inject = [];
-    constructor() { }
+    constructor() {
+        this.load();
+    }
 
     save() {
         fs.writeFileSync('mongodb.json', JSON.stringify(this));
-        this.#loaded = true;
     }
 
-    load() {
-        this.#loaded = false;
-        if (fs.existsSync()) {
+    /**
+     * 
+     * @param {boolean} refresh 
+     */
+    load(refresh) {
+        if (!fs.existsSync()) {
+            this.save();
+            this.#loaded = true;
+        }
+        else if (!this.#loaded || refresh) {
             var json = fs.readFileSync('mongodb.json');
             var obj = JSON.parse(json);
             this.hostname = obj.hostname;
             this.username = obj.username;
             this.password = obj.password;
             this.#loaded = true;
-        }
-        else {
-            this.save();
         }
     }
 
