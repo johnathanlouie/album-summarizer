@@ -1,5 +1,4 @@
 const angular = require('angular');
-const fs = require('fs');
 import SettingsService from './settings.service.js';
 
 
