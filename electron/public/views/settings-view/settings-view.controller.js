@@ -1,7 +1,6 @@
 const angular = require('angular');
 import ModalService from '../../services/modal.service.js';
 import SettingsService from '../../services/settings.service.js';
-import QueryServerService from '../../services/query-server.service.js';
 
 
 class SettingsViewController {
