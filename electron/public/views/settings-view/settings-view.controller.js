@@ -6,6 +6,11 @@ import QueryServerService from '../../services/query-server.service.js';
 
 class SettingsViewController {
 
+    $scope;
+    mongoDbSettings;
+    modal;
+    queryServer
+
     static $inject = ['$scope', 'mongoDbSettings', 'modal', 'queryServer'];
 
     /**
@@ -15,15 +20,17 @@ class SettingsViewController {
      * @param {QueryServerService} queryServer 
      */
     constructor($scope, mongoDbSettings, modal, queryServer) {
+        this.$scope = $scope;
+        this.mongoDbSettings = mongoDbSettings;
+        this.modal = modal;
+        this.queryServer = queryServer;
 
-        $scope.queryServerSettings = queryServer.settings;
+        $scope.queryServerSettings = this.queryServer.settings;
+        $scope.settings = this.mongoDbSettings;
 
         function load() {
             try {
-                $scope.settings = mongoDbSettings;
-                if (!mongoDbSettings.isLoaded) {
-                    mongoDbSettings.load();
-                }
+                mongoDbSettings.load();
             }
             catch (e) {
                 console.warn(e);
