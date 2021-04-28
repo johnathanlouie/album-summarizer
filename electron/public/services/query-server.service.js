@@ -1,5 +1,6 @@
 const angular = require('angular');
 const fs = require('fs');
+import SettingsService from './settings.service.js';
 
 
 /**
@@ -68,55 +69,26 @@ const fs = require('fs');
  */
 
 
-class SettingsFile {
-
-    serverUrl = 'http://localhost:8080';
-    #loaded = false;
-
-    save() {
-        fs.writeFileSync('server.json', JSON.stringify(this));
-        this.#loaded = true;
-    }
-
-    load() {
-        this.#loaded = false;
-        if (fs.existsSync()) {
-            var json = fs.readFileSync('server.json');
-            var obj = JSON.parse(json);
-            this.serverUrl = obj.serverUrl;
-            this.#loaded = true;
-        }
-        else {
-            this.save();
-        }
-    }
-
-    get isLoaded() { return this.#loaded; }
-
-}
-
-
 /**
  * An interface to the python server
  */
 class QueryServerService {
 
-    #http;
-    settings = new SettingsFile();
+    $http;
+    settings;
 
-    static $inject = ['$http'];
+    static $inject = ['$http', 'settings'];
 
     /**
      * @param {angular.IHttpService} $http 
+     * @param {SettingsService} settings 
      */
-    constructor($http) {
-        this.#http = $http;
-        if (!this.settings.isLoaded) {
-            this.settings.load();
-        }
+    constructor($http, settings) {
+        this.$http = $http;
+        this.settings = settings;
     }
 
-    get #serverUrl() { return this.settings.serverUrl; }
+    get #serverUrl() { return this.settings.server.url; }
 
     /**
      * Rates and clusters images
@@ -124,7 +96,7 @@ class QueryServerService {
      * @returns {Promise.<Array.<Array.<RunReturnObject>>>}
      */
     async run(dir) {
-        return (await this.#http.post(`${this.#serverUrl}/run`, { url: dir })).data;
+        return (await this.$http.post(`${this.#serverUrl}/run`, { url: dir })).data;
     }
 
     /**
@@ -132,7 +104,7 @@ class QueryServerService {
      * @returns {Promise.<OptionsReturnObject>}
      */
     async options() {
-        return (await this.#http.get(`${this.#serverUrl}/options`)).data;
+        return (await this.$http.get(`${this.#serverUrl}/options`)).data;
     }
 
     /**
@@ -141,7 +113,7 @@ class QueryServerService {
      * @returns {Promise.<PredictReturnObject>}
      */
     async predict(model) {
-        return (await this.#http.post(`${this.#serverUrl}/predict`, model)).data;
+        return (await this.$http.post(`${this.#serverUrl}/predict`, model)).data;
     }
 
     /**
@@ -151,7 +123,7 @@ class QueryServerService {
      * @returns {Promise.<Array.<Array.<string>>>}
      */
     async cluster(algorithm, directory) {
-        return (await this.#http.post(`${this.#serverUrl}/cluster`, {
+        return (await this.$http.post(`${this.#serverUrl}/cluster`, {
             cluster: algorithm,
             directory: directory,
         })).data;
@@ -161,7 +133,7 @@ class QueryServerService {
      * @returns {Promise.<Array.<EvaluationReturnObject>>}
      */
     async evaluateAll() {
-        return (await this.#http.get(`${this.#serverUrl}/evaluate/all/0`)).data;
+        return (await this.$http.get(`${this.#serverUrl}/evaluate/all/0`)).data;
     }
 
     /**
@@ -169,7 +141,7 @@ class QueryServerService {
      * @returns {Promise.<EvaluationReturnObject>}
      */
     async evaluate(model) {
-        return (await this.#http.post(`${this.#serverUrl}/evaluate`, model)).data;
+        return (await this.$http.post(`${this.#serverUrl}/evaluate`, model)).data;
     }
 
 }

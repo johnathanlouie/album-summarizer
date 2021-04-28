@@ -1,32 +1,29 @@
 const angular = require('angular');
 import ModalService from '../../services/modal.service.js';
-import MongoDbSettingsService from '../../services/mongodb-settings.service.js';
+import SettingsService from '../../services/settings.service.js';
 import QueryServerService from '../../services/query-server.service.js';
 
 
 class SettingsViewController {
 
     $scope;
-    mongoDbSettings;
+    settings;
     modal;
-    queryServer
 
-    static $inject = ['$scope', 'mongoDbSettings', 'modal', 'queryServer'];
+    static $inject = ['$scope', 'settings', 'modal'];
 
     /**
      * @param {angular.IScope} $scope 
-     * @param {MongoDbSettingsService} mongoDbSettings 
+     * @param {SettingsService} settings 
      * @param {ModalService} modal 
-     * @param {QueryServerService} queryServer 
      */
-    constructor($scope, mongoDbSettings, modal, queryServer) {
+    constructor($scope, settings, modal) {
         this.$scope = $scope;
-        this.mongoDbSettings = mongoDbSettings;
+        this.settings = settings;
         this.modal = modal;
-        this.queryServer = queryServer;
 
-        $scope.queryServerSettings = this.queryServer.settings;
-        $scope.settings = this.mongoDbSettings;
+        $scope.serverSettings = this.settings.server;
+        $scope.settings = this.settings.mongodb;
 
         function load() {
             try {

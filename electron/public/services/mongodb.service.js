@@ -1,5 +1,5 @@
 const mongodb = require('mongodb');
-import MongoDbSettings from './mongodb-settings.service.js';
+import SettingsService from './settings.service.js';
 
 
 class MongoDbService {
@@ -10,17 +10,18 @@ class MongoDbService {
     /** @type {mongodb.Db} */
     #db;
 
-    /** @type {MongoDbSettings} */
-    #mongoDbSettings;
+    settings;
 
-    static $inject = ['mongoDbSettings'];
+    static $inject = ['settings'];
 
-    constructor(mongoDbSettings) {
-        this.#mongoDbSettings = mongoDbSettings;
-        if (!this.#mongoDbSettings.isLoaded) {
-            this.#mongoDbSettings.load();
-        }
-        this.#client = new mongodb.MongoClient(this.#mongoDbSettings.uri(), {
+    /**
+     * 
+     * @param {SettingsService} settings 
+     */
+    constructor(settings) {
+        this.settings = settings;
+
+        this.#client = new mongodb.MongoClient(this.settings.mongodb.uri(), {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
