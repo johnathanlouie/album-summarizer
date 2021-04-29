@@ -7,7 +7,14 @@ import FocusImageService from '../../services/cwd.service.js';
 import ModalService from '../../services/modal.service.js';
 
 
-class Controller {
+class OrganizerViewController {
+
+    $scope;
+    history;
+    cwd;
+    screenView;
+    focusImage;
+    modal;
 
     static $inject = ['$scope', 'history', 'cwd', 'screenView', 'focusImage', 'modal'];
 
@@ -20,6 +27,13 @@ class Controller {
      * @param {ModalService} modal
      */
     constructor($scope, history, cwd, screenView, focusImage, modal) {
+        this.$scope = $scope;
+        this.history = history;
+        this.cwd = cwd;
+        this.screenView = screenView;
+        this.focusImage = focusImage;
+        this.modal = modal;
+
         $scope.cwd = cwd;
         $scope.screenView = screenView;
         $scope.focusImage = focusImage;
@@ -93,4 +107,4 @@ class Controller {
 }
 
 
-export default Controller;
+export default OrganizerViewController;
