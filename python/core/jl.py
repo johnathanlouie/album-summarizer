@@ -430,3 +430,7 @@ def copy_file(file_: Url, directory: Url, ancestors: int = 0) -> None:
     except PermissionError:
         raise PermissionError("Copy \"%s\" to \"%s\"." % (file_, new_url))
     return
+
+
+def hash_images(images: List[Url]) -> int:
+    return hash(tuple(images))
