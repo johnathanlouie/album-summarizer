@@ -415,7 +415,7 @@ class KerasAdapter(object):
         predictions: ndarray = self._kmodel.predict_generator(generator=seq, verbose=1)
         if simple:
             if predictions.ndim == 2 and predictions.shape[1] == 1:
-                predictions.flatten()
+                predictions = predictions.flatten()
         y = predictions.tolist()
         if simple:
             y = self._data.translate_predictions(y)
