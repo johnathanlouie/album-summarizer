@@ -89,7 +89,8 @@ class ClusterStrategy(ABC):
         if os.path.exists(filepath):
             return dill.load(filepath)
         results = self.run(images)
-        dill.dump(results, filepath)
+        with open(filepath, 'w') as f:
+            dill.dump(results, f)
         return results
 
 
