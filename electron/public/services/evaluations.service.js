@@ -23,26 +23,26 @@ class EvaluationsService {
      * 
      * @param {Evaluation} evaluation 
      */
-    #set(evaluation) {
+    set(evaluation) {
         this.#container.set(evaluation.model.toString(), evaluation);
     }
 
     /**
-     * 
+     * @deprecated
      * @param {Evaluation} evaluation 
      */
     async add(evaluation) {
         await this.database.addEvaluation(evaluation);
-        this.#set(evaluation);
+        this.set(evaluation);
     }
 
     /**
-     * 
+     * @deprecated
      * @param {Evaluation} evaluation 
      */
     async update(evaluation) {
         await this.database.updateEvaluation(evaluation);
-        this.#set(evaluation);
+        this.set(evaluation);
     }
 
     /**
@@ -62,6 +62,9 @@ class EvaluationsService {
         return Array.from(this.#container.values());
     }
 
+    /**
+     * @deprecated
+     */
     async fromMongoDb() {
         if (!this.#isLoaded) {
             for (let i of await this.database.getAllEvaluations()) {
@@ -71,6 +74,9 @@ class EvaluationsService {
         }
     }
 
+    /**
+     * @deprecated
+     */
     async removeMongoDbDuplicates() {
         let copy = new Map();
         for (let evaluation of await this.database.getAllEvaluations()) {
