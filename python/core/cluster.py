@@ -1,7 +1,10 @@
+import os.path
 from abc import ABC, abstractmethod
 from typing import Dict, List, Union
 
-from core.jl import ImageDirectory
+import dill
+
+from core.jl import ImageDirectory, hash_images
 from core.typing2 import Url
 
 
@@ -77,6 +80,17 @@ class ClusterStrategy(ABC):
         Clusters a list of images.
         """
         pass
+
+    def _cache_path(self, images: List[Url]) -> Url:
+        return "cache/%d/%s-cluster.dill" % (hash_images(images), type(self).__name__)
+
+    def run_cached(self, images: List[Url]) -> ClusterResults:
+        filepath = self._cache_path(images)
+        if os.path.exists(filepath):
+            return dill.load(filepath)
+        results = self.run(images)
+        dill.dump(results, filepath)
+        return results
 
 
 class ClusterRegistryInsertionError(LookupError):
