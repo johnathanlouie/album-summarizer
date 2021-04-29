@@ -81,11 +81,14 @@ class ModelSplitName(object):
         self.latest: ModelSplitName2 = ModelSplitName2(self.dirname(), 'latest')
         self.best: ModelSplitName2 = ModelSplitName2(self.dirname(), 'best')
 
+    def model_id(self) -> Url:
+        return "%s-%s-%s-%s/%d-%d/%d" % (self._architecture, self._dataset, self._loss, self._optimizer, self._epochs, self._patience, self._split)
+
     def dirname(self) -> Url:
         """
         Returns the path up to each file.
         """
-        return "out/%s-%s-%s-%s/%d-%d/%d" % (self._architecture, self._dataset, self._loss, self._optimizer, self._epochs, self._patience, self._split)
+        return "models/%s" % self.model_id()
 
     def log(self) -> Url:
         """
