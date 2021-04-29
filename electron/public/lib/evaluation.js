@@ -58,22 +58,22 @@ class Evaluation {
     /** @type {string} */
     status;
 
-    /** @type {Metrics} */
+    /** @type {?Metrics} */
     training;
 
-    /** @type {Metrics} */
+    /** @type {?Metrics} */
     validation;
 
-    /** @type {Metrics} */
+    /** @type {?Metrics} */
     test;
 
     static from(evaluation) {
         /** @type {Evaluation} */
         let instance = Object.assign(new Evaluation(), evaluation);
         instance.model = ModelDescription.from(instance.model);
-        instance.training = Metrics.from(instance.training);
-        instance.validation = Metrics.from(instance.validation);
-        instance.test = Metrics.from(instance.test);
+        instance.training = instance.training ? Metrics.from(instance.training) : null;
+        instance.validation = instance.validation ? Metrics.from(instance.validation) : null;
+        instance.test = instance.test ? Metrics.from(instance.test) : null;
         return instance;
     }
 
