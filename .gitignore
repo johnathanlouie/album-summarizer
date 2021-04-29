@@ -339,5 +339,6 @@ nbproject/private/
 # Data files
 /data/
 /out/
+/models/
 /electron/public/data/
 electron/settings.json
