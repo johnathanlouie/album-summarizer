@@ -12,26 +12,6 @@ from numpy import asarray, load, ndarray, save, zeros
 from typing2 import ArrayLike, Image, ImageArray, IntClass, OneHot, Url
 
 
-TEXT_CLASSES = 'out/categ.txt'
-TEXT_PRED = 'out/pred.txt'
-TEXT_RATE = 'out/rate.txt'
-
-TEXT_CLUSTER_SIFT = 'out/cl1.txt'
-TEXT_CLUSTER_HISTOGRAM = 'out/cl2.txt'
-TEXT_CLUSTER_COMBINED = 'out/cl3.txt'
-TEXT_CLUSTER_COMBINED2 = 'out/cl4.txt'
-
-NPY_CLASSES = 'categ'
-NPY_PHOTOS = 'photos'
-NPY_PHOTOS2 = 'photos2'
-NPY_PRED = 'pred'
-NPY_PREDRATE = 'predrate'
-NPY_DESC = 'desc'
-NPY_RATE = 'rate'
-
-JSON_SIMILARITYMATRIX = 'out/sim.json'
-
-
 def npsave(name: str, data: ArrayLike, verbose: bool = True) -> None:
     """
     Saves to a binary NumPy file.
