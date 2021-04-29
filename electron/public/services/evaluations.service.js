@@ -68,7 +68,7 @@ class EvaluationsService {
     async fromMongoDb() {
         if (!this.#isLoaded) {
             for (let i of await this.database.getAllEvaluations()) {
-                this.#set(i);
+                this.set(i);
             }
             this.#isLoaded = true;
         }
