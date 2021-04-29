@@ -340,5 +340,6 @@ nbproject/private/
 /data/
 /out/
 /models/
+/cache/
 /electron/public/data/
 electron/settings.json

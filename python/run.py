@@ -114,8 +114,8 @@ def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> 
     images = ImageDirectory(directory).jpeg(False)
     if len(images) == 0:
         return list()
-    clusters = algorithm.run(images)
-    rates = algorithm2.predict(images).human_readable()
+    clusters = algorithm.run_cached(images)
+    rates = algorithm2.predict(images, True).human_readable()
     print('Ranking results....')
     cr = ClusterRank(clusters, rates)
     return cr.jsonable()
@@ -256,7 +256,7 @@ if __name__ == '__main__':
             settings = flask.request.get_json()
             images = ImageDirectory(settings['directory']).jpeg(False)
             cluster = ClusterRegistry.get(settings['cluster'])
-            results = cluster.run(images).urls()
+            results = cluster.run_cached(images).urls()
             results = flask.jsonify(results)
             return results
         except ClusterRegistryNameError:
