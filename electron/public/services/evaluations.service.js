@@ -1,6 +1,6 @@
 const _ = require('lodash');
 import DatabaseService from './database.service.js';
-import { Evaluation, Metrics, ModelDescription } from '../lib/evaluation.js';
+import { Evaluation, ModelDescription } from '../lib/evaluation.js';
 
 
 class EvaluationsService {
