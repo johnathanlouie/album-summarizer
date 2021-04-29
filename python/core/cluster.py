@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 
 import dill
 
-from core.jl import ImageDirectory, hash_images
+from core.jl import ImageDirectory, hash_images, mkdirname
 from core.typing2 import Url
 
 
@@ -82,13 +82,17 @@ class ClusterStrategy(ABC):
         pass
 
     def _cache_path(self, images: List[Url]) -> Url:
-        return "cache/%d/%s-cluster.dill" % (hash_images(images), type(self).__name__)
+        return "cache/%s/%s-cluster.dill" % (hash_images(images), type(self).__name__)
 
     def run_cached(self, images: List[Url]) -> ClusterResults:
         filepath = self._cache_path(images)
+        mkdirname(filepath)
         if os.path.exists(filepath):
-            return dill.load(filepath)
+            print('LOADING: %s' % filepath)
+            with open(filepath, 'r') as f:
+                return dill.load(f)
         results = self.run(images)
+        print('SAVING: %s' % filepath)
         with open(filepath, 'w') as f:
             dill.dump(results, f)
         return results
