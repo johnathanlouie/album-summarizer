@@ -5,6 +5,7 @@ from enum import Enum, auto
 from os.path import isfile
 from typing import Any, Dict, List, Union
 
+import dill
 import keras.models
 import tensorflow as tf
 from keras.backend import clear_session
@@ -15,7 +16,7 @@ from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
 from core.dataset import DataSet, DataSetSplit, DataSetSplitName
 from core.epoch import EpochObserver, EpochPickle
-from core.jl import ListFile, Resolution, hash_images, mkdirs
+from core.jl import ListFile, Resolution, hash_images, mkdirname, mkdirs
 from core.kerashelper import (CompletionStatusObserver, ModelCheckpoint2,
                               ModelCheckpoint2Observer, ModelCheckpoint2Pickle,
                               NanInfStatusObserver, SaveKmodelObserver,
@@ -118,13 +119,13 @@ class ModelSplitName(object):
     def evaluation_cache(self) -> Url:
         return "cache/%s" % self.model_id()
 
-    def training_set_evaluation_cache(self, images) -> Url:
+    def training_set_evaluation_cache(self) -> Url:
         return "%s/training.dill" % self.evaluation_cache()
 
-    def validation_set_evaluation_cache(self, images) -> Url:
+    def validation_set_evaluation_cache(self) -> Url:
         return "%s/validation.dill" % self.evaluation_cache()
 
-    def test_set_evaluation_cache(self, images) -> Url:
+    def test_set_evaluation_cache(self) -> Url:
         return "%s/test.dill" % self.evaluation_cache()
 
 
@@ -356,25 +357,55 @@ class KerasAdapter(object):
         """
         Evaluates the model using the training set
         """
+        filepath = self._names.training_set_evaluation_cache()
+        mkdirname(filepath)
+        if os.path.exists(filepath):
+            print("LOADING: %s" % filepath)
+            with open(filepath) as f:
+                return dill.load(f)
         x = self._data.train().x().load()
         y = self._data.train().y().load()
-        return self.evaluate(x, y)
+        results = self.evaluate(x, y)
+        print("SAVING: %s" % filepath)
+        with open(filepath, 'w') as f:
+            dill.dump(results, f)
+        return results
 
     def evaluate_validation_set(self) -> Dict[str, float]:
         """
         Evaluates the model using the validation set
         """
+        filepath = self._names.validation_set_evaluation_cache()
+        mkdirname(filepath)
+        if os.path.exists(filepath):
+            print("LOADING: %s" % filepath)
+            with open(filepath) as f:
+                return dill.load(f)
         x = self._data.validation().x().load()
         y = self._data.validation().y().load()
-        return self.evaluate(x, y)
+        results = self.evaluate(x, y)
+        print("SAVING: %s" % filepath)
+        with open(filepath, 'w') as f:
+            dill.dump(results, f)
+        return results
 
     def evaluate_test_set(self) -> Dict[str, float]:
         """
         Evaluates the model using the test set
         """
+        filepath = self._names.test_set_evaluation_cache()
+        mkdirname(filepath)
+        if os.path.exists(filepath):
+            print("LOADING: %s" % filepath)
+            with open(filepath) as f:
+                return dill.load(f)
         x = self._data.test().x().load()
         y = self._data.test().y().load()
-        return self.evaluate(x, y)
+        results = self.evaluate(x, y)
+        print("SAVING: %s" % filepath)
+        with open(filepath, 'w') as f:
+            dill.dump(results, f)
+        return results
 
     def predict(self, images: List[Url], simple: bool) -> Prediction:
         """
