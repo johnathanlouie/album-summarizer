@@ -4,9 +4,14 @@
 
     <div class="form-row mb-2">
         <div class="col">
-            <div class="progress">
-                <div class="progress-bar" ng-class="progressBar.classes()" role="progressbar"
-                    ng-style="progressBar.style()">{{ progressBar.current }} / {{ progressBar.total }}</div>
+            <div class="progress position-relative">
+                <div class="progress-bar" ng-class="progressBar.classes()" ng-style="progressBar.style()"
+                    role="progressbar">
+                </div>
+                <span
+                    class="d-flex align-items-center justify-content-center position-absolute w-100 h-100 text-black font-weight-bold">
+                    {{ progressBar.current }} / {{ progressBar.total }}
+                </span>
             </div>
         </div>
     </div>
