@@ -1,3 +1,4 @@
+import hashlib
 from csv import reader
 from os import getcwd, makedirs, walk
 from os.path import abspath, basename, dirname, isdir, isfile, join, normpath
@@ -432,5 +433,8 @@ def copy_file(file_: Url, directory: Url, ancestors: int = 0) -> None:
     return
 
 
-def hash_images(images: List[Url]) -> int:
-    return hash(tuple(images))
+def hash_images(images: List[Url]) -> str:
+    md5 = hashlib.md5()
+    for image in sorted(images):
+        md5.update(image.encode())
+    return md5.hexdigest()
