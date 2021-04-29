@@ -15,7 +15,7 @@ from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
 from core.dataset import DataSet, DataSetSplit, DataSetSplitName
 from core.epoch import EpochObserver, EpochPickle
-from core.jl import ListFile, Resolution, mkdirs
+from core.jl import ListFile, Resolution, hash_images, mkdirs
 from core.kerashelper import (CompletionStatusObserver, ModelCheckpoint2,
                               ModelCheckpoint2Observer, ModelCheckpoint2Pickle,
                               NanInfStatusObserver, SaveKmodelObserver,
@@ -111,6 +111,21 @@ class ModelSplitName(object):
             self.log(),
             self.predictions(),
         ] + self.best.list_all() + self.latest.list_all()
+
+    def prediction_cache(self, images: List[Url]) -> Url:
+        return "cache/%s/%s/prediction.dill" % (hash_images(images), self.model_id())
+
+    def evaluation_cache(self) -> Url:
+        return "cache/%s" % self.model_id()
+
+    def training_set_evaluation_cache(self, images) -> Url:
+        return "%s/training.dill" % self.evaluation_cache()
+
+    def validation_set_evaluation_cache(self, images) -> Url:
+        return "%s/validation.dill" % self.evaluation_cache()
+
+    def test_set_evaluation_cache(self, images) -> Url:
+        return "%s/test.dill" % self.evaluation_cache()
 
 
 class Evaluation(dict):
