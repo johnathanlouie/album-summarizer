@@ -4,11 +4,12 @@ from typing import Dict, List
 
 import cv2
 from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
-from jl import npsave, read_image
+from core.jl import npsave, read_image
+from core.typing2 import Url, number
 from numpy import amax, apply_along_axis, ndarray, set_printoptions, zeros
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
-from typing2 import Url, number
+
 
 set_printoptions(threshold=10000000000)
 Descriptors = ndarray

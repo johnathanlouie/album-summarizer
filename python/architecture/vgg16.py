@@ -2,8 +2,8 @@ from typing import Optional
 
 from core import modelbuilder
 from core.architecture import Architecture
+from core.jl import Resolution
 from core.modeltype import OutputType
-from jl import Resolution
 from keras.applications.vgg16 import VGG16
 from keras.engine.input_layer import Input
 from keras.layers import Conv2D, Dense, Flatten, MaxPooling2D

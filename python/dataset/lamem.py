@@ -4,10 +4,10 @@ from typing import Any, List
 
 from core import modelbuilder
 from core.dataset import DataSet, LabelTranslator
+from core.jl import ListFile
 from core.modeltype import OutputType
-from jl import ListFile
+from core.typing2 import Url
 from numpy import asarray, ndarray
-from typing2 import Url
 
 
 class LamemDataFile(object):

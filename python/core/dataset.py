@@ -2,13 +2,13 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any, List, Optional, Tuple
 
-from jl import npexists, npload, npsave
 from keras.utils import to_categorical
 from numpy import ndarray
 from sklearn.model_selection import train_test_split
-from typing2 import ArrayLike, number
 
+from core.jl import npexists, npload, npsave
 from core.modeltype import OutputType
+from core.typing2 import ArrayLike, number
 
 
 class XY(Enum):

@@ -4,9 +4,9 @@ from typing import Union
 
 import keras
 from keras.callbacks import ReduceLROnPlateau
-from typing2 import Url
 
 from core.kerashelper import CheckpointObserver, PickleAbstractClass
+from core.typing2 import Url
 
 
 class ReduceLROnPlateauPickle(PickleAbstractClass):

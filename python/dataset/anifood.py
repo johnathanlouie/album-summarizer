@@ -4,10 +4,10 @@ from typing import Any, List, Optional
 
 from core import modelbuilder
 from core.dataset import DataSet, LabelTranslator
+from core.jl import ImageDirectory
 from core.modeltype import OutputType
-from jl import ImageDirectory
+from core.typing2 import Url
 from numpy import asarray, ndarray
-from typing2 import Url
 
 from dataset.cc import CcDataFile
 

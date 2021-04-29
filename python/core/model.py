@@ -7,16 +7,15 @@ from typing import Any, Dict, List, Union
 
 import keras.models
 import tensorflow as tf
-from jl import ListFile, Resolution, mkdirs
 from keras.backend import clear_session
 from keras.callbacks import CSVLogger, ReduceLROnPlateau
 from numpy import asarray, ndarray
-from typing2 import Image, Url
 
 from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
 from core.dataset import DataSet, DataSetSplit, DataSetSplitName
 from core.epoch import EpochObserver, EpochPickle
+from core.jl import ListFile, Resolution, mkdirs
 from core.kerashelper import (CompletionStatusObserver, ModelCheckpoint2,
                               ModelCheckpoint2Observer, ModelCheckpoint2Pickle,
                               NanInfStatusObserver, SaveKmodelObserver,
@@ -24,6 +23,7 @@ from core.kerashelper import (CompletionStatusObserver, ModelCheckpoint2,
                               TerminateOnNanInfObserver, TrainingStatus,
                               TrainingStatusData)
 from core.reducelr import ReduceLROnPlateauObserver, ReduceLROnPlateauPickle
+from core.typing2 import Image, Url
 
 
 class ModelSplitName2(object):

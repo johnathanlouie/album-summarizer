@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, Optional, Union
 
-from jl import Resolution
 from keras.models import Model
 from keras.optimizers import Optimizer
 
+from core.jl import Resolution
 from core.modeltype import OutputType
 
 

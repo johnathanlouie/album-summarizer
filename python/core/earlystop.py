@@ -5,9 +5,9 @@ from typing import Union
 import keras
 import numpy as np
 from keras.callbacks import EarlyStopping
-from typing2 import Url
 
 from core.kerashelper import CheckpointObserver, PickleAbstractClass
+from core.typing2 import Url
 
 
 class EarlyStoppingPickle(PickleAbstractClass):

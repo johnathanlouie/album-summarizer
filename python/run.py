@@ -12,12 +12,12 @@ import addon
 from builds import builds
 from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
                           ClusterResults, ClusterStrategy)
+from core.jl import ImageDirectory
 from core.kerashelper import TrainingStatus
 from core.model import (BadModelSettings, ModelSplit, ModelStateMissingError,
                         TrainingIncompleteException)
 from core.modelbuilder import ModelBuilder
-from jl import ImageDirectory
-from typing2 import Url
+from core.typing2 import Url
 
 
 class ClusterRank(object):
