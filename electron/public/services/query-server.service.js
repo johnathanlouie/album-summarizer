@@ -68,6 +68,89 @@ import SettingsService from './settings.service.js';
  */
 
 
+class ModelDescription {
+
+    /** @type {string} */
+    architecture;
+
+    /** @type {string} */
+    dataset;
+
+    /** @type {string} */
+    loss;
+
+    /** @type {string} */
+    optimizer;
+
+    /** @type {string} */
+    metrics;
+
+    /** @type {number} */
+    epochs;
+
+    /** @type {number} */
+    patience;
+
+    /** @type {number} */
+    split;
+
+    toString() {
+        return `${this.architecture}-${this.dataset}-${this.loss}-${this.optimizer}-${this.metrics}-${this.epochs}-${this.patience}-${this.split}`;
+    }
+
+    static from(model) {
+        return Object.assign(new ModelDescription(), model);
+    }
+
+}
+
+
+class Metrics {
+
+    /** @type {number} */
+    accuracy;
+
+    /** @type {number} */
+    loss;
+
+    static from(metrics) {
+        return Object.assign(new Metrics(), metrics);
+    }
+
+}
+
+
+class Evaluation {
+
+    /** @type {ModelDescription} */
+    model;
+
+    /** @type {string} */
+    status;
+
+    /** @type {Metrics} */
+    training;
+
+    /** @type {Metrics} */
+    validation;
+
+    /** @type {Metrics} */
+    test;
+
+    /** @type {EvaluationReturnObject} */
+    static from(evaluation) {
+        /** @type {Evaluation} */
+        let instance = Object.assign(new Evaluation(), evaluation);
+        instance.model = ModelDescription.from(instance.model);
+        instance.training = Metrics.from(instance.training);
+        instance.validation = Metrics.from(instance.validation);
+        instance.test = Metrics.from(instance.test);
+        return instance;
+    }
+
+}
+
+
 /**
  * An interface to the python server
  */
@@ -129,18 +212,19 @@ class QueryServerService {
     }
 
     /**
-     * @returns {Promise.<Array.<EvaluationReturnObject>>}
+     * @returns {Promise.<Array.<Evaluation>>}
      */
     async evaluateAll() {
-        return (await this.$http.get(`${this.#serverUrl}/evaluate/all/0`)).data;
+        return (await this.$http.get(`${this.#serverUrl}/evaluate/all/0`)).data.
+            map(i => Evaluation.from(i));
     }
 
     /**
      * @param {ModelDescription} model
-     * @returns {Promise.<EvaluationReturnObject>}
+     * @returns {Promise.<Evaluation>}
      */
     async evaluate(model) {
-        return (await this.$http.post(`${this.#serverUrl}/evaluate`, model)).data;
+        return Evaluation.from((await this.$http.post(`${this.#serverUrl}/evaluate`, model)).data);
     }
 
 }
