@@ -41,13 +41,6 @@ class ProgressBar {
 
 class Controller {
 
-    #scope;
-    #queryServer;
-    #modal;
-    #options;
-    #mongoDb;
-    #evaluations;
-
     #quit = false;
     #search = {
         model: {
@@ -64,23 +57,27 @@ class Controller {
     };
     #progressBar = new ProgressBar();
 
-    static $inject = ['$scope', 'queryServer', 'modal', 'options', 'mongoDb', 'evaluations'];
+    $scope;
+    queryServer;
+    modal;
+    options;
+    evaluations;
+
+    static $inject = ['$scope', 'queryServer', 'modal', 'options', 'evaluations'];
 
     /**
      * @param {angular.IScope} $scope 
      * @param {QueryServerService} queryServer
      * @param {ModalService} modal
      * @param {OptionsService} options
-     * @param {MongoDbService} mongoDb
      * @param {EvaluationsService} evaluations
      */
-    constructor($scope, queryServer, modal, options, mongoDb, evaluations) {
-        this.#scope = $scope;
-        this.#queryServer = queryServer;
-        this.#modal = modal;
-        this.#options = options;
-        this.#mongoDb = mongoDb;
-        this.#evaluations = evaluations;
+    constructor($scope, queryServer, modal, options, evaluations) {
+        this.$scope = $scope;
+        this.queryServer = queryServer;
+        this.modal = modal;
+        this.options = options;
+        this.evaluations = evaluations;
 
         $scope.options = options;
         $scope.search = this.#search;
@@ -88,7 +85,7 @@ class Controller {
 
         $scope.progressBar = this.#progressBar;
         $scope.optionsLoaded = () => options.isLoaded;
-        $scope.evaluations = this.#evaluations;
+        $scope.evaluations = this.evaluations;
 
         $scope.retry = () => this.#retry();
         $scope.removeMongoDbDuplicates = () => this.removeMongoDbDuplicates();
@@ -101,37 +98,37 @@ class Controller {
 
     async removeMongoDbDuplicates() {
         try {
-            this.#modal.showLoading('DELETING...');
-            await this.#evaluations.removeMongoDbDuplicates();
-            this.#modal.hideLoading();
+            this.modal.showLoading('DELETING...');
+            await this.evaluations.removeMongoDbDuplicates();
+            this.modal.hideLoading();
         }
         catch (e) {
             console.error(e);
-            this.#modal.hideLoading();
-            this.#modal.showError(e, 'ERROR: MongoDB', 'Error while deleting duplicates');
+            this.modal.hideLoading();
+            this.modal.showError(e, 'ERROR: MongoDB', 'Error while deleting duplicates');
         }
-        this.#scope.$apply();
+        this.$scope.$apply();
     }
 
     async #evaluate() {
         this.#progressBar.run();
         this.#progressBar.current = 0;
-        this.#progressBar.total = this.#options.modelCount();
-        this.#scope.$apply();
-        for (let model of this.#options.models()) {
+        this.#progressBar.total = this.options.modelCount();
+        this.$scope.$apply();
+        for (let model of this.options.models()) {
             if (this.#quit) { return; }
-            if (!this.#evaluations.has(model)) {
+            if (!this.evaluations.has(model)) {
                 try {
-                    await this.#evaluations.add(await this.#queryServer.evaluate(model));
+                    await this.evaluations.add(await this.queryServer.evaluate(model));
                     this.#progressBar.current++;
-                    this.#scope.$apply();
+                    this.$scope.$apply();
                 }
                 catch (e) {
                     console.error(e);
                     if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
                         this.#progressBar.stop();
-                        this.#modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
-                        this.#scope.$apply();
+                        this.modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
+                        this.$scope.$apply();
                         return;
                     }
                     else if (e.status === 500) {
@@ -139,8 +136,8 @@ class Controller {
                     }
                     else {
                         this.#progressBar.stop();
-                        this.#modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
-                        this.#scope.$apply();
+                        this.modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
+                        this.$scope.$apply();
                         return;
                     }
                 }
@@ -150,27 +147,27 @@ class Controller {
             }
         }
         this.#progressBar.complete();
-        this.#scope.$apply();
+        this.$scope.$apply();
     }
 
     async #reevaluatePending() {
         this.#progressBar.run();
         this.#progressBar.current = 0;
-        this.#progressBar.total = this.#options.modelCount();
-        for (let evaluation of this.#evaluations.toArray()) {
+        this.#progressBar.total = this.options.modelCount();
+        for (let evaluation of this.evaluations.toArray()) {
             if (this.#quit) { return; }
             if (evaluation.status === 'TrainingStatus.PENDING') {
                 try {
-                    await this.#evaluations.update(await this.#queryServer.evaluate(evaluation.model));
+                    await this.evaluations.update(await this.queryServer.evaluate(evaluation.model));
                     this.#progressBar.current++;
-                    this.#scope.$apply();
+                    this.$scope.$apply();
                 }
                 catch (e) {
                     console.error(e);
                     if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
                         this.#progressBar.stop();
-                        this.#modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
-                        this.#scope.$apply();
+                        this.modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
+                        this.$scope.$apply();
                         return;
                     }
                     else if (e.status === 500) {
@@ -178,8 +175,8 @@ class Controller {
                     }
                     else {
                         this.#progressBar.stop();
-                        this.#modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
-                        this.#scope.$apply();
+                        this.modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
+                        this.$scope.$apply();
                         return;
                     }
                 }
@@ -189,24 +186,24 @@ class Controller {
             }
         }
         this.#progressBar.complete();
-        this.#scope.$apply();
+        this.$scope.$apply();
     }
 
     async #loadOptions() {
-        await this.#options.load();
+        await this.options.load();
     }
 
     async #preInit() {
         try {
-            this.#modal.showLoading('RETRIEVING...');
-            await Promise.all([this.#evaluations.fromMongoDb(), this.#loadOptions()]);
-            this.#modal.hideLoading();
-            this.#scope.$apply();
+            this.modal.showLoading('RETRIEVING...');
+            await Promise.all([this.evaluations.fromMongoDb(), this.#loadOptions()]);
+            this.modal.hideLoading();
+            this.$scope.$apply();
             this.#evaluate();
         }
         catch (e) {
             console.error(e);
-            this.#modal.hideLoading();
+            this.modal.hideLoading();
             $('#staticBackdrop').modal();
         }
     }
