@@ -65,15 +65,10 @@ class OrganizerViewController {
             screenView.screen = 'IMAGE_VIEWER';
         };
 
-        /**
-         * 
-         * @param {boolean} refresh
-         */
-        async function organize(refresh) {
+        async function organize() {
             try {
                 modal.showLoading('ORGANIZING...');
-                if (refresh) { await cwd.reorganize(); }
-                else { await cwd.organize(); }
+                await cwd.organize();
                 modal.hideLoading();
             }
             catch (err) {
@@ -90,11 +85,9 @@ class OrganizerViewController {
         $scope.toggleOrganize = function () {
             // If user switches to organized view
             if ($scope.isOrganizeToggled) {
-                organize(false);
+                organize();
             }
         };
-
-        $scope.reorganize = function () { organize(true); };
 
         $scope.$on('CHANGE_DIRECTORY', function (event, dst) {
             $scope.goTo(dst);

@@ -4,6 +4,20 @@ import OrganizedDirFile from '../lib/organize.js';
 import QueryServerService from './query-server.service.js';
 
 
+class OrganizedImage {
+
+    /** @type {number} */
+    cluster;
+
+    /** @type {string} */
+    path;
+
+    /** @type {number} */
+    rating;
+
+}
+
+
 class CwdService {
     #HOME_DIR = os.homedir();
 
@@ -12,10 +26,10 @@ class CwdService {
 
     /** @type {string} */
     #path;
+
+    /** @type {?Array.<Array.<OrganizedImage>>} */
     #organization;
 
-    /** @type {OrganizedDirFile} */
-    #dirFile;
     #queryServer;
 
     static $inject = ['queryServer'];
@@ -30,7 +44,6 @@ class CwdService {
     cd(dst) {
         this.#path = dst;
         this.#organization = null;
-        this.#dirFile = new OrganizedDirFile(dst);
         this.#dir = new Directory(dst);
     }
 
@@ -38,28 +51,10 @@ class CwdService {
 
     async refresh() { this.cd(this.#path); }
 
-    /**
-     * 
-     * @param {boolean} refresh
-     */
-    async #organize(refresh) {
+    async organize() {
         this.#organization = null;
-        if (refresh || !this.#dirFile.exists()) {
-            this.#dirFile.delete();
-            var data = await this.#queryServer.run(this.#path);
-            this.#organization = data;
-            var json = JSON.stringify(data);
-            this.#dirFile.write(json);
-        }
-        else {
-            var json = this.#dirFile.read();
-            this.#organization = JSON.parse(json);
-        }
+        this.#organization = await this.#queryServer.run(this.#path);
     }
-
-    async organize() { await this.#organize(false); }
-
-    async reorganize() { await this.#organize(true); }
 
     get organization() { return this.#organization; }
 
