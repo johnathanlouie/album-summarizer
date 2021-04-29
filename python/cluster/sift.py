@@ -4,7 +4,7 @@ from typing import Dict, List
 
 import cv2
 from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
-from jl import JSON_SIMILARITYMATRIX, NPY_DESC, npsave, read_image
+from jl import npsave, read_image
 from numpy import amax, apply_along_axis, ndarray, set_printoptions, zeros
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
@@ -145,7 +145,7 @@ class SimilarityMatrix(object):
         dim = (size, size)
         return zeros(dim)
 
-    def save_as_json(self, url: Url = JSON_SIMILARITYMATRIX) -> None:
+    def save_as_json(self, url: Url) -> None:
         """
         Saves the similarity matrix as a JSON file.
         """
@@ -175,7 +175,7 @@ class SiftDescriptorSet(object):
     More features helps distinguishing images but adds more bad descriptors.
     """
 
-    def __init__(self, images: List[Url], features: int = 300) -> None:
+    def __init__(self, images: List[Url], features: int = 300):
         sift = cv2.xfeatures2d.SIFT_create(nfeatures=features)
         a = list()
         for url in images:
@@ -189,14 +189,12 @@ class SiftDescriptorSet(object):
         Scales input vectors individually to unit norm (vector length).
         """
         self.descriptors = list(map(normalize, self.descriptors))
-        return
 
-    def save(self, url: Url = NPY_DESC) -> None:
+    def save(self, url: Url) -> None:
         """
         Saves descriptors to a NumPy file.
         """
         npsave(url, self.descriptors)
-        return
 
 
 class SiftCluster(ClusterStrategy):

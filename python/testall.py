@@ -29,7 +29,7 @@ def main():
                 patience=3,
             )
             if not model.is_complete():
-                results.append(model.test())
+                results.append(model.evaluate_test_set())
         except ValueError:
             print('Incompatible model: %s %s %s %s %s' % (
                 architecture,
