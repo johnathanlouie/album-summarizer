@@ -10,6 +10,7 @@ import Settings from './settings.service.js';
 import Modal from './modal.service.js';
 import Users from './users.service.js';
 import Evaluations from './evaluations.service.js';
+import Database from './database.service.js';
 
 
 const module = angular.module('services', []);
@@ -24,6 +25,7 @@ module.factory('settings', Settings);
 module.factory('modal', Modal);
 module.factory('users', Users);
 module.factory('evaluations', Evaluations);
+module.factory('database', Database);
 
 
 export default module.name;

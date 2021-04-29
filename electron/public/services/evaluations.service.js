@@ -1,91 +1,22 @@
 const _ = require('lodash');
-import MongoDbService from './mongodb.service.js';
+import DatabaseService from './database.service.js';
+import { Evaluation, Metrics, ModelDescription } from '../lib/evaluation.js';
 
 
-class ModelDescription {
+class EvaluationsService {
 
-    /** @type {string} */
-    architecture;
-
-    /** @type {string} */
-    dataset;
-
-    /** @type {string} */
-    loss;
-
-    /** @type {string} */
-    optimizer;
-
-    /** @type {string} */
-    metrics;
-
-    /** @type {number} */
-    epochs;
-
-    /** @type {number} */
-    patience;
-
-    /** @type {number} */
-    split;
-
-    /**
-     * 
-     * @param {ModelDescription} model 
-     */
-    static toString(model) {
-        return `${model.architecture}-${model.dataset}-${model.loss}-${model.optimizer}-${model.metrics}-${model.epochs}-${model.patience}-${model.split}`;
-    }
-
-}
-
-
-class Metrics {
-
-    /** @type {number} */
-    accuracy;
-
-    /** @type {number} */
-    loss;
-
-}
-
-
-class Evaluation {
-
-    /** @type {ModelDescription} */
-    model;
-
-    /** @type {string} */
-    status;
-
-    /** @type {Metrics} */
-    training;
-
-    /** @type {Metrics} */
-    validation;
-
-    /** @type {Metrics} */
-    test;
-
-}
-
-
-class Evaluations {
-
-    #mongoDb;
-
-    /** @type {Map.<ModelDescription, Evaluation>} */
-    #container = new Map();
-
+    /** @type {Map.<ModelDescription, Evaluation>} */ #container = new Map();
     #isLoaded = false;
 
-    static $inject = ['mongoDb'];
+    database;
+
+    static $inject = ['database'];
 
     /**
-     * @param {MongoDbService} mongoDb
+     * @param {DatabaseService} database
      */
-    constructor(mongoDb) {
-        this.#mongoDb = mongoDb;
+    constructor(database) {
+        this.database = database;
     }
 
     /**
@@ -93,7 +24,7 @@ class Evaluations {
      * @param {Evaluation} evaluation 
      */
     #set(evaluation) {
-        this.#container.set(ModelDescription.toString(evaluation.model), evaluation);
+        this.#container.set(evaluation.model.toString(), evaluation);
     }
 
     /**
@@ -101,7 +32,7 @@ class Evaluations {
      * @param {Evaluation} evaluation 
      */
     async add(evaluation) {
-        await this.#mongoDb.insertOne('evaluations', evaluation);
+        await this.database.addEvaluation(evaluation);
         this.#set(evaluation);
     }
 
@@ -110,7 +41,7 @@ class Evaluations {
      * @param {Evaluation} evaluation 
      */
     async update(evaluation) {
-        await this.#mongoDb.findOneAndReplace('evaluations', { model: evaluation.model }, evaluation);
+        await this.database.updateEvaluation(evaluation);
         this.#set(evaluation);
     }
 
@@ -120,7 +51,7 @@ class Evaluations {
      * @returns {boolean}
      */
     has(model) {
-        return this.#container.has(ModelDescription.toString(model));
+        return this.#container.has(model.toString());
     }
 
     statuses() {
@@ -133,7 +64,7 @@ class Evaluations {
 
     async fromMongoDb() {
         if (!this.#isLoaded) {
-            for (let i of await this.#mongoDb.getAll('evaluations')) {
+            for (let i of await this.database.getAllEvaluations()) {
                 this.#set(i);
             }
             this.#isLoaded = true;
@@ -142,13 +73,13 @@ class Evaluations {
 
     async removeMongoDbDuplicates() {
         let copy = new Map();
-        for (let evaluation of await this.#mongoDb.getAll('evaluations')) {
-            if (copy.has(ModelDescription.toString(evaluation.model))) {
+        for (let evaluation of await this.database.getAllEvaluations()) {
+            if (copy.has(evaluation.model.toString())) {
                 console.log(evaluation);
-                await this.#mongoDb.deleteOne('evaluations', evaluation);
+                this.database.deleteEvaluation(evaluation);
             }
             else {
-                copy.set(ModelDescription.toString(evaluation.model), evaluation);
+                copy.set(evaluation.model.toString(), evaluation);
             }
         }
     }
@@ -156,4 +87,4 @@ class Evaluations {
 }
 
 
-export default Evaluations;
+export default EvaluationsService;
