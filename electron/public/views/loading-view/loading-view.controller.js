@@ -59,7 +59,6 @@ class Controller {
             await Promise.all([
                 this.#options.load(),
                 this.#users.load(),
-                this.#evaluations.fromMongoDb(),
             ]);
             this.#location.path('/organizer');
         }

@@ -3,7 +3,6 @@ const mongodb = require('mongodb');
 import QueryServerService from '../../services/query-server.service.js';
 import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
-import MongoDbService from '../../services/mongodb.service.js';
 import EvaluationsService from '../../services/evaluations.service.js';
 
 
@@ -39,7 +38,7 @@ class ProgressBar {
 }
 
 
-class Controller {
+class StatusViewController {
 
     #quit = false;
     #search = {
@@ -88,27 +87,11 @@ class Controller {
         $scope.evaluations = this.evaluations;
 
         $scope.retry = () => this.#retry();
-        $scope.removeMongoDbDuplicates = () => this.removeMongoDbDuplicates();
-        $scope.reevaluatePending = () => this.#reevaluatePending();
 
         this.#preInit();
     }
 
     $onDestroy() { this.#quit = true; }
-
-    async removeMongoDbDuplicates() {
-        try {
-            this.modal.showLoading('DELETING...');
-            await this.evaluations.removeMongoDbDuplicates();
-            this.modal.hideLoading();
-        }
-        catch (e) {
-            console.error(e);
-            this.modal.hideLoading();
-            this.modal.showError(e, 'ERROR: MongoDB', 'Error while deleting duplicates');
-        }
-        this.$scope.$apply();
-    }
 
     async #evaluate() {
         this.#progressBar.run();
@@ -119,7 +102,7 @@ class Controller {
             if (this.#quit) { return; }
             if (!this.evaluations.has(model)) {
                 try {
-                    await this.evaluations.add(await this.queryServer.evaluate(model));
+                    this.evaluations.set(await this.queryServer.evaluate(model));
                     this.#progressBar.current++;
                     this.$scope.$apply();
                 }
@@ -148,55 +131,12 @@ class Controller {
         }
         this.#progressBar.complete();
         this.$scope.$apply();
-    }
-
-    async #reevaluatePending() {
-        this.#progressBar.run();
-        this.#progressBar.current = 0;
-        this.#progressBar.total = this.options.modelCount();
-        for (let evaluation of this.evaluations.toArray()) {
-            if (this.#quit) { return; }
-            if (evaluation.status === 'TrainingStatus.PENDING') {
-                try {
-                    await this.evaluations.update(await this.queryServer.evaluate(evaluation.model));
-                    this.#progressBar.current++;
-                    this.$scope.$apply();
-                }
-                catch (e) {
-                    console.error(e);
-                    if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
-                        this.#progressBar.stop();
-                        this.modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
-                        this.$scope.$apply();
-                        return;
-                    }
-                    else if (e.status === 500) {
-                        // Ignore 500 errors
-                    }
-                    else {
-                        this.#progressBar.stop();
-                        this.modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
-                        this.$scope.$apply();
-                        return;
-                    }
-                }
-            }
-            else {
-                this.#progressBar.current++;
-            }
-        }
-        this.#progressBar.complete();
-        this.$scope.$apply();
-    }
-
-    async #loadOptions() {
-        await this.options.load();
     }
 
     async #preInit() {
         try {
             this.modal.showLoading('RETRIEVING...');
-            await Promise.all([this.evaluations.fromMongoDb(), this.#loadOptions()]);
+            await this.options.load();
             this.modal.hideLoading();
             this.$scope.$apply();
             this.#evaluate();
@@ -216,4 +156,4 @@ class Controller {
 }
 
 
-export default Controller;
+export default StatusViewController;
