@@ -89,11 +89,11 @@ class ClusterStrategy(ABC):
         mkdirname(filepath)
         if os.path.exists(filepath):
             print('LOADING: %s' % filepath)
-            with open(filepath, 'r') as f:
+            with open(filepath, 'rb') as f:
                 return dill.load(f)
         results = self.run(images)
         print('SAVING: %s' % filepath)
-        with open(filepath, 'w') as f:
+        with open(filepath, 'wb') as f:
             dill.dump(results, f)
         return results
 

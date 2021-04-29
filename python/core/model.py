@@ -97,12 +97,6 @@ class ModelSplitName(object):
         """
         return "%s/log.csv" % self.dirname()
 
-    def predictions(self) -> Url:
-        """
-        Returns the URL of the predictions file.
-        """
-        return "%s/predictions.txt" % self.dirname()
-
     def status(self) -> Url:
         return '%s/status.txt' % self.dirname()
 
@@ -110,7 +104,6 @@ class ModelSplitName(object):
         return [
             self.status(),
             self.log(),
-            self.predictions(),
         ] + self.best.list_all() + self.latest.list_all()
 
     def prediction_cache(self, images: List[Url]) -> Url:
@@ -361,13 +354,13 @@ class KerasAdapter(object):
         mkdirname(filepath)
         if os.path.exists(filepath):
             print("LOADING: %s" % filepath)
-            with open(filepath) as f:
+            with open(filepath, 'rb') as f:
                 return dill.load(f)
         x = self._data.train().x().load()
         y = self._data.train().y().load()
         results = self.evaluate(x, y)
         print("SAVING: %s" % filepath)
-        with open(filepath, 'w') as f:
+        with open(filepath, 'wb') as f:
             dill.dump(results, f)
         return results
 
@@ -379,13 +372,13 @@ class KerasAdapter(object):
         mkdirname(filepath)
         if os.path.exists(filepath):
             print("LOADING: %s" % filepath)
-            with open(filepath) as f:
+            with open(filepath, 'rb') as f:
                 return dill.load(f)
         x = self._data.validation().x().load()
         y = self._data.validation().y().load()
         results = self.evaluate(x, y)
         print("SAVING: %s" % filepath)
-        with open(filepath, 'w') as f:
+        with open(filepath, 'wb') as f:
             dill.dump(results, f)
         return results
 
@@ -397,13 +390,13 @@ class KerasAdapter(object):
         mkdirname(filepath)
         if os.path.exists(filepath):
             print("LOADING: %s" % filepath)
-            with open(filepath) as f:
+            with open(filepath, 'rb') as f:
                 return dill.load(f)
         x = self._data.test().x().load()
         y = self._data.test().y().load()
         results = self.evaluate(x, y)
         print("SAVING: %s" % filepath)
-        with open(filepath, 'w') as f:
+        with open(filepath, 'wb') as f:
             dill.dump(results, f)
         return results
 
@@ -411,6 +404,12 @@ class KerasAdapter(object):
         """
         Predicts using the trained model
         """
+        filepath = self._names.prediction_cache(images)
+        mkdirname(filepath)
+        if os.path.exists(filepath):
+            print("LOADING: %s" % filepath)
+            with open(filepath, 'rb') as f:
+                return dill.load(f)
         x = asarray(images)
         seq = Sequence1(x, x, self._res, self._batch)
         predictions: ndarray = self._kmodel.predict_generator(generator=seq, verbose=1)
@@ -420,7 +419,11 @@ class KerasAdapter(object):
         y = predictions.tolist()
         if simple:
             y = self._data.translate_predictions(y)
-        return Prediction(images, y)
+        results = Prediction(images, y)
+        print("SAVING: %s" % filepath)
+        with open(filepath, 'wb') as f:
+            dill.dump(results, f)
+        return results
 
     def predict_training_set(self, simple: bool) -> Prediction:
         x = self._data.train().x().load().tolist()
