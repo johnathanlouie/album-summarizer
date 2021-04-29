@@ -55,10 +55,10 @@ class Settings(object):
     FILENAME = 'out/settings.json'
 
     def __init__(self):
-        self.architecture = 'smi13'
-        self.dataset = 'ccr'
-        self.loss = 'rmse'
-        self.optimizer = 'sgd1'
+        self.architecture = 'smi13a'
+        self.dataset = 'ccrc'
+        self.loss = 'bce'
+        self.optimizer = 'sgd'
         self.metrics = 'acc'
         self.epochs = 0
         self.patience = 3
@@ -115,7 +115,7 @@ def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> 
     if len(images) == 0:
         return list()
     clusters = algorithm.run_cached(images)
-    rates = algorithm2.predict(images, True).human_readable()
+    rates = algorithm2.predict(images, True).y.predicted
     print('Ranking results....')
     cr = ClusterRank(clusters, rates)
     return cr.jsonable()
@@ -150,6 +150,7 @@ if __name__ == '__main__':
             )
             split = model.split(settings.split)
             results = main(directory, cluster, split)
+            results = flask.jsonify(results)
             return results
         except TrainingIncompleteException:
             response = flask.Response()
