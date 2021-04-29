@@ -231,3 +231,4 @@ class QueryServerService {
 
 
 export default QueryServerService;
+export { ModelDescription, Metrics, Evaluation, QueryServerService };
