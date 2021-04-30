@@ -10,7 +10,7 @@ class Controller {
      */
     constructor($scope) {
         $scope.$on('ERROR_MODAL_SHOW', (event, error, title, message) => {
-            $scope.error = error;
+            $scope.error = JSON.stringify(error, null, 2);
             $scope.message = message;
             $scope.title = title;
             $('#errorModal').modal();
