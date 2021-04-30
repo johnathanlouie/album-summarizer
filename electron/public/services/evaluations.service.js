@@ -1,22 +1,30 @@
 const _ = require('lodash');
 import DatabaseService from './database.service.js';
+import QueryServerService from './query-server.service.js';
 import { Evaluation, ModelDescription } from '../lib/evaluation.js';
 
 
 class EvaluationsService {
 
-    /** @type {Map.<ModelDescription, Evaluation>} */ #container = new Map();
+    /** @type {Map.<ModelDescription, Evaluation>} */
+    #container = new Map();
     #isLoaded = false;
 
-    database;
+    /** @type {Array.<string>} */
+    #statuses = [];
 
-    static $inject = ['database'];
+    database;
+    queryServer;
+
+    static $inject = ['database', 'queryServer'];
 
     /**
      * @param {DatabaseService} database
+     * @param {QueryServerService} queryServer
      */
-    constructor(database) {
+    constructor(database, queryServer) {
         this.database = database;
+        this.queryServer = queryServer;
     }
 
     /**
@@ -54,8 +62,12 @@ class EvaluationsService {
         return this.#container.has(model.toString());
     }
 
+    async fetchStatuses() {
+        this.#statuses = await this.queryServer.trainingStatuses();
+    }
+
     statuses() {
-        return _.uniq(this.toArray().map(e => e.status));
+        return this.#statuses;
     }
 
     toArray() {

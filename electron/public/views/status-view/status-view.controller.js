@@ -136,7 +136,10 @@ class StatusViewController {
     async #preInit() {
         try {
             this.modal.showLoading('RETRIEVING...');
-            await this.options.load();
+            await Promise.all([
+                this.options.load(),
+                this.evaluations.fetchStatuses(),
+            ])
             this.modal.hideLoading();
             this.$scope.$apply();
             this.#evaluate();

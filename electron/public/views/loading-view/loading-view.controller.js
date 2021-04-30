@@ -59,10 +59,12 @@ class Controller {
             await Promise.all([
                 this.#options.load(),
                 this.#users.load(),
+                this.#evaluations.fetchStatuses(),
             ]);
             this.#location.path('/organizer');
         }
         catch (e) {
+            console.error(e);
             this.#scope.status = 'DISCONNECTED';
             this.#scope.connectionFailed = true;
             this.#modal.showError(e, 'ERROR: Server/MongoDB Connection', 'Errors during loading of program.');

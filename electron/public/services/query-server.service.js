@@ -145,6 +145,11 @@ class QueryServerService {
         return Evaluation.from((await this.$http.post(`${this.#serverUrl}/evaluate`, model)).data);
     }
 
+    /** @returns {Promise.<Array.<string>>} */
+    async trainingStatuses() {
+        return (await this.$http.get(`${this.#serverUrl}/training-statuses`)).data;
+    }
+
 }
 
 

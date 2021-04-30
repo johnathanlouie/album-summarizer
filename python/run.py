@@ -356,4 +356,8 @@ if __name__ == '__main__':
             response.status = 'Error: Unknown'
             return response
 
+    @app.route('/training-statuses', methods=['GET'])
+    def training_statuses():
+        return flask.jsonify([str(e) for e in TrainingStatus])
+
     app.run(port=8080, threaded=False)
