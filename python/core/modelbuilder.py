@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 from core.architecture import Architecture, CompileOption
 from core.dataset import DataSet
@@ -79,3 +79,11 @@ class ModelBuilder(object):
             raise ModelBuilderInsertError
         else:
             cls.METRICS[option.name] = option
+
+    @classmethod
+    def builds(cls) -> Tuple[str, str, str, str]:
+        for architecture in cls.ARCHITECTURES.keys():
+            for dataset in cls.DATASETS.keys():
+                for loss in cls.LOSSES.keys():
+                    for optimizer in cls.OPTIMIZERS.keys():
+                        yield architecture, dataset, loss, optimizer

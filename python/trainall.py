@@ -1,13 +1,13 @@
 from typing import Tuple
 
 import aaa
-import builds
+import addon
 import core.model
 import core.modelbuilder
 
 
 def main():
-    for architecture, dataset, loss, optimizer in builds.builds():
+    for architecture, dataset, loss, optimizer in core.modelbuilder.ModelBuilder.builds():
         print()
         try:
             model = core.modelbuilder.ModelBuilder.create(

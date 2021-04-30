@@ -6,25 +6,16 @@ import addon
 import core.modelbuilder
 
 
-def builds() -> Tuple[str, str, str, str, str]:
-    for metric in core.modelbuilder.ModelBuilder.METRICS.keys():
-        for architecture in core.modelbuilder.ModelBuilder.ARCHITECTURES.keys():
-            for dataset in core.modelbuilder.ModelBuilder.DATASETS.keys():
-                for loss in core.modelbuilder.ModelBuilder.LOSSES.keys():
-                    for optimizer in core.modelbuilder.ModelBuilder.OPTIMIZERS.keys():
-                        yield architecture, dataset, loss, optimizer, metric
-
-
 def main():
     results = list()
-    for architecture, dataset, loss, optimizer, metric in builds():
+    for architecture, dataset, loss, optimizer, metric in core.modelbuilder.ModelBuilder.builds():
         try:
             model = core.modelbuilder.ModelBuilder.create(
                 architecture,
                 dataset,
                 loss,
                 optimizer,
-                metric,
+                metrics='acc',
                 epochs=0,
                 patience=3,
             )

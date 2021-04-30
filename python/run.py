@@ -3,13 +3,11 @@ import os.path
 from copy import deepcopy
 from traceback import print_exc
 from typing import Any, Dict, List
-from urllib.parse import quote
 
 import flask
 
 import aaa
 import addon
-from builds import builds
 from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
                           ClusterResults, ClusterStrategy)
 from core.jl import ImageDirectory
@@ -38,9 +36,8 @@ class ClusterRank(object):
 
     def save_results(self, dst: Url) -> None:
         """
-        Saves the results to a JSON file at 'electron/public/data/***.json'.
+        Saves the results to a JSON file.
         """
-        dst = 'electron/public/data/%s.json' % quote(dst)
         with open(dst, 'w', encoding='utf8') as f:
             json.dump(self._results, f, indent=4)
 
@@ -314,7 +311,7 @@ if __name__ == '__main__':
     def evaluate_all_0():
         try:
             results = []
-            for architecture, dataset, loss, optimizer in builds():
+            for architecture, dataset, loss, optimizer in ModelBuilder.builds():
                 settings = {
                     'architecture': architecture,
                     'dataset': dataset,
