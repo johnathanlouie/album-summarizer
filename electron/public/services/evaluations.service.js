@@ -13,10 +13,9 @@ class EvaluationsService {
     /** @type {Array.<string>} */
     #statuses = [];
 
+    static $inject = ['database', 'queryServer'];
     database;
     queryServer;
-
-    static $inject = ['database', 'queryServer'];
 
     /**
      * @param {DatabaseService} database

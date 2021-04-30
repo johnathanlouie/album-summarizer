@@ -56,13 +56,12 @@ class StatusViewController {
     };
     #progressBar = new ProgressBar();
 
+    static $inject = ['$scope', 'queryServer', 'modal', 'options', 'evaluations'];
     $scope;
     queryServer;
     modal;
     options;
     evaluations;
-
-    static $inject = ['$scope', 'queryServer', 'modal', 'options', 'evaluations'];
 
     /**
      * @param {angular.IScope} $scope 

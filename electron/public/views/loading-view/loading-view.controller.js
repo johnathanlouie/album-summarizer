@@ -7,14 +7,13 @@ import EvaluationsService from '../../services/evaluations.service.js';
 
 class LoadingViewController {
 
+    static $inject = ['$scope', '$location', 'modal', 'options', 'users', 'evaluations'];
     $scope;
     $location;
     modal;
     options;
     users;
     evaluations;
-
-    static $inject = ['$scope', '$location', 'modal', 'options', 'users', 'evaluations'];
 
     /**
      * @param {angular.IScope} $scope 
