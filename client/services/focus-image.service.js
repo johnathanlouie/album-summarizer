@@ -1,5 +1,5 @@
 class FocusImageService {
-    image = 'public/image-placeholder.png';
+    image = 'image-placeholder.png';
 }
 
 

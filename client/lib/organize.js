@@ -15,12 +15,12 @@ class OrganizedDirFile {
     }
 
     url() {
-        return path.normalize(`public/data/${encodeURIComponent(this.#dir)}.json`);
+        return path.normalize(`data/${encodeURIComponent(this.#dir)}.json`);
     }
 
     mkdir() {
-        if (!fs.existsSync('public/data')) {
-            fs.mkdirSync('public/data');
+        if (!fs.existsSync('data')) {
+            fs.mkdirSync('data');
         }
     }
 

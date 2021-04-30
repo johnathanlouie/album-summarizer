@@ -1,6 +1,6 @@
 const angular = require('angular');
 import SettingsService from './settings.service.js';
-import { ModelDescription, Metrics, Evaluation } from '../lib/evaluation.js';
+import { ModelDescription, Evaluation } from '../lib/evaluation.js';
 
 
 /**
