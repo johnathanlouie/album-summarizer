@@ -48,6 +48,7 @@ class LoadingViewController {
                 this.options.load(),
                 this.users.load(),
                 this.evaluations.fetchStatuses(),
+                this.evaluations.fromMongoDb(),
             ]);
             this.$location.path('/organizer');
         }

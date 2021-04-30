@@ -84,6 +84,8 @@ class StatusViewController {
         $scope.progressBar = this.#progressBar;
         $scope.optionsLoaded = () => options.isLoaded;
         $scope.evaluations = this.evaluations;
+        $scope.removeMongoDbDuplicates = () => this.#removeMongoDbDuplicates();
+        $scope.reevaluatePending = () => this.#reevaluatePending();
 
         $scope.retry = () => this.#retry();
 
@@ -101,7 +103,7 @@ class StatusViewController {
             if (this.#quit) { return; }
             if (!this.evaluations.has(model)) {
                 try {
-                    this.evaluations.set(await this.queryServer.evaluate(model));
+                    this.evaluations.add(await this.queryServer.evaluate(model));
                     this.#progressBar.current++;
                     this.$scope.$apply();
                 }
@@ -132,12 +134,66 @@ class StatusViewController {
         this.$scope.$apply();
     }
 
+    async #reevaluatePending() {
+        this.#progressBar.run();
+        this.#progressBar.current = 0;
+        this.#progressBar.total = this.options.modelCount();
+        for (let evaluation of this.evaluations.toArray()) {
+            if (this.#quit) { return; }
+            if (evaluation.status === 'TrainingStatus.PENDING') {
+                try {
+                    await this.evaluations.update(await this.queryServer.evaluate(evaluation.model));
+                    this.#progressBar.current++;
+                    this.$scope.$apply();
+                }
+                catch (e) {
+                    console.error(e);
+                    if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
+                        this.#progressBar.stop();
+                        this.modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
+                        this.$scope.$apply();
+                        return;
+                    }
+                    else if (e.status === 500) {
+                        // Ignore 500 errors
+                    }
+                    else {
+                        this.#progressBar.stop();
+                        this.modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
+                        this.$scope.$apply();
+                        return;
+                    }
+                }
+            }
+            else {
+                this.#progressBar.current++;
+            }
+        }
+        this.#progressBar.complete();
+        this.$scope.$apply();
+    }
+
+    async #removeMongoDbDuplicates() {
+        try {
+            this.modal.showLoading('DELETING...');
+            await this.evaluations.removeMongoDbDuplicates();
+            this.modal.hideLoading();
+        }
+        catch (e) {
+            console.error(e);
+            this.modal.hideLoading();
+            this.modal.showError(e, 'ERROR: MongoDB', 'Error while deleting duplicates');
+        }
+        this.$scope.$apply();
+    }
+
     async #preInit() {
         try {
             this.modal.showLoading('RETRIEVING...');
             await Promise.all([
                 this.options.load(),
                 this.evaluations.fetchStatuses(),
+                this.evaluations.fromMongoDb(),
             ])
             this.modal.hideLoading();
             this.$scope.$apply();

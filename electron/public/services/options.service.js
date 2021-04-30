@@ -1,5 +1,6 @@
 const angular = require('angular');
 import QueryServerService from './query-server.service.js';
+import { ModelDescription } from '../lib/evaluation.js';
 
 
 class Options {
@@ -67,7 +68,7 @@ class Options {
             for (let d of this.datasets) {
                 for (let l of this.losses) {
                     for (let o of this.optimizers) {
-                        yield {
+                        yield Object.assign(new ModelDescription(), {
                             architecture: a,
                             dataset: d,
                             loss: l,
@@ -76,7 +77,7 @@ class Options {
                             epochs: 0,
                             patience: 3,
                             split: 0,
-                        };
+                        });
                     }
                 }
             }
