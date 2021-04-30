@@ -9,14 +9,13 @@ import ModalService from '../../services/modal.service.js';
 
 class OrganizerViewController {
 
+    static $inject = ['$scope', 'history', 'cwd', 'screenView', 'focusImage', 'modal'];
     $scope;
     history;
     cwd;
     screenView;
     focusImage;
     modal;
-
-    static $inject = ['$scope', 'history', 'cwd', 'screenView', 'focusImage', 'modal'];
 
     /**
      * @param {angular.IScope} $scope 
