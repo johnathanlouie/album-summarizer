@@ -1,6 +1,5 @@
 const os = require('os');
 import Directory from '../lib/directory.js';
-import OrganizedDirFile from '../lib/organize.js';
 import QueryServerService from './query-server.service.js';
 
 
@@ -30,15 +29,14 @@ class CwdService {
     /** @type {?Array.<Array.<OrganizedImage>>} */
     #organization;
 
-    #queryServer;
-
     static $inject = ['queryServer'];
+    queryServer;
 
     /**
      * @param {QueryServerService} queryServer
      */
     constructor(queryServer) {
-        this.#queryServer = queryServer;
+        this.queryServer = queryServer;
     }
 
     cd(dst) {
@@ -53,7 +51,7 @@ class CwdService {
 
     async organize() {
         this.#organization = null;
-        this.#organization = await this.#queryServer.run(this.#path);
+        this.#organization = await this.queryServer.run(this.#path);
     }
 
     get organization() { return this.#organization; }
