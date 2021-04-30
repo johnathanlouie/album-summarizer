@@ -4,6 +4,7 @@ import errorModal from './error-modal/error-modal.module.js';
 import imageViewer from './image-viewer/image-viewer.module.js';
 import loadingModal from './loading-modal/loading-modal.module.js';
 import subdirectoryPanel from './subdirectory-panel/subdirectory-panel.module.js';
+import photoModal from './photo-modal/photo-modal.module.js';
 
 
 const module = angular.module('components', [
@@ -12,6 +13,7 @@ const module = angular.module('components', [
     imageViewer,
     loadingModal,
     subdirectoryPanel,
+    photoModal,
 ]);
 
 

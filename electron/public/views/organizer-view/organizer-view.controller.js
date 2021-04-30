@@ -61,7 +61,7 @@ class OrganizerViewController {
 
         $scope.focusOnImage = function (url) {
             focusImage.image = url;
-            screenView.screen = 'IMAGE_VIEWER';
+            modal.showPhoto();
         };
 
         async function organize() {

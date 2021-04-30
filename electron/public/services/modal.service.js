@@ -36,6 +36,10 @@ class ModalService {
         this.#root.$broadcast('LOADING_MODAL_HIDE');
     }
 
+    showPhoto() {
+        this.#root.$broadcast('PHOTO_MODAL_SHOW');
+    }
+
 }
 
 
