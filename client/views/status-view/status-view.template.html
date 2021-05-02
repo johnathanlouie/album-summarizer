@@ -2,28 +2,34 @@
 
 <div class="container-fluid">
 
-    <h6>Overall Evaluation Progress</h6>
+    <div class="card mb-3">
+        <div class="card-body">
 
-    <div class="progress position-relative mb-2">
-        <div class="progress-bar" ng-class="progressBar.classes()" ng-style="progressBar.totalWidth()"
-            role="progressbar">
+            <h6>Overall Evaluation Progress</h6>
+
+            <div class="progress position-relative mb-2">
+                <div class="progress-bar" ng-class="progressBar.classes()" ng-style="progressBar.totalWidth()"
+                    role="progressbar">
+                </div>
+                <span class="d-flex align-items-center justify-content-center position-absolute w-100 h-100">
+                    {{ progressBar.current }} / {{ progressBar.total }}
+                </span>
+            </div>
+
+            <h6>Breakdown</h6>
+
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" ng-style="progressBar.completeWidth()"
+                    ng-class="progressBar.animate()">{{ progressBar.complete }}</div>
+                <div class="progress-bar bg-warning" role="progressbar" ng-style="progressBar.pendingWidth()"
+                    ng-class="progressBar.animate()">{{ progressBar.pending }}</div>
+                <div class="progress-bar bg-danger" role="progressbar" ng-style="progressBar.resourceWidth()"
+                    ng-class="progressBar.animate()">{{ progressBar.resource }}</div>
+                <div class="progress-bar bg-dark" role="progressbar" ng-style="progressBar.badWidth()"
+                    ng-class="progressBar.animate()">{{ progressBar.bad }}</div>
+            </div>
+
         </div>
-        <span class="d-flex align-items-center justify-content-center position-absolute w-100 h-100">
-            {{ progressBar.current }} / {{ progressBar.total }}
-        </span>
-    </div>
-
-    <h6>Breakdown</h6>
-
-    <div class="progress mb-2">
-        <div class="progress-bar bg-success" role="progressbar" ng-style="progressBar.completeWidth()"
-            ng-class="progressBar.animate()">{{ progressBar.complete }}</div>
-        <div class="progress-bar bg-warning" role="progressbar" ng-style="progressBar.pendingWidth()"
-            ng-class="progressBar.animate()">{{ progressBar.pending }}</div>
-        <div class="progress-bar bg-danger" role="progressbar" ng-style="progressBar.resourceWidth()"
-            ng-class="progressBar.animate()">{{ progressBar.resource }}</div>
-        <div class="progress-bar bg-dark" role="progressbar" ng-style="progressBar.badWidth()"
-            ng-class="progressBar.animate()">{{ progressBar.bad }}</div>
     </div>
 
     <div class="row mb-2">
