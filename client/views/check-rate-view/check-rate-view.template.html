@@ -2,72 +2,75 @@
 
 <div class="container-fluid">
 
-    <form class="mb-3" ng-submit="submit()">
-        <div class="form-row">
+    <form class="card mb-3" ng-submit="submit()">
+        <div class="card-body">
+            <div class="form-row">
 
-            <div class="form-group col-2">
-                <label for="phase">Sets</label>
-                <select class="form-control" id="phase" ng-model="selectedOptions.phase">
-                    <option>training</option>
-                    <option>validation</option>
-                    <option>test</option>
-                </select>
+                <div class="form-group col-2">
+                    <label for="phase">Phases</label>
+                    <select class="form-control" id="phase" ng-model="selectedOptions.phase">
+                        <option>training</option>
+                        <option>validation</option>
+                        <option>test</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="architectures">Architectures</label>
+                    <select class="form-control" id="architectures" ng-model="selectedOptions.architecture">
+                        <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="datasets">Datasets</label>
+                    <select class="form-control" id="datasets" ng-model="selectedOptions.dataset">
+                        <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="losses">Losses</label>
+                    <select class="form-control" id="losses" ng-model="selectedOptions.loss">
+                        <option ng-repeat="loss in options.losses">{{ loss }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="optimizers">Optimizers</label>
+                    <select class="form-control" id="optimizers" ng-model="selectedOptions.optimizer">
+                        <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="metrics">Metrics</label>
+                    <input class="form-control" ng-model="selectedOptions.metrics" type="text" id="metrics">
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="epochs">Epochs</label>
+                    <input class="form-control" ng-model="selectedOptions.epochs" type="number" id="epochs" min="0"
+                        step="1">
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="patience">Patience</label>
+                    <input class="form-control" ng-model="selectedOptions.patience" type="number" id="patience" min="0"
+                        step="1">
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="split">Split</label>
+                    <input class="form-control" ng-model="selectedOptions.split" type="number" id="split" min="0"
+                        step="1">
+                </div>
+
+                <div class="form-group col d-flex align-items-end">
+                    <button class="btn btn-primary" type="submit">Compare Predictions</button>
+                </div>
+
             </div>
-
-            <div class="form-group col-2">
-                <label for="architectures">Architectures</label>
-                <select class="form-control" id="architectures" ng-model="selectedOptions.architecture">
-                    <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
-                </select>
-            </div>
-
-            <div class="form-group col-2">
-                <label for="datasets">Datasets</label>
-                <select class="form-control" id="datasets" ng-model="selectedOptions.dataset">
-                    <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
-                </select>
-            </div>
-
-            <div class="form-group col-2">
-                <label for="losses">Losses</label>
-                <select class="form-control" id="losses" ng-model="selectedOptions.loss">
-                    <option ng-repeat="loss in options.losses">{{ loss }}</option>
-                </select>
-            </div>
-
-            <div class="form-group col-2">
-                <label for="optimizers">Optimizers</label>
-                <select class="form-control" id="optimizers" ng-model="selectedOptions.optimizer">
-                    <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
-                </select>
-            </div>
-
-            <div class="form-group col-2">
-                <label for="metrics">Metrics</label>
-                <input class="form-control" ng-model="selectedOptions.metrics" type="text" id="metrics">
-            </div>
-
-            <div class="form-group col-2">
-                <label for="epochs">Epochs</label>
-                <input class="form-control" ng-model="selectedOptions.epochs" type="number" id="epochs" min="0"
-                    step="1">
-            </div>
-
-            <div class="form-group col-2">
-                <label for="patience">Patience</label>
-                <input class="form-control" ng-model="selectedOptions.patience" type="number" id="patience" min="0"
-                    step="1">
-            </div>
-
-            <div class="form-group col-2">
-                <label for="split">Split</label>
-                <input class="form-control" ng-model="selectedOptions.split" type="number" id="split" min="0" step="1">
-            </div>
-
-            <div class="form-group col d-flex align-items-end">
-                <button class="btn btn-primary" type="submit">Compare Predictions</button>
-            </div>
-
         </div>
     </form>
 
