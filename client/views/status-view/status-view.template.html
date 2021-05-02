@@ -37,66 +37,56 @@
 
     <div class="row mb-2">
 
-        <div class="col">
-
-            <div class="row">
-                <div class="col-auto">Architecture</div>
-                <div class="col">
-                    <select class="form-control" id="architectures" ng-model="search.model.architecture">
-                        <option></option>
-                        <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-auto">Dataset</div>
-                <div class="col">
-                    <select class="form-control" id="datasets" ng-model="search.model.dataset">
-                        <option></option>
-                        <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-auto">Loss</div>
-                <div class="col">
-                    <select class="form-control" id="losses" ng-model="search.model.loss">
-                        <option></option>
-                        <option ng-repeat="loss in options.losses">{{ loss }}</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-auto">Optimizer</div>
-                <div class="col">
-                    <select class="form-control" id="optimizers" ng-model="search.model.optimizer">
-                        <option></option>
-                        <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
-                    </select>
-                </div>
-            </div>
-
+        <div class="form-group col">
+            <label for="architectures">Architecture</label>
+            <select class="form-control" id="architectures" ng-model="search.model.architecture">
+                <option></option>
+                <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
+            </select>
         </div>
 
-        <div class="col">
-            <select class="form-control" ng-model="search.status">
+        <div class="form-group col">
+            <label for="datasets">Dataset</label>
+            <select class="form-control" id="datasets" ng-model="search.model.dataset">
+                <option></option>
+                <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
+            </select>
+        </div>
+
+        <div class="form-group col">
+            <label for="losses">Loss</label>
+            <select class="form-control" id="losses" ng-model="search.model.loss">
+                <option></option>
+                <option ng-repeat="loss in options.losses">{{ loss }}</option>
+            </select>
+        </div>
+
+        <div class="form-group col">
+            <label for="optimizers">Optimizer</label>
+            <select class="form-control" id="optimizers" ng-model="search.model.optimizer">
+                <option></option>
+                <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
+            </select>
+        </div>
+
+        <div class="form-group col">
+            <label for="status">Status</label>
+            <select class="form-control" id="status" ng-model="search.status">
                 <option></option>
                 <option ng-repeat="status in evaluations.statuses()">{{ status }}</option>
             </select>
         </div>
 
-        <div class="col">
-            <select class="form-control" ng-model="sort.phase">
+        <div class="form-group col">
+            <label for="sortBy">Sort By</label>
+            <select class="form-control" ng-model="sort.phase" id="sortBy">
                 <option>training.accuracy</option>
                 <option>validation.accuracy</option>
                 <option>test.accuracy</option>
             </select>
         </div>
 
-        <div class="col-auto">
+        <div class="col-auto d-flex align-items-end mb-3">
             <div class="btn-group-toggle" data-toggle="buttons">
                 <label class="btn btn-info active">
                     <input type="checkbox" ng-model="sort.reverse">
