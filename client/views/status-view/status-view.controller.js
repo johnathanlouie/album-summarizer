@@ -9,29 +9,29 @@ import EvaluationsService from '../../services/evaluations.service.js';
 class ProgressBar {
 
     total = 0;
-    finished = 0;
+    complete = 0;
     pending = 0;
     bad = 0;
-    error = 0;
+    resource = 0;
     #state = 'stopped';
 
     stop() { this.#state = 'stopped'; }
     run() { this.#state = 'running'; }
-    complete() { this.#state = 'complete'; }
+    end() { this.#state = 'complete'; }
 
     reset(total) {
         this.total = total;
-        this.finished = 0;
+        this.complete = 0;
         this.pending = 0;
         this.bad = 0;
-        this.error = 0;
+        this.resource = 0;
     }
 
     get current() {
-        return this.finished +
+        return this.complete +
             this.pending +
             this.bad +
-            this.error;
+            this.resource;
     }
 
     #percentage(value) {
@@ -42,10 +42,10 @@ class ProgressBar {
     #cssWidth(value) { return { width: `${this.#percentage(value)}%` }; }
 
     totalWidth() { return this.#cssWidth(this.current); }
-    completeWidth() { return this.#cssWidth(this.finished); }
+    completeWidth() { return this.#cssWidth(this.complete); }
     pendingWidth() { return this.#cssWidth(this.pending); }
+    resourceWidth() { return this.#cssWidth(this.resource); }
     badWidth() { return this.#cssWidth(this.bad); }
-    errorWidth() { return this.#cssWidth(this.error); }
 
     animate() {
         if (this.#state === 'running') { return ['progress-bar-striped', 'progress-bar-animated'] };
@@ -130,11 +130,15 @@ class StatusViewController {
     updateProgressBar(status) {
         switch (status) {
             case 'TrainingStatus.COMPLETE':
-                this.#progressBar.finished++;
+                this.#progressBar.complete++;
                 break;
             case 'TrainingStatus.PENDING':
             case 'TrainingStatus.TRAINING':
                 this.#progressBar.pending++;
+                break;
+            case 'TrainingStatus.RESOURCE':
+            case 'TrainingStatus.RESOURCE2':
+                this.#progressBar.resource++;
                 break;
             default:
                 this.#progressBar.bad++;
@@ -163,7 +167,7 @@ class StatusViewController {
                         return;
                     }
                     else if (e.status === 500) {
-                        this.#progressBar.error++;
+                        // Ignore
                     }
                     else {
                         this.#progressBar.stop();
@@ -177,7 +181,7 @@ class StatusViewController {
                 this.updateProgressBar(this.evaluations.get(model).status);
             }
         }
-        this.#progressBar.complete();
+        this.#progressBar.end();
         this.$scope.$apply();
     }
 
@@ -202,7 +206,7 @@ class StatusViewController {
                         return;
                     }
                     else if (e.status === 500) {
-                        this.#progressBar.error++;
+                        // Ignore
                     }
                     else {
                         this.#progressBar.stop();
@@ -216,7 +220,7 @@ class StatusViewController {
                 this.updateProgressBar(this.evaluations.get(model).status);
             }
         }
-        this.#progressBar.complete();
+        this.#progressBar.end();
         this.$scope.$apply();
     }
 
