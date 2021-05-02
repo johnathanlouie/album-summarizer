@@ -4,14 +4,23 @@
 
     <div class="form-row mb-2">
         <div class="col">
-            <div class="progress position-relative">
-                <div class="progress-bar" ng-class="progressBar.classes()" ng-style="progressBar.style()"
+            <div class="progress position-relative mb-2">
+                <div class="progress-bar" ng-class="progressBar.classes()" ng-style="progressBar.totalWidth()"
                     role="progressbar">
                 </div>
-                <span
-                    class="d-flex align-items-center justify-content-center position-absolute w-100 h-100 text-black font-weight-bold">
+                <span class="d-flex align-items-center justify-content-center position-absolute w-100 h-100">
                     {{ progressBar.current }} / {{ progressBar.total }}
                 </span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar bg-success" role="progressbar" ng-style="progressBar.completeWidth()"
+                    ng-class="progressBar.animate()">{{ progressBar.finished }}</div>
+                <div class="progress-bar bg-warning" role="progressbar" ng-style="progressBar.pendingWidth()"
+                    ng-class="progressBar.animate()">{{ progressBar.pending }}</div>
+                <div class="progress-bar bg-danger" role="progressbar" ng-style="progressBar.badWidth()"
+                    ng-class="progressBar.animate()">{{ progressBar.bad }}</div>
+                <div class="progress-bar bg-dark" role="progressbar" ng-style="progressBar.errorWidth()"
+                    ng-class="progressBar.animate()">{{ progressBar.error }}</div>
             </div>
         </div>
     </div>

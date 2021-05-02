@@ -10,18 +10,33 @@ class ProgressBar {
 
     total = 0;
     current = 0;
+    finished = 0;
+    pending = 0;
+    bad = 0;
+    error = 0;
     #state = 'stopped';
 
     stop() { this.#state = 'stopped'; }
     run() { this.#state = 'running'; }
     complete() { this.#state = 'complete'; }
 
-    percentage() {
+    #percentage(value) {
         if (this.total === 0) { return 0; }
-        return Math.round(this.current / this.total * 100);
+        return Math.round(value / this.total * 100);
     }
 
-    style() { return { width: `${this.percentage()}%` }; }
+    #cssWidth(value) { return { width: `${this.#percentage(value)}%` }; }
+
+    totalWidth() { return this.#cssWidth(this.current); }
+    completeWidth() { return this.#cssWidth(this.finished); }
+    pendingWidth() { return this.#cssWidth(this.pending); }
+    badWidth() { return this.#cssWidth(this.bad); }
+    errorWidth() { return this.#cssWidth(this.error); }
+
+    animate() {
+        if (this.#state === 'running') { return ['progress-bar-striped', 'progress-bar-animated'] };
+        return [];
+    }
 
     classes() {
         switch (this.#state) {
@@ -97,13 +112,29 @@ class StatusViewController {
     async #evaluate() {
         this.#progressBar.run();
         this.#progressBar.current = 0;
+        this.#progressBar.finished = 0;
+        this.#progressBar.pending = 0;
+        this.#progressBar.bad = 0;
+        this.#progressBar.error = 0;
         this.#progressBar.total = this.options.modelCount();
         this.$scope.$apply();
         for (let model of this.options.models()) {
             if (this.#quit) { return; }
             if (!this.evaluations.has(model)) {
                 try {
-                    this.evaluations.add(await this.queryServer.evaluate(model));
+                    let evaluation = await this.queryServer.evaluate(model);
+                    this.evaluations.add(evaluation);
+                    switch (evaluation.status) {
+                        case 'TrainingStatus.COMPLETE':
+                            this.#progressBar.finished++;
+                            break;
+                        case 'TrainingStatus.PENDING':
+                        case 'TrainingStatus.TRAINING':
+                            this.#progressBar.pending++;
+                            break;
+                        default:
+                            this.#progressBar.bad++;
+                    }
                     this.#progressBar.current++;
                     this.$scope.$apply();
                 }
@@ -116,7 +147,7 @@ class StatusViewController {
                         return;
                     }
                     else if (e.status === 500) {
-                        // Ignore 500 errors
+                        this.#progressBar.error++;
                     }
                     else {
                         this.#progressBar.stop();
@@ -128,6 +159,17 @@ class StatusViewController {
             }
             else {
                 this.#progressBar.current++;
+                switch (this.evaluations.get(model).status) {
+                    case 'TrainingStatus.COMPLETE':
+                        this.#progressBar.finished++;
+                        break;
+                    case 'TrainingStatus.PENDING':
+                    case 'TrainingStatus.TRAINING':
+                        this.#progressBar.pending++;
+                        break;
+                    default:
+                        this.#progressBar.bad++;
+                }
             }
         }
         this.#progressBar.complete();
