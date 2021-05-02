@@ -93,6 +93,15 @@ class EvaluationsService {
         }
     }
 
+    /**
+     * 
+     * @param {ModelDescription} model 
+     * @returns {Evaluation}
+     */
+    get(model) {
+        return this.#container.get(model.toString());
+    }
+
 }
 
 
