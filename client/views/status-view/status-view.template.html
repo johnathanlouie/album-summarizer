@@ -88,9 +88,14 @@
 
         <div class="col-auto">
             <div class="btn-group-toggle" data-toggle="buttons">
-                <label class="btn"
-                    ng-class="{ 'btn-info': sort.reverse, 'btn-outline-info': !sort.reverse, 'active': sort.reverse }">
-                    <input type="checkbox" ng-model="sort.reverse"> Reverse
+                <label class="btn btn-info active">
+                    <input type="checkbox" ng-model="sort.reverse">
+                    <svg class="btn-icon bi bi-sort-down" ng-show="sort.reverse" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#sort-down" />
+                    </svg>
+                    <svg class="btn-icon bi bi-sort-down-alt" ng-hide="sort.reverse" fill="currentColor">
+                        <use xlink:href="bootstrap-icons.svg#sort-down-alt" />
+                    </svg>
                 </label>
             </div>
         </div>
