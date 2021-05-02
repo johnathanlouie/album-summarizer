@@ -155,6 +155,16 @@ class MongoDbService {
         if ((await this.#db.collection(collection).deleteOne(filter)).result.ok !== 1) { throw new Error(); }
     }
 
+    /**
+     * 
+     * @param {string} collection 
+     * @param {Object} filter 
+     */
+    async findOneAndDelete(collection, filter) {
+        await this.connect();
+        if ((await this.#db.collection(collection).findOneAndDelete(filter)).ok !== 1) { throw new Error(); }
+    }
+
 }
 
 

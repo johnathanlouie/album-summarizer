@@ -40,7 +40,7 @@ class DatabaseService {
      * @param {Evaluation} evaluation 
      */
     async deleteEvaluation(evaluation) {
-        await this.mongoDb.deleteOne('evaluations', evaluation);
+        await this.mongoDb.findOneAndDelete('evaluations', { _id: evaluation._id });
     }
 
 }
