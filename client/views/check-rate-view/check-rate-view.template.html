@@ -85,8 +85,10 @@
         <tbody>
             <tr ng-repeat="datum in prediction">
                 <td class="text-center">
-                    <img class="rate-thumbnail img-thumbnail" ng-src="{{ datum.x | fileUrl }}"
-                        style="max-width: 300px; max-height: 300px;">
+                    <a ng-click="focusOnImage(datum.x)" role="button">
+                        <img class="rate-thumbnail img-thumbnail" ng-src="{{ datum.x | fileUrl }}"
+                            style="max-width: 300px; max-height: 300px;">
+                    </a>
                 </td>
                 <td>
                     <div ng-if="keyGuide === null">{{ datum.y.truth }}</div>
@@ -136,3 +138,5 @@
         </div>
     </div>
 </div>
+
+<photo-modal></photo-modal>

@@ -2,6 +2,7 @@ const angular = require('angular');
 import OptionsService from '../../services/options.service.js';
 import ModalService from '../../services/modal.service.js';
 import QueryServerService from '../../services/query-server.service.js';
+import FocusImageService from '../../services/focus-image.service.js';
 
 
 function maxIndex(a) {
@@ -68,8 +69,9 @@ class Prediction {
  * @param {OptionsService} options 
  * @param {ModalService} modal
  * @param {QueryServerService} queryServer
+ * @param {FocusImageService} focusImage
  */
-function controllerFn($scope, options, modal, queryServer) {
+function controllerFn($scope, options, modal, queryServer, focusImage) {
 
     $scope.options = options;
 
@@ -135,9 +137,14 @@ function controllerFn($scope, options, modal, queryServer) {
         loadOptions();
     };
 
+    $scope.focusOnImage = function (url) {
+        focusImage.image = url;
+        modal.showPhoto();
+    };
+
 }
 
-controllerFn.$inject = ['$scope', 'options', 'modal', 'queryServer'];
+controllerFn.$inject = ['$scope', 'options', 'modal', 'queryServer', 'focusImage'];
 
 
 export default controllerFn;
