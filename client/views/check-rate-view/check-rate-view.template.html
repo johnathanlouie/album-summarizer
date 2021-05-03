@@ -94,19 +94,21 @@
                 </td>
                 <td>
                     <div ng-if="keyGuide === null">{{ datum.y.predicted }}</div>
-                    <div class="row" ng-repeat="oneHotValue in datum.y.predicted.arr" ng-if="keyGuide !== null">
-                        <div class="col-2">{{ oneHotValue.name }}</div>
-                        <div class="col-2 text-right">{{ oneHotValue.percentage | number : 3 }}%</div>
-                        <div class="col">
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar"
-                                    ng-class="oneHotValue.isMax ? 'bg-success' : 'bg-info'"
-                                    ng-style="oneHotValue.cssWidth" aria-valuenow="{{ oneHotValue.percentage }}"
-                                    aria-valuemin="0" aria-valuemax="100">
+                    <table class="table table-borderless" ng-if="keyGuide !== null">
+                        <tr ng-repeat="oneHotValue in datum.y.predicted.arr" class="bg-transparent">
+                            <th scope="row" class="col-auto">{{ oneHotValue.name }}</th>
+                            <td class="text-right col-auto">{{ oneHotValue.percentage | number : 3 }}%</td>
+                            <td class="col">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar"
+                                        ng-class="oneHotValue.isMax ? 'bg-success' : 'bg-info'"
+                                        ng-style="oneHotValue.cssWidth" aria-valuenow="{{ oneHotValue.percentage }}"
+                                        aria-valuemin="0" aria-valuemax="100">
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </tbody>
