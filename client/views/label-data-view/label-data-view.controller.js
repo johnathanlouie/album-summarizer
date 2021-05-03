@@ -144,7 +144,22 @@ function controllerFn($scope, mongoDb, modal, users) {
         await getUnlabeledData();
     };
 
-    $scope.isNullData = function () { return $scope.unlabeledData === nullData; }
+    $scope.isNullData = function () { return $scope.unlabeledData === nullData; };
+
+    $scope.deleteUser = async function () {
+        try {
+            modal.showLoading('Removing user...');
+            await mongoDb.dropCollection($scope.selectedCollection);
+            await users.load(true);
+            modal.hideLoading();
+        }
+        catch (e) {
+            console.error(e);
+            modal.hideLoading();
+            modal.showError(e, 'ERROR: Delete User', 'Error during deleting a user')
+        }
+        finally { $scope.$apply(); }
+    };
 
     $scope.unlabeledData = nullData;
     $scope.selectedCollection = null;

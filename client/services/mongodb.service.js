@@ -165,6 +165,15 @@ class MongoDbService {
         if ((await this.#db.collection(collection).findOneAndDelete(filter)).ok !== 1) { throw new Error(); }
     }
 
+    /**
+     * 
+     * @param {string} collection 
+     */
+    async dropCollection(collection) {
+        await this.connect();
+        if (!await this.#db.collection(collection).drop()) { throw new Error(); }
+    }
+
 }
 
 

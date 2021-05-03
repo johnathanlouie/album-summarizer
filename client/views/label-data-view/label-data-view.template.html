@@ -3,7 +3,7 @@
 <div class="container" ng-show="selectUserScreen"
     style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
 
-    <form class="mb-5" ng-submit="getUnlabeledData()">
+    <form class="mb-5">
         <div class="form-row">
             <div class="input-group col">
                 <div class="input-group-prepend">
@@ -15,10 +15,10 @@
                 </select>
             </div>
             <div class="col-auto">
-                <button class="btn btn-primary" type="submit">Select User</button>
+                <button class="btn btn-primary" ng-click="getUnlabeledData()">Select User</button>
             </div>
             <div class="col-auto">
-                <button class="btn btn-danger">Delete User</button>
+                <button class="btn btn-danger" ng-click="deleteUser()">Delete User</button>
             </div>
         </div>
     </form>
