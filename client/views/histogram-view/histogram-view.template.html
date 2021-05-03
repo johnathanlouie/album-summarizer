@@ -29,7 +29,9 @@
     <div class="card mb-3" ng-repeat="cluster in clusters">
         <h5 class="card-header text-center">{{ $index }}</h5>
         <div class="card-body">
-            <img class="img-thumbnail img-max-300" ng-src="{{ image }}" ng-repeat="image in cluster">
+            <a ng-click="focusOnImage(image)" role="button" ng-repeat="image in cluster">
+                <img class="img-thumbnail img-max-300" ng-src="{{ image }}">
+            </a>
         </div>
     </div>
 </div>
@@ -54,3 +56,5 @@
         </div>
     </div>
 </div>
+
+<photo-modal></photo-modal>
