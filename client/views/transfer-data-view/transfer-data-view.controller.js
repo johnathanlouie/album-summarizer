@@ -137,7 +137,7 @@ class Controller {
     async getMongoCollections() {
         try {
             this.#modal.showLoading('RETRIEVING...');
-            await this.#users.load();
+            await this.#users.load(true);
             if (this.#users.users.length > 0) {
                 this.#scope.collectionPull = this.#users.users[0];
             }
