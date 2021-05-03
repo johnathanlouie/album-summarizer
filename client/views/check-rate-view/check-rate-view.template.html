@@ -7,15 +7,6 @@
             <div class="form-row">
 
                 <div class="form-group col-2">
-                    <label for="phase">Phases</label>
-                    <select class="form-control" id="phase" ng-model="selectedOptions.phase">
-                        <option>training</option>
-                        <option>validation</option>
-                        <option>test</option>
-                    </select>
-                </div>
-
-                <div class="form-group col-2">
                     <label for="architectures">Architectures</label>
                     <select class="form-control" id="architectures" ng-model="selectedOptions.architecture">
                         <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
@@ -58,6 +49,15 @@
                     <label for="patience">Patience</label>
                     <input class="form-control" ng-model="selectedOptions.patience" type="number" id="patience" min="0"
                         step="1">
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="phase">Phases</label>
+                    <select class="form-control" id="phase" ng-model="selectedOptions.phase">
+                        <option>training</option>
+                        <option>validation</option>
+                        <option>test</option>
+                    </select>
                 </div>
 
                 <div class="form-group col-2">
