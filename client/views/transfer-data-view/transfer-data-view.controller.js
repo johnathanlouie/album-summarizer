@@ -140,7 +140,8 @@ class Controller {
             await this.#users.load();
             if (this.#users.users.length > 0) {
                 this.#scope.collectionPull = this.#users.users[0];
-            } else {
+            }
+            else {
                 this.#scope.collectionPull = null;
             }
             this.#modal.hideLoading();
