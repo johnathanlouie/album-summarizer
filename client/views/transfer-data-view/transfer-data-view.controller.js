@@ -76,7 +76,13 @@ class Controller {
         try {
             this.#modal.showLoading('UPLOADING...');
             await this.#mongoDb.insertMany(this.#scope.data, this.#scope.collectionPush);
-            await this.getMongoCollections();
+            await this.#users.load(true);
+            if (this.#users.users.length > 0) {
+                this.#scope.collectionPull = this.#users.users[0];
+            }
+            else {
+                this.#scope.collectionPull = null;
+            }
             this.#modal.hideLoading();
         }
         catch (e) {
@@ -137,7 +143,7 @@ class Controller {
     async getMongoCollections() {
         try {
             this.#modal.showLoading('RETRIEVING...');
-            await this.#users.load(true);
+            await this.#users.load(false);
             if (this.#users.users.length > 0) {
                 this.#scope.collectionPull = this.#users.users[0];
             }
