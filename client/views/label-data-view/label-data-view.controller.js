@@ -1,5 +1,6 @@
 const angular = require('angular');
 const _ = require('lodash');
+const $ = require('jquery');
 import ModalService from '../../services/modal.service.js';
 import MongoDbService from '../../services/mongodb.service.js';
 import UsersService from '../../services/users.service.js';
@@ -145,6 +146,8 @@ function controllerFn($scope, mongoDb, modal, users) {
     };
 
     $scope.isNullData = function () { return $scope.unlabeledData === nullData; };
+
+    $scope.confirmDeleteUser = () => $('#deleteUserModal').modal();
 
     $scope.deleteUser = async function () {
         try {
