@@ -192,9 +192,9 @@ class StatusViewController {
             if (this.#quit) { return; }
             if (evaluation.status === 'TrainingStatus.PENDING') {
                 try {
-                    let evaluation = await this.queryServer.evaluate(model);
-                    this.evaluations.add(evaluation);
-                    this.updateProgressBar(evaluation.status);
+                    let reevaluation = await this.queryServer.evaluate(evaluation.model);
+                    await this.evaluations.update(reevaluation);
+                    this.updateProgressBar(reevaluation.status);
                     this.$scope.$apply();
                 }
                 catch (e) {
@@ -217,7 +217,7 @@ class StatusViewController {
                 }
             }
             else {
-                this.updateProgressBar(this.evaluations.get(model).status);
+                this.updateProgressBar(this.evaluations.get(evaluation.model).status);
             }
         }
         this.#progressBar.end();
