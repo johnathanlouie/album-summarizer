@@ -19,28 +19,30 @@ class DatabaseService {
      * 
      * @param {Evaluation} evaluation 
      */
-    async addEvaluation(evaluation) {
-        await this.mongoDb.insertOne('evaluations', evaluation);
+    addEvaluation(evaluation) {
+        return this.mongoDb.insertOne('evaluations', evaluation);
     }
 
     /**
      * 
      * @param {Evaluation} evaluation 
      */
-    async updateEvaluation(evaluation) {
-        await this.mongoDb.findOneAndReplace('evaluations', { model: evaluation.model }, evaluation);
+    updateEvaluation(evaluation) {
+        return this.mongoDb.findOneAndReplace('evaluations', { model: evaluation.model }, evaluation);
     }
 
-    async getAllEvaluations() {
-        return (await this.mongoDb.getAll('evaluations')).map(i => Evaluation.from(i));
+    getAllEvaluations() {
+        return this.mongoDb.getAll('evaluations').then(
+            evaluations => evaluations.map(i => Evaluation.from(i))
+        );
     }
 
     /**
      * 
      * @param {Evaluation} evaluation 
      */
-    async deleteEvaluation(evaluation) {
-        await this.mongoDb.findOneAndDelete('evaluations', { _id: evaluation._id });
+    deleteEvaluation(evaluation) {
+        return this.mongoDb.findOneAndDelete('evaluations', { _id: evaluation._id });
     }
 
 }
