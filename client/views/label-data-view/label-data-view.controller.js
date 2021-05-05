@@ -20,38 +20,38 @@ function LabelDataViewController($scope, mongoDb, modal, users) {
     function keyHandler(event) {
         switch (event.key) {
             case '1':
-                $scope.category = 'environment';
+                $scope.unlabeledData.class = 'environment';
                 $scope.$apply();
                 break;
             case '2':
-                $scope.category = 'people';
+                $scope.unlabeledData.class = 'people';
                 $scope.$apply();
                 break;
             case '3':
-                $scope.category = 'object';
+                $scope.unlabeledData.class = 'object';
                 $scope.$apply();
                 break;
             case '4':
-                $scope.category = 'hybrid';
+                $scope.unlabeledData.class = 'hybrid';
                 $scope.$apply();
                 break;
             case '5':
-                $scope.category = 'animal';
+                $scope.unlabeledData.class = 'animal';
                 $scope.$apply();
                 break;
             case '6':
-                $scope.category = 'food';
+                $scope.unlabeledData.class = 'food';
                 $scope.$apply();
                 break;
             case '+':
-                if ($scope.rating < 3) {
-                    $scope.rating++;
+                if ($scope.unlabeledData.rating < 3) {
+                    $scope.unlabeledData.rating++;
                     $scope.$apply();
                 }
                 break;
             case '-':
-                if ($scope.rating > 1) {
-                    $scope.rating--;
+                if ($scope.unlabeledData.rating > 1) {
+                    $scope.unlabeledData.rating--;
                     $scope.$apply();
                 }
                 break;
