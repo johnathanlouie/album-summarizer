@@ -155,7 +155,7 @@ class StatusViewController {
         for (let model of this.options.models()) {
             if (this.#quit || quit) { return; }
             if (!this.evaluations.has(model)) {
-                this.$q.when(this.queryServer.evaluate(model)).then(evaluation => {
+                this.queryServer.evaluate(model).then(evaluation => {
                     this.evaluations.add(evaluation);
                     this.updateProgressBar(evaluation.status);
                 }, e => {
@@ -189,7 +189,7 @@ class StatusViewController {
         for (let evaluation of this.evaluations.toArray()) {
             if (this.#quit || quit) { return; }
             if (evaluation.status === 'TrainingStatus.PENDING') {
-                this.$q.when(this.queryServer.evaluate(evaluation.model)).then(reevaluation => {
+                this.queryServer.evaluate(evaluation.model).then(reevaluation => {
                     this.evaluations.update(reevaluation);
                     this.updateProgressBar(reevaluation.status);
                 }, e => {
@@ -218,7 +218,7 @@ class StatusViewController {
 
     async #removeMongoDbDuplicates() {
         this.modal.showLoading('DELETING...');
-        this.$q.when(this.evaluations.removeMongoDbDuplicates()).then(
+        this.evaluations.removeMongoDbDuplicates().then(
             () => this.modal.hideLoading(),
             e => {
                 console.error(e);
