@@ -93,61 +93,60 @@ class QueryServerService {
     /**
      * Rates and clusters images
      * @param {string} dir Filepath of the directory of images to rate and cluster
-     * @returns {Promise.<Array.<Array.<RunReturnObject>>>}
+     * @returns {angular.IPromise.<Array.<Array.<RunReturnObject>>>}
      */
-    async run(dir) {
-        return (await this.$http.post(`${this.#serverUrl}/run`, { url: dir })).data;
+    run(dir) {
+        return this.$http.post(`${this.#serverUrl}/run`, { url: dir }).then(httpReturnValue => httpReturnValue.data);
     }
 
     /**
      * Fetches compile options for the model
-     * @returns {Promise.<OptionsReturnObject>}
+     * @returns {angular.IPromise.<OptionsReturnObject>}
      */
-    async options() {
-        return (await this.$http.get(`${this.#serverUrl}/options`)).data;
+    options() {
+        return this.$http.get(`${this.#serverUrl}/options`).then(httpReturnValue => httpReturnValue.data);
     }
 
     /**
      * Classifies or rates the model's training, validation, or test set
      * @param {ModelDescription} model Data object that describes that model to use
-     * @returns {Promise.<PredictReturnObject>}
+     * @returns {angular.IPromise.<PredictReturnObject>}
      */
-    async predict(model) {
-        return (await this.$http.post(`${this.#serverUrl}/predict`, model)).data;
+    predict(model) {
+        return this.$http.post(`${this.#serverUrl}/predict`, model).then(httpReturnValue => httpReturnValue.data);
     }
 
     /**
      * Clusters the images in a directory
      * @param {string} algorithm 
      * @param {string} directory 
-     * @returns {Promise.<Array.<Array.<string>>>}
+     * @returns {angular.IPromise.<Array.<Array.<string>>>}
      */
-    async cluster(algorithm, directory) {
-        return (await this.$http.post(`${this.#serverUrl}/cluster`, {
+    cluster(algorithm, directory) {
+        return this.$http.post(`${this.#serverUrl}/cluster`, {
             cluster: algorithm,
             directory: directory,
-        })).data;
+        }).then(httpReturnValue => httpReturnValue.data);
     }
 
     /**
-     * @returns {Promise.<Array.<Evaluation>>}
+     * @returns {angular.IPromise.<Array.<Evaluation>>}
      */
-    async evaluateAll() {
-        return (await this.$http.get(`${this.#serverUrl}/evaluate/all/0`)).data.
-            map(i => Evaluation.from(i));
+    evaluateAll() {
+        return this.$http.get(`${this.#serverUrl}/evaluate/all/0`).then(httpReturnValue => httpReturnValue.data.map(i => Evaluation.from(i)));
     }
 
     /**
      * @param {ModelDescription} model
-     * @returns {Promise.<Evaluation>}
+     * @returns {angular.IPromise.<Evaluation>}
      */
-    async evaluate(model) {
-        return Evaluation.from((await this.$http.post(`${this.#serverUrl}/evaluate`, model)).data);
+    evaluate(model) {
+        return this.$http.post(`${this.#serverUrl}/evaluate`, model).then(httpReturnValue => Evaluation.from(httpReturnValue.data));
     }
 
-    /** @returns {Promise.<Array.<string>>} */
-    async trainingStatuses() {
-        return (await this.$http.get(`${this.#serverUrl}/training-statuses`)).data;
+    /** @returns {angular.IPromise.<Array.<string>>} */
+    trainingStatuses() {
+        return this.$http.get(`${this.#serverUrl}/training-statuses`).then(httpReturnValue => httpReturnValue.data);
     }
 
 }
