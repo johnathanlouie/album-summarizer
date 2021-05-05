@@ -182,7 +182,7 @@ class StatusViewController {
         this.#progressBar.end();
     }
 
-    async #reevaluatePending() {
+    #reevaluatePending() {
         this.#progressBar.run();
         this.#progressBar.reset(this.options.modelCount());
         var quit = false;
@@ -216,9 +216,9 @@ class StatusViewController {
         this.#progressBar.end();
     }
 
-    async #removeMongoDbDuplicates() {
+    #removeMongoDbDuplicates() {
         this.modal.showLoading('DELETING...');
-        this.evaluations.removeMongoDbDuplicates().then(
+        return this.evaluations.removeMongoDbDuplicates().then(
             () => this.modal.hideLoading(),
             e => {
                 console.error(e);
@@ -228,9 +228,9 @@ class StatusViewController {
         );
     }
 
-    async #preInit() {
+    #preInit() {
         this.modal.showLoading('RETRIEVING...');
-        this.$q.all([
+        return this.$q.all([
             this.options.load(),
             this.evaluations.fetchStatuses(),
             this.evaluations.fromMongoDb(),
@@ -246,7 +246,7 @@ class StatusViewController {
 
     #retry() {
         $('#staticBackdrop').modal('hide');
-        this.#preInit();
+        return this.#preInit();
     }
 
 }
