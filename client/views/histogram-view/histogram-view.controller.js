@@ -18,38 +18,36 @@ function controllerFn($scope, options, modal, queryServer, focusImage) {
 
     $scope.options = options;
 
-    async function loadOptions() {
-        try {
-            modal.showLoading('RETRIEVING...');
-            await options.load();
-            modal.hideLoading();
-        }
-        catch (e) {
-            console.error(e);
-            modal.hideLoading();
-            $('#staticBackdrop').modal();
-        }
-        $scope.$apply();
+    function loadOptions() {
+        modal.showLoading('RETRIEVING...');
+        return options.load().then(
+            () => modal.hideLoading(),
+            e => {
+                console.error(e);
+                modal.hideLoading();
+                $('#staticBackdrop').modal();
+            },
+        );
     }
 
     loadOptions();
 
-    $scope.submit = async function () {
-        try {
-            modal.showLoading('CLUSTERING...');
-            $scope.clusters = [];
-            $scope.clusters = await queryServer.cluster(
-                $scope.requestParameters.cluster,
-                $scope.requestParameters.directory,
-            );
-            modal.hideLoading();
-        }
-        catch (e) {
-            console.error(e);
-            modal.hideLoading();
-            modal.showError(e, 'ERROR: Clustering Algorithms', 'Error while clustering');
-        }
-        $scope.$apply();
+    $scope.submit = function () {
+        modal.showLoading('CLUSTERING...');
+        $scope.clusters = [];
+        return queryServer.cluster(
+            $scope.requestParameters.cluster,
+            $scope.requestParameters.directory,
+        ).then(
+            clusters => {
+                $scope.clusters = clusters; modal.hideLoading();
+            },
+            e => {
+                console.error(e);
+                modal.hideLoading();
+                modal.showError(e, 'ERROR: Clustering Algorithms', 'Error while clustering');
+            },
+        );
     };
 
     $scope.requestParameters = {
@@ -61,7 +59,7 @@ function controllerFn($scope, options, modal, queryServer, focusImage) {
 
     $scope.retry = function () {
         $('#staticBackdrop').modal('hide');
-        loadOptions();
+        return loadOptions();
     };
 
     $scope.focusOnImage = function (url) {
