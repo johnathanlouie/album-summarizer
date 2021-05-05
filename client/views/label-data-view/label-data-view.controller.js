@@ -12,7 +12,7 @@ import UsersService from '../../services/users.service.js';
  * @param {ModalService} modal 
  * @param {UsersService} users 
  */
-function controllerFn($scope, mongoDb, modal, users) {
+function LabelDataViewController($scope, mongoDb, modal, users) {
 
     $scope.selectUserScreen = true;
     $scope.users = users;
@@ -80,19 +80,17 @@ function controllerFn($scope, mongoDb, modal, users) {
         }
     };
 
-    async function getMongoCollections() {
+    function getMongoCollections() {
         $scope.selectedCollection = null;
-        try {
-            modal.showLoading('RETRIEVING...');
-            await users.load();
-            modal.hideLoading();
-        }
-        catch (e) {
-            console.error(e);
-            modal.hideLoading();
-            modal.showError(e, 'ERROR: MongoDB', 'Error while fetching users');
-        }
-        $scope.$apply();
+        modal.showLoading('RETRIEVING...');
+        return users.load().then(
+            () => modal.hideLoading(),
+            e => {
+                console.error(e);
+                modal.hideLoading();
+                modal.showError(e, 'ERROR: MongoDB', 'Error while fetching users');
+            },
+        );
     }
 
     const nullData = {
@@ -102,77 +100,72 @@ function controllerFn($scope, mongoDb, modal, users) {
         _id: '####',
     };
 
-    async function getUnlabeledData() {
+    function getUnlabeledData() {
         $scope.unlabeledData = nullData;
-        try {
-            modal.showLoading('RETRIEVING...');
-            let data = await mongoDb.sample({ isLabeled: false }, 1, $scope.selectedCollection);
-            if (data.length === 0) {
-                $scope.unlabeledData = nullData;
+        modal.showLoading('RETRIEVING...');
+        return mongoDb.sample({ isLabeled: false }, 1, $scope.selectedCollection).then(
+            data => {
                 modal.hideLoading();
-                modal.showError(null, 'NOTICE: MongoDB', 'All data points in this collection were labeled');
-            }
-            else {
-                $scope.selectUserScreen = false;
-                $scope.unlabeledData = data[0];
-                $scope.unlabeledData.rating = 2;
-                $scope.unlabeledData.class = 'hybrid';
-                $scope.unlabeledData.collection = $scope.selectedCollection;
+                if (data.length === 0) {
+                    $scope.unlabeledData = nullData;
+                    modal.showError(null, 'NOTICE: MongoDB', 'All data points in this collection were labeled');
+                }
+                else {
+                    $scope.selectUserScreen = false;
+                    $scope.unlabeledData = data[0];
+                    $scope.unlabeledData.rating = 2;
+                    $scope.unlabeledData.class = 'hybrid';
+                    $scope.unlabeledData.collection = $scope.selectedCollection;
+                }
+            },
+            e => {
+                console.error(e);
                 modal.hideLoading();
-            }
-        }
-        catch (e) {
-            console.error(e);
-            modal.hideLoading();
-            modal.showError(e, 'ERROR: MongoDB', 'Error while fetching an unlabeled document from MongoDB');
-        }
-        $scope.$apply();
+                modal.showError(e, 'ERROR: MongoDB', 'Error while fetching an unlabeled document from MongoDB');
+            },
+        );
     }
 
     $scope.getUnlabeledData = getUnlabeledData;
 
-    async function updateOne() {
-        try {
-            modal.showLoading('UPDATING...');
-            await mongoDb.findOneAndUpdate(
-                $scope.unlabeledData.collection,
-                { _id: $scope.unlabeledData._id },
-                {
-                    rating: $scope.unlabeledData.rating,
-                    class: $scope.unlabeledData.class,
-                    isLabeled: true,
-                },
-            );
-        }
-        catch (e) {
+    function updateOne() {
+        modal.showLoading('UPDATING...');
+        return mongoDb.findOneAndUpdate(
+            $scope.unlabeledData.collection,
+            { _id: $scope.unlabeledData._id },
+            {
+                rating: $scope.unlabeledData.rating,
+                class: $scope.unlabeledData.class,
+                isLabeled: true,
+            },
+        ).catch(e => {
             console.error(e);
             modal.hideLoading();
             modal.showError(e, 'ERROR: MongoDB', 'Error while updating an document');
-        }
+        });
     }
 
-    $scope.submit = async function (event) {
-        await updateOne();
-        await getUnlabeledData();
+    $scope.submit = function (event) {
+        return updateOne().then(() => getUnlabeledData());
     };
 
     $scope.isNullData = function () { return $scope.unlabeledData === nullData; };
 
     $scope.confirmDeleteUser = () => $('#deleteUserModal').modal();
 
-    $scope.deleteUser = async function () {
-        try {
-            modal.showLoading('Removing user...');
-            await mongoDb.dropCollection($scope.selectedCollection);
-            await users.load(true);
-            modal.hideLoading();
-        }
-        catch (e) {
-            console.error(e);
-            modal.hideLoading();
-            modal.showError(e, 'ERROR: Delete User', 'Error during deleting a user')
-        }
-        finally { $scope.$apply(); }
+    $scope.deleteUser = function () {
+        modal.showLoading('Removing user...');
+        return mongoDb.dropCollection($scope.selectedCollection).then(
+            () => users.load(true)
+        ).then(
+            () => modal.hideLoading()
+        ).catch(
+            e => {
+                console.error(e);
+                modal.hideLoading();
+                modal.showError(e, 'ERROR: Delete User', 'Error during deleting a user')
+            }
+        );
     };
 
     $scope.unlabeledData = nullData;
@@ -181,7 +174,7 @@ function controllerFn($scope, mongoDb, modal, users) {
 
 }
 
-controllerFn.$inject = ['$scope', 'mongoDb', 'modal', 'users'];
+LabelDataViewController.$inject = ['$scope', 'mongoDb', 'modal', 'users'];
 
 
-export default controllerFn;
+export default LabelDataViewController;
