@@ -22,19 +22,21 @@ class Options {
     /** @type {Array.<string>} */
     clusters = [];
 
-    #$rootScope;
-    #queryServer;
-
-    static $inject = ['$rootScope', 'queryServer'];
+    static $inject = ['$rootScope', '$q', 'queryServer'];
+    $rootScope;
+    $q;
+    queryServer;
 
     /**
      * 
      * @param {angular.IRootScopeService} $rootScope 
+     * @param {angular.IQService} $q 
      * @param {QueryServerService} queryServer 
      */
-    constructor($rootScope, queryServer) {
-        this.#$rootScope = $rootScope;
-        this.#queryServer = queryServer;
+    constructor($rootScope, $q, queryServer) {
+        this.$rootScope = $rootScope;
+        this.$q = $q;
+        this.queryServer = queryServer;
     }
 
     clear() {
@@ -50,17 +52,19 @@ class Options {
      * Fetches compile options for the deep learning model
      * @param {boolean} reload Forces a refresh
      */
-    async load(reload) {
+    load(reload) {
         if (!this.#isLoaded || reload) {
             this.clear();
-            var response = await this.#queryServer.options();
-            this.architectures = response.architectures;
-            this.datasets = response.datasets;
-            this.losses = response.losses;
-            this.optimizers = response.optimizers;
-            this.clusters = response.clusters;
-            this.#isLoaded = true;
+            return this.queryServer.options().then(response => {
+                this.architectures = response.architectures;
+                this.datasets = response.datasets;
+                this.losses = response.losses;
+                this.optimizers = response.optimizers;
+                this.clusters = response.clusters;
+                this.#isLoaded = true;
+            });
         }
+        return this.$q.resolve();
     }
 
     *models() {
