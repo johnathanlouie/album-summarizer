@@ -19,31 +19,31 @@ function controllerFn($scope, mongoDb, modal, users) {
 
     function keyHandler(event) {
         switch (event.key) {
-            case "1":
+            case '1':
                 $scope.category = 'environment';
                 break;
-            case "2":
+            case '2':
                 $scope.category = 'people';
                 break;
-            case "3":
+            case '3':
                 $scope.category = 'object';
                 break;
-            case "4":
+            case '4':
                 $scope.category = 'hybrid';
                 break;
-            case "5":
+            case '5':
                 $scope.category = 'animal';
                 break;
-            case "6":
+            case '6':
                 $scope.category = 'food';
                 break;
-            case "+":
+            case '+':
                 if ($scope.rating < 3) { $scope.rating++; }
                 break;
-            case "-":
+            case '-':
                 if ($scope.rating > 1) { $scope.rating--; }
                 break;
-            case "Enter":
+            case 'Enter':
                 $scope.submit();
                 break;
         }
