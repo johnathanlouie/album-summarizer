@@ -1,3 +1,6 @@
+const $ = require('jquery');
+
+
 function imageviewerSizeHandler() {
     var whole = $('#imageviewer').height();
     var top = $('#imageviewerButtonbar').outerHeight();
@@ -5,31 +8,24 @@ function imageviewerSizeHandler() {
 }
 
 
-function controllerFn($scope, screenView, focusImage) {
-    $scope.screenView = screenView;
-    $scope.focusImage = focusImage;
+class ImageViewerController {
 
-    var lastState;
-    var watchValue = 0;
+    static $inject = ['$scope', 'screenView', 'focusImage'];
 
-    function onVisible() {
-        var currentState = $('#imageviewer').is(':visible');
-        if (currentState === lastState) { return watchValue; } // If no change; stops infinite propagation
-        lastState = currentState; // Keeps track of toggling
-        if (currentState) { return ++watchValue; } // On visible
-        return watchValue; // On invisible
+    constructor($scope, screenView, focusImage) {
+        $scope.screenView = screenView;
+        $scope.focusImage = focusImage;
+
+        function isVisible() {
+            return $('#imageviewer').is(':visible');
+        }
+
+        $scope.$watch(isVisible, imageviewerSizeHandler);
+
+        $scope.unfocusImage = function () { screenView.screen = 'MAIN'; };
     }
 
-    $scope.$watch(onVisible, imageviewerSizeHandler, true);
-
-    $scope.unfocusImage = function () { screenView.screen = 'MAIN'; };
 }
 
-controllerFn.$inject = ['$scope', 'screenView', 'focusImage'];
 
-
-$(window).resize(imageviewerSizeHandler);
-$('#imageviewer').ready(imageviewerSizeHandler);
-
-
-export default controllerFn;
+export default ImageViewerController;
