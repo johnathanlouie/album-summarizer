@@ -1,5 +1,5 @@
 import MongoDbService from './mongodb.service.js';
-import { Evaluation, Metrics, ModelDescription } from '../lib/evaluation.js';
+import { Evaluation } from '../lib/evaluation.js';
 
 
 class DatabaseService {
