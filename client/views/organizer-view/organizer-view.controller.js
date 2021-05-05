@@ -64,21 +64,18 @@ class OrganizerViewController {
             modal.showPhoto();
         };
 
-        async function organize() {
-            try {
-                modal.showLoading('ORGANIZING...');
-                await cwd.organize();
-                modal.hideLoading();
-            }
-            catch (err) {
-                console.error(err);
-                $scope.isOrganizeToggled = false;
-                modal.hideLoading();
-                modal.showError(err, 'ERROR: Smart Organizer', 'Error while organizing');
-            }
-            finally {
-                $scope.$apply();
-            }
+        function organize() {
+            modal.showLoading('ORGANIZING...');
+            return cwd.organize().then(
+                () => modal.hideLoading()
+            ).catch(
+                err => {
+                    console.error(err);
+                    $scope.isOrganizeToggled = false;
+                    modal.hideLoading();
+                    modal.showError(err, 'ERROR: Smart Organizer', 'Error while organizing');
+                }
+            );
         }
 
         $scope.toggleOrganize = function () {
