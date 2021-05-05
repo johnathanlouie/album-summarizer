@@ -80,49 +80,46 @@ class CheckRateViewController {
 
         $scope.options = options;
 
-        async function loadOptions() {
-            try {
-                modal.showLoading('RETRIEVING...');
-                await options.load();
-                modal.hideLoading();
-            }
-            catch (e) {
-                console.error(e);
-                modal.hideLoading();
-                $('#staticBackdrop').modal();
-            }
-            $scope.$apply();
+        function loadOptions() {
+            modal.showLoading('RETRIEVING...');
+            return options.load().then(
+                () => modal.hideLoading(),
+                e => {
+                    console.error(e);
+                    modal.hideLoading();
+                    $('#staticBackdrop').modal();
+                }
+            );
         }
 
         loadOptions();
 
-        $scope.submit = async function () {
-            try {
-                modal.showLoading('PREDICTING...');
-                $scope.prediction = [];
-                $scope.keyGuide = null;
-                var response = await queryServer.predict($scope.selectedOptions);
-                $scope.keyGuide = response.keyGuide;
-                if ($scope.keyGuide === null) {
-                    response.prediction.y.predicted = _.flatten(response.prediction.y.predicted);
+        $scope.submit = function () {
+            modal.showLoading('PREDICTING...');
+            $scope.prediction = [];
+            $scope.keyGuide = null;
+            return queryServer.predict($scope.selectedOptions).then(
+                response => {
+                    $scope.keyGuide = response.keyGuide;
+                    if ($scope.keyGuide === null) {
+                        response.prediction.y.predicted = _.flatten(response.prediction.y.predicted);
+                    }
+                    for (let i in response.prediction.x) {
+                        $scope.prediction.push(new Prediction(
+                            response.prediction.x[i],
+                            response.prediction.y.predicted[i],
+                            response.prediction.y.truth[i],
+                            response.keyGuide,
+                        ));
+                    }
+                    modal.hideLoading();
+                },
+                e => {
+                    console.error(e);
+                    modal.hideLoading();
+                    modal.showError(e, 'ERROR: Deep Learning', 'Error during prediction');
                 }
-                for (let i in response.prediction.x) {
-                    $scope.prediction.push(new Prediction(
-                        response.prediction.x[i],
-                        response.prediction.y.predicted[i],
-                        response.prediction.y.truth[i],
-                        response.keyGuide,
-                    ));
-                }
-                modal.hideLoading();
-                $scope.$apply();
-            }
-            catch (e) {
-                console.error(e);
-                modal.hideLoading();
-                modal.showError(e, 'ERROR: Deep Learning', 'Error during prediction');
-                $scope.$apply();
-            }
+            );
         };
 
         $scope.selectedOptions = {
