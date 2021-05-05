@@ -1,23 +1,26 @@
 const _ = require('lodash');
+const angular = require('angular');
 import MongoDbService from './mongodb.service.js';
 
 
 class UsersService {
 
-    #mongoDb;
-
     /** @type {Array.<string>} */
     #users = [];
     #isLoaded = false;
 
-    static $inject = ['mongoDb'];
+    static $inject = ['$q', 'mongoDb'];
+    $q;
+    mongoDb;
 
     /**
      * 
+     * @param {angular.IQService} $q 
      * @param {MongoDbService} mongoDb 
      */
-    constructor(mongoDb) {
-        this.#mongoDb = mongoDb;
+    constructor($q, mongoDb) {
+        this.$q = $q;
+        this.mongoDb = mongoDb;
     }
 
     /**
@@ -43,10 +46,13 @@ class UsersService {
     async load(reload) {
         if (!this.#isLoaded || reload) {
             this.#isLoaded = false;
-            this.#users = await this.#mongoDb.collections();
-            this.remove('evaluations');
-            this.#isLoaded = true;
+            return this.mongoDb.collections().then(users => {
+                this.#users = users;
+                this.remove('evaluations');
+                this.#isLoaded = true;
+            });
         }
+        return this.$q.resolve();
     }
 
     get users() { return this.#users; }
