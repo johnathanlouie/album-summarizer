@@ -45,13 +45,15 @@ class CwdService {
         this.#dir = new Directory(dst);
     }
 
-    async goHome() { this.cd(this.#HOME_DIR); }
+    goHome() { this.cd(this.#HOME_DIR); }
 
-    async refresh() { this.cd(this.#path); }
+    refresh() { this.cd(this.#path); }
 
-    async organize() {
-        this.#organization = null;
-        this.#organization = await this.queryServer.run(this.#path);
+    organize() {
+        return this.queryServer.run(this.#path).then(
+            x => { this.#organization = x; },
+            () => { this.#organization = null; },
+        );
     }
 
     get organization() { return this.#organization; }
