@@ -64,87 +64,92 @@ class Prediction {
     }
 }
 
-/**
- * @param {angular.IScope} $scope 
- * @param {OptionsService} options 
- * @param {ModalService} modal
- * @param {QueryServerService} queryServer
- * @param {FocusImageService} focusImage
- */
-function controllerFn($scope, options, modal, queryServer, focusImage) {
 
-    $scope.options = options;
+class CheckRateViewController {
 
-    async function loadOptions() {
-        try {
-            modal.showLoading('RETRIEVING...');
-            await options.load();
-            modal.hideLoading();
-        }
-        catch (e) {
-            console.error(e);
-            modal.hideLoading();
-            $('#staticBackdrop').modal();
-        }
-        $scope.$apply();
-    }
+    static $inject = ['$scope', 'options', 'modal', 'queryServer', 'focusImage'];
 
-    loadOptions();
+    /**
+     * @param {angular.IScope} $scope 
+     * @param {OptionsService} options 
+     * @param {ModalService} modal
+     * @param {QueryServerService} queryServer
+     * @param {FocusImageService} focusImage
+     */
+    constructor($scope, options, modal, queryServer, focusImage) {
 
-    $scope.submit = async function () {
-        try {
-            modal.showLoading('PREDICTING...');
-            $scope.prediction = [];
-            $scope.keyGuide = null;
-            var response = await queryServer.predict($scope.selectedOptions);
-            $scope.keyGuide = response.keyGuide;
-            if ($scope.keyGuide === null) {
-                response.prediction.y.predicted = _.flatten(response.prediction.y.predicted);
+        $scope.options = options;
+
+        async function loadOptions() {
+            try {
+                modal.showLoading('RETRIEVING...');
+                await options.load();
+                modal.hideLoading();
             }
-            for (let i in response.prediction.x) {
-                $scope.prediction.push(new Prediction(
-                    response.prediction.x[i],
-                    response.prediction.y.predicted[i],
-                    response.prediction.y.truth[i],
-                    response.keyGuide,
-                ));
+            catch (e) {
+                console.error(e);
+                modal.hideLoading();
+                $('#staticBackdrop').modal();
             }
-            modal.hideLoading();
             $scope.$apply();
         }
-        catch (e) {
-            console.error(e);
-            modal.hideLoading();
-            modal.showError(e, 'ERROR: Deep Learning', 'Error during prediction');
-            $scope.$apply();
-        }
-    };
 
-    $scope.selectedOptions = {
-        phase: 'test',
-        architecture: 'smi13a',
-        dataset: 'ccrc',
-        loss: 'bce',
-        optimizer: 'sgd',
-        metrics: 'acc',
-        epochs: 0,
-        patience: 3,
-        split: 0,
-    };
-
-    $scope.retry = function () {
-        $('#staticBackdrop').modal('hide');
         loadOptions();
-    };
 
-    $scope.focusOnImage = function (url) {
-        focusImage.image = url;
-        modal.showPhoto();
-    };
+        $scope.submit = async function () {
+            try {
+                modal.showLoading('PREDICTING...');
+                $scope.prediction = [];
+                $scope.keyGuide = null;
+                var response = await queryServer.predict($scope.selectedOptions);
+                $scope.keyGuide = response.keyGuide;
+                if ($scope.keyGuide === null) {
+                    response.prediction.y.predicted = _.flatten(response.prediction.y.predicted);
+                }
+                for (let i in response.prediction.x) {
+                    $scope.prediction.push(new Prediction(
+                        response.prediction.x[i],
+                        response.prediction.y.predicted[i],
+                        response.prediction.y.truth[i],
+                        response.keyGuide,
+                    ));
+                }
+                modal.hideLoading();
+                $scope.$apply();
+            }
+            catch (e) {
+                console.error(e);
+                modal.hideLoading();
+                modal.showError(e, 'ERROR: Deep Learning', 'Error during prediction');
+                $scope.$apply();
+            }
+        };
+
+        $scope.selectedOptions = {
+            phase: 'test',
+            architecture: 'smi13a',
+            dataset: 'ccrc',
+            loss: 'bce',
+            optimizer: 'sgd',
+            metrics: 'acc',
+            epochs: 0,
+            patience: 3,
+            split: 0,
+        };
+
+        $scope.retry = function () {
+            $('#staticBackdrop').modal('hide');
+            loadOptions();
+        };
+
+        $scope.focusOnImage = function (url) {
+            focusImage.image = url;
+            modal.showPhoto();
+        };
+
+    }
 
 }
 
-controllerFn.$inject = ['$scope', 'options', 'modal', 'queryServer', 'focusImage'];
 
-
-export default controllerFn;
+export default CheckRateViewController;
