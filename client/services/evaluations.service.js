@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const angular = require('angular');
 import DatabaseService from './database.service.js';
 import QueryServerService from './query-server.service.js';
 import { Evaluation, ModelDescription } from '../lib/evaluation.js';
@@ -13,15 +14,18 @@ class EvaluationsService {
     /** @type {Array.<string>} */
     #statuses = [];
 
-    static $inject = ['database', 'queryServer'];
+    static $inject = ['$q', 'database', 'queryServer'];
+    $q;
     database;
     queryServer;
 
     /**
+     * @param {angular.IQService} $q
      * @param {DatabaseService} database
      * @param {QueryServerService} queryServer
      */
-    constructor(database, queryServer) {
+    constructor($q, database, queryServer) {
+        this.$q = $q;
         this.database = database;
         this.queryServer = queryServer;
     }
@@ -37,17 +41,15 @@ class EvaluationsService {
     /**
      * @param {Evaluation} evaluation 
      */
-    async add(evaluation) {
-        this.database.addEvaluation(evaluation);
-        this.set(evaluation);
+    add(evaluation) {
+        return this.database.addEvaluation(evaluation).then(() => this.set(evaluation));
     }
 
     /**
      * @param {Evaluation} evaluation 
      */
-    async update(evaluation) {
-        this.database.updateEvaluation(evaluation);
-        this.set(evaluation);
+    update(evaluation) {
+        return this.database.updateEvaluation(evaluation).then(() => this.set(evaluation));
     }
 
     /**
@@ -59,8 +61,8 @@ class EvaluationsService {
         return this.#container.has(model.toString());
     }
 
-    async fetchStatuses() {
-        this.#statuses = await this.queryServer.trainingStatuses();
+    fetchStatuses() {
+        return this.queryServer.trainingStatuses().then(statuses => this.#statuses = statuses);
     }
 
     statuses() {
@@ -71,26 +73,32 @@ class EvaluationsService {
         return Array.from(this.#container.values());
     }
 
-    async fromMongoDb() {
+    fromMongoDb() {
         if (!this.#isLoaded) {
-            for (let i of await this.database.getAllEvaluations()) {
-                this.set(i);
-            }
-            this.#isLoaded = true;
+            return this.database.getAllEvaluations().then(evaluations => {
+                for (let i of evaluations) {
+                    this.set(i);
+                }
+                this.#isLoaded = true;
+            });
         }
+        return this.$q.resolve();
     }
 
-    async removeMongoDbDuplicates() {
-        let copy = new Map();
-        for (let evaluation of await this.database.getAllEvaluations()) {
-            if (copy.has(evaluation.model.toString())) {
-                console.log(evaluation);
-                this.database.deleteEvaluation(evaluation);
+    removeMongoDbDuplicates() {
+        return this.database.getAllEvaluations().then(evaluations => {
+            let copy = new Map();
+            for (let evaluation of evaluations) {
+                if (copy.has(evaluation.model.toString())) {
+                    console.log(evaluation);
+                    this.database.deleteEvaluation(evaluation);
+                }
+                else {
+                    copy.set(evaluation.model.toString(), evaluation);
+                }
             }
-            else {
-                copy.set(evaluation.model.toString(), evaluation);
-            }
-        }
+        });
+
     }
 
     /**
