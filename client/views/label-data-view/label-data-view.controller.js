@@ -21,33 +21,44 @@ function controllerFn($scope, mongoDb, modal, users) {
         switch (event.key) {
             case '1':
                 $scope.category = 'environment';
+                $scope.$apply();
                 break;
             case '2':
                 $scope.category = 'people';
+                $scope.$apply();
                 break;
             case '3':
                 $scope.category = 'object';
+                $scope.$apply();
                 break;
             case '4':
                 $scope.category = 'hybrid';
+                $scope.$apply();
                 break;
             case '5':
                 $scope.category = 'animal';
+                $scope.$apply();
                 break;
             case '6':
                 $scope.category = 'food';
+                $scope.$apply();
                 break;
             case '+':
-                if ($scope.rating < 3) { $scope.rating++; }
+                if ($scope.rating < 3) {
+                    $scope.rating++;
+                    $scope.$apply();
+                }
                 break;
             case '-':
-                if ($scope.rating > 1) { $scope.rating--; }
+                if ($scope.rating > 1) {
+                    $scope.rating--;
+                    $scope.$apply();
+                }
                 break;
             case 'Enter':
                 $scope.submit();
                 break;
         }
-        $scope.$apply();
     }
 
     $(document).keydown(keyHandler);
