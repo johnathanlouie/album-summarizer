@@ -43,7 +43,7 @@ class UsersService {
      * Fetches compile options for the deep learning model
      * @param {boolean} reload Forces a refresh
      */
-    async load(reload) {
+    load(reload) {
         if (!this.#isLoaded || reload) {
             this.#isLoaded = false;
             return this.mongoDb.collections().then(users => {
