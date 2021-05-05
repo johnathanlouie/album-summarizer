@@ -4,6 +4,7 @@ const $ = require('jquery');
 import ModalService from '../../services/modal.service.js';
 import MongoDbService from '../../services/mongodb.service.js';
 import UsersService from '../../services/users.service.js';
+import FocusImageService from '../../services/focus-image.service.js';
 
 
 /**
@@ -11,8 +12,9 @@ import UsersService from '../../services/users.service.js';
  * @param {MongoDbService} mongoDb 
  * @param {ModalService} modal 
  * @param {UsersService} users 
+ * @param {FocusImageService} focusImage
  */
-function LabelDataViewController($scope, mongoDb, modal, users) {
+function LabelDataViewController($scope, mongoDb, modal, users, focusImage) {
 
     $scope.selectUserScreen = true;
     $scope.users = users;
@@ -168,13 +170,18 @@ function LabelDataViewController($scope, mongoDb, modal, users) {
         );
     };
 
+    $scope.focusOnImage = function (url) {
+        focusImage.image = url;
+        modal.showPhoto();
+    };
+
     $scope.unlabeledData = nullData;
     $scope.selectedCollection = null;
     getMongoCollections();
 
 }
 
-LabelDataViewController.$inject = ['$scope', 'mongoDb', 'modal', 'users'];
+LabelDataViewController.$inject = ['$scope', 'mongoDb', 'modal', 'users', 'focusImage'];
 
 
 export default LabelDataViewController;
