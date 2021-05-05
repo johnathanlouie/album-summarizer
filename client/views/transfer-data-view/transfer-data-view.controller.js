@@ -72,11 +72,11 @@ class Controller {
         }
     }
 
-    async writeMongoDb() {
-        try {
-            this.#modal.showLoading('UPLOADING...');
-            await this.#mongoDb.insertMany(this.#scope.data, this.#scope.collectionPush);
-            await this.#users.load(true);
+    writeMongoDb() {
+        this.#modal.showLoading('UPLOADING...');
+        return this.#mongoDb.insertMany(this.#scope.data, this.#scope.collectionPush).then(
+            () => this.#users.load(true)
+        ).then(() => {
             if (this.#users.users.length > 0) {
                 this.#scope.collectionPull = this.#users.users[0];
             }
@@ -84,28 +84,24 @@ class Controller {
                 this.#scope.collectionPull = null;
             }
             this.#modal.hideLoading();
-        }
-        catch (e) {
+        }).catch(e => {
             console.error(e);
             this.#modal.hideLoading();
             this.#modal.showError(e, 'ERROR: MongoDB', 'Error while inserting many');
-        }
-        this.#scope.$apply();
+        });
     }
 
-    async readMongoDb() {
+    readMongoDb() {
         this.#scope.data = null;
-        try {
-            this.#modal.showLoading('RETRIEVING...');
-            this.#scope.data = await this.#mongoDb.getAll(this.#scope.collectionPull);
+        this.#modal.showLoading('RETRIEVING...');
+        return this.#mongoDb.getAll(this.#scope.collectionPull).then(x => {
+            this.#scope.data = x;
             this.#modal.hideLoading();
-        }
-        catch (e) {
+        }).catch(e => {
             console.error(e);
             this.#modal.hideLoading();
             this.#modal.showError(e, 'ERROR: MongoDB', 'Error while fetching collection');
-        }
-        this.#scope.$apply();
+        });
     }
 
     writeCsv() {
@@ -140,10 +136,9 @@ class Controller {
     /**
      * Gets the names of all the collections in MongoDB so the user can select which collection to pull from
      */
-    async getMongoCollections() {
-        try {
-            this.#modal.showLoading('RETRIEVING...');
-            await this.#users.load(false);
+    getMongoCollections() {
+        this.#modal.showLoading('RETRIEVING...');
+        return this.#users.load(false).then(() => {
             if (this.#users.users.length > 0) {
                 this.#scope.collectionPull = this.#users.users[0];
             }
@@ -151,13 +146,11 @@ class Controller {
                 this.#scope.collectionPull = null;
             }
             this.#modal.hideLoading();
-        }
-        catch (e) {
+        }).catch(e => {
             console.error(e);
             this.#modal.hideLoading();
             this.#modal.showError(e, 'ERROR: MongoDB', 'Error while fetching users');
-        }
-        this.#scope.$apply();
+        });
     }
 
 }
