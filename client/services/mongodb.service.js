@@ -1,4 +1,5 @@
 const mongodb = require('mongodb');
+const angular = require('angular');
 import SettingsService from './settings.service.js';
 
 
@@ -10,15 +11,17 @@ class MongoDbService {
     /** @type {mongodb.Db} */
     #db;
 
+    static $inject = ['$q', 'settings'];
+    $q;
     settings;
-
-    static $inject = ['settings'];
 
     /**
      * 
+     * @param {angular.IQService} $q 
      * @param {SettingsService} settings 
      */
-    constructor(settings) {
+    constructor($q, settings) {
+        this.$q = $q;
         this.settings = settings;
 
         this.#client = new mongodb.MongoClient(this.settings.mongodb.uri(), {
@@ -27,17 +30,21 @@ class MongoDbService {
         });
     }
 
-    async connect() {
+    connect() {
         if (!this.#client.isConnected()) {
-            this.#client = await this.#client.connect();
-            this.#db = this.#client.db('albumsummarizer');
+            return this.$q.resolve(this.#client.connect()).then(client => {
+                this.#client = client;
+                this.#db = client.db('albumsummarizer');
+            });
         }
+        return this.$q.resolve();
     }
 
-    async close() {
+    close() {
         if (this.#client.isConnected()) {
-            await this.#client.close();
+            return this.$q.resolve(this.#client.close());
         }
+        return this.$q.resolve();
     }
 
     /**
@@ -45,46 +52,42 @@ class MongoDbService {
      * @param {Array.<Object>} docs Documents to insert.
      * @param {string} collection The collection name we wish to access.
      */
-    async insertMany(docs, collection) {
-        await this.connect();
-        for (let i in docs) {
-            docs[i]._id = mongodb.ObjectID(docs[i]._id);
-        }
-        let insertWriteOpResult = await this.#db.collection(collection).insertMany(docs);
-        if (insertWriteOpResult.result.ok !== 1) { throw new Error(); }
+    insertMany(docs, collection) {
+        return this.connect().then(() => {
+            for (let i in docs) {
+                docs[i]._id = mongodb.ObjectID(docs[i]._id);
+            }
+            return this.#db.collection(collection).insertMany(docs);
+        }).then(insertWriteOpResult => {
+            if (insertWriteOpResult.result.ok !== 1) { throw new Error(); }
+        });
     }
 
     /**
      * Gets all documents from a collection.
      * @param {string} collection The collection name we wish to access.
-     * @returns {Promise.<Array.<Object>>}
      */
-    async getAll(collection) {
-        await this.connect();
-        let cursor = this.#db.collection(collection).find();
-        try {
-            return await cursor.toArray();
-        }
-        finally {
-            cursor.close();
-        }
+    getAll(collection) {
+        return this.connect().then(() => {
+            let cursor = this.#db.collection(collection).find();
+            return cursor.toArray().finally(() => cursor.close());
+        });
     }
 
-    async collections() {
-        await this.connect();
-        let collections = await this.#db.collections();
-        return collections.map(c => c.collectionName);
+    collections() {
+        return this.connect().
+            then(() => this.#db.collections()).
+            then(collections => collections.map(c => c.collectionName));
     }
 
     /**
      * Fetches the first document that matches the query
      * @param {Object} query Query for find operation
      * @param {string} collection The collection name we wish to access
-     * @returns {Promise.<Object>}
      */
-    async findOne(query, collection) {
-        await this.connect();
-        return await this.#db.collection(collection).findOne(query);
+    findOne(query, collection) {
+        return this.connect().
+            then(() => this.#db.collection(collection).findOne(query));
     }
 
     /**
@@ -92,24 +95,21 @@ class MongoDbService {
      * @param {Object} query Query for find operation
      * @param {number} count Number of samples to return
      * @param {string} collection The collection name we wish to access
-     * @returns {Promise.<Array.<Object>>}
      */
-    async sample(query, count, collection) {
-        await this.connect();
+    sample(query, count, collection) {
         let cursor;
-        try {
+        return this.connect().then(() => {
             cursor = this.#db.collection(collection).aggregate([
                 { $sample: { size: count } },
                 { $match: query },
             ]);
             if (cursor === null) { throw new Error(); }
-            return await cursor.toArray();
-        }
-        finally {
+            return cursor.toArray();
+        }).finally(() => {
             if (cursor !== null) {
                 cursor.close();
             }
-        }
+        });
     }
 
     /**
@@ -118,10 +118,13 @@ class MongoDbService {
      * @param {Object} filter A filter object to select the document to update
      * @param {Object} update The operations to be performed on the document
      */
-    async findOneAndUpdate(collection, filter, update) {
-        await this.connect();
+    findOneAndUpdate(collection, filter, update) {
         update = { $set: update };
-        if ((await this.#db.collection(collection).findOneAndUpdate(filter, update)).ok !== 1) { throw new Error(); }
+        return this.connect().then(
+            () => this.#db.collection(collection).findOneAndUpdate(filter, update)
+        ).then(result => {
+            if (result.ok !== 1) { throw new Error(); }
+        });
     }
 
     /**
@@ -130,9 +133,12 @@ class MongoDbService {
      * @param {Object} filter A filter object to select the document to update
      * @param {Object} replacement The document that replaces the matching document
      */
-    async findOneAndReplace(collection, filter, replacement) {
-        await this.connect();
-        if ((await this.#db.collection(collection).findOneAndReplace(filter, replacement)).ok !== 1) { throw new Error(); }
+    findOneAndReplace(collection, filter, replacement) {
+        return this.connect().then(
+            () => this.#db.collection(collection).findOneAndReplace(filter, replacement)
+        ).then(result => {
+            if (result.ok !== 1) { throw new Error(); }
+        });
     }
 
     /**
@@ -140,9 +146,12 @@ class MongoDbService {
      * @param {string} collection The name of the collection
      * @param {Object} doc Data to be inserted
      */
-    async insertOne(collection, doc) {
-        await this.connect();
-        if ((await this.#db.collection(collection).insertOne(doc)).result.ok !== 1) { throw new Error(); }
+    insertOne(collection, doc) {
+        return this.connect().then(
+            () => this.#db.collection(collection).insertOne(doc)
+        ).then(insertOneWriteOpResult => {
+            if (insertOneWriteOpResult.result.ok !== 1) { throw new Error(); }
+        });
     }
 
     /**
@@ -150,9 +159,12 @@ class MongoDbService {
      * @param {string} collection 
      * @param {Object} filter 
      */
-    async deleteOne(collection, filter) {
-        await this.connect();
-        if ((await this.#db.collection(collection).deleteOne(filter)).result.ok !== 1) { throw new Error(); }
+    deleteOne(collection, filter) {
+        return this.connect().then(
+            () => this.#db.collection(collection).deleteOne(filter)
+        ).then(deleteWriteOpResult => {
+            if (deleteWriteOpResult.result.ok !== 1) { throw new Error(); }
+        });
     }
 
     /**
@@ -160,18 +172,24 @@ class MongoDbService {
      * @param {string} collection 
      * @param {Object} filter 
      */
-    async findOneAndDelete(collection, filter) {
-        await this.connect();
-        if ((await this.#db.collection(collection).findOneAndDelete(filter)).ok !== 1) { throw new Error(); }
+    findOneAndDelete(collection, filter) {
+        return this.connect().then(
+            () => this.#db.collection(collection).findOneAndDelete(filter)
+        ).then(findAndModifyWriteOpResult => {
+            if (findAndModifyWriteOpResult.ok !== 1) { throw new Error(); }
+        });
     }
 
     /**
      * 
      * @param {string} collection 
      */
-    async dropCollection(collection) {
-        await this.connect();
-        if (!await this.#db.collection(collection).drop()) { throw new Error(); }
+    dropCollection(collection) {
+        return this.connect().then(
+            () => this.#db.collection(collection).drop()
+        ).then(wasDropped => {
+            if (!wasDropped) { throw new Error(); }
+        });
     }
 
 }
