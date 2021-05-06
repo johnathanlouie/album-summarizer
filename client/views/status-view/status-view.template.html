@@ -121,19 +121,19 @@
         <tbody>
             <tr ng-repeat="eval_ in evaluations.toArray() | filter : search | orderBy : sort.phase : sort.reverse">
                 <td>
-                    <pre>{{ eval_.model | json }}</pre>
+                    <pre><code>{{ eval_.model | json }}</code></pre>
                 </td>
                 <td>
-                    <pre>{{ eval_.status }}</pre>
+                    <pre><code>{{ eval_.status }}</code></pre>
                 </td>
                 <td>
-                    <pre>{{ eval_.training | json }}</pre>
+                    <pre><code>{{ eval_.training | json }}</code></pre>
                 </td>
                 <td>
-                    <pre>{{ eval_.validation | json }}</pre>
+                    <pre><code>{{ eval_.validation | json }}</code></pre>
                 </td>
                 <td>
-                    <pre>{{ eval_.test | json }}</pre>
+                    <pre><code>{{ eval_.test | json }}</code></pre>
                 </td>
             </tr>
         </tbody>
