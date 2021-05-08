@@ -84,19 +84,22 @@ class LoadingViewController {
             this.$q.resolve(this.evaluations.fetchStatuses()).then(() => { this.#statuses.evaluationStatuses = true; }),
         ])).then(
             loadResults => {
+                let hasErrors = false;
                 for (let i of loadResults) {
                     if (i.status === 'rejected') {
-                        throw new Error();
+                        hasErrors = true;
+                        break;
                     }
                 }
-                this.$location.path('/organizer');
-            }
-        ).catch(
-            e => {
-                console.error(e);
-                this.$scope.status = 'DISCONNECTED';
-                this.$scope.connectionFailed = true;
-                this.modal.showError(e, 'ERROR: Server/MongoDB Connection', 'Errors during loading of program.');
+                if (hasErrors) {
+                    console.table(loadResults);
+                    this.$scope.status = 'DISCONNECTED';
+                    this.$scope.connectionFailed = true;
+                    this.modal.showError(e, 'ERROR: Server/MongoDB Connection', 'Errors during loading of program.');
+                }
+                else {
+                    this.$location.path('/organizer');
+                }
             }
         );
     }
