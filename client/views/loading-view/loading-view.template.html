@@ -4,13 +4,27 @@
             {{ statuses.succeeded }} / {{ statuses.total }}
         </small>
     </h1>
-    <p>
-        <b>Options</b> - {{ statuses.options ? 'OK' : 'LOADING...' }}<br>
-        <b>Users</b> - {{ statuses.users ? 'OK' : 'LOADING...' }}<br>
-        <b>Evaluations</b> - {{ statuses.evaluations ? 'OK' : 'LOADING...' }}<br>
-        <b>Statuses</b> - {{ statuses.evaluationStatuses ? 'OK' : 'LOADING...' }}
-    </p>
-    <p class="text-center" ng-show="connectionFailed">
+    <div class="text-center">
+        <table class="table table-borderless table-sm d-inline text-left">
+            <tr>
+                <th class=>Options</th>
+                <td>{{ statuses.options }}</td>
+            </tr>
+            <tr>
+                <th>Users</th>
+                <td>{{ statuses.users }}</td>
+            </tr>
+            <tr>
+                <th>Evaluations</th>
+                <td>{{ statuses.evaluations }}</td>
+            </tr>
+            <tr>
+                <th>Statuses</th>
+                <td>{{ statuses.evaluationStatuses }}</td>
+            </tr>
+        </table>
+    </div>
+    <p class="text-center mt-3" ng-show="connectionFailed">
         <button type="button" class="btn btn-primary" ng-click="retry()">Retry Connecting</button>
         <a href="#!/organizer" class="btn btn-danger">Continue Anyway</a>
     </p>
