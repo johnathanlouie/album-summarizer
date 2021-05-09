@@ -1,5 +1,6 @@
 const fs = require('fs');
 const os = require('os');
+const mongodb = require('mongodb');
 const _ = require('lodash');
 const process = require('process');
 const path = require('path');
@@ -12,7 +13,65 @@ import UsersService from '../../services/users.service.js';
 import FocusImageService from '../../services/focus-image.service.js';
 
 
+class Datum {
+
+    /** @type {mongodb.ObjectID} */
+    _id;
+
+    /** @type {string} */
+    image;
+
+    /** @type {number} */
+    rating;
+
+    /** @type {string} */
+    class;
+
+    /** @type {boolean} */
+    isLabeled;
+
+}
+
+
+class DataContainer {
+
+    /** @type {Array.<Datum>} */
+    container = [];
+
+    /** Removes the _id property of documents so they can be inserted into MongoDB */
+    removeIds() {
+        for (let i of this.container) {
+            delete i._id;
+        }
+    }
+
+    randomRating() {
+        for (let doc of this.container) {
+            doc.rating = Math.round(Math.random() * 2) + 1;
+        }
+    }
+
+    randomClass() {
+        for (let doc of this.container) {
+            doc.class = _.sample([
+                'environment',
+                'people',
+                'object',
+                'hybrid',
+                'animal',
+                'food',
+            ]);
+        }
+    }
+
+    get isEmpty() { return this.container.length === 0; }
+
+}
+
+
 class Controller {
+
+    #data = new DataContainer();
 
     static $inject = ['$scope', 'mongoDb', 'modal', 'users', 'focusImage'];
     $scope;
@@ -36,32 +95,33 @@ class Controller {
         this.focusImage = focusImage;
 
         $scope.users = users;
-        this.$scope.newData = {
+        $scope.newData = {
             filepath: path.join(os.homedir(), 'Pictures'),
             recursive: true,
         };
-        this.$scope.exportPath = path.join(process.cwd(), 'export.csv');
-        this.$scope.data = null;
-        this.$scope.load = () => this.readCsv();
-        this.$scope.upload = () => this.writeMongoDb();
-        this.$scope.download = () => this.readMongoDb();
-        this.$scope.export = () => this.writeCsv();
-        this.$scope.getImages = () => this.getImages();
-        this.$scope.removeIds = () => this.removeIds();
-        this.$scope.randomRating = () => this.randomRating();
-        this.$scope.randomClass = () => this.randomClass();
+        $scope.exportPath = path.join(process.cwd(), 'export.csv');
+        $scope.data = this.#data;
+        $scope.load = () => this.readCsv();
+        $scope.upload = () => this.writeMongoDb();
+        $scope.download = () => this.readMongoDb();
+        $scope.export = () => this.writeCsv();
+        $scope.getImages = () => this.getImages();
+        $scope.removeIds = () => this.#data.removeIds();
+        $scope.randomRating = () => this.#data.randomRating();
+        $scope.randomClass = () => this.#data.randomClass();
         $scope.focusOnImage = function (url) {
             focusImage.image = url;
             modal.showPhoto();
         };
+
         this.getMongoCollections();
     }
 
     readCsv() {
-        this.$scope.data = null;
+        this.#data.container = [];
         if (this.$scope.file1.length > 0) {
             try {
-                this.$scope.data = parseCsv(fs.readFileSync(this.$scope.file1[0].path), {
+                this.#data.container = parseCsv(fs.readFileSync(this.$scope.file1[0].path), {
                     columns: ['image', 'rating', 'class', 'isLabeled', '_id'],
                     cast: function (value, context) {
                         switch (context.column) {
@@ -84,7 +144,7 @@ class Controller {
 
     writeMongoDb() {
         this.modal.showLoading('UPLOADING...');
-        return this.mongoDb.insertMany(this.$scope.data, this.$scope.collectionPush).then(
+        return this.mongoDb.insertMany(this.#data.container, this.$scope.collectionPush).then(
             () => this.users.load(true)
         ).then(() => {
             if (this.users.users.length > 0) {
@@ -102,10 +162,10 @@ class Controller {
     }
 
     readMongoDb() {
-        this.$scope.data = null;
+        this.#data.container = [];
         this.modal.showLoading('RETRIEVING...');
         return this.mongoDb.getAll(this.$scope.collectionPull).then(x => {
-            this.$scope.data = x;
+            this.#data.container = x;
             this.modal.hideLoading();
         }).catch(e => {
             console.error(e);
@@ -115,7 +175,7 @@ class Controller {
     }
 
     writeCsv() {
-        fs.writeFileSync(this.$scope.exportPath, stringifyCsv(this.$scope.data, {
+        fs.writeFileSync(this.$scope.exportPath, stringifyCsv(this.#data.container, {
             columns: [
                 { key: 'image' },
                 { key: 'rating' },
@@ -127,39 +187,13 @@ class Controller {
     }
 
     getImages() {
-        this.$scope.data = null;
-        this.$scope.data = fs.readdirSync(this.$scope.newData.filepath, { withFileTypes: true }).
+        this.#data.container = [];
+        this.#data.container = fs.readdirSync(this.$scope.newData.filepath, { withFileTypes: true }).
             filter(f => f.isFile() && ['.jpg', '.jpeg'].includes(path.extname(f.name).toLowerCase())).
             map(f => ({
                 image: path.join(this.$scope.newData.filepath, f.name),
                 isLabeled: false,
             }));
-    }
-
-    /** Removes the _id property of documents so they can be inserted into MongoDB */
-    removeIds() {
-        for (let i of this.$scope.data) {
-            delete i._id;
-        }
-    }
-
-    randomRating() {
-        for (let doc of this.$scope.data) {
-            doc.rating = Math.round(Math.random() * 2) + 1;
-        }
-    }
-
-    randomClass() {
-        for (let doc of this.$scope.data) {
-            doc.class = _.sample([
-                'environment',
-                'people',
-                'object',
-                'hybrid',
-                'animal',
-                'food',
-            ]);
-        }
     }
 
     /**

@@ -62,7 +62,7 @@
             <h6>Export to CSV file</h6>
 
             <form class="mb-2" ng-submit="export()">
-                <fieldset ng-disabled="!data">
+                <fieldset ng-disabled="data.isEmpty">
                     <div class="form-row">
                         <div class="col">
                             <input class="form-control" ng-model="exportPath" type="text" placeholder="Filepath"
@@ -102,7 +102,7 @@
             <h6>Create a new user</h6>
 
             <form class="mb-2" ng-submit="upload()">
-                <fieldset ng-disabled="!data">
+                <fieldset ng-disabled="data.isEmpty">
                     <div class="form-row">
                         <div class="col">
                             <input class="form-control" ng-model="collectionPush" type="text" placeholder="Username"
@@ -120,9 +120,9 @@
 
     <h1>
         Data
-        <button class="btn btn-danger ml-2" ng-click="removeIds()" ng-disabled="!data">Remove IDs</button>
-        <button class="btn btn-danger ml-2" ng-click="randomRating()" ng-disabled="!data">Random Ratings</button>
-        <button class="btn btn-danger ml-2" ng-click="randomClass()" ng-disabled="!data">Random Classes</button>
+        <button class="btn btn-danger ml-2" ng-click="removeIds()" ng-disabled="data.isEmpty">Remove IDs</button>
+        <button class="btn btn-danger ml-2" ng-click="randomRating()" ng-disabled="data.isEmpty">Random Ratings</button>
+        <button class="btn btn-danger ml-2" ng-click="randomClass()" ng-disabled="data.isEmpty">Random Classes</button>
     </h1>
 
     <div class="table-responsive">
@@ -137,7 +137,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="doc in data track by $index">
+                <tr ng-repeat="doc in data.container track by $index">
                     <th scope="row">{{ doc._id }}</th>
                     <td class="text-break"><a ng-click="focusOnImage(doc.image)" role="button">{{ doc.image }}</a></td>
                     <td>{{ doc.rating }}</td>
