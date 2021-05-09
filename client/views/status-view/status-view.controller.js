@@ -1,5 +1,6 @@
 const angular = require('angular');
 const mongodb = require('mongodb');
+const _ = require('lodash');
 import QueryServerService from '../../services/query-server.service.js';
 import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
@@ -65,6 +66,9 @@ class ProgressBar {
     }
 
 }
+
+
+class QuitError extends Error { }
 
 
 class StatusViewController {
@@ -151,69 +155,123 @@ class StatusViewController {
     #evaluate() {
         this.#progressBar.run();
         this.#progressBar.reset(this.options.modelCount());
-        var quit = false;
-        for (let model of this.options.models()) {
-            if (this.#quit || quit) { return; }
-            if (!this.evaluations.has(model)) {
-                this.queryServer.evaluate(model).then(evaluation => {
-                    this.evaluations.add(evaluation);
-                    this.updateProgressBar(evaluation.status);
-                }, e => {
-                    console.error(e);
-                    if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
-                        this.#progressBar.stop();
-                        this.modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
-                        quit = true;
+        let promiseChain = this.$q.resolve();
+        let notEvaluated = Array.from(this.options.models()).
+            filter(
+                model => {
+                    if (this.evaluations.has(model)) {
+                        this.updateProgressBar(this.evaluations.get(model).status);
+                        return false;
                     }
-                    else if (e.status === 500) {
-                        // Ignore
+                    return true;
+                }
+            );
+        for (let chunk of _.chunk(notEvaluated, 5)) {
+            promiseChain = promiseChain.then(
+                () => {
+                    if (this.#quit) {
+                        throw new QuitError();
                     }
-                    else {
-                        this.#progressBar.stop();
-                        this.modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
-                        quit = true;
+                }
+            ).then(
+                () => Promise.allSettled(chunk.map(
+                    model => this.queryServer.evaluate(model).then(
+                        evaluation => {
+                            this.evaluations.add(evaluation);
+                            this.updateProgressBar(evaluation.status);
+                        },
+                        e => {
+                            if (e.status !== 500) { throw e; } // Ignore 500 errors
+                        },
+                    )
+                ))
+            ).then(
+                results => {
+                    for (let i of results) {
+                        if (i.status === 'rejected') { throw i.reason; }
                     }
-                });
+                }
+            );
+        }
+        return promiseChain.then(() => {
+            this.#progressBar.end();
+        }).catch(e => {
+            this.#progressBar.stop();
+            if (e instanceof QuitError) {
+                this.#progressBar.end();
+                return;
+            }
+            console.error(e);
+            if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
+                this.#progressBar.stop();
+                this.modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
             }
             else {
-                this.updateProgressBar(this.evaluations.get(model).status);
+                this.#progressBar.stop();
+                this.modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
             }
-        }
-        this.#progressBar.end();
+        });
     }
 
     #reevaluatePending() {
         this.#progressBar.run();
         this.#progressBar.reset(this.options.modelCount());
-        var quit = false;
-        for (let evaluation of this.evaluations.toArray()) {
-            if (this.#quit || quit) { return; }
-            if (evaluation.status === 'TrainingStatus.PENDING') {
-                this.queryServer.evaluate(evaluation.model).then(reevaluation => {
-                    this.evaluations.update(reevaluation);
-                    this.updateProgressBar(reevaluation.status);
-                }, e => {
-                    console.error(e);
-                    if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
-                        this.#progressBar.stop();
-                        this.modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
-                        quit = true;
+        let promiseChain = this.$q.resolve();
+        let pending = Array.from(this.evaluations.toArray()).
+            filter(
+                evaluation => {
+                    if (evaluation.status !== 'TrainingStatus.PENDING') {
+                        this.updateProgressBar(evaluation.status);
+                        return false;
                     }
-                    else if (e.status === 500) {
-                        // Ignore
+                    return true;
+                }
+            );
+        for (let chunk of _.chunk(pending, 5)) {
+            promiseChain = promiseChain.then(
+                () => {
+                    if (this.#quit) {
+                        throw new QuitError();
                     }
-                    else {
-                        this.#progressBar.stop();
-                        this.modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
-                        quit = true;
+                }
+            ).then(
+                () => Promise.allSettled(chunk.map(
+                    evaluation => this.queryServer.evaluate(evaluation.model).then(
+                        reevaluation => {
+                            this.evaluations.update(reevaluation);
+                            this.updateProgressBar(reevaluation.status);
+                        },
+                        e => {
+                            if (e.status !== 500) { throw e; } // Ignore 500 errors
+                        },
+                    )
+                ))
+            ).then(
+                results => {
+                    for (let i of results) {
+                        if (i.status === 'rejected') { throw i.reason; }
                     }
-                });
+                }
+            );
+        }
+        return promiseChain.then(() => {
+            this.#progressBar.end();
+        }).catch(e => {
+            this.#progressBar.stop();
+            if (e instanceof QuitError) {
+                this.#progressBar.end();
+                return;
+            }
+            console.error(e);
+            if (e.status === -1 || e instanceof mongodb.MongoServerSelectionError) {
+                this.#progressBar.stop();
+                this.modal.showError(e, 'ERROR: Connection', 'Disconnected from MongoDB or server');
             }
             else {
-                this.updateProgressBar(this.evaluations.get(evaluation.model).status);
+                this.#progressBar.stop();
+                this.modal.showError(e, 'ERROR: Deep Learning', 'Error while evaluating');
             }
-        }
-        this.#progressBar.end();
+        });
     }
 
     #removeMongoDbDuplicates() {
