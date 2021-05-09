@@ -1,5 +1,6 @@
 const fs = require('fs');
 const os = require('os');
+const _ = require('lodash');
 const process = require('process');
 const path = require('path');
 const parseCsv = require('csv-parse/lib/sync');
@@ -47,6 +48,8 @@ class Controller {
         this.$scope.export = () => this.writeCsv();
         this.$scope.getImages = () => this.getImages();
         this.$scope.removeIds = () => this.removeIds();
+        this.$scope.randomRating = () => this.randomRating();
+        this.$scope.randomClass = () => this.randomClass();
         $scope.focusOnImage = function (url) {
             focusImage.image = url;
             modal.showPhoto();
@@ -137,6 +140,25 @@ class Controller {
     removeIds() {
         for (let i of this.$scope.data) {
             delete i._id;
+        }
+    }
+
+    randomRating() {
+        for (let doc of this.$scope.data) {
+            doc.rating = Math.round(Math.random() * 2) + 1;
+        }
+    }
+
+    randomClass() {
+        for (let doc of this.$scope.data) {
+            doc.class = _.sample([
+                'environment',
+                'people',
+                'object',
+                'hybrid',
+                'animal',
+                'food',
+            ]);
         }
     }
 

@@ -118,7 +118,12 @@
         </div>
     </div>
 
-    <h1>Data<button class="btn btn-danger ml-2" ng-click="removeIds()" ng-disabled="!data">Remove IDs</button></h1>
+    <h1>
+        Data
+        <button class="btn btn-danger ml-2" ng-click="removeIds()" ng-disabled="!data">Remove IDs</button>
+        <button class="btn btn-danger ml-2" ng-click="randomRating()" ng-disabled="!data">Random Ratings</button>
+        <button class="btn btn-danger ml-2" ng-click="randomClass()" ng-disabled="!data">Random Classes</button>
+    </h1>
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
