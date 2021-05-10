@@ -69,7 +69,7 @@ class DatabaseService {
     /**
      * 
      * @param {string} username 
-     * @returns {angular.IPromise.<RatingClass>}
+     * @returns {angular.IPromise.<Array.<RatingClass>>}
      */
     getRatingClass(username) {
         return this.mongoDb.getAll(username);
