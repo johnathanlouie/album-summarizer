@@ -98,6 +98,13 @@ class Datum {
     /** @type {boolean} */
     isLabeled;
 
+    static fromUrl(dirname, filename) {
+        let instance = new Datum();
+        instance.image = path.join(dirname, filename);
+        instance.isLabeled = false;
+        return instance;
+    }
+
 }
 
 
@@ -309,12 +316,21 @@ class Controller {
 
     getImages() {
         this.#data.container = [];
-        this.#data.container = fs.readdirSync(this.#dataTargets.newData.filepath, { withFileTypes: true }).
-            filter(f => f.isFile() && ['.jpg', '.jpeg'].includes(path.extname(f.name).toLowerCase())).
-            map(f => ({
-                image: path.join(this.#dataTargets.newData.filepath, f.name),
-                isLabeled: false,
-            }));
+        let directories = [this.#dataTargets.newData.filepath];
+        /** @type {Array.<Datum>} */
+        for (let i = 0; i < directories.length; i++) {
+            let contents = fs.readdirSync(directories[i], { withFileTypes: true });
+            for (let datum of contents.filter(dirent => dirent.isFile() && ['.jpg', '.jpeg'].includes(path.extname(dirent.name).toLowerCase())).
+                map(dirent => Datum.fromUrl(directories[i], dirent.name))) {
+                this.#data.container.push(datum);
+            }
+            if (this.#dataTargets.newData.recursive) {
+                for (let dirname of contents.filter(dirent => dirent.isDirectory()).
+                    map(dirent => path.join(directories[i], dirent.name))) {
+                    directories.push(dirname);
+                }
+            }
+        }
     }
 
     /**
