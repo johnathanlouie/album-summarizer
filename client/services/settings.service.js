@@ -25,11 +25,27 @@ class ServerSettings {
 }
 
 
+class OrganizerSettings {
+
+    architecture = 'smi13a';
+    dataset = 'ccrc';
+    loss = 'bce';
+    optimizer = 'sgd';
+    metrics = 'acc';
+    epochs = 0;
+    patience = 3;
+    split = 0;
+    cluster = 'sift';
+
+}
+
+
 class SettingsService {
 
     #saveFile = 'settings.json';
     mongodb = new MongoDbSettings();
     server = new ServerSettings();
+    organizer = new OrganizerSettings();
 
     static $inject = [];
     constructor() {
@@ -45,6 +61,7 @@ class SettingsService {
             var loadObj = JSON.parse(fs.readFileSync(this.#saveFile));
             Object.assign(this.mongodb, loadObj.mongodb);
             Object.assign(this.server, loadObj.server);
+            Object.assign(this.organizer, loadObj.organizer);
         }
     }
 
