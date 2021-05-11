@@ -143,9 +143,31 @@ class DataContainer {
 }
 
 
+class DataTargets {
+
+    newData = {
+        filepath: path.join(os.homedir(), 'Pictures'),
+        recursive: true,
+    };
+
+    exportPath = path.join(process.cwd(), 'export.csv');
+
+    /** @type {FileList} */
+    file1;
+
+    /** @type {string} */
+    collectionPush;
+
+    /** @type {string} */
+    collectionPull;
+
+}
+
+
 class Controller {
 
     #data = new DataContainer();
+    #dataTargets = new DataTargets();
 
     static $inject = ['$scope', '$q', 'mongoDb', 'modal', 'users', 'focusImage', 'database'];
     $scope;
@@ -175,11 +197,7 @@ class Controller {
         this.database = database;
 
         $scope.users = users;
-        $scope.newData = {
-            filepath: path.join(os.homedir(), 'Pictures'),
-            recursive: true,
-        };
-        $scope.exportPath = path.join(process.cwd(), 'export.csv');
+        $scope.dataTargets = this.#dataTargets;
         $scope.data = this.#data;
         $scope.load = () => this.readCsv();
         $scope.upload = () => this.writeMongoDb();
@@ -197,9 +215,9 @@ class Controller {
 
     readCsv() {
         this.#data.container = [];
-        if (this.$scope.file1.length > 0) {
+        if (this.#dataTargets.file1.length > 0) {
             try {
-                this.#data.container = parseCsv(fs.readFileSync(this.$scope.file1[0].path), {
+                this.#data.container = parseCsv(fs.readFileSync(this.#dataTargets.file1[0].path), {
                     columns: ['image', 'rating', 'class', 'isLabeled', '_id'],
                     cast: function (value, context) {
                         switch (context.column) {
@@ -222,14 +240,14 @@ class Controller {
 
     writeMongoDb() {
         this.modal.showLoading('UPLOADING...');
-        return this.mongoDb.insertMany(this.#data.container, this.$scope.collectionPush).then(
+        return this.mongoDb.insertMany(this.#data.container, this.#dataTargets.collectionPush).then(
             () => this.users.load(true)
         ).then(() => {
             if (this.users.users.length > 0) {
-                this.$scope.collectionPull = this.users.users[0];
+                this.#dataTargets.collectionPull = this.users.users[0];
             }
             else {
-                this.$scope.collectionPull = null;
+                this.#dataTargets.collectionPull = null;
             }
             this.modal.hideLoading();
         }).catch(e => {
@@ -242,7 +260,7 @@ class Controller {
     readMongoDb() {
         this.#data.container = [];
         this.modal.showLoading('RETRIEVING...');
-        return this.mongoDb.getAll(this.$scope.collectionPull).then(x => {
+        return this.mongoDb.getAll(this.#dataTargets.collectionPull).then(x => {
             this.#data.container = x;
             this.modal.hideLoading();
         }).catch(e => {
@@ -278,7 +296,7 @@ class Controller {
     }
 
     writeCsv() {
-        fs.writeFileSync(this.$scope.exportPath, stringifyCsv(this.#data.container, {
+        fs.writeFileSync(this.#dataTargets.exportPath, stringifyCsv(this.#data.container, {
             columns: [
                 { key: 'image' },
                 { key: 'rating' },
@@ -291,10 +309,10 @@ class Controller {
 
     getImages() {
         this.#data.container = [];
-        this.#data.container = fs.readdirSync(this.$scope.newData.filepath, { withFileTypes: true }).
+        this.#data.container = fs.readdirSync(this.#dataTargets.newData.filepath, { withFileTypes: true }).
             filter(f => f.isFile() && ['.jpg', '.jpeg'].includes(path.extname(f.name).toLowerCase())).
             map(f => ({
-                image: path.join(this.$scope.newData.filepath, f.name),
+                image: path.join(this.#dataTargets.newData.filepath, f.name),
                 isLabeled: false,
             }));
     }
@@ -306,10 +324,10 @@ class Controller {
         this.modal.showLoading('RETRIEVING...');
         return this.users.load(false).then(() => {
             if (this.users.users.length > 0) {
-                this.$scope.collectionPull = this.users.users[0];
+                this.#dataTargets.collectionPull = this.users.users[0];
             }
             else {
-                this.$scope.collectionPull = null;
+                this.#dataTargets.collectionPull = null;
             }
             this.modal.hideLoading();
         }).catch(e => {

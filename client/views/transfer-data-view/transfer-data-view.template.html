@@ -19,14 +19,14 @@
             <form class="mb-2" ng-submit="getImages()">
                 <div class="form-row">
                     <div class="col">
-                        <input class="form-control" ng-model="newData.filepath" type="text" placeholder="Directory"
+                        <input class="form-control" ng-model="dataTargets.newData.filepath" type="text" placeholder="Directory"
                             required>
                     </div>
                     <div class="col-auto">
                         <div class="btn-group-toggle" data-toggle="buttons">
                             <label class="btn"
-                                ng-class="{ 'btn-info': newData.recursive, 'btn-outline-info': !newData.recursive, 'active': newData.recursive }">
-                                <input type="checkbox" ng-model="newData.recursive"> Recursive
+                                ng-class="{ 'btn-info': dataTargets.newData.recursive, 'btn-outline-info': !dataTargets.newData.recursive, 'active': dataTargets.newData.recursive }">
+                                <input type="checkbox" ng-model="dataTargets.newData.recursive"> Recursive
                             </label>
                         </div>
                     </div>
@@ -47,8 +47,8 @@
             <form class="mb-2" ng-submit="load()">
                 <div class="form-row">
                     <div class="custom-file col">
-                        <input class="custom-file-input" file-input="file1" type="file" id="csvInput" required>
-                        <label class="custom-file-label" for="csvInput">{{ file1[0].name || 'Choose file' }}</label>
+                        <input class="custom-file-input" file-input="dataTargets.file1" type="file" id="csvInput" required>
+                        <label class="custom-file-label" for="csvInput">{{ dataTargets.file1[0].name || 'Choose file' }}</label>
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-primary" type="submit">Load</button>
@@ -65,7 +65,7 @@
                 <fieldset ng-disabled="data.isEmpty">
                     <div class="form-row">
                         <div class="col">
-                            <input class="form-control" ng-model="exportPath" type="text" placeholder="Filepath"
+                            <input class="form-control" ng-model="dataTargets.exportPath" type="text" placeholder="Filepath"
                                 required>
                         </div>
                         <div class="col-auto">
@@ -86,7 +86,7 @@
             <form class="mb-2" ng-submit="download()">
                 <div class="form-row">
                     <div class="col mb-2">
-                        <select class="custom-select" ng-model="collectionPull">
+                        <select class="custom-select" ng-model="dataTargets.collectionPull">
                             <option ng-repeat="c in users.users">{{ c }}</option>
                         </select>
                     </div>
@@ -105,7 +105,7 @@
                 <fieldset ng-disabled="data.isEmpty">
                     <div class="form-row">
                         <div class="col">
-                            <input class="form-control" ng-model="collectionPush" type="text" placeholder="Username"
+                            <input class="form-control" ng-model="dataTargets.collectionPush" type="text" placeholder="Username"
                                 required pattern="(?!evaluations$).*">
                         </div>
                         <div class="col-auto">
