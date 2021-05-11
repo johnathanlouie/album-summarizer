@@ -118,11 +118,19 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-6">
+            <h6>Collate Database</h6>
+            <button class="btn btn-primary btn-block" ng-click="collateData()">Load Collated Data</button>
+        </div>
+    </div>
+
     <h1>
         Data
-        <button class="btn btn-danger ml-2" ng-click="removeIds()" ng-disabled="data.isEmpty">Remove IDs</button>
-        <button class="btn btn-danger ml-2" ng-click="randomRating()" ng-disabled="data.isEmpty">Random Ratings</button>
-        <button class="btn btn-danger ml-2" ng-click="randomClass()" ng-disabled="data.isEmpty">Random Classes</button>
+        <button class="btn btn-danger ml-2" ng-click="data.removeIds()" ng-disabled="data.isEmpty">Remove IDs</button>
+        <button class="btn btn-danger ml-2" ng-click="data.randomRating()" ng-disabled="data.isEmpty">Random Ratings</button>
+        <button class="btn btn-danger ml-2" ng-click="data.randomClass()" ng-disabled="data.isEmpty">Random Classes</button>
+        <button class="btn btn-danger ml-2" ng-click="data.roundRating()" ng-disabled="data.isEmpty">Round Rating</button>
     </h1>
 
     <div class="table-responsive">

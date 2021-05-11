@@ -11,6 +11,74 @@ import MongoDbService from '../../services/mongodb.service.js';
 import ModalService from '../../services/modal.service.js';
 import UsersService from '../../services/users.service.js';
 import FocusImageService from '../../services/focus-image.service.js';
+import DatabaseService from '../../services/database.service.js';
+
+
+class CombinedDatum {
+
+    /** @type {mongodb.ObjectID} */
+    _id;
+
+    /** @type {string} */
+    image;
+
+    /** @type {Array.<number>} */
+    rating = [];
+
+    /** @type {Array.<string>} */
+    class = [];
+
+    /** @type {boolean} */
+    isLabeled = true;
+
+    /**
+     * 
+     * @param {string} image 
+     */
+    constructor(image) {
+        this.image = image;
+    }
+
+    /** @param {Datum} datum */
+    combine(datum) {
+        if (this.image !== datum.image) { throw new Error(); }
+        this.rating.push(datum.rating);
+        this.class.push(datum.class);
+    }
+
+    averageRating() {
+        return _.mean(this.rating);
+    }
+
+    /**
+     * 
+     * @returns {string}
+     */
+    mostCommonClass() {
+        let max = 0;
+        let maxClasses = [];
+        for (let [class_, count] of _.toPairs(_.countBy(this.class))) {
+            if (max === count) {
+                maxClasses.push(class_);
+            }
+            else if (max < count) {
+                max = count;
+                maxClasses = [class_];
+            }
+        }
+        return _.sample(maxClasses);
+    }
+
+    toDatum() {
+        let datum = new Datum();
+        datum.image = this.image;
+        datum.rating = this.averageRating();
+        datum.class = this.mostCommonClass();
+        datum.isLabeled = true;
+        return datum;
+    }
+
+}
 
 
 class Datum {
@@ -64,6 +132,12 @@ class DataContainer {
         }
     }
 
+    roundRating() {
+        for (let doc of this.container) {
+            doc.rating = Math.round(doc.rating);
+        }
+    }
+
     get isEmpty() { return this.container.length === 0; }
 
 }
@@ -73,26 +147,32 @@ class Controller {
 
     #data = new DataContainer();
 
-    static $inject = ['$scope', 'mongoDb', 'modal', 'users', 'focusImage'];
+    static $inject = ['$scope', '$q', 'mongoDb', 'modal', 'users', 'focusImage', 'database'];
     $scope;
+    $q;
     mongoDb;
     modal;
     users;
     focusImage;
+    database;
 
     /**
      * @param {angular.IScope} $scope 
+     * @param {angular.IQService} $q 
      * @param {MongoDbService} mongoDb 
      * @param {ModalService} modal
      * @param {UsersService} users
      * @param {FocusImageService} focusImage
+     * @param {DatabaseService} database
      */
-    constructor($scope, mongoDb, modal, users, focusImage) {
+    constructor($scope, $q, mongoDb, modal, users, focusImage, database) {
         this.$scope = $scope;
+        this.$q = $q;
         this.mongoDb = mongoDb;
         this.modal = modal;
         this.users = users;
         this.focusImage = focusImage;
+        this.database = database;
 
         $scope.users = users;
         $scope.newData = {
@@ -106,9 +186,7 @@ class Controller {
         $scope.download = () => this.readMongoDb();
         $scope.export = () => this.writeCsv();
         $scope.getImages = () => this.getImages();
-        $scope.removeIds = () => this.#data.removeIds();
-        $scope.randomRating = () => this.#data.randomRating();
-        $scope.randomClass = () => this.#data.randomClass();
+        $scope.collateData = () => this.collateData();
         $scope.focusOnImage = function (url) {
             focusImage.image = url;
             modal.showPhoto();
@@ -166,6 +244,31 @@ class Controller {
         this.modal.showLoading('RETRIEVING...');
         return this.mongoDb.getAll(this.$scope.collectionPull).then(x => {
             this.#data.container = x;
+            this.modal.hideLoading();
+        }).catch(e => {
+            console.error(e);
+            this.modal.hideLoading();
+            this.modal.showError(e, 'ERROR: MongoDB', 'Error while fetching collection');
+        });
+    }
+
+    collateData() {
+        this.#data.container = [];
+        /** @type {Map.<string, CombinedDatum>} */
+        let map = new Map();
+        this.modal.showLoading('RETRIEVING...');
+        return this.$q.all(this.users.users.map(
+            username => this.database.getRatingClass(username).
+                then(docs => {
+                    for (let doc of docs) {
+                        if (!map.has(doc.image)) {
+                            map.set(doc.image, new CombinedDatum(doc.image));
+                        }
+                        map.get(doc.image).combine(doc);
+                    }
+                })
+        )).then(() => {
+            this.#data.container = Array.from(map.values()).map(combined => combined.toDatum());
             this.modal.hideLoading();
         }).catch(e => {
             console.error(e);
