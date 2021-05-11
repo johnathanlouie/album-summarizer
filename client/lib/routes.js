@@ -69,12 +69,12 @@ class RouteManager {
             '<histogram-view></histogram-view>',
         ),
         new Route(
-            'Data Preparation',
+            'Data Labeling',
             '/devtools/label-data',
             '<label-data-view></label-data-view>',
         ),
         new Route(
-            'Data Transfer',
+            'Data Management',
             '/devtools/data-transfer',
             '<transfer-data-view></transfer-data-view>',
         ),
