@@ -32,16 +32,26 @@
         </div>
     </div>
 
-    <div class="row mb-2">
-        <div class="col-auto">
-            <button type="button" class="btn btn-primary" ng-click="reevaluatePending()">Re-evaluate Pending</button>
-        </div>
-        <div class="col-auto">
-            <button type="button" class="btn btn-danger" ng-click="removeMongoDbDuplicates()">Delete Duplicates</button>
+    <div class="card">
+        <div class="card-body">
+
+            <h5 class="card-title">Controls</h5>
+
+            <div class="row">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-primary" ng-click="reevaluatePending()">Re-evaluate
+                        Pending</button>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-danger" ng-click="removeMongoDbDuplicates()">Delete
+                        Duplicates</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <div class="card">
+    <div class="card mt-3">
         <div class="card-body">
 
             <h5 class="card-title">Filters</h5>
