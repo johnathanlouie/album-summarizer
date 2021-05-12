@@ -205,17 +205,18 @@
                                 {{ cluster[0].path | filename }}
                             </button>
                         </li>
+                        <li class="list-group-item">
+                            Rating: {{ cluster[0].rating | normalizeRating | number : 2 }}
+                        </li>
                         <li class="list-group-item p-0">
                             <div class="btn-group-toggle" data-toggle="buttons">
                                 <label class="btn btn-light btn-block squared-top"
                                     ng-class="{ 'disabled': cluster.length < 2 }">
                                     <input type="checkbox" ng-disabled="cluster.length < 2" ng-model="clusterExpand">
-                                    <svg class="btn-icon bi bi-plus" ng-hide="clusterExpand"
-                                        fill="currentColor">
+                                    <svg class="btn-icon bi bi-plus" ng-hide="clusterExpand" fill="currentColor">
                                         <use xlink:href="bootstrap-icons.svg#plus" />
                                     </svg>
-                                    <svg class="btn-icon bi bi-dash" ng-show="clusterExpand"
-                                        fill="currentColor">
+                                    <svg class="btn-icon bi bi-dash" ng-show="clusterExpand" fill="currentColor">
                                         <use xlink:href="bootstrap-icons.svg#dash" />
                                     </svg>
                                     See {{ clusterExpand ? 'less' : 'more' }}
@@ -237,8 +238,11 @@
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item p-0">
                             <button class="btn btn-light btn-block rounded-0" ng-click="focusOnImage(image.path)">
-                                {{ cluster[0].path | filename }}
+                                {{ image.path | filename }}
                             </button>
+                        </li>
+                        <li class="list-group-item">
+                            Rating: {{ image.rating | normalizeRating | number : 2 }}
                         </li>
                     </ul>
                 </div>
@@ -279,7 +283,7 @@
                                         <img ng-src="{{ image.path | fileUrl }}" style="max-height: 1em;">
                                     </td>
                                     <td class="text-break text-wrap">{{ image.path | filename }}</td>
-                                    <td>{{ image.rating | normalizeRating |number : 2 }}</td>
+                                    <td>{{ image.rating | normalizeRating | number : 2 }}</td>
                                 </tr>
                             </tbody>
                         </table>
