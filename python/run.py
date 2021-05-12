@@ -129,12 +129,14 @@ if __name__ == '__main__':
                 response.status_code = 400
                 response.status = 'Error: Not JSON'
                 return response
-            directory = flask.request.get_json()['url']
+            request_data = flask.request.get_json()
+            directory = request_data['url']
             settings = Settings()
-            if not settings.exists():
-                settings.save()
-            else:
-                settings.load()
+            settings.__dict__.update(request_data)
+            # if not settings.exists():
+            #     settings.save()
+            # else:
+            #     settings.load()
             cluster = ClusterRegistry.get(settings.cluster)
             model = ModelBuilder.create(
                 settings.architecture,

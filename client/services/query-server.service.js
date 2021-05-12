@@ -96,7 +96,10 @@ class QueryServerService {
      * @returns {angular.IPromise.<Array.<Array.<RunReturnObject>>>}
      */
     run(dir) {
-        return this.$http.post(`${this.#serverUrl}/run`, { url: dir }).then(httpReturnValue => httpReturnValue.data);
+        return this.$http.post(
+            `${this.#serverUrl}/run`,
+            Object.assign({ url: dir }, this.settings.organizer),
+        ).then(httpReturnValue => httpReturnValue.data);
     }
 
     /**

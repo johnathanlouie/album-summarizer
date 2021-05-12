@@ -1,26 +1,30 @@
 const angular = require('angular');
 import ModalService from '../../services/modal.service.js';
 import SettingsService from '../../services/settings.service.js';
+import OptionsService from '../../services/options.service.js';
 
 
 class SettingsViewController {
 
+    static $inject = ['$scope', 'settings', 'modal', 'options'];
     $scope;
     settings;
     modal;
-
-    static $inject = ['$scope', 'settings', 'modal'];
+    options;
 
     /**
      * @param {angular.IScope} $scope 
      * @param {SettingsService} settings 
      * @param {ModalService} modal 
+     * @param {OptionsService} options 
      */
-    constructor($scope, settings, modal) {
+    constructor($scope, settings, modal, options) {
         this.$scope = $scope;
         this.settings = settings;
         this.modal = modal;
+        this.options = options;
 
+        $scope.options = options;
         $scope.settings = this.settings;
         $scope.save = () => this.save();
 
