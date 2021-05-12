@@ -19,8 +19,8 @@
             <form class="mb-2" ng-submit="getImages()">
                 <div class="form-row">
                     <div class="col">
-                        <input class="form-control" ng-model="dataTargets.newData.filepath" type="text" placeholder="Directory"
-                            required>
+                        <input class="form-control" ng-model="dataTargets.newData.filepath" type="text"
+                            placeholder="Directory" required>
                     </div>
                     <div class="col-auto">
                         <div class="btn-group-toggle" data-toggle="buttons">
@@ -47,8 +47,10 @@
             <form class="mb-2" ng-submit="load()">
                 <div class="form-row">
                     <div class="custom-file col">
-                        <input class="custom-file-input" file-input="dataTargets.file1" type="file" id="csvInput" required>
-                        <label class="custom-file-label" for="csvInput">{{ dataTargets.file1[0].name || 'Choose file' }}</label>
+                        <input class="custom-file-input" file-input="dataTargets.file1" type="file" id="csvInput"
+                            required>
+                        <label class="custom-file-label" for="csvInput">{{ dataTargets.file1[0].name || 'Choose file'
+                            }}</label>
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-primary" type="submit">Load</button>
@@ -65,8 +67,8 @@
                 <fieldset ng-disabled="data.isEmpty">
                     <div class="form-row">
                         <div class="col">
-                            <input class="form-control" ng-model="dataTargets.exportPath" type="text" placeholder="Filepath"
-                                required>
+                            <input class="form-control" ng-model="dataTargets.exportPath" type="text"
+                                placeholder="Filepath" required>
                         </div>
                         <div class="col-auto">
                             <button class="btn btn-primary" type="submit">Export</button>
@@ -105,8 +107,8 @@
                 <fieldset ng-disabled="data.isEmpty">
                     <div class="form-row">
                         <div class="col">
-                            <input class="form-control" ng-model="dataTargets.collectionPush" type="text" placeholder="Username"
-                                required pattern="(?!evaluations$).*">
+                            <input class="form-control" ng-model="dataTargets.collectionPush" type="text"
+                                placeholder="Username" required pattern="(?!evaluations$).*">
                         </div>
                         <div class="col-auto">
                             <button class="btn btn-primary" type="submit">Export</button>
@@ -125,12 +127,15 @@
         </div>
     </div>
 
-    <h1>
+    <h1 class="mt-3">
         Data
         <button class="btn btn-danger ml-2" ng-click="data.removeIds()" ng-disabled="data.isEmpty">Remove IDs</button>
-        <button class="btn btn-danger ml-2" ng-click="data.randomRating()" ng-disabled="data.isEmpty">Random Ratings</button>
-        <button class="btn btn-danger ml-2" ng-click="data.randomClass()" ng-disabled="data.isEmpty">Random Classes</button>
-        <button class="btn btn-danger ml-2" ng-click="data.roundRating()" ng-disabled="data.isEmpty">Round Rating</button>
+        <button class="btn btn-danger ml-2" ng-click="data.randomRating()" ng-disabled="data.isEmpty">Random
+            Ratings</button>
+        <button class="btn btn-danger ml-2" ng-click="data.randomClass()" ng-disabled="data.isEmpty">Random
+            Classes</button>
+        <button class="btn btn-danger ml-2" ng-click="data.roundRating()" ng-disabled="data.isEmpty">Round
+            Rating</button>
     </h1>
 
     <div class="table-responsive">
