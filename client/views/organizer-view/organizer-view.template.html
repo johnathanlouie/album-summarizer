@@ -210,6 +210,14 @@
                                 <label class="btn btn-light btn-block squared-top"
                                     ng-class="{ 'disabled': cluster.length < 2 }">
                                     <input type="checkbox" ng-disabled="cluster.length < 2" ng-model="clusterExpand">
+                                    <svg class="btn-icon bi bi-plus" ng-hide="clusterExpand"
+                                        fill="currentColor">
+                                        <use xlink:href="bootstrap-icons.svg#plus" />
+                                    </svg>
+                                    <svg class="btn-icon bi bi-dash" ng-show="clusterExpand"
+                                        fill="currentColor">
+                                        <use xlink:href="bootstrap-icons.svg#dash" />
+                                    </svg>
                                     See {{ clusterExpand ? 'less' : 'more' }}
                                 </label>
                             </div>
