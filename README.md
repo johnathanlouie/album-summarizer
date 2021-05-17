@@ -22,7 +22,7 @@ conda create --name album keras-gpu "tensorflow-gpu<2" autopep8 pylint dill open
 ```
 
 ## Running the Program
-The current working directory must be `<project-home>/electron`.
+The current working directory must be `<project-home>/client`.
 ```
 npm start
 ```
