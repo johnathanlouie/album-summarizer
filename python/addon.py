@@ -1,3 +1,4 @@
+import architecture.resnet
 import architecture.smi13
 import architecture.vgg16
 import cluster.histogram
