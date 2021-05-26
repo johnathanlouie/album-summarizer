@@ -42,11 +42,20 @@ class Architecture(ABC):
             'layers': list(),
         }
         for layer in kmodel.layers:
-            model_summary['layers'].append({
+            layer_dict = {
                 'name': layer.name,
-                'output_shape': layer.output_shape,
+                'input_shape': [int(i) for i in layer.input_shape[1:]],
                 'layer_type': layer.__class__.__name__,
-            })
+            }
+            if hasattr(layer, 'kernel_size'):
+                layer_dict['kernel_size'] = layer.kernel_size
+            else:
+                layer_dict['kernel_size'] = None
+            if hasattr(layer, 'pool_size'):
+                layer_dict['pool_size'] = layer.pool_size
+            else:
+                layer_dict['pool_size'] = None
+            model_summary['layers'].append(layer_dict)
         return model_summary
 
 
