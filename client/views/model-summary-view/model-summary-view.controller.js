@@ -32,40 +32,99 @@ class ModelSummaryViewController {
 
         loadOptions();
 
-        $scope.submit = function () {
-            modal.showLoading('FETCHING...');
+        $scope.nnSvgStyle = 'alexnet';
+        var modelSummary = null;
+
+        function alexnet() {
             var architecture = [];
             var architecture2 = [];
+            for (let layer of modelSummary.layers) {
+                switch (layer.layer_type) {
+                    case 'InputLayer':
+                    case 'Conv2D':
+                    case 'BatchNormalization':
+                    case 'MaxPooling2D':
+                        let filter = [1, 1];
+                        if (layer.pool_size) { filter = layer.pool_size; }
+                        else if (layer.kernel_size) { filter = layer.kernel_size; }
+                        architecture.push({
+                            width: layer.input_shape[0],
+                            height: layer.input_shape[1],
+                            depth: layer.input_shape[2],
+                            filterWidth: filter[0],
+                            filterHeight: filter[1],
+                            rel_y: 0,
+                            rel_x: 0,
+                        });
+                        break;
+                    case 'Flatten':
+                    case 'Dense':
+                        architecture2.push(layer.input_shape[0]);
+                        break;
+                    default:
+                        throw new Error('Unknown layer type', layer);
+                }
+            }
+            window.ALEXNET.redraw({
+                architecture_: architecture,
+                architecture2_: architecture2,
+            });
+        }
+
+        function lenet() {
+            var architecture = [];
+            var architecture2 = [];
+            for (let layer of modelSummary.layers) {
+                switch (layer.layer_type) {
+                    case 'InputLayer':
+                    case 'Conv2D':
+                    case 'BatchNormalization':
+                    case 'MaxPooling2D':
+                        let filter = [1, 1];
+                        if (layer.pool_size) { filter = layer.pool_size; }
+                        else if (layer.kernel_size) { filter = layer.kernel_size; }
+                        architecture.push({
+                            squareHeight: layer.input_shape[0],
+                            squareWidth: layer.input_shape[1],
+                            numberOfSquares: layer.input_shape[2],
+                            filterHeight: filter[0],
+                            filterWidth: filter[1],
+                            Op: layer.layer_type,
+                        });
+                        break;
+                    case 'Flatten':
+                    case 'Dense':
+                        architecture2.push(layer.input_shape[0]);
+                        break;
+                    default:
+                        throw new Error('Unknown layer type', layer);
+                }
+            }
+            window.LENET.redraw({
+                architecture_: architecture,
+                architecture2_: architecture2,
+            });
+        }
+
+        function draw() {
+            if (modelSummary !== null) {
+                if ($scope.nnSvgStyle === 'alexnet') {
+                    alexnet();
+                }
+                else if ($scope.nnSvgStyle === 'lenet') {
+                    lenet();
+                }
+            }
+        }
+
+        $scope.styleSubmit = function () { draw(); };
+
+        $scope.submit = function () {
+            modal.showLoading('FETCHING...');
             return queryServer.modelSummary($scope.selectedOptions).then(
                 response => {
-                    for (let layer of response.layers) {
-                        switch (layer.layer_type) {
-                            case 'InputLayer':
-                            case 'Conv2D':
-                            case 'BatchNormalization':
-                            case 'MaxPooling2D':
-                                let s = [1, 1];
-                                if (layer.pool_size) { s = layer.pool_size; }
-                                else if (layer.kernel_size) { s = layer.kernel_size; }
-                                architecture.push({
-                                    width: layer.input_shape[0],
-                                    height: layer.input_shape[1],
-                                    depth: layer.input_shape[2],
-                                    filterWidth: s[0],
-                                    filterHeight: s[1],
-                                    rel_y: 0,
-                                    rel_x: 0,
-                                });
-                                break;
-                            case 'Flatten':
-                            case 'Dense':
-                                architecture2.push(layer.input_shape[0]);
-                                break;
-                            default:
-                                throw new Error('Unknown layer type', layer);
-                        }
-                    }
-                    window.ALEXNET.redraw({ 'architecture_': architecture, 'architecture2_': architecture2 });
+                    modelSummary = response;
+                    draw();
                     modal.hideLoading();
                 },
                 e => {

@@ -59,9 +59,34 @@
         </div>
     </form>
 
-    <div class="card mt-3" id="graph-container"></div>
+    <div class="card mt-3">
+        <div class="card-body">
+            <form ng-submit="styleSubmit()">
+                <div class="form-check">
+                    <input class="form-check-input" ng-model="nnSvgStyle" type="radio" name="nnSvgStyle" id="lenetRadio"
+                        value="lenet">
+                    <label class="form-check-label" for="lenetRadio">
+                        LeNet Style
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" ng-model="nnSvgStyle" type="radio" name="nnSvgStyle"
+                        id="alexnetRadio" value="alexnet">
+                    <label class="form-check-label" for="alexnetRadio">
+                        AlexNet Style
+                    </label>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body" id="graph-container"></div>
+    </div>
 
 </div>
+
 
 <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -85,11 +110,14 @@
 </div>
 
 <script>window.THREE = require('three');</script>
+<script>window.d3 = require('d3');</script>
 <script src="nn-svg/OrbitControls.js"></script>
 <script src="nn-svg/SVGRenderer.js"></script>
 <script src="nn-svg/Projector.js"></script>
-<script src="nn-svg/AlexNet.js"></script>
 <script src="nn-svg/util.js"></script>
+<script src="nn-svg/AlexNet.js"></script>
+<script src="nn-svg/LeNet.js"></script>
 <script>
     window.ALEXNET = AlexNet();
+    window.LENET = LeNet();
 </script>
