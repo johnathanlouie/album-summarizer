@@ -571,6 +571,9 @@ class KerasAdapter(object):
         clear_session()
         gc.collect()
 
+    def summary(self) -> None:
+        self._architecture.summary(self._res, self._data.classes)
+
 
 class ModelSplit(object):
     """
@@ -746,6 +749,15 @@ class ModelSplit(object):
         ) as kadapter:
             kadapter.delete(keep_history)
 
+    def summary(self) -> None:
+        with KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        ) as kadapter:
+            kadapter.summary()
+
 
 class BadModelSettings(ValueError):
     pass
@@ -843,3 +855,8 @@ class Model(object):
             print("Split %d / %d" % (i + 1, self._dataset.splits()))
             evaluation.append(self.split(i).evaluate_test_set())
         return evaluation
+
+    def summary(self) -> None:
+        """
+        """
+        self.split(0).summary()

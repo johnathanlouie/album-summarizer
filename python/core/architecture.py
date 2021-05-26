@@ -32,6 +32,11 @@ class Architecture(ABC):
         """
         pass
 
+    def summary(self, res: Resolution, classes: Optional[int]) -> None:
+        """
+        """
+        self.create(res, classes).summary()
+
 
 class CompileOption(object):
     """
@@ -113,3 +118,6 @@ class CompiledArchitecture(object):
         Creates a data object with the names of the architecture and compile options.
         """
         return CompiledArchitectureName(self._architecture.NAME, self._loss.name, self._optimizer.name, self._metric.name)
+
+    def summary(self, res: Resolution, classes: Optional[int]) -> None:
+        self._architecture.summary(res, classes)
