@@ -22,6 +22,7 @@ function LeNet() {
     var betweenLayersDefault = 12;
 
     var architecture = [];
+    var architecture2 = [];
     var lenet = {};
     var layer_offsets = [];
     var largest_layer_width = 0;
@@ -39,6 +40,7 @@ function LeNet() {
                      architecture2_=architecture2}={}) {
 
         architecture = architecture_;
+        architecture2 = architecture2_;
 
         lenet.rects = architecture.map((layer, layer_index) => range(layer['numberOfSquares']).map(rect_index => {return {'id':layer_index+'_'+rect_index,'layer':layer_index,'rect_index':rect_index,'width':layer['squareWidth'],'height':layer['squareHeight']}}));
         lenet.rects = flatten(lenet.rects);
