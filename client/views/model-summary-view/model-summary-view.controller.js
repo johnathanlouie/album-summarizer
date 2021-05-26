@@ -74,6 +74,8 @@ class ModelSummaryViewController {
         function lenet() {
             var architecture = [];
             var architecture2 = [];
+            var betweenLayers = [];
+            var layerId = 0;
             for (let layer of modelSummary.layers) {
                 switch (layer.layer_type) {
                     case 'InputLayer':
@@ -89,8 +91,10 @@ class ModelSummaryViewController {
                             numberOfSquares: layer.input_shape[2],
                             filterHeight: filter[0],
                             filterWidth: filter[1],
-                            Op: layer.layer_type,
+                            layer: layerId,
+                            op: layer.layer_type,
                         });
+                        betweenLayers.push(20);
                         break;
                     case 'Flatten':
                     case 'Dense':
@@ -99,10 +103,15 @@ class ModelSummaryViewController {
                     default:
                         throw new Error('Unknown layer type', layer);
                 }
+                layerId++;
             }
             window.LENET.redraw({
                 architecture_: architecture,
                 architecture2_: architecture2,
+            });
+            window.LENET.redistribute({
+                // betweenLayers_: betweenLayers,
+                // betweenSquares_: 1,
             });
         }
 
@@ -121,6 +130,7 @@ class ModelSummaryViewController {
 
         $scope.submit = function () {
             modal.showLoading('FETCHING...');
+            modelSummary = null;
             return queryServer.modelSummary($scope.selectedOptions).then(
                 response => {
                     modelSummary = response;

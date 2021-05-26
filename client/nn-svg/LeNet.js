@@ -8,7 +8,7 @@ function LeNet() {
     var w = window.innerWidth;
     var h = window.innerHeight;
 
-    var svg = d3.select("#graph-container").append("svg").attr("xmlns", "http://www.w3.org/2000/svg");
+    var svg = d3.select("#graph-container2").append("svg").attr("xmlns", "http://www.w3.org/2000/svg");
     var g = svg.append("g");
     svg.style("cursor", "move");
 
