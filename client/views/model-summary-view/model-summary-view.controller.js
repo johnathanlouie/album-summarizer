@@ -117,7 +117,7 @@ class ModelSummaryViewController {
             }
         }
 
-        $scope.styleSubmit = function () { draw(); };
+        $scope.$watch('nnSvgStyle', () => draw());
 
         $scope.submit = function () {
             modal.showLoading('FETCHING...');
