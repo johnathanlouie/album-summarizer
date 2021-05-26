@@ -83,6 +83,11 @@ class RouteManager {
             '/devtools/check-status',
             '<status-view></status-view>',
         ),
+        new Route(
+            'Model Summary',
+            '/devtools/model-summary',
+            '<model-summary-view></model-summary-view>',
+        ),
     ];
 
     static menu1() {

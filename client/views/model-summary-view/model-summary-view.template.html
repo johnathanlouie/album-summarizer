@@ -1,0 +1,95 @@
+<devtools-navbar></devtools-navbar>
+
+<div class="container-fluid">
+
+    <form class="card" ng-submit="submit()">
+        <div class="card-body">
+            <div class="form-row">
+
+                <div class="form-group col-2">
+                    <label for="architectures">Architectures</label>
+                    <select class="form-control" id="architectures" ng-model="selectedOptions.architecture">
+                        <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="datasets">Datasets</label>
+                    <select class="form-control" id="datasets" ng-model="selectedOptions.dataset">
+                        <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="losses">Losses</label>
+                    <select class="form-control" id="losses" ng-model="selectedOptions.loss">
+                        <option ng-repeat="loss in options.losses">{{ loss }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="optimizers">Optimizers</label>
+                    <select class="form-control" id="optimizers" ng-model="selectedOptions.optimizer">
+                        <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="metrics">Metrics</label>
+                    <input class="form-control" ng-model="selectedOptions.metrics" type="text" id="metrics">
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="epochs">Epochs</label>
+                    <input class="form-control" ng-model="selectedOptions.epochs" type="number" id="epochs" min="0"
+                        step="1">
+                </div>
+
+                <div class="form-group col-2">
+                    <label for="patience">Patience</label>
+                    <input class="form-control" ng-model="selectedOptions.patience" type="number" id="patience" min="0"
+                        step="1">
+                </div>
+
+                <div class="form-group col d-flex align-items-end">
+                    <button class="btn btn-primary" type="submit">Compare Predictions</button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <div class="card mt-3" id="graph-container"></div>
+
+</div>
+
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Loading Data Failed</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Make sure the server is on.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Quit</button>
+                <button type="button" class="btn btn-primary" ng-click="retry()">Retry</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>window.THREE = require('three');</script>
+<script src="nn-svg/OrbitControls.js"></script>
+<script src="nn-svg/SVGRenderer.js"></script>
+<script src="nn-svg/Projector.js"></script>
+<script src="nn-svg/AlexNet.js"></script>
+<script src="nn-svg/util.js"></script>
+<script>
+    window.ALEXNET = AlexNet();
+</script>

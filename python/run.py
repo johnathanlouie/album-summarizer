@@ -355,6 +355,47 @@ if __name__ == '__main__':
             response.status = 'Error: Unknown'
             return response
 
+    @app.route('/modelsummary', methods=['POST'])
+    def model_summary():
+        try:
+            if not flask.request.is_json:
+                response = flask.Response()
+                response.status_code = 400
+                response.status = 'Error: Not JSON'
+                return response
+            settings = flask.request.get_json()
+            model = ModelBuilder.create(
+                settings['architecture'],
+                settings['dataset'],
+                settings['loss'],
+                settings['optimizer'],
+                settings['metrics'],
+                settings['epochs'],
+                settings['patience'],
+            )
+            return flask.jsonify(model.summary())
+        except TrainingIncompleteException:
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Training incomplete'
+            return response
+        except ModelStateMissingError:
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Model state missing'
+            return response
+        except BadModelSettings:
+            response = flask.Response()
+            response.status_code = 400
+            response.status = 'Error: Incompatible architecture/dataset'
+            return response
+        except:
+            print_exc()
+            response = flask.Response()
+            response.status_code = 500
+            response.status = 'Error: Unknown'
+            return response
+
     @app.route('/training-statuses', methods=['GET'])
     def training_statuses():
         return flask.jsonify([str(e) for e in TrainingStatus])
