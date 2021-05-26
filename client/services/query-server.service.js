@@ -70,6 +70,25 @@ import { ModelDescription, Evaluation } from '../lib/evaluation.js';
 
 
 /**
+ * Model summary layer
+ * @typedef {Object} ModelSummaryLayer
+ * @property {string} name
+ * @property {Array.<number>} input_shape
+ * @property {string} layer_type
+ * @property {?Array.<number>} kernel_size
+ * @property {?Array.<number>} pool_size
+ */
+
+
+/**
+ * Model summary
+ * @typedef {Object} ModelSummaryReturnObject
+ * @property {string} name
+ * @property {Array.<ModelSummaryLayer>} layers
+ */
+
+
+/**
  * An interface to the python server
  */
 class QueryServerService {
@@ -150,6 +169,14 @@ class QueryServerService {
     /** @returns {angular.IPromise.<Array.<string>>} */
     trainingStatuses() {
         return this.$http.get(`${this.#serverUrl}/training-statuses`).then(httpReturnValue => httpReturnValue.data);
+    }
+
+    /**
+     * @param {ModelDescription} model
+     * @returns {angular.IPromise.<ModelSummaryReturnObject>}
+     */
+    modelSummary(model) {
+        return this.$http.post(`${this.#serverUrl}/modelsummary`, model).then(httpReturnValue => httpReturnValue.data);
     }
 
 }
