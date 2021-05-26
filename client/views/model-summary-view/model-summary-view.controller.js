@@ -33,12 +33,12 @@ class ModelSummaryViewController {
         loadOptions();
 
         $scope.nnSvgStyle = 'alexnet';
-        var modelSummary = null;
+        $scope.modelSummary = null;
 
         function alexnet() {
             var architecture = [];
             var architecture2 = [];
-            for (let layer of modelSummary.layers) {
+            for (let layer of $scope.modelSummary.layers) {
                 switch (layer.layer_type) {
                     case 'InputLayer':
                     case 'Conv2D':
@@ -76,7 +76,7 @@ class ModelSummaryViewController {
             var architecture2 = [];
             var betweenLayers = [];
             var layerId = 0;
-            for (let layer of modelSummary.layers) {
+            for (let layer of $scope.modelSummary.layers) {
                 switch (layer.layer_type) {
                     case 'InputLayer':
                     case 'Conv2D':
@@ -116,7 +116,7 @@ class ModelSummaryViewController {
         }
 
         function draw() {
-            if (modelSummary !== null) {
+            if ($scope.modelSummary !== null) {
                 if ($scope.nnSvgStyle === 'alexnet') {
                     alexnet();
                 }
@@ -130,10 +130,10 @@ class ModelSummaryViewController {
 
         $scope.submit = function () {
             modal.showLoading('FETCHING...');
-            modelSummary = null;
+            $scope.modelSummary = null;
             return queryServer.modelSummary($scope.selectedOptions).then(
                 response => {
-                    modelSummary = response;
+                    $scope.modelSummary = response;
                     draw();
                     modal.hideLoading();
                 },
