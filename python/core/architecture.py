@@ -32,10 +32,22 @@ class Architecture(ABC):
         """
         pass
 
-    def summary(self, res: Resolution, classes: Optional[int]) -> None:
+    def summary(self, res: Resolution, classes: Optional[int]):
         """
         """
-        self.create(res, classes).summary()
+        kmodel = self.create(res, classes)
+        kmodel.summary()
+        model_summary = {
+            'name': self.NAME,
+            'layers': list(),
+        }
+        for layer in kmodel.layers:
+            model_summary['layers'].append({
+                'name': layer.name,
+                'output_shape': layer.output_shape,
+                'layer_type': layer.__class__.__name__,
+            })
+        return model_summary
 
 
 class CompileOption(object):
@@ -120,4 +132,4 @@ class CompiledArchitecture(object):
         return CompiledArchitectureName(self._architecture.NAME, self._loss.name, self._optimizer.name, self._metric.name)
 
     def summary(self, res: Resolution, classes: Optional[int]) -> None:
-        self._architecture.summary(res, classes)
+        return self._architecture.summary(res, classes)

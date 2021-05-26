@@ -572,7 +572,7 @@ class KerasAdapter(object):
         gc.collect()
 
     def summary(self) -> None:
-        self._architecture.summary(self._res, self._data.classes)
+        return self._architecture.summary(self._res, self._data.classes)
 
 
 class ModelSplit(object):
@@ -756,7 +756,7 @@ class ModelSplit(object):
             self._epochs,
             self._patience,
         ) as kadapter:
-            kadapter.summary()
+            return kadapter.summary()
 
 
 class BadModelSettings(ValueError):
@@ -859,4 +859,4 @@ class Model(object):
     def summary(self) -> None:
         """
         """
-        self.split(0).summary()
+        return self.split(0).summary()
