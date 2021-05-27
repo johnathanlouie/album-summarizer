@@ -137,6 +137,7 @@
                                     <th scope="col">Name</th>
                                     <th scope="col">Type</th>
                                     <th scope="col">Shape</th>
+                                    <th scope="col">Activation</th>
                                     <th scope="col">Kernel/Pool</th>
                                 </tr>
                             </thead>
@@ -146,6 +147,7 @@
                                     <td>{{ layer.name }}</td>
                                     <td>{{ layer.layer_type }}</td>
                                     <td>{{ layer.input_shape }}</td>
+                                    <td>{{ layer.activation }}</td>
                                     <td>{{ layer.pool_size || layer.kernel_size }}</td>
                                 </tr>
                             </tbody>

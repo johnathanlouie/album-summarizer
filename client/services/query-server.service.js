@@ -74,6 +74,7 @@ import { ModelDescription, Evaluation } from '../lib/evaluation.js';
  * @typedef {Object} ModelSummaryLayer
  * @property {string} name
  * @property {Array.<number>} input_shape
+ * @property {string} activation
  * @property {string} layer_type
  * @property {?Array.<number>} kernel_size
  * @property {?Array.<number>} pool_size

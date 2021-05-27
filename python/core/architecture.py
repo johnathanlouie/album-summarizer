@@ -42,11 +42,16 @@ class Architecture(ABC):
             'layers': list(),
         }
         for layer in kmodel.layers:
+            layer_config = layer.get_config()
             layer_dict = {
                 'name': layer.name,
                 'input_shape': [int(i) for i in layer.input_shape[1:]],
                 'layer_type': layer.__class__.__name__,
             }
+            if 'activation' in layer_config:
+                layer_dict['activation'] = layer_config['activation']
+            else:
+                layer_dict['activation'] = None
             if hasattr(layer, 'kernel_size'):
                 layer_dict['kernel_size'] = layer.kernel_size
             else:
