@@ -8,96 +8,113 @@
 
 <div class="position-relative">
 
-    <div class="card mb-3 ml-3" style="width: 20%; top: 0; left: 0; position: absolute;">
+    <div class="accordion mb-3 ml-3" id="optionsAccordion" style="max-width: 20%; top: 0; left: 0; position: absolute;">
 
-        <div class="card-body">
-            <form ng-submit="submit()">
+        <div class="card">
 
-                <div class="form-row">
+            <div class="card-header">
+                <h2 class="mb-0">
+                    <button class="btn btn-link btn-block text-left p-0" type="button" data-toggle="collapse"
+                        data-target="#optionsCollapse" aria-expanded="true" aria-controls="optionsCollapse">
+                        Model Options
+                    </button>
+                </h2>
+            </div>
 
-                    <div class="form-group col">
-                        <label for="architectures">Architectures</label>
-                        <select class="form-control" id="architectures" ng-model="selectedOptions.architecture">
-                            <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
-                        </select>
-                    </div>
+            <div id="optionsCollapse" class="collapse show" data-parent="#optionsAccordion">
 
-                    <div class="form-group col">
-                        <label for="datasets">Datasets</label>
-                        <select class="form-control" id="datasets" ng-model="selectedOptions.dataset">
-                            <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
-                        </select>
-                    </div>
+                <div class="card-body">
+                    <form ng-submit="submit()">
 
+                        <div class="form-row">
+
+                            <div class="form-group col">
+                                <label for="architectures">Architectures</label>
+                                <select class="form-control" id="architectures" ng-model="selectedOptions.architecture">
+                                    <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col">
+                                <label for="datasets">Datasets</label>
+                                <select class="form-control" id="datasets" ng-model="selectedOptions.dataset">
+                                    <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="form-row">
+
+                            <div class="form-group col">
+                                <label for="losses">Losses</label>
+                                <select class="form-control" id="losses" ng-model="selectedOptions.loss">
+                                    <option ng-repeat="loss in options.losses">{{ loss }}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col">
+                                <label for="optimizers">Optimizers</label>
+                                <select class="form-control" id="optimizers" ng-model="selectedOptions.optimizer">
+                                    <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="form-row">
+
+                            <div class="form-group col">
+                                <label for="metrics">Metrics</label>
+                                <input class="form-control" ng-model="selectedOptions.metrics" type="text" id="metrics">
+                            </div>
+
+                        </div>
+                        <div class="form-row">
+
+                            <div class="form-group col">
+                                <label for="epochs">Epochs</label>
+                                <input class="form-control" ng-model="selectedOptions.epochs" type="number" id="epochs"
+                                    min="0" step="1">
+                            </div>
+
+                            <div class="form-group col">
+                                <label for="patience">Patience</label>
+                                <input class="form-control" ng-model="selectedOptions.patience" type="number"
+                                    id="patience" min="0" step="1">
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex align-items-end">
+                            <button class="btn btn-primary" type="submit">Draw Model</button>
+                        </div>
+
+                    </form>
                 </div>
-                <div class="form-row">
 
-                    <div class="form-group col">
-                        <label for="losses">Losses</label>
-                        <select class="form-control" id="losses" ng-model="selectedOptions.loss">
-                            <option ng-repeat="loss in options.losses">{{ loss }}</option>
-                        </select>
+            </div>
+
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <h6>Diagram Style</h6>
+                    <div class="form-check">
+                        <input class="form-check-input" ng-model="nnSvgStyle" type="radio" name="nnSvgStyle"
+                            id="lenetRadio" value="lenet">
+                        <label class="form-check-label" for="lenetRadio">
+                            LeNet
+                        </label>
                     </div>
-
-                    <div class="form-group col">
-                        <label for="optimizers">Optimizers</label>
-                        <select class="form-control" id="optimizers" ng-model="selectedOptions.optimizer">
-                            <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
-                        </select>
+                    <div class="form-check">
+                        <input class="form-check-input" ng-model="nnSvgStyle" type="radio" name="nnSvgStyle"
+                            id="alexnetRadio" value="alexnet">
+                        <label class="form-check-label" for="alexnetRadio">
+                            AlexNet
+                        </label>
                     </div>
+                </li>
+            </ul>
 
-                </div>
-                <div class="form-row">
 
-                    <div class="form-group col">
-                        <label for="metrics">Metrics</label>
-                        <input class="form-control" ng-model="selectedOptions.metrics" type="text" id="metrics">
-                    </div>
-
-                </div>
-                <div class="form-row">
-
-                    <div class="form-group col">
-                        <label for="epochs">Epochs</label>
-                        <input class="form-control" ng-model="selectedOptions.epochs" type="number" id="epochs" min="0"
-                            step="1">
-                    </div>
-
-                    <div class="form-group col">
-                        <label for="patience">Patience</label>
-                        <input class="form-control" ng-model="selectedOptions.patience" type="number" id="patience"
-                            min="0" step="1">
-                    </div>
-
-                </div>
-
-                <div class="d-flex align-items-end">
-                    <button class="btn btn-primary" type="submit">Draw Model</button>
-                </div>
-
-            </form>
         </div>
-
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-                <h6>Diagram Style</h6>
-                <div class="form-check">
-                    <input class="form-check-input" ng-model="nnSvgStyle" type="radio" name="nnSvgStyle" id="lenetRadio"
-                        value="lenet">
-                    <label class="form-check-label" for="lenetRadio">
-                        LeNet
-                    </label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" ng-model="nnSvgStyle" type="radio" name="nnSvgStyle"
-                        id="alexnetRadio" value="alexnet">
-                    <label class="form-check-label" for="alexnetRadio">
-                        AlexNet
-                    </label>
-                </div>
-            </li>
-        </ul>
-
     </div>
 
     <div class="accordion mb-3 mr-3" id="modelSummaryAccordion" style="top: 0; right: 0; position: absolute;">
