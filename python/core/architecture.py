@@ -39,6 +39,7 @@ class Architecture(ABC):
         kmodel.summary()
         model_summary = {
             'name': self.NAME,
+            'params': kmodel.count_params(),
             'layers': list(),
         }
         for layer in kmodel.layers:
@@ -46,14 +47,15 @@ class Architecture(ABC):
             layer_dict = {
                 'name': layer.name,
                 'layer_type': layer.__class__.__name__,
+                'params': layer.count_params(),
             }
-            if type(layer.input_shape) == tuple:
-                input_shape = layer.input_shape
-            elif type(layer.input_shape) == list:
-                input_shape = layer.input_shape[0]
+            if type(layer.output_shape) == tuple:
+                output_shape = layer.output_shape
+            elif type(layer.output_shape) == list:
+                output_shape = layer.output_shape[0]
             else:
                 raise Exception
-            layer_dict['input_shape'] = [int(i) for i in input_shape[1:]]
+            layer_dict['output_shape'] = [int(i) for i in output_shape[1:]]
             if 'activation' in layer_config:
                 layer_dict['activation'] = layer_config['activation']
             else:

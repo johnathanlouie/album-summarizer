@@ -39,15 +39,15 @@ class ModelSummaryViewController {
             var architecture = [];
             var architecture2 = [];
             for (let layer of $scope.modelSummary.layers) {
-                switch (layer.input_shape.length) {
+                switch (layer.output_shape.length) {
                     case 3:
                         let filter = [1, 1];
                         if (layer.pool_size) { filter = layer.pool_size; }
                         else if (layer.kernel_size) { filter = layer.kernel_size; }
                         architecture.push({
-                            width: layer.input_shape[0],
-                            height: layer.input_shape[1],
-                            depth: layer.input_shape[2],
+                            width: layer.output_shape[0],
+                            height: layer.output_shape[1],
+                            depth: layer.output_shape[2],
                             filterWidth: filter[0],
                             filterHeight: filter[1],
                             rel_y: 0,
@@ -55,7 +55,7 @@ class ModelSummaryViewController {
                         });
                         break;
                     case 1:
-                        architecture2.push(layer.input_shape[0]);
+                        architecture2.push(layer.output_shape[0]);
                         break;
                     default:
                         throw new Error('Unknown layer type', layer);
@@ -73,15 +73,15 @@ class ModelSummaryViewController {
             var betweenLayers = [];
             var layerId = 0;
             for (let layer of $scope.modelSummary.layers) {
-                switch (layer.input_shape.length) {
+                switch (layer.output_shape.length) {
                     case 3:
                         let filter = [1, 1];
                         if (layer.pool_size) { filter = layer.pool_size; }
                         else if (layer.kernel_size) { filter = layer.kernel_size; }
                         architecture.push({
-                            squareHeight: layer.input_shape[0],
-                            squareWidth: layer.input_shape[1],
-                            numberOfSquares: layer.input_shape[2],
+                            squareHeight: layer.output_shape[0],
+                            squareWidth: layer.output_shape[1],
+                            numberOfSquares: layer.output_shape[2],
                             filterHeight: filter[0],
                             filterWidth: filter[1],
                             layer: layerId,
@@ -90,7 +90,7 @@ class ModelSummaryViewController {
                         betweenLayers.push(20);
                         break;
                     case 1:
-                        architecture2.push(layer.input_shape[0]);
+                        architecture2.push(layer.output_shape[0]);
                         break;
                     default:
                         throw new Error('Unknown layer type', layer);

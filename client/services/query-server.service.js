@@ -73,11 +73,12 @@ import { ModelDescription, Evaluation } from '../lib/evaluation.js';
  * Model summary layer
  * @typedef {Object} ModelSummaryLayer
  * @property {string} name
- * @property {Array.<number>} input_shape
+ * @property {Array.<number>} output_shape
  * @property {string} activation
  * @property {string} layer_type
  * @property {?Array.<number>} kernel_size
  * @property {?Array.<number>} pool_size
+ * @property {number} params
  */
 
 
@@ -86,6 +87,7 @@ import { ModelDescription, Evaluation } from '../lib/evaluation.js';
  * @typedef {Object} ModelSummaryReturnObject
  * @property {string} name
  * @property {Array.<ModelSummaryLayer>} layers
+ * @property {number} params
  */
 
 
