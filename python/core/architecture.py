@@ -45,9 +45,15 @@ class Architecture(ABC):
             layer_config = layer.get_config()
             layer_dict = {
                 'name': layer.name,
-                'input_shape': [int(i) for i in layer.input_shape[1:]],
                 'layer_type': layer.__class__.__name__,
             }
+            if type(layer.input_shape) == tuple:
+                input_shape = layer.input_shape
+            elif type(layer.input_shape) == list:
+                input_shape = layer.input_shape[0]
+            else:
+                raise Exception
+            layer_dict['input_shape'] = [int(i) for i in input_shape[1:]]
             if 'activation' in layer_config:
                 layer_dict['activation'] = layer_config['activation']
             else:
