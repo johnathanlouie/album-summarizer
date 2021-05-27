@@ -39,11 +39,8 @@ class ModelSummaryViewController {
             var architecture = [];
             var architecture2 = [];
             for (let layer of $scope.modelSummary.layers) {
-                switch (layer.layer_type) {
-                    case 'InputLayer':
-                    case 'Conv2D':
-                    case 'BatchNormalization':
-                    case 'MaxPooling2D':
+                switch (layer.input_shape.length) {
+                    case 3:
                         let filter = [1, 1];
                         if (layer.pool_size) { filter = layer.pool_size; }
                         else if (layer.kernel_size) { filter = layer.kernel_size; }
@@ -57,8 +54,7 @@ class ModelSummaryViewController {
                             rel_x: 0,
                         });
                         break;
-                    case 'Flatten':
-                    case 'Dense':
+                    case 1:
                         architecture2.push(layer.input_shape[0]);
                         break;
                     default:
@@ -77,11 +73,8 @@ class ModelSummaryViewController {
             var betweenLayers = [];
             var layerId = 0;
             for (let layer of $scope.modelSummary.layers) {
-                switch (layer.layer_type) {
-                    case 'InputLayer':
-                    case 'Conv2D':
-                    case 'BatchNormalization':
-                    case 'MaxPooling2D':
+                switch (layer.input_shape.length) {
+                    case 3:
                         let filter = [1, 1];
                         if (layer.pool_size) { filter = layer.pool_size; }
                         else if (layer.kernel_size) { filter = layer.kernel_size; }
@@ -96,8 +89,7 @@ class ModelSummaryViewController {
                         });
                         betweenLayers.push(20);
                         break;
-                    case 'Flatten':
-                    case 'Dense':
+                    case 1:
                         architecture2.push(layer.input_shape[0]);
                         break;
                     default:
