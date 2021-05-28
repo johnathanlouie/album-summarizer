@@ -246,9 +246,13 @@ class KerasAdapter(object):
         return self._status.status
 
     def is_complete(self) -> bool:
+        if self._status is None:
+            self._status = TrainingStatusData.load(self._names.status())
         return self._status.is_complete()
 
     def has_error(self) -> bool:
+        if self._status is None:
+            self._status = TrainingStatusData.load(self._names.status())
         return self._status.has_error()
 
     def train(self) -> TrainingStatus:
