@@ -253,10 +253,7 @@ class KerasAdapter(object):
         Trains the model
         """
         if self.is_complete():
-            print('Training completed: %s' % self._names.dirname())
-            return self._status.status
-        else:
-            print('Training: %s' % self._names.dirname())
+            return TrainingStatus.COMPLETE
 
         # Training state
         term = TerminateOnDemand()
@@ -624,6 +621,8 @@ class ModelSplit(object):
             self._epochs,
             self._patience,
         ) as kadapter:
+            if self.is_complete():
+                return TrainingStatus.COMPLETE
             if not kadapter.is_saved():
                 kadapter.create()
             kadapter.load()
