@@ -14,6 +14,10 @@ For Windows users, Anaconda uses scripts, which are blocked by default in Window
 ```
 Set-ExecutionPolicy Bypass
 ```
+Or to get train, evaluate, and reclaim storage space, run this:
+```
+powershell.exe -ExecutionPolicy ByPass -NoExit -Command "& conda activate album; python python/cli.py --all --train --evaluate --removebad"
+```
 
 Run the following in a terminal that has access to Anaconda:
 ```
