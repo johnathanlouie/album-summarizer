@@ -41,7 +41,7 @@ def doSomething(
                 model = model.split(split)
             if train:
                 if model.is_complete():
-                    print('Complete model: %s %s %s %s %s' % (
+                    print('COMPLETE: %s %s %s %s %s' % (
                         architecture,
                         dataset,
                         loss,
@@ -49,7 +49,7 @@ def doSomething(
                         'acc',
                     ))
                 elif model.has_error():
-                    print('Error model: %s %s %s %s %s' % (
+                    print('ERROR: %s %s %s %s %s' % (
                         architecture,
                         dataset,
                         loss,
@@ -57,6 +57,13 @@ def doSomething(
                         'acc',
                     ))
                 else:
+                    print('TRAINING: %s %s %s %s %s' % (
+                        architecture,
+                        dataset,
+                        loss,
+                        optimizer,
+                        'acc',
+                    ))
                     model.train()
             if evaluate:
                 if model.is_complete():
