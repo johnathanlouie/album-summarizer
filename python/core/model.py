@@ -800,7 +800,10 @@ class Model(object):
         return TrainingStatus.COMPLETE
 
     def is_complete(self) -> bool:
-        return self.status() == TrainingStatus.COMPLETE
+        for i in range(self._dataset.splits()):
+            if not self.split(i).is_complete():
+                return False
+        return True
 
     def split(self, num: int) -> ModelSplit:
         """
