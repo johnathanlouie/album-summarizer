@@ -774,6 +774,25 @@ class ModelSplit(object):
         ) as kadapter:
             return kadapter.summary()
 
+    def auto_train(self) -> None:
+        with KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        ) as kadapter:
+            if not kadapter.has_error() and not kadapter.is_complete():
+                if not kadapter.is_saved():
+                    kadapter.create()
+                kadapter.load()
+                kadapter.train()
+            if kadapter.has_error():
+                kadapter.delete(keep_history=True)
+            elif kadapter.is_complete():
+                kadapter.evaluate_training_set()
+                kadapter.evaluate_validation_set()
+                kadapter.evaluate_test_set()
+
 
 class BadModelSettings(ValueError):
     pass

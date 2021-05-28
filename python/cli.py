@@ -39,40 +39,43 @@ def doSomething(
         else:
             if split != None:
                 model = model.split(split)
-            if train:
-                if model.is_complete():
-                    print('COMPLETE: %s %s %s %s %s' % (
-                        architecture,
-                        dataset,
-                        loss,
-                        optimizer,
-                        'acc',
-                    ))
-                elif model.has_error():
-                    print('ERROR: %s %s %s %s %s' % (
-                        architecture,
-                        dataset,
-                        loss,
-                        optimizer,
-                        'acc',
-                    ))
-                else:
-                    print('TRAINING: %s %s %s %s %s' % (
-                        architecture,
-                        dataset,
-                        loss,
-                        optimizer,
-                        'acc',
-                    ))
-                    model.train()
-            if evaluate:
-                if model.is_complete():
-                    model.evaluate_training_set()
-                    model.evaluate_validation_set()
-                    model.evaluate_test_set()
-            if remove_bad:
-                if model.has_error():
-                    model.delete(True)
+            if train and evaluate and remove_bad:
+                model.auto_train()
+            else:
+                if train:
+                    if model.is_complete():
+                        print('COMPLETE: %s %s %s %s %s' % (
+                            architecture,
+                            dataset,
+                            loss,
+                            optimizer,
+                            'acc',
+                        ))
+                    elif model.has_error():
+                        print('ERROR: %s %s %s %s %s' % (
+                            architecture,
+                            dataset,
+                            loss,
+                            optimizer,
+                            'acc',
+                        ))
+                    else:
+                        print('TRAINING: %s %s %s %s %s' % (
+                            architecture,
+                            dataset,
+                            loss,
+                            optimizer,
+                            'acc',
+                        ))
+                        model.train()
+                if evaluate:
+                    if model.is_complete():
+                        model.evaluate_training_set()
+                        model.evaluate_validation_set()
+                        model.evaluate_test_set()
+                if remove_bad:
+                    if model.has_error():
+                        model.delete(True)
     except core.model.BadModelSettings:
         print("IGNORE: %s %s %s %s" % (architecture, dataset, loss, optimizer))
 
