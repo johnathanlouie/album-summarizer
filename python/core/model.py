@@ -248,11 +248,14 @@ class KerasAdapter(object):
                 return TrainingStatus.PENDING
         return self._status.status
 
+    def is_complete(self) -> bool:
+        return self._status.is_complete()
+
     def train(self) -> TrainingStatus:
         """
         Trains the model
         """
-        if self._status.is_complete():
+        if self.is_complete():
             print('Training completed: %s' % self._names.dirname())
             return self._status.status
         else:
