@@ -248,6 +248,9 @@ class KerasAdapter(object):
     def is_complete(self) -> bool:
         return self._status.is_complete()
 
+    def has_error(self) -> bool:
+        return self._status.has_error()
+
     def train(self) -> TrainingStatus:
         """
         Trains the model
@@ -609,7 +612,13 @@ class ModelSplit(object):
             return kadapter.is_complete()
 
     def has_error(self) -> bool:
-        return self.status() not in [TrainingStatus.TRAINING, TrainingStatus.COMPLETE, TrainingStatus.PENDING]
+        with KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        ) as kadapter:
+            return kadapter.has_error()
 
     def train(self) -> TrainingStatus:
         """
