@@ -518,7 +518,8 @@ class KerasAdapter(object):
         """
         try:
             print()
-            self._status = TrainingStatusData.load(self._names.status())
+            if self._status == None:
+                self._status = TrainingStatusData.load(self._names.status())
             self._is_best = best_snapshot
             # print('Compiling architecture')
             self._kmodel = self._architecture.compile(self._res, self._data.classes)
