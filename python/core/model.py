@@ -604,7 +604,13 @@ class ModelSplit(object):
             return kadapter.status()
 
     def is_complete(self) -> bool:
-        return self.status() == TrainingStatus.COMPLETE
+        with KerasAdapter(
+            self._architecture,
+            self._data,
+            self._epochs,
+            self._patience,
+        ) as kadapter:
+            return kadapter.is_complete()
 
     def has_error(self) -> bool:
         return self.status() not in [TrainingStatus.TRAINING, TrainingStatus.COMPLETE, TrainingStatus.PENDING]
