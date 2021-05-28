@@ -242,10 +242,7 @@ class KerasAdapter(object):
 
     def status(self) -> TrainingStatus:
         if self._status is None:
-            try:
-                self._status = TrainingStatusData.load(self._names.status())
-            except:
-                return TrainingStatus.PENDING
+            self._status = TrainingStatusData.load(self._names.status())
         return self._status.status
 
     def is_complete(self) -> bool:
@@ -457,7 +454,8 @@ class KerasAdapter(object):
         try:
             # Training status
             mkdirs(self._names.dirname())
-            self._status = TrainingStatusData(self._names.status())
+            if self._status == None:
+                self._status = TrainingStatusData.load(self._names.status())
             self._status.status = TrainingStatus.TRAINING
             self._status.save()
 

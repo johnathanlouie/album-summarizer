@@ -60,7 +60,7 @@ class TrainingStatusData(object):
     """
 
     def __init__(self, url: Url):
-        self.status: TrainingStatus = TrainingStatus.TRAINING
+        self.status: TrainingStatus = TrainingStatus.PENDING
         self._url: Url = url
 
     def save(self, verbose: bool = True) -> None:
@@ -73,7 +73,7 @@ class TrainingStatusData(object):
         return self.status == TrainingStatus.COMPLETE
 
     def has_error(self) -> bool:
-        return self.status not in [TrainingStatus.TRAINING, TrainingStatus.COMPLETE]
+        return self.status not in [TrainingStatus.TRAINING, TrainingStatus.COMPLETE, TrainingStatus.PENDING]
 
     def delete(self) -> None:
         os.remove(self._url)
@@ -82,10 +82,13 @@ class TrainingStatusData(object):
     def load(cls, url: Url, verbose: bool = True) -> TrainingStatusData:
         if verbose:
             print('Loading %s' % url)
-        with open(url) as f:
-            self = cls(url)
-            self.status = TrainingStatus(f.read())
-            return self
+        try:
+            with open(url) as f:
+                self = cls(url)
+                self.status = TrainingStatus(f.read())
+                return self
+        except FileNotFoundError:
+            return cls(url)
 
 
 class PickleAbstractClass(ABC):
