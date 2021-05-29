@@ -23,8 +23,6 @@ def doSomething(
         remove_bad=False
 ):
     try:
-        print()
-        print()
         model = core.modelbuilder.ModelBuilder.create(
             architecture,
             dataset,
@@ -34,6 +32,8 @@ def doSomething(
             epochs,
             patience,
         )
+        print()
+        print()
         if summary:
             model.summary()
         else:
@@ -107,7 +107,6 @@ def main():
         print('Metrics')
         for i in core.modelbuilder.ModelBuilder.METRICS.keys():
             print(' - %s' % i)
-        print()
     elif args.model != None:
         try:
             with open(args.model) as f:
@@ -130,7 +129,6 @@ def main():
             print("MISSING: %s" % args.model)
     elif args.all:
         for architecture, dataset, loss, optimizer in core.modelbuilder.ModelBuilder.builds():
-            print()
             doSomething(
                 architecture,
                 dataset,
