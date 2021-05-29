@@ -153,7 +153,7 @@ class Evaluation(dict):
 
     def save(self, url: Url, verbose: bool = True) -> None:
         if verbose:
-            print('Saving %s' % url)
+            print('SAVING: %s' % url)
         with open(url, 'w') as f:
             json.dump(self, f)
 
@@ -312,7 +312,7 @@ class KerasAdapter(object):
         seq2 = Sequence1(x2, y2, self._res, self._batch)
 
         # Training
-        print('Training starting: %s\n' % self._names.dirname())
+        print('TRAINING: %s\n' % self._names.dirname())
         try:
             self._kmodel.fit_generator(
                 generator=seq1,
@@ -477,7 +477,7 @@ class KerasAdapter(object):
 
             # Latest snapshot
             mkdirs(self._names.latest.dirname)
-            print('Saving %s' % self._names.latest.weights())
+            print('SAVING: %s' % self._names.latest.weights())
             self._kmodel.save_weights(self._names.latest.weights())
             mcp.save(self._names.latest.mcp())
             lr.save(self._names.latest.lr())
@@ -485,7 +485,7 @@ class KerasAdapter(object):
 
             # Best snapshot
             mkdirs(self._names.best.dirname)
-            print('Saving %s' % self._names.best.weights())
+            print('SAVING: %s' % self._names.best.weights())
             self._kmodel.save_weights(self._names.best.weights())
             mcp.save(self._names.best.mcp())
             lr.save(self._names.best.lr())
@@ -512,7 +512,7 @@ class KerasAdapter(object):
         ]
         for filename in files:
             if not isfile(filename):
-                print('Missing %s' % filename)
+                print('MISSING: %s' % filename)
                 return False
         return True
 
@@ -528,10 +528,10 @@ class KerasAdapter(object):
             # print('Compiling architecture')
             self._kmodel = self._architecture.compile(self._res, self._data.classes)
             if best_snapshot:
-                print('Loading %s' % self._names.best.weights())
+                print('LOADING: %s' % self._names.best.weights())
                 self._kmodel.load_weights(self._names.best.weights())
             else:
-                print('Loading %s' % self._names.latest.weights())
+                print('LOADING: %s' % self._names.latest.weights())
                 self._kmodel.load_weights(self._names.latest.weights())
         except tf.errors.ResourceExhaustedError:
             print('\nTraining resource exhaustion: %s' % self._names.dirname())
@@ -548,24 +548,24 @@ class KerasAdapter(object):
             files = self._names.list_all()
         for f in files:
             try:
-                print("DELETE: %s" % f)
+                print("DELETING: %s" % f)
                 os.remove(f)
             except:
                 pass
         if keep_history:
             try:
-                print("DELETE: %s" % self._names.best.dirname())
+                print("DELETING: %s" % self._names.best.dirname())
                 os.rmdir(self._names.best.dirname())
             except:
                 pass
             try:
-                print("DELETE: %s" % self._names.latest.dirname())
+                print("DELETING: %s" % self._names.latest.dirname())
                 os.rmdir(self._names.latest.dirname())
             except:
                 pass
         else:
             try:
-                print("DELETE: %s" % self._names.dirname())
+                print("DELETING: %s" % self._names.dirname())
                 os.rmdir(self._names.dirname())
             except:
                 pass
