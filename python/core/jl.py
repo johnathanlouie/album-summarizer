@@ -20,7 +20,7 @@ def npsave(name: str, data: ArrayLike, verbose: bool = True) -> None:
     url = "out/%s" % name
     mkdirname(url)
     if verbose:
-        print('Saving %s.npy' % url)
+        print('SAVING: %s.npy' % url)
     return save(url, data)
 
 
@@ -30,7 +30,7 @@ def npload(name: str, verbose: bool = True) -> ArrayLike:
     """
     url = 'out/%s.npy' % name
     if verbose:
-        print('Loading %s' % url)
+        print('LOADING: %s' % url)
     return load(url, allow_pickle=True)
 
 
@@ -89,7 +89,7 @@ def mkdirs(path: Url, verbose: bool = True) -> None:
     Make all directories in a path including the child.
     """
     if verbose:
-        print('Making %s' % path)
+        print('CREATING: %s' % path)
     makedirs(path, exist_ok=True)
 
 
@@ -258,7 +258,7 @@ class Stopwatch(object):
         Prints the time elapsed in minutes and seconds.
         """
         minutes, sec = divmod(self.elapsed(), 60)
-        print('time: %d:%02d' % (minutes, sec))
+        print('TIME: %d:%02d' % (minutes, sec))
         return
 
     def reset(self) -> None:
