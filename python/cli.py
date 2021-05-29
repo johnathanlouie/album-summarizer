@@ -109,22 +109,25 @@ def main():
             print(' - %s' % i)
         print()
     elif args.model != None:
-        with open(args.model) as f:
-            settings: Dict[str, str] = json.load(f)
-            doSomething(
-                settings['architecture'],
-                settings['dataset'],
-                settings['loss'],
-                settings['optimizer'],
-                settings['metrics'],
-                settings['epochs'],
-                settings['patience'],
-                settings.get('split'),
-                args.summary,
-                args.train,
-                args.evaluate,
-                args.removebad,
-            )
+        try:
+            with open(args.model) as f:
+                settings: Dict[str, str] = json.load(f)
+                doSomething(
+                    settings['architecture'],
+                    settings['dataset'],
+                    settings['loss'],
+                    settings['optimizer'],
+                    settings['metrics'],
+                    settings['epochs'],
+                    settings['patience'],
+                    settings.get('split'),
+                    args.summary,
+                    args.train,
+                    args.evaluate,
+                    args.removebad,
+                )
+        except FileNotFoundError:
+            print("MISSING: %s" % args.model)
     elif args.all:
         for architecture, dataset, loss, optimizer in core.modelbuilder.ModelBuilder.builds():
             print()
