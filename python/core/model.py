@@ -464,7 +464,7 @@ class KerasAdapter(object):
             self._status.save()
 
             # Blank model and training state
-            kmodel = self._architecture.compile(self._res, self._data.classes)
+            self._kmodel = self._architecture.compile(self._res, self._data.classes)
             if self._total_epochs == 0:
                 mcp = ModelCheckpoint2Pickle(ModelCheckpoint2(patience=10))
             else:
@@ -478,7 +478,7 @@ class KerasAdapter(object):
             # Latest snapshot
             mkdirs(self._names.latest.dirname)
             print('Saving %s' % self._names.latest.weights())
-            kmodel.save_weights(self._names.latest.weights())
+            self._kmodel.save_weights(self._names.latest.weights())
             mcp.save(self._names.latest.mcp())
             lr.save(self._names.latest.lr())
             epoch.save(self._names.latest.epoch())
@@ -486,7 +486,7 @@ class KerasAdapter(object):
             # Best snapshot
             mkdirs(self._names.best.dirname)
             print('Saving %s' % self._names.best.weights())
-            kmodel.save_weights(self._names.best.weights())
+            self._kmodel.save_weights(self._names.best.weights())
             mcp.save(self._names.best.mcp())
             lr.save(self._names.best.lr())
             epoch.save(self._names.best.epoch())
@@ -574,6 +574,7 @@ class KerasAdapter(object):
         """
         Clears Keras model from memory.
         """
+        self._kmodel = None
         clear_session()
         gc.collect()
 
@@ -638,7 +639,8 @@ class ModelSplit(object):
                 return TrainingStatus.COMPLETE
             if not kadapter.is_saved():
                 kadapter.create()
-            kadapter.load()
+            else:
+                kadapter.load()
             return kadapter.train()
 
     def evaluate_training_set(self) -> Dict[str, float]:
@@ -788,7 +790,8 @@ class ModelSplit(object):
             if not kadapter.has_error() and not kadapter.is_complete():
                 if not kadapter.is_saved():
                     kadapter.create()
-                kadapter.load()
+                else:
+                    kadapter.load()
                 kadapter.train()
             if kadapter.has_error():
                 kadapter.delete(keep_history=True)
