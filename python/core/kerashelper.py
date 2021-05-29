@@ -65,7 +65,7 @@ class TrainingStatusData(object):
 
     def save(self, verbose: bool = True) -> None:
         if verbose:
-            print('Saving %s' % self._url)
+            print('SAVING: %s' % self._url)
         with open(self._url, 'w') as f:
             f.write(self.status.value)
 
@@ -81,7 +81,7 @@ class TrainingStatusData(object):
     @classmethod
     def load(cls, url: Url, verbose: bool = True) -> TrainingStatusData:
         if verbose:
-            print('Loading %s' % url)
+            print('LOADING: %s' % url)
         try:
             with open(url) as f:
                 self = cls(url)
@@ -101,13 +101,13 @@ class PickleAbstractClass(ABC):
 
     def save(self, save_location: Url, verbose: bool = True) -> None:
         if verbose:
-            print('Saving %s' % save_location)
+            print('SAVING: %s' % save_location)
         dill.dump(self, open(save_location, 'wb'))
 
     @staticmethod
     def load(save_location: Url, verbose: bool = True) -> PickleAbstractClass:
         if verbose:
-            print('Loading %s' % save_location)
+            print('LOADING: %s' % save_location)
         return dill.load(open(save_location, 'rb'))
 
 
@@ -195,7 +195,7 @@ class SaveKmodelObserver(CheckpointObserver):
         epoch: int = None,
         batch: int = None,
     ) -> None:
-        print('Saving %s' % self._url)
+        print('SAVING: %s' % self._url)
         kmodel.save_weights(self._url, overwrite=True)
 
 
