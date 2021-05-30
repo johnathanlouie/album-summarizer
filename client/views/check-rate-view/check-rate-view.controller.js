@@ -5,7 +5,11 @@ import ModalService from '../../services/modal.service.js';
 import QueryServerService from '../../services/query-server.service.js';
 import FocusImageService from '../../services/focus-image.service.js';
 
-
+/**
+ * 
+ * @param {Array.<number>} a 
+ * @returns 
+ */
 function maxIndex(a) {
     return a.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
 }
@@ -66,6 +70,41 @@ class Prediction {
 }
 
 
+class ConfusionMatrix {
+
+    classes = [];
+    container = [];
+
+    /**
+     * 
+     * @param {Array.<string>} classes 
+     */
+    constructor(classes) {
+        this.classes = classes;
+        this.container = classes.map(() => classes.map(() => 0));
+        // for (let m in classes) {
+        //     let row = [];
+        //     for (let n in classes) {
+        //         row.push(0);
+        //     }
+        //     this.container.push(row);
+        // }
+    }
+
+    /**
+     * 
+     * @param {number} truth 
+     * @param {number} predicted 
+     */
+    add(truth, predicted) {
+        if (!Number.isInteger(truth)) { throw new TypeError(); }
+        if (!Number.isInteger(predicted)) { throw new TypeError(); }
+        this.container[truth][predicted]++;
+    }
+
+}
+
+
 class CheckRateViewController {
 
     static $inject = ['$scope', 'options', 'modal', 'queryServer', 'focusImage'];
@@ -80,6 +119,7 @@ class CheckRateViewController {
     constructor($scope, options, modal, queryServer, focusImage) {
 
         $scope.options = options;
+        $scope.confusionMatrix = null;
 
         function loadOptions() {
             modal.showLoading('RETRIEVING...');
@@ -98,12 +138,16 @@ class CheckRateViewController {
         $scope.submit = function () {
             modal.showLoading('PREDICTING...');
             $scope.prediction = [];
-            $scope.keyGuide = null;
+            $scope.keyGuide = [];
+            $scope.confusionMatrix = null;
             return queryServer.predict($scope.selectedOptions).then(
                 response => {
                     $scope.keyGuide = response.keyGuide;
                     if ($scope.keyGuide.length === 0) {
                         response.prediction.y.predicted = _.flatten(response.prediction.y.predicted);
+                    }
+                    else {
+                        $scope.confusionMatrix = new ConfusionMatrix(response.keyGuide);
                     }
                     for (let i in response.prediction.x) {
                         $scope.prediction.push(new Prediction(
@@ -112,6 +156,12 @@ class CheckRateViewController {
                             response.prediction.y.truth[i],
                             response.keyGuide,
                         ));
+                        if (response.keyGuide.length > 0) {
+                            $scope.confusionMatrix.add(
+                                maxIndex(response.prediction.y.truth[i]),
+                                maxIndex(response.prediction.y.predicted[i]),
+                            );
+                        }
                     }
                     modal.hideLoading();
                 },
