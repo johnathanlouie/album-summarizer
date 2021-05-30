@@ -1,4 +1,5 @@
 const angular = require('angular');
+const _ = require('lodash');
 import OptionsService from '../../services/options.service.js';
 import ModalService from '../../services/modal.service.js';
 import QueryServerService from '../../services/query-server.service.js';
@@ -53,14 +54,18 @@ class Prediction {
 
     constructor(x, yPred, yTruth, keyGuide) {
         this.x = x;
-        if (keyGuide === null) {
+        if (keyGuide.length === 0) {
+            console.log('asdf');
             this.y.truth = yTruth;
             this.y.predicted = yPred;
         }
         else {
+            console.log('456');
             this.y.truth = new OneHot(yTruth, keyGuide);
             this.y.predicted = new OneHot(yPred, keyGuide);
         }
+        console.log(this.y.truth);
+        console.log(this.y.predicted);
     }
 }
 

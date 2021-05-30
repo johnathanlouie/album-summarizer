@@ -89,12 +89,12 @@
                         ng-src="{{ datum.x | fileUrl }}" style="max-width: 300px; max-height: 300px;">
                 </td>
                 <td>
-                    <div ng-if="keyGuide === null">{{ datum.y.truth }}</div>
-                    <div ng-if="keyGuide !== null">{{ datum.y.truth.label }}</div>
+                    <div ng-if="keyGuide.length === 0">{{ datum.y.truth }}</div>
+                    <div ng-if="keyGuide.length > 0">{{ datum.y.truth.label }}</div>
                 </td>
                 <td>
-                    <div ng-if="keyGuide === null">{{ datum.y.predicted }}</div>
-                    <table class="table table-borderless" ng-if="keyGuide !== null">
+                    <div ng-if="keyGuide.length === 0">{{ datum.y.predicted }}</div>
+                    <table class="table table-borderless" ng-if="keyGuide.length > 0">
                         <tr ng-repeat="oneHotValue in datum.y.predicted.arr" class="bg-transparent">
                             <th scope="row" class="col-auto">{{ oneHotValue.name }}</th>
                             <td class="text-right col-auto">{{ oneHotValue.percentage | number : 3 }}%</td>
