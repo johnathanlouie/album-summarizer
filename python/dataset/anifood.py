@@ -68,21 +68,17 @@ class CccafDataSet(DataSet):
         """
         Returns the relative url of the image from the filename.
         """
-        a = join(getcwd(), 'data', 'cc', url)
-        return normpath(a)
+        return normpath(join(getcwd(), 'data', 'cc', url))
 
     def _x(self) -> ndarray:
         """
         Returns an array of URLs to the images.
         Combines the 3 sources together.
         """
-        data_file = CcDataFile()
-        x = data_file.url()
-        x = [self._relative_url(i) for i in x]
+        x1 = [self._relative_url(i) for i in CcDataFile().url()]
         x2 = AnimalCollection().jpeg(True, self._animal_num)
         x3 = FoodCollection().jpeg(True, self._food_num)
-        x4 = x + x2 + x3
-        return asarray(x4)
+        return asarray(x1 + x2 + x3)
 
     def _y(self) -> ndarray:
         """

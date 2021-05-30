@@ -107,17 +107,13 @@ class Cc(DataSet):
         """
         Returns the relative url of the image from the filename.
         """
-        a = join(getcwd(), 'data', 'cc', url)
-        return normpath(a)
+        return normpath(join(getcwd(), 'data', 'cc', url))
 
     def _x(self) -> ndarray:
         """
         Returns an array of URLs to the images.
         """
-        data_file = CcDataFile()
-        x = data_file.url()
-        x = [self._relative_url(i) for i in x]
-        return asarray(x)
+        return asarray([self._relative_url(i) for i in CcDataFile().url()])
 
     @abstractmethod
     def _y(self) -> ndarray:
@@ -253,9 +249,7 @@ class CcrCategorical(Cc):
         """
         Returns the Y as one hot arrays.
         """
-        data_file = CcDataFile()
-        y = data_file.rating()
-        y = [i - 1 for i in y]
+        y = [i - 1 for i in CcDataFile().rating()]
         y = asarray(y)
         y = self.one_hot(y, 3)
         return y
