@@ -207,7 +207,7 @@ if __name__ == '__main__':
                 settings['patience'],
             )
             split = model.split(settings['split'])
-            key_guide = ModelBuilder.DATASETS[settings['dataset']].key_guide()
+            key_guide = ModelBuilder.DATASETS[settings['dataset']].classes()
             if settings['phase'] == 'training':
                 results = split.predict_training_set(False).get_dict()
             elif settings['phase'] == 'validation':

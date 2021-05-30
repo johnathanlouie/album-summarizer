@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from keras.utils import to_categorical
 from numpy import ndarray
@@ -291,5 +291,5 @@ class DataSet(ABC):
         pass
 
     @staticmethod
-    def key_guide() -> Optional[List[str]]:
-        return None
+    def classes() -> List[str]:
+        return list()

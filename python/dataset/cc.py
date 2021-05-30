@@ -179,7 +179,7 @@ class Ccc(Cc):
         return CccLabelTranslator()
 
     @staticmethod
-    def key_guide() -> Optional[List[str]]:
+    def classes() -> List[str]:
         return CcDataFile.CLASSES.copy()
 
 
@@ -267,7 +267,7 @@ class CcrCategorical(Cc):
         return CcrcLabelTranslator()
 
     @staticmethod
-    def key_guide() -> Optional[List[str]]:
+    def classes() -> List[str]:
         return ['bad', 'average', 'good']
 
 

@@ -124,7 +124,7 @@ class CccafDataSet(DataSet):
         return CccafLabelTranslator()
 
     @staticmethod
-    def key_guide() -> Optional[List[str]]:
+    def classes() -> List[str]:
         return CcDataFile.CLASSES.copy()
 
 
