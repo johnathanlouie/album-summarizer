@@ -122,6 +122,7 @@ class StatusViewController {
         $scope.evaluations = this.evaluations;
         $scope.removeMongoDbDuplicates = () => this.#removeMongoDbDuplicates();
         $scope.reevaluatePending = () => this.#reevaluatePending();
+        $scope.comparator = (actual, expected) => this.#comparator(actual, expected);
 
         $scope.retry = () => this.#retry();
 
@@ -305,6 +306,13 @@ class StatusViewController {
     #retry() {
         $('#staticBackdrop').modal('hide');
         return this.#preInit();
+    }
+
+    #comparator(actual, expected) {
+        if (expected === '') {
+            return true;
+        }
+        return actual === expected;
     }
 
 }

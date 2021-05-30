@@ -138,7 +138,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="eval_ in evaluations.toArray() | filter : search | orderBy : sort.phase : sort.reverse">
+            <tr ng-repeat="eval_ in evaluations.toArray() | filter : search : comparator | orderBy : sort.phase : sort.reverse">
                 <td>
                     <pre><code>{{ eval_.model | json }}</code></pre>
                 </td>
