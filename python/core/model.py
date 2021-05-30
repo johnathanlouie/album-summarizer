@@ -350,12 +350,20 @@ class KerasAdapter(object):
         )
         return {metric: scalar for metric, scalar in zip(self._kmodel.metrics_names, results)}
 
+    def is_evaluate_training_set_cached(self) -> bool:
+        return os.path.exists(self._names.training_set_evaluation_cache())
+
+    def is_evaluate_validation_set_cached(self) -> bool:
+        return os.path.exists(self._names.validation_set_evaluation_cache())
+
+    def is_evaluate_test_set_cached(self) -> bool:
+        return os.path.exists(self._names.test_set_evaluation_cache())
+
     def evaluate_training_set(self) -> Dict[str, float]:
         """
         Evaluates the model using the training set
         """
         filepath = self._names.training_set_evaluation_cache()
-        mkdirname(filepath)
         if os.path.exists(filepath):
             print("LOADING: %s" % filepath)
             with open(filepath, 'rb') as f:
@@ -363,6 +371,7 @@ class KerasAdapter(object):
         x = self._data.train().x().load()
         y = self._data.train().y().load()
         results = self.evaluate(x, y)
+        mkdirname(filepath)
         print("SAVING: %s" % filepath)
         with open(filepath, 'wb') as f:
             dill.dump(results, f)
@@ -373,7 +382,6 @@ class KerasAdapter(object):
         Evaluates the model using the validation set
         """
         filepath = self._names.validation_set_evaluation_cache()
-        mkdirname(filepath)
         if os.path.exists(filepath):
             print("LOADING: %s" % filepath)
             with open(filepath, 'rb') as f:
@@ -381,6 +389,7 @@ class KerasAdapter(object):
         x = self._data.validation().x().load()
         y = self._data.validation().y().load()
         results = self.evaluate(x, y)
+        mkdirname(filepath)
         print("SAVING: %s" % filepath)
         with open(filepath, 'wb') as f:
             dill.dump(results, f)
@@ -391,7 +400,6 @@ class KerasAdapter(object):
         Evaluates the model using the test set
         """
         filepath = self._names.test_set_evaluation_cache()
-        mkdirname(filepath)
         if os.path.exists(filepath):
             print("LOADING: %s" % filepath)
             with open(filepath, 'rb') as f:
@@ -399,6 +407,7 @@ class KerasAdapter(object):
         x = self._data.test().x().load()
         y = self._data.test().y().load()
         results = self.evaluate(x, y)
+        mkdirname(filepath)
         print("SAVING: %s" % filepath)
         with open(filepath, 'wb') as f:
             dill.dump(results, f)
@@ -657,7 +666,8 @@ class ModelSplit(object):
         ) as kadapter:
             if not kadapter.is_saved():
                 raise ModelStateMissingError()
-            kadapter.load()
+            if not kadapter.is_evaluate_training_set_cached():
+                kadapter.load()
             return kadapter.evaluate_training_set()
 
     def evaluate_validation_set(self) -> Dict[str, float]:
@@ -674,7 +684,8 @@ class ModelSplit(object):
         ) as kadapter:
             if not kadapter.is_saved():
                 raise ModelStateMissingError()
-            kadapter.load()
+            if not kadapter.is_evaluate_validation_set_cached():
+                kadapter.load()
             return kadapter.evaluate_validation_set()
 
     def evaluate_test_set(self) -> Dict[str, float]:
@@ -691,7 +702,8 @@ class ModelSplit(object):
         ) as kadapter:
             if not kadapter.is_saved():
                 raise ModelStateMissingError()
-            kadapter.load()
+            if not kadapter.is_evaluate_test_set_cached():
+                kadapter.load()
             return kadapter.evaluate_test_set()
 
     def predict(self, images: List[Url], simple: bool) -> Prediction:
