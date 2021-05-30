@@ -129,7 +129,7 @@ class Evaluation(dict):
 
     def __init__(self):
         super().__init__()
-        self['splits']: List[Dict[str, float]] = list()
+        self['splits'] = list()
         self['mean'] = dict()
 
     def append(self, resultx: Dict[str, float]) -> None:
