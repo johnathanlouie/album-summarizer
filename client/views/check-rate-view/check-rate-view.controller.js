@@ -82,13 +82,6 @@ class ConfusionMatrix {
     constructor(classes) {
         this.classes = classes;
         this.container = classes.map(() => classes.map(() => 0));
-        // for (let m in classes) {
-        //     let row = [];
-        //     for (let n in classes) {
-        //         row.push(0);
-        //     }
-        //     this.container.push(row);
-        // }
     }
 
     /**
