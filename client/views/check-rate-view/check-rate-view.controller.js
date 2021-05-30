@@ -101,7 +101,7 @@ class CheckRateViewController {
             return queryServer.predict($scope.selectedOptions).then(
                 response => {
                     $scope.keyGuide = response.keyGuide;
-                    if ($scope.keyGuide === null) {
+                    if ($scope.keyGuide.length === 0) {
                         response.prediction.y.predicted = _.flatten(response.prediction.y.predicted);
                     }
                     for (let i in response.prediction.x) {
