@@ -209,11 +209,11 @@ if __name__ == '__main__':
             split = model.split(settings['split'])
             key_guide = ModelBuilder.DATASETS[settings['dataset']].classes()
             if settings['phase'] == 'training':
-                results = split.predict_training_set(False).get_dict()
+                results = split.predict_training_set(False)
             elif settings['phase'] == 'validation':
-                results = split.predict_validation_set(False).get_dict()
+                results = split.predict_validation_set(False)
             elif settings['phase'] == 'test':
-                results = split.predict_test_set(False).get_dict()
+                results = split.predict_test_set(False)
             else:
                 response = flask.Response()
                 response.status_code = 400
@@ -221,7 +221,13 @@ if __name__ == '__main__':
                 return response
             return flask.jsonify({
                 'keyGuide': key_guide,
-                'prediction': results,
+                'prediction': results.get_dict(),
+                'metrics': {
+                    'accuracy': results.accuracy(),
+                    'recall': results.recall(),
+                    'precision': results.precision(),
+                    'f1': results.f1(),
+                },
             })
         except TrainingIncompleteException:
             response = flask.Response()

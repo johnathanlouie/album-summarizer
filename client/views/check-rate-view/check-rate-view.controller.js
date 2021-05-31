@@ -82,6 +82,7 @@ class ConfusionMatrix {
 
     classes = [];
     container = [];
+    total = 0;
 
     /**
      * 
@@ -101,6 +102,39 @@ class ConfusionMatrix {
         if (!Number.isInteger(truth)) { throw new TypeError(); }
         if (!Number.isInteger(predicted)) { throw new TypeError(); }
         this.container[truth][predicted]++;
+        this.total++;
+    }
+
+    accuracy() {
+        let right = 0;
+        for (let i = 0; i < this.container.length; i++) {
+            right += this.container[i][i];
+        }
+        return right / this.total;
+    }
+
+    recall() {
+        let total = 0;
+        for (let i = 0; i < this.container.length; i++) {
+            total += this.container[i][i] / this.container[i].reduce((total, value) => total + value);
+        }
+        return total / this.classes.length;
+    }
+
+    precision() {
+        let total = 0;
+        for (let i = 0; i < this.container.length; i++) {
+            let colSum = 0;
+            for (let j = 0; j < this.container.length; j++) {
+                colSum += this.container[j][i];
+            }
+            total += this.container[i][i] / colSum;
+        }
+        return total / this.classes.length;
+    }
+
+    f1() {
+        return 2 * this.precision() * this.recall() / (this.precision() + this.recall());
     }
 
 }
@@ -141,10 +175,12 @@ class CheckRateViewController {
             modal.showLoading('PREDICTING...');
             $scope.prediction = [];
             $scope.keyGuide = [];
+            $scope.metrics = null;
             $scope.confusionMatrix = null;
             return queryServer.predict($scope.selectedOptions).then(
                 response => {
                     $scope.keyGuide = response.keyGuide;
+                    $scope.metrics = response.metrics;
                     if ($scope.keyGuide.length === 0) {
                         response.prediction.y.predicted = _.flatten(response.prediction.y.predicted);
                     }
@@ -187,7 +223,11 @@ class CheckRateViewController {
             split: 0,
         };
 
-        Object.assign($scope.selectedOptions, $location.search());
+        let inputOptions = $location.search();
+        if ('epochs' in inputOptions) { inputOptions.epochs = Number(inputOptions.epochs); }
+        if ('patience' in inputOptions) { inputOptions.patience = Number(inputOptions.patience); }
+        if ('split' in inputOptions) { inputOptions.split = Number(inputOptions.split); }
+        Object.assign($scope.selectedOptions, inputOptions);
 
         $scope.retry = function () {
             $('#staticBackdrop').modal('hide');

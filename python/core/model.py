@@ -10,7 +10,9 @@ import keras.models
 import tensorflow as tf
 from keras.backend import clear_session
 from keras.callbacks import CSVLogger, ReduceLROnPlateau
-from numpy import asarray, ndarray
+from numpy import argmax, asarray, ndarray
+from sklearn.metrics import (accuracy_score, f1_score, precision_score,
+                             recall_score)
 
 from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
@@ -180,6 +182,42 @@ class Prediction(object):
                 'truth': self.y.truth,
             },
         }
+
+    def accuracy(self) -> float:
+        truth = self.y.truth
+        predicted = self.y.predicted
+        if type(self.y.truth[0]) == list:
+            truth = asarray(self.y.truth).argmax(1)
+        if type(self.y.predicted[0]) == list:
+            predicted = asarray(self.y.predicted).argmax(1)
+        return accuracy_score(y_true=truth, y_pred=predicted)
+
+    def f1(self) -> float:
+        truth = self.y.truth
+        predicted = self.y.predicted
+        if type(self.y.truth[0]) == list:
+            truth = asarray(self.y.truth).argmax(1)
+        if type(self.y.predicted[0]) == list:
+            predicted = asarray(self.y.predicted).argmax(1)
+        return f1_score(y_true=truth, y_pred=predicted, average='macro')
+
+    def recall(self) -> float:
+        truth = self.y.truth
+        predicted = self.y.predicted
+        if type(self.y.truth[0]) == list:
+            truth = asarray(self.y.truth).argmax(1)
+        if type(self.y.predicted[0]) == list:
+            predicted = asarray(self.y.predicted).argmax(1)
+        return recall_score(y_true=truth, y_pred=predicted, average='macro')
+
+    def precision(self) -> float:
+        truth = self.y.truth
+        predicted = self.y.predicted
+        if type(self.y.truth[0]) == list:
+            truth = asarray(self.y.truth).argmax(1)
+        if type(self.y.predicted[0]) == list:
+            predicted = asarray(self.y.predicted).argmax(1)
+        return precision_score(y_true=truth, y_pred=predicted, average='macro')
 
     def save_as_list(self, url: Url) -> None:
         """
