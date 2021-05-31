@@ -102,6 +102,10 @@ class RouteManager {
         return RouteManager.ROUTES.find(element => element.view === '<check-rate-view></check-rate-view>');
     }
 
+    static modelSummary() {
+        return RouteManager.ROUTES.find(element => element.view === '<model-summary-view></model-summary-view>');
+    }
+
 }
 
 

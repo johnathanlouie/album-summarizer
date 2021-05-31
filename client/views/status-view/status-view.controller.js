@@ -129,6 +129,7 @@ class StatusViewController {
         $scope.reevaluatePending = () => this.#reevaluatePending();
         $scope.comparator = (actual, expected) => this.#comparator(actual, expected);
         $scope.inspect = model => this.#inspect(model);
+        $scope.draw = model => this.#draw(model);
 
         $scope.retry = () => this.#retry();
 
@@ -327,6 +328,15 @@ class StatusViewController {
      */
     #inspect(model) {
         this.$location.path(RouteManager.checkRate().path);
+        this.$location.search(model);
+    }
+
+    /**
+     * 
+     * @param {ModelDescription} model 
+     */
+    #draw(model) {
+        this.$location.path(RouteManager.modelSummary().path);
         this.$location.search(model);
     }
 

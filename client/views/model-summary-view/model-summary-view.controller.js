@@ -6,15 +6,16 @@ import QueryServerService from '../../services/query-server.service.js';
 
 class ModelSummaryViewController {
 
-    static $inject = ['$scope', 'options', 'modal', 'queryServer'];
+    static $inject = ['$scope', '$location', 'options', 'modal', 'queryServer'];
 
     /**
      * @param {angular.IScope} $scope 
+     * @param {angular.ILocationService} $location 
      * @param {OptionsService} options 
      * @param {ModalService} modal
      * @param {QueryServerService} queryServer
      */
-    constructor($scope, options, modal, queryServer) {
+    constructor($scope, $location, options, modal, queryServer) {
 
         $scope.options = options;
 
@@ -146,6 +147,8 @@ class ModelSummaryViewController {
             epochs: 0,
             patience: 3,
         };
+
+        Object.assign($scope.selectedOptions, $location.search());
 
         $scope.retry = function () {
             $('#staticBackdrop').modal('hide');
