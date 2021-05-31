@@ -49,14 +49,22 @@ class OneHot {
 }
 
 
-class Prediction {
+class PredictionUnit {
     x;
     y = {
         predicted: undefined,
         truth: undefined,
     };
 
+    /**
+     * 
+     * @param {string} x 
+     * @param {number|Array.<number>} yPred 
+     * @param {number|Array.<number>} yTruth 
+     * @param {Array.<string>} keyGuide 
+     */
     constructor(x, yPred, yTruth, keyGuide) {
+        if (!Array.isArray(keyGuide)) { throw new TypeError(keyGuide); }
         this.x = x;
         if (keyGuide.length === 0) {
             this.y.truth = yTruth;
@@ -143,17 +151,17 @@ class CheckRateViewController {
                     else {
                         $scope.confusionMatrix = new ConfusionMatrix(response.keyGuide);
                     }
-                    for (let i in response.prediction.x) {
-                        $scope.prediction.push(new Prediction(
-                            response.prediction.x[i],
-                            response.prediction.y.predicted[i],
-                            response.prediction.y.truth[i],
+                    for (let [x, truth, predicted] of _.zip(response.prediction.x, response.prediction.y.truth, response.prediction.y.predicted)) {
+                        $scope.prediction.push(new PredictionUnit(
+                            x,
+                            predicted,
+                            truth,
                             response.keyGuide,
                         ));
                         if (response.keyGuide.length > 0) {
                             $scope.confusionMatrix.add(
-                                maxIndex(response.prediction.y.truth[i]),
-                                maxIndex(response.prediction.y.predicted[i]),
+                                maxIndex(truth),
+                                maxIndex(predicted),
                             );
                         }
                     }
