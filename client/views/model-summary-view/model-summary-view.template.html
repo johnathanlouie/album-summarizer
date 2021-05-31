@@ -144,13 +144,18 @@
                             </thead>
                             <tbody>
                                 <tr ng-repeat="layer in modelSummary.layers">
-                                    <th scope="row">{{ $index }}</th>
+                                    <th class="text-right" scope="row">{{ $index }}</th>
                                     <td>{{ layer.name }}</td>
                                     <td>{{ layer.layer_type }}</td>
                                     <td>{{ layer.output_shape }}</td>
                                     <td>{{ layer.activation }}</td>
                                     <td>{{ layer.pool_size || layer.kernel_size }}</td>
-                                    <td>{{ layer.params }}</td>
+                                    <td class="text-right">{{ layer.params | number }}</td>
+                                </tr>
+                                <tr class="table-info">
+                                    <th scope="row">Total</th>
+                                    <td colspan="5"></td>
+                                    <td>{{ modelSummary.params | number }}</td>
                                 </tr>
                             </tbody>
                         </table>
