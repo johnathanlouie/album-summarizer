@@ -135,10 +135,12 @@
                 <th scope="col">Training</th>
                 <th scope="col">Validation</th>
                 <th scope="col">Test</th>
+                <th scope="col">Options</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="eval_ in evaluations.toArray() | filter : search : comparator | orderBy : sort.phase : sort.reverse">
+            <tr
+                ng-repeat="eval_ in evaluations.toArray() | filter : search : comparator | orderBy : sort.phase : sort.reverse">
                 <td>
                     <pre><code>{{ eval_.model | json }}</code></pre>
                 </td>
@@ -153,6 +155,9 @@
                 </td>
                 <td>
                     <pre><code>{{ eval_.test | json }}</code></pre>
+                </td>
+                <td>
+                    <button class="btn btn-primary" ng-click="inspect(eval_.model)">Inspect</button>
                 </td>
             </tr>
         </tbody>

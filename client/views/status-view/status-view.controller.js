@@ -5,6 +5,8 @@ import QueryServerService from '../../services/query-server.service.js';
 import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
 import EvaluationsService from '../../services/evaluations.service.js';
+import RouteManager from '../../lib/routes.js';
+import { ModelDescription } from '../../lib/evaluation.js';
 
 
 class ProgressBar {
@@ -89,8 +91,9 @@ class StatusViewController {
     };
     #progressBar = new ProgressBar();
 
-    static $inject = ['$scope', '$q', 'queryServer', 'modal', 'options', 'evaluations'];
+    static $inject = ['$scope', '$location', '$q', 'queryServer', 'modal', 'options', 'evaluations'];
     $scope;
+    $location;
     $q;
     queryServer;
     modal;
@@ -99,14 +102,16 @@ class StatusViewController {
 
     /**
      * @param {angular.IScope} $scope 
+     * @param {angular.ILocationService} $location 
      * @param {angular.IQService} $q 
      * @param {QueryServerService} queryServer
      * @param {ModalService} modal
      * @param {OptionsService} options
      * @param {EvaluationsService} evaluations
      */
-    constructor($scope, $q, queryServer, modal, options, evaluations) {
+    constructor($scope, $location, $q, queryServer, modal, options, evaluations) {
         this.$scope = $scope;
+        this.$location = $location;
         this.$q = $q;
         this.queryServer = queryServer;
         this.modal = modal;
@@ -123,6 +128,7 @@ class StatusViewController {
         $scope.removeMongoDbDuplicates = () => this.#removeMongoDbDuplicates();
         $scope.reevaluatePending = () => this.#reevaluatePending();
         $scope.comparator = (actual, expected) => this.#comparator(actual, expected);
+        $scope.inspect = model => this.#inspect(model);
 
         $scope.retry = () => this.#retry();
 
@@ -313,6 +319,15 @@ class StatusViewController {
             return true;
         }
         return actual === expected;
+    }
+
+    /**
+     * 
+     * @param {ModelDescription} model 
+     */
+    #inspect(model) {
+        this.$location.path(RouteManager.checkRate().path);
+        this.$location.search(model);
     }
 
 }

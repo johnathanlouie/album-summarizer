@@ -98,6 +98,10 @@ class RouteManager {
         return RouteManager.ROUTES.filter(e => e.isDevTool());
     }
 
+    static checkRate() {
+        return RouteManager.ROUTES.find(element => element.view === '<check-rate-view></check-rate-view>');
+    }
+
 }
 
 

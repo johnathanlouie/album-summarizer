@@ -100,16 +100,17 @@ class ConfusionMatrix {
 
 class CheckRateViewController {
 
-    static $inject = ['$scope', 'options', 'modal', 'queryServer', 'focusImage'];
+    static $inject = ['$scope', '$location', 'options', 'modal', 'queryServer', 'focusImage'];
 
     /**
      * @param {angular.IScope} $scope 
+     * @param {angular.ILocationService} $location 
      * @param {OptionsService} options 
      * @param {ModalService} modal
      * @param {QueryServerService} queryServer
      * @param {FocusImageService} focusImage
      */
-    constructor($scope, options, modal, queryServer, focusImage) {
+    constructor($scope, $location, options, modal, queryServer, focusImage) {
 
         $scope.options = options;
         $scope.confusionMatrix = null;
@@ -177,6 +178,8 @@ class CheckRateViewController {
             patience: 3,
             split: 0,
         };
+
+        Object.assign($scope.selectedOptions, $location.search());
 
         $scope.retry = function () {
             $('#staticBackdrop').modal('hide');
