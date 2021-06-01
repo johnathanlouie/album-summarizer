@@ -49,7 +49,16 @@ class DatabaseService {
      * @param {Evaluation} evaluation 
      */
     updateEvaluation(evaluation) {
-        return this.mongoDb.findOneAndReplace('evaluations', { model: evaluation.model }, evaluation);
+        return this.mongoDb.findOneAndReplace('evaluations', {
+            'model.architecture': evaluation.model.architecture,
+            'model.dataset': evaluation.model.dataset,
+            'model.epochs': evaluation.model.epochs,
+            'model.loss': evaluation.model.loss,
+            'model.metrics': evaluation.model.metrics,
+            'model.optimizer': evaluation.model.optimizer,
+            'model.patience': evaluation.model.patience,
+            'model.split': evaluation.model.split,
+        }, evaluation);
     }
 
     getAllEvaluations() {

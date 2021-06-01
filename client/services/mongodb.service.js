@@ -137,7 +137,8 @@ class MongoDbService {
         return this.connect().then(
             () => this.#db.collection(collection).findOneAndReplace(filter, replacement)
         ).then(result => {
-            if (result.ok !== 1) { throw new Error(); }
+            if (result.ok !== 1) { throw new Error('Some findOneAndReplace error'); }
+            if (result.value === null) { throw new Error('Did not replace any documents'); }
         });
     }
 
