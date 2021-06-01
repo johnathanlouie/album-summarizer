@@ -585,6 +585,12 @@ class KerasAdapter(object):
             self._status.status = TrainingStatus.RESOURCE2
             self._status.save()
 
+    def is_loaded(self) -> bool:
+        """
+        Returns true if the weights are loaded.
+        """
+        return self._kmodel != None
+
     def delete(self, keep_history: bool) -> None:
         """
         Deletes the model file and other training state files.
@@ -840,15 +846,24 @@ class ModelSplit(object):
             if not kadapter.has_error() and not kadapter.is_complete():
                 if not kadapter.is_saved():
                     kadapter.create()
-                else:
+                elif not kadapter.is_loaded():
                     kadapter.load()
                 kadapter.train()
             if kadapter.has_error():
                 kadapter.delete(keep_history=True)
             elif kadapter.is_complete():
-                kadapter.evaluate_training_set()
-                kadapter.evaluate_validation_set()
-                kadapter.evaluate_test_set()
+                if not kadapter.is_evaluate_training_set_cached():
+                    if not kadapter.is_loaded():
+                        kadapter.load()
+                    kadapter.evaluate_training_set()
+                if not kadapter.is_evaluate_validation_set_cached():
+                    if not kadapter.is_loaded():
+                        kadapter.load()
+                    kadapter.evaluate_validation_set()
+                if not kadapter.is_evaluate_test_set_cached():
+                    if not kadapter.is_loaded():
+                        kadapter.load()
+                    kadapter.evaluate_test_set()
 
 
 class BadModelSettings(ValueError):
