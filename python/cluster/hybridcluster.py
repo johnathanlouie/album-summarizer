@@ -4,7 +4,7 @@ from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
 from core.typing2 import Url
 
 from cluster.histogram import HistogramCluster
-from cluster.sift import (SiftCluster, Similarity, Similarity1, Similarity2,
+from cluster.sift import (SiftCluster, SiftCluster2, Similarity, Similarity1, Similarity2,
                           Similarity3)
 
 
@@ -95,9 +95,26 @@ class HybridCluster2(HybridCluster):
         return ClusterResults(images, cluster)
 
 
+class HybridCluster3(HybridCluster):
+    def __init__(self):
+        pass
+
+    def run(self, images: List[Url]) -> ClusterResults:
+        results1 = SiftCluster2().run(images)
+        results2 = HistogramCluster().run(images)
+        labels1 = results1.labels()
+        labels2 = results2.labels()
+        k1 = results1.k()
+        cluster = [self.combine(c1, c2, k1)
+                   for c1, c2 in zip(labels1, labels2)]
+        self.remove_empty_clusters(cluster)
+        return ClusterResults(images, cluster)
+
+
 ClusterRegistry.add('hybrid1a', HybridCluster(Similarity1()))
 ClusterRegistry.add('hybrid1b', HybridCluster(Similarity2()))
 ClusterRegistry.add('hybrid1c', HybridCluster(Similarity3()))
 ClusterRegistry.add('hybrid2a', HybridCluster2(Similarity1()))
 ClusterRegistry.add('hybrid2b', HybridCluster2(Similarity2()))
 ClusterRegistry.add('hybrid2c', HybridCluster2(Similarity3()))
+ClusterRegistry.add('hybrid3', HybridCluster3())

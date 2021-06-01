@@ -225,6 +225,32 @@ class SiftCluster(ClusterStrategy):
         return ClusterResults(images, cluster)
 
 
+class SiftCluster2(ClusterStrategy):
+    def run(self, images: List[Url]) -> ClusterResults:
+        list_of_images = list()
+        for url in images:
+            keypoint, descriptors = cv2.xfeatures2d.SIFT_create(nfeatures=400).detectAndCompute(image=read_image(url), mask=None)
+            list_of_images.append(descriptors)
+        matrix = SimilarityMatrix.empty_matrix(len(images))
+        for i, a in enumerate(list_of_images):
+            for j, b in enumerate(list_of_images):
+                if i != j:
+                    matches = cv2.BFMatcher_create().knnMatch(queryDescriptors=a, trainDescriptors=b, k=2)
+                    good = []
+                    for m, n in matches:
+                        if m.distance < .8 * n.distance:
+                            good.append(m)
+                    inverse_distance = 0
+                    for k in good:
+                        inverse_distance += 1 - k.distance
+                    if len(good) > 0:
+                        matrix[i][j] = inverse_distance / len(good)
+                        matrix[j][i] = inverse_distance / len(good)
+        cluster = AffinityPropagation(random_state=0).fit_predict(matrix).tolist()
+        return ClusterResults(images, cluster)
+
+
 ClusterRegistry.add('sift', SiftCluster(Similarity1()))
 ClusterRegistry.add('sift2', SiftCluster(Similarity2()))
 ClusterRegistry.add('sift3', SiftCluster(Similarity3()))
+ClusterRegistry.add('sift4', SiftCluster2())
