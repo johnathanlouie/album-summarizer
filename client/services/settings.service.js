@@ -35,7 +35,7 @@ class OrganizerSettings {
     epochs = 0;
     patience = 3;
     split = 0;
-    cluster = 'sift';
+    cluster = 'hybrid3';
 
 }
 
