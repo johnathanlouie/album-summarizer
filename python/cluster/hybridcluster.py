@@ -1,7 +1,7 @@
 from typing import Dict, List
 
-from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
-from core.typing2 import Url
+from rasek.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
+from rasek.typing2 import Url
 
 from cluster.histogram import HistogramCluster
 from cluster.sift import (SiftCluster, SiftCluster2, Similarity, Similarity1, Similarity2,

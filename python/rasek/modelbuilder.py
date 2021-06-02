@@ -1,8 +1,8 @@
 from typing import Dict, Tuple
 
-from core.architecture import Architecture, CompileOption
-from core.dataset import DataSet
-from core.model import Model
+from rasek.architecture import Architecture, CompileOption
+from rasek.dataset import DataSet
+from rasek.model import Model
 
 
 class ModelBuilderInsertError(LookupError):

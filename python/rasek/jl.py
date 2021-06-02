@@ -10,7 +10,7 @@ from typing import Any, List, Optional, Tuple
 import cv2 as cv
 from numpy import asarray, load, ndarray, save, zeros
 
-from core.typing2 import ArrayLike, Image, ImageArray, IntClass, OneHot, Url
+from rasek.typing2 import ArrayLike, Image, ImageArray, IntClass, OneHot, Url
 
 
 def npsave(name: str, data: ArrayLike, verbose: bool = True) -> None:

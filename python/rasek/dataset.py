@@ -6,9 +6,9 @@ from keras.utils import to_categorical
 from numpy import ndarray
 from sklearn.model_selection import train_test_split
 
-from core.jl import npexists, npload, npsave
-from core.modeltype import OutputType
-from core.typing2 import ArrayLike, number
+from rasek.jl import npexists, npload, npsave
+from rasek.modeltype import OutputType
+from rasek.typing2 import ArrayLike, number
 
 
 class XY(Enum):

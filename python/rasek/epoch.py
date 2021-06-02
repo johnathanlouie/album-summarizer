@@ -1,7 +1,7 @@
 import keras.models
 
-from core.kerashelper import CheckpointObserver, PickleAbstractClass
-from core.typing2 import Url
+from rasek.kerashelper import CheckpointObserver, PickleAbstractClass
+from rasek.typing2 import Url
 
 
 class EpochPickle(PickleAbstractClass):

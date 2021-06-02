@@ -5,8 +5,8 @@ from typing import Union
 import keras
 from keras.callbacks import ReduceLROnPlateau
 
-from core.kerashelper import CheckpointObserver, PickleAbstractClass
-from core.typing2 import Url
+from rasek.kerashelper import CheckpointObserver, PickleAbstractClass
+from rasek.typing2 import Url
 
 
 class ReduceLROnPlateauPickle(PickleAbstractClass):
