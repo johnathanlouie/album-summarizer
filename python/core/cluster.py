@@ -4,8 +4,8 @@ from typing import Dict, List, Union
 
 import dill
 
-from rasek.jl import ImageDirectory, hash_images, mkdirname
-from rasek.typing2 import Url
+from core.jl import ImageDirectory, hash_images, mkdirname
+from core.typing2 import Url
 
 
 class ClusterResult(object):

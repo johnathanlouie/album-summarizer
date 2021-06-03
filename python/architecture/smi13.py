@@ -1,9 +1,9 @@
 from typing import Optional
 
-from rasek import modelbuilder
-from rasek.architecture import Architecture
-from rasek.jl import Resolution
-from rasek.modeltype import OutputType
+from core import modelbuilder
+from core.architecture import Architecture
+from core.jl import Resolution
+from core.modeltype import OutputType
 from keras.engine.input_layer import Input
 from keras.layers import (BatchNormalization, Conv2D, Dense, Flatten,
                           MaxPooling2D)

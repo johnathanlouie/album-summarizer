@@ -14,8 +14,8 @@ from keras.callbacks import Callback
 from keras.utils import Sequence
 from numpy import asarray, ceil, ndarray
 
-from rasek.jl import Resolution, resize_img
-from rasek.typing2 import Url
+from core.jl import Resolution, resize_img
+from core.typing2 import Url
 
 
 class Sequence1(Sequence):

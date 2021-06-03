@@ -4,8 +4,8 @@ from typing import Dict
 
 import aaa
 import addon
-import rasek.modelbuilder
-import rasek.model
+import core.modelbuilder
+import core.model
 
 
 def doSomething(
@@ -23,7 +23,7 @@ def doSomething(
         remove_bad=False
 ):
     try:
-        model = rasek.modelbuilder.ModelBuilder.create(
+        model = core.modelbuilder.ModelBuilder.create(
             architecture,
             dataset,
             loss,
@@ -76,7 +76,7 @@ def doSomething(
                 if remove_bad:
                     if model.has_error():
                         model.delete(True)
-    except rasek.model.BadModelSettings:
+    except core.model.BadModelSettings:
         print("IGNORE: %s %s %s %s" % (architecture, dataset, loss, optimizer))
 
 
@@ -93,19 +93,19 @@ def main():
     if args.options:
         print()
         print('Architectures')
-        for i in rasek.modelbuilder.ModelBuilder.ARCHITECTURES.keys():
+        for i in core.modelbuilder.ModelBuilder.ARCHITECTURES.keys():
             print(' - %s' % i)
         print('Data Sets')
-        for i in rasek.modelbuilder.ModelBuilder.DATASETS.keys():
+        for i in core.modelbuilder.ModelBuilder.DATASETS.keys():
             print(' - %s' % i)
         print('Losses')
-        for i in rasek.modelbuilder.ModelBuilder.LOSSES.keys():
+        for i in core.modelbuilder.ModelBuilder.LOSSES.keys():
             print(' - %s' % i)
         print('Optimizers')
-        for i in rasek.modelbuilder.ModelBuilder.OPTIMIZERS.keys():
+        for i in core.modelbuilder.ModelBuilder.OPTIMIZERS.keys():
             print(' - %s' % i)
         print('Metrics')
-        for i in rasek.modelbuilder.ModelBuilder.METRICS.keys():
+        for i in core.modelbuilder.ModelBuilder.METRICS.keys():
             print(' - %s' % i)
     elif args.model != None:
         try:
@@ -128,7 +128,7 @@ def main():
         except FileNotFoundError:
             print("MISSING: %s" % args.model)
     elif args.all:
-        for architecture, dataset, loss, optimizer in rasek.modelbuilder.ModelBuilder.builds():
+        for architecture, dataset, loss, optimizer in core.modelbuilder.ModelBuilder.builds():
             doSomething(
                 architecture,
                 dataset,

@@ -14,19 +14,19 @@ from numpy import argmax, asarray, ndarray
 from sklearn.metrics import (accuracy_score, f1_score, precision_score,
                              recall_score)
 
-from rasek.architecture import (Architecture, CompiledArchitecture,
+from core.architecture import (Architecture, CompiledArchitecture,
                                CompiledArchitectureName, CompileOption)
-from rasek.dataset import DataSet, DataSetSplit, DataSetSplitName
-from rasek.epoch import EpochObserver, EpochPickle
-from rasek.jl import ListFile, Resolution, hash_images, mkdirname, mkdirs
-from rasek.kerashelper import (CompletionStatusObserver, ModelCheckpoint2,
+from core.dataset import DataSet, DataSetSplit, DataSetSplitName
+from core.epoch import EpochObserver, EpochPickle
+from core.jl import ListFile, Resolution, hash_images, mkdirname, mkdirs
+from core.kerashelper import (CompletionStatusObserver, ModelCheckpoint2,
                               ModelCheckpoint2Observer, ModelCheckpoint2Pickle,
                               NanInfStatusObserver, SaveKmodelObserver,
                               Sequence1, TerminateOnDemand,
                               TerminateOnNanInfObserver, TrainingStatus,
                               TrainingStatusData)
-from rasek.reducelr import ReduceLROnPlateauObserver, ReduceLROnPlateauPickle
-from rasek.typing2 import Image, Url
+from core.reducelr import ReduceLROnPlateauObserver, ReduceLROnPlateauPickle
+from core.typing2 import Image, Url
 
 
 class ModelSplitName2(object):

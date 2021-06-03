@@ -4,8 +4,8 @@ from typing import Any, Callable, Dict, Optional, Union
 from keras.models import Model
 from keras.optimizers import Optimizer
 
-from rasek.jl import Resolution
-from rasek.modeltype import OutputType
+from core.jl import Resolution
+from core.modeltype import OutputType
 
 
 class Architecture(ABC):

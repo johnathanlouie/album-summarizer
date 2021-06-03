@@ -8,14 +8,14 @@ import flask
 
 import aaa
 import addon
-from rasek.cluster import (ClusterRegistry, ClusterRegistryNameError,
-                           ClusterResults, ClusterStrategy)
-from rasek.jl import ImageDirectory
-from rasek.kerashelper import TrainingStatus
-from rasek.model import (BadModelSettings, ModelSplit, ModelStateMissingError,
-                         TrainingIncompleteException)
-from rasek.modelbuilder import ModelBuilder
-from rasek.typing2 import Url
+from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
+                          ClusterResults, ClusterStrategy)
+from core.jl import ImageDirectory
+from core.kerashelper import TrainingStatus
+from core.model import (BadModelSettings, ModelSplit, ModelStateMissingError,
+                        TrainingIncompleteException)
+from core.modelbuilder import ModelBuilder
+from core.typing2 import Url
 
 
 class ClusterRank(object):

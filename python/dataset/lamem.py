@@ -2,11 +2,11 @@ from os import getcwd
 from os.path import join, normpath
 from typing import Any, List
 
-from rasek import modelbuilder
-from rasek.dataset import DataSet, LabelTranslator
-from rasek.jl import ListFile
-from rasek.modeltype import OutputType
-from rasek.typing2 import Url
+from core import modelbuilder
+from core.dataset import DataSet, LabelTranslator
+from core.jl import ListFile
+from core.modeltype import OutputType
+from core.typing2 import Url
 from numpy import asarray, ndarray
 
 

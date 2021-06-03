@@ -1,5 +1,5 @@
-from rasek.architecture import CompileOption
-from rasek.modelbuilder import ModelBuilder
+from core.architecture import CompileOption
+from core.modelbuilder import ModelBuilder
 from keras import backend as K
 
 

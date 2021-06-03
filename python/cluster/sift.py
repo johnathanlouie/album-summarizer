@@ -3,9 +3,9 @@ from json import dump
 from typing import Dict, List
 
 import cv2
-from rasek.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
-from rasek.jl import npsave, read_image
-from rasek.typing2 import Url, number
+from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
+from core.jl import npsave, read_image
+from core.typing2 import Url, number
 from numpy import amax, apply_along_axis, ndarray, set_printoptions, zeros
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize

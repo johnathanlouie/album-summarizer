@@ -1,9 +1,9 @@
 from typing import Dict, List
 
 import cv2
-from rasek.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
-from rasek.jl import hsv, read_image
-from rasek.typing2 import Url
+from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
+from core.jl import hsv, read_image
+from core.typing2 import Url
 from numpy import concatenate, ndarray, reshape, vstack
 from sklearn.cluster import MeanShift
 

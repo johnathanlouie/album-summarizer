@@ -3,11 +3,11 @@ from os import getcwd
 from os.path import join, normpath
 from typing import Any, List, Optional
 
-from rasek import modelbuilder
-from rasek.dataset import DataSet, LabelTranslator
-from rasek.jl import Csv
-from rasek.modeltype import OutputType
-from rasek.typing2 import Url
+from core import modelbuilder
+from core.dataset import DataSet, LabelTranslator
+from core.jl import Csv
+from core.modeltype import OutputType
+from core.typing2 import Url
 from numpy import asarray, ndarray
 
 
