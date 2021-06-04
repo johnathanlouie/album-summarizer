@@ -22,8 +22,6 @@ function controllerFn($scope, $q, options, modal, queryServer, focusImage, clust
     $scope.options = options;
     $scope.clusterAlgorithms = clusterAlgorithms;
 
-    window.AAA = clusterAlgorithms;
-
     function preload() {
         modal.showLoading('RETRIEVING...');
         return $q.all([options.load(), clusterAlgorithms.preload()]).then(
