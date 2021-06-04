@@ -1,11 +1,13 @@
+from enum import Enum
 import hashlib
+import inspect
 from csv import reader
 from os import getcwd, makedirs, walk
 from os.path import abspath, basename, dirname, isdir, isfile, join, normpath
 from random import sample
 from shutil import copy2
 from time import time
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, get_type_hints
 
 import cv2 as cv
 from numpy import asarray, load, ndarray, save, zeros
@@ -438,3 +440,25 @@ def hash_images(images: List[Url]) -> str:
     for image in sorted(images):
         md5.update(image.encode())
     return md5.hexdigest()
+
+
+def function_signature(func) -> Dict[str, Dict[str, Any]]:
+    signature = inspect.signature(func)
+    a = dict()
+    types = get_type_hints(func)
+    for param, type_ in types.items():
+        if param == 'return':
+            continue
+        b = dict()
+        a[param] = b
+        if inspect.isclass(type_) and issubclass(type_, Enum):
+            b['type'] = str(Enum)
+            b['choices'] = [i.value for i in type_]
+        else:
+            b['type'] = str(type_)
+        if signature.parameters[param].default != inspect.Parameter.empty:
+            if inspect.isclass(type_) and issubclass(type_, Enum):
+                b['default'] = signature.parameters[param].default.value
+            else:
+                b['default'] = signature.parameters[param].default
+    return a

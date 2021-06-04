@@ -10,7 +10,7 @@ import aaa
 import addon
 from core.cluster import (ClusterRegistry, ClusterRegistryNameError,
                           ClusterResults, ClusterStrategy)
-from core.jl import ImageDirectory
+from core.jl import ImageDirectory, function_signature
 from core.kerashelper import TrainingStatus
 from core.model import (BadModelSettings, ModelSplit, ModelStateMissingError,
                         TrainingIncompleteException)
@@ -251,6 +251,19 @@ if __name__ == '__main__':
             response.status = 'Error: Unknown'
             return response
 
+    @app.route('/cluster-algorithms', methods=['GET'])
+    def cluster_algorithms():
+        results = list()
+        for name, algorithm in ClusterRegistry.items():
+            parameters = function_signature(algorithm.run)
+            if 'images' in parameters:
+                del parameters['images']
+            results.append({
+                'name': name,
+                'parameters': parameters,
+            })
+        return flask.jsonify(results)
+
     @app.route('/cluster', methods=['POST'])
     def cluster():
         try:
@@ -262,7 +275,7 @@ if __name__ == '__main__':
             settings = flask.request.get_json()
             images = ImageDirectory(settings['directory']).jpeg(False)
             cluster = ClusterRegistry.get(settings['cluster'])
-            results = cluster.run_cached(images).urls()
+            results = cluster.run_cached(images, **settings['args']).urls()
             results = flask.jsonify(results)
             return results
         except ClusterRegistryNameError:

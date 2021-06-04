@@ -1,6 +1,8 @@
+import hashlib
+import json
 import os.path
 from abc import ABC, abstractmethod
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import dill
 
@@ -75,23 +77,26 @@ class ClusterStrategy(ABC):
     """
 
     @abstractmethod
-    def run(self,  images: List[Url]) -> ClusterResults:
+    def run(self,  images: List[Url], **kwargs) -> ClusterResults:
         """
         Clusters a list of images.
         """
         pass
 
-    def _cache_path(self, images: List[Url]) -> Url:
-        return "cache/%s/%s-cluster.dill" % (hash_images(images), type(self).__name__)
+    def _cache_path(self, images: List[Url], **kwargs) -> Url:
+        md5 = hashlib.md5()
+        md5.update(type(self).__name__.encode())
+        md5.update(json.dumps(kwargs).encode('utf-8'))
+        return "cache/%s/cluster/%s.dill" % (hash_images(images), md5.hexdigest())
 
-    def run_cached(self, images: List[Url]) -> ClusterResults:
-        filepath = self._cache_path(images)
+    def run_cached(self, images: List[Url], **kwargs) -> ClusterResults:
+        filepath = self._cache_path(images, **kwargs)
         mkdirname(filepath)
         if os.path.exists(filepath):
             print('LOADING: %s' % filepath)
             with open(filepath, 'rb') as f:
                 return dill.load(f)
-        results = self.run(images)
+        results = self.run(images, **kwargs)
         print('SAVING: %s' % filepath)
         with open(filepath, 'wb') as f:
             dill.dump(results, f)
@@ -112,19 +117,23 @@ class ClusterRegistry(object):
 
     _REGISTRY: Dict[str, ClusterStrategy] = dict()
 
-    @classmethod
+    @ classmethod
     def add(cls, name: str, strategy: ClusterStrategy) -> None:
         if name in cls._REGISTRY:
             raise ClusterRegistryInsertionError(name)
         else:
             cls._REGISTRY[name] = strategy
 
-    @classmethod
+    @ classmethod
     def get(cls, name: str) -> ClusterStrategy:
         if name not in cls._REGISTRY:
             raise ClusterRegistryNameError(name)
         return cls._REGISTRY[name]
 
-    @classmethod
+    @ classmethod
     def keys(cls) -> List[str]:
         return list(cls._REGISTRY.keys())
+
+    @classmethod
+    def items(cls) -> List[Tuple[str, ClusterStrategy]]:
+        return [i for i in cls._REGISTRY.items()]

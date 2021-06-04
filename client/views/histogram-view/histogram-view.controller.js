@@ -5,22 +5,28 @@ import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
 import QueryServerService from '../../services/query-server.service.js';
 import FocusImageService from '../../services/focus-image.service.js';
+import ClusterAlgorithmsService from '../../services/cluster-algorithms.service.js';
 
 
 /**
  * @param {angular.IScope} $scope 
+ * @param {angular.IQService} $q 
  * @param {OptionsService} options 
  * @param {ModalService} modal 
  * @param {QueryServerService} queryServer
  * @param {FocusImageService} focusImage
+ * @param {ClusterAlgorithmsService} clusterAlgorithms
  */
-function controllerFn($scope, options, modal, queryServer, focusImage) {
+function controllerFn($scope, $q, options, modal, queryServer, focusImage, clusterAlgorithms) {
 
     $scope.options = options;
+    $scope.clusterAlgorithms = clusterAlgorithms;
 
-    function loadOptions() {
+    window.AAA = clusterAlgorithms;
+
+    function preload() {
         modal.showLoading('RETRIEVING...');
-        return options.load().then(
+        return $q.all([options.load(), clusterAlgorithms.preload()]).then(
             () => modal.hideLoading(),
             e => {
                 console.error(e);
@@ -30,14 +36,15 @@ function controllerFn($scope, options, modal, queryServer, focusImage) {
         );
     }
 
-    loadOptions();
+    preload();
 
     $scope.submit = function () {
         modal.showLoading('CLUSTERING...');
         $scope.clusters = [];
         return queryServer.cluster(
-            $scope.requestParameters.cluster,
-            $scope.requestParameters.directory,
+            $scope.requestArgs.cluster,
+            $scope.requestArgs.directory,
+            $scope.requestArgs.args,
         ).then(
             clusters => {
                 $scope.clusters = clusters; modal.hideLoading();
@@ -50,16 +57,17 @@ function controllerFn($scope, options, modal, queryServer, focusImage) {
         );
     };
 
-    $scope.requestParameters = {
+    $scope.requestArgs = {
         cluster: 'sift',
         directory: path.join(os.homedir(), 'Pictures'),
+        args: Object(),
     };
 
     $scope.clusters = [];
 
     $scope.retry = function () {
         $('#staticBackdrop').modal('hide');
-        return loadOptions();
+        return preload();
     };
 
     $scope.focusOnImage = function (url) {
@@ -69,7 +77,7 @@ function controllerFn($scope, options, modal, queryServer, focusImage) {
 
 }
 
-controllerFn.$inject = ['$scope', 'options', 'modal', 'queryServer', 'focusImage'];
+controllerFn.$inject = ['$scope', '$q', 'options', 'modal', 'queryServer', 'focusImage', 'clusterAlgorithms'];
 
 
 export default controllerFn;

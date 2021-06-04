@@ -2,31 +2,64 @@
 
 <div class="container-fluid">
 
-    <form class="card mb-3" ng-submit="submit()">
-        <div class="card-body">
-            <div class="form-row align-items-end">
+    <form ng-submit="submit()">
 
-                <div class="col-2">
-                    <label for="clusterSelector">Clustering Algorithm</label>
-                    <select class="form-control" id="clusterSelector" ng-model="requestParameters.cluster">
-                        <option ng-repeat="option in options.clusters">{{ option }}</option>
-                    </select>
+        <div class="card">
+            <div class="card-body">
+                <div class="form-row align-items-end">
+
+                    <div class="col-2">
+                        <label for="clusterSelector">Clustering Algorithm</label>
+                        <select class="form-control" id="clusterSelector" ng-model="requestArgs.cluster">
+                            <option ng-repeat="algorithms in clusterAlgorithms.items()">{{ algorithms.name }}</option>
+                        </select>
+                    </div>
+
+                    <div class="col">
+                        <label for="fileSelector">Directory</label>
+                        <input class="form-control" ng-model="requestArgs.directory" type="text" id="fileSelector">
+                    </div>
+
+                    <div class="col-auto">
+                        <button class="btn btn-primary" type="submit">Cluster</button>
+                    </div>
+
                 </div>
-
-                <div class="col">
-                    <label for="fileSelector">Directory</label>
-                    <input class="form-control" ng-model="requestParameters.directory" type="text" id="fileSelector">
-                </div>
-
-                <div class="col-auto">
-                    <button class="btn btn-primary" type="submit">Cluster</button>
-                </div>
-
             </div>
         </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Additional Parameters</h5>
+                <div class="form-row" ng-repeat="algorithm in clusterAlgorithms.items()"
+                    ng-if="algorithm.name === requestArgs.cluster">
+                    <div class="col-2" ng-repeat="(parameterName, parameterDetails) in algorithm.parameters">
+                        <div class="form-group">
+                            <label ng-attr-for="{{ algorithm.name + parameterName }}">{{ parameterName }}</label>
+                            <select class="form-control"
+                                ng-init="requestArgs.args[parameterName] = parameterDetails.default"
+                                ng-if="parameterDetails.type === '<enum \'Enum\'>'"
+                                ng-model="requestArgs.args[parameterName]"
+                                ng-attr-id="{{ algorithm.name + parameterName }}">
+                                <option ng-repeat="choices in parameterDetails.choices">{{ choices }}</option>
+                            </select>
+                            <input ng-init="requestArgs.args[parameterName] = parameterDetails.default"
+                                ng-if="parameterDetails.type === '<class \'float\'>'" type="number" class="form-control"
+                                ng-attr-id="{{ algorithm.name + parameterName }}"
+                                ng-model="requestArgs.args[parameterName]" step="any">
+                            <input ng-init="requestArgs.args[parameterName] = parameterDetails.default"
+                                ng-if="parameterDetails.type === '<class \'int\'>'" type="number" class="form-control"
+                                ng-attr-id="{{ algorithm.name + parameterName }}"
+                                ng-model="requestArgs.args[parameterName]" step="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </form>
 
-    <div class="card mb-3" ng-repeat="cluster in clusters">
+    <div class="card mt-3 mb-3" ng-repeat="cluster in clusters">
         <h5 class="card-header text-center">{{ $index }}</h5>
         <div class="card-body">
             <img class="img-thumbnail img-max-300 m-1" ng-src="{{ image }}" ng-click="focusOnImage(image)" role="button"

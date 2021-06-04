@@ -3,6 +3,7 @@ import ModalService from '../../services/modal.service.js';
 import OptionsService from '../../services/options.service.js';
 import UsersService from '../../services/users.service.js';
 import EvaluationsService from '../../services/evaluations.service.js';
+import ClusterAlgorithmsService from '../../services/cluster-algorithms.service.js';
 
 
 const OK = 'OK';
@@ -16,13 +17,15 @@ class Statuses {
     users = LOADING;
     evaluations = LOADING;
     evaluationStatuses = LOADING;
-    total = 4;
+    clusterAlgorithms = LOADING;
+    total = 5;
 
     reset() {
         this.options = LOADING;
         this.users = LOADING;
         this.evaluations = LOADING;
         this.evaluationStatuses = LOADING;
+        this.clusterAlgorithms = LOADING;
     }
 
     get succeeded() {
@@ -31,6 +34,7 @@ class Statuses {
         if (this.users === OK) { n++; }
         if (this.evaluations === OK) { n++; }
         if (this.evaluationStatuses === OK) { n++; }
+        if (this.clusterAlgorithms === OK) { n++; }
         return n;
     }
 
@@ -41,10 +45,11 @@ class LoadingViewController {
 
     #statuses = new Statuses();
 
-    static $inject = ['$scope', '$location', '$q', 'modal', 'options', 'users', 'evaluations'];
+    static $inject = ['$scope', '$location', '$q', 'clusterAlgorithms', 'modal', 'options', 'users', 'evaluations'];
     $scope;
     $location;
     $q;
+    clusterAlgorithms;
     modal;
     options;
     users;
@@ -54,15 +59,17 @@ class LoadingViewController {
      * @param {angular.IScope} $scope 
      * @param {angular.ILocationService} $location
      * @param {angular.IQService} $q
+     * @param {ClusterAlgorithmsService} clusterAlgorithms
      * @param {ModalService} modal
      * @param {OptionsService} options
      * @param {UsersService} users
      * @param {EvaluationsService} evaluations
      */
-    constructor($scope, $location, $q, modal, options, users, evaluations) {
+    constructor($scope, $location, $q, clusterAlgorithms, modal, options, users, evaluations) {
         this.$scope = $scope;
         this.$location = $location;
         this.$q = $q;
+        this.clusterAlgorithms = clusterAlgorithms;
         this.modal = modal;
         this.options = options;
         this.users = users;
@@ -98,6 +105,10 @@ class LoadingViewController {
             this.$q.resolve(this.evaluations.fetchStatuses()).then(
                 () => { this.#statuses.evaluationStatuses = OK; },
                 e => { this.#statuses.evaluationStatuses = FAIL; throw e; },
+            ),
+            this.$q.resolve(this.clusterAlgorithms.preload()).then(
+                () => { this.#statuses.clusterAlgorithms = OK; },
+                e => { this.#statuses.clusterAlgorithms = FAIL; throw e; },
             ),
         ])).then(
             loadResults => {

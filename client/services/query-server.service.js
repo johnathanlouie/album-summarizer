@@ -92,6 +92,14 @@ import { ModelDescription, Evaluation } from '../lib/evaluation.js';
 
 
 /**
+ * Cluster algorithm
+ * @typedef {Object} ClusterAlgorithmReturnObject
+ * @property {string} name
+ * @property {Object} parameters
+ */
+
+
+/**
  * An interface to the python server
  */
 class QueryServerService {
@@ -142,15 +150,23 @@ class QueryServerService {
     }
 
     /**
+     * @returns {angular.IPromise.<ClusterAlgorithmReturnObject>}
+     */
+    clusterAlgorithms() {
+        return this.$http.get(`${this.#serverUrl}/cluster-algorithms`).then(httpReturnValue => httpReturnValue.data);
+    }
+
+    /**
      * Clusters the images in a directory
      * @param {string} algorithm 
      * @param {string} directory 
      * @returns {angular.IPromise.<Array.<Array.<string>>>}
      */
-    cluster(algorithm, directory) {
+    cluster(algorithm, directory, args) {
         return this.$http.post(`${this.#serverUrl}/cluster`, {
             cluster: algorithm,
             directory: directory,
+            args: args,
         }).then(httpReturnValue => httpReturnValue.data);
     }
 

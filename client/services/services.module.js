@@ -11,6 +11,7 @@ import Modal from './modal.service.js';
 import Users from './users.service.js';
 import Evaluations from './evaluations.service.js';
 import Database from './database.service.js';
+import ClusterAlgorithms from './cluster-algorithms.service.js';
 
 
 const module = angular.module('services', []);
@@ -26,6 +27,7 @@ module.factory('modal', Modal);
 module.factory('users', Users);
 module.factory('evaluations', Evaluations);
 module.factory('database', Database);
+module.factory('clusterAlgorithms', ClusterAlgorithms);
 
 
 export default module.name;

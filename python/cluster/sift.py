@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
+from enum import Enum
 from json import dump
-from typing import Dict, List
-
+from typing import Any, Dict, List, Union
+import itertools
 import cv2
 from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
 from core.jl import npsave, read_image
@@ -9,7 +10,6 @@ from core.typing2 import Url, number
 from numpy import amax, apply_along_axis, ndarray, set_printoptions, zeros
 from sklearn.cluster import AffinityPropagation
 from sklearn.preprocessing import normalize
-
 
 set_printoptions(threshold=10000000000)
 Descriptors = ndarray
@@ -225,28 +225,80 @@ class SiftCluster(ClusterStrategy):
         return ClusterResults(images, cluster)
 
 
+class SimilarityMetric(Enum):
+    INVERSE_DISTANCE = 'inverse_distance'
+    COUNT = 'count'
+
+
+class AffinityPropagationAffinity(Enum):
+    EUCLIDEAN = 'euclidean'
+    PRECOMPUTED = 'precomputed'
+
+
 class SiftCluster2(ClusterStrategy):
-    def run(self, images: List[Url]) -> ClusterResults:
+    def run(
+        self,
+        images: List[Url],
+        nfeatures: int = 0,
+        nOctaveLayers: int = 3,
+        contrastThreshold: float = 0.04,
+        edgeThreshold: float = 10,
+        sigma: float = 1.6,
+        ratio: float = 0.8,
+        similarity_metric: SimilarityMetric = SimilarityMetric.INVERSE_DISTANCE,
+        damping: float = 0.5,
+        max_iter: int = 200,
+        convergence_iter: int = 15,
+        affinity: AffinityPropagationAffinity = AffinityPropagationAffinity.EUCLIDEAN,
+    ) -> ClusterResults:
+        if not isinstance(similarity_metric, SimilarityMetric):
+            similarity_metric = SimilarityMetric(similarity_metric)
+        if not isinstance(affinity, AffinityPropagationAffinity):
+            affinity = AffinityPropagationAffinity(affinity)
         list_of_images = list()
-        for url in images:
-            keypoint, descriptors = cv2.xfeatures2d.SIFT_create(nfeatures=400).detectAndCompute(image=read_image(url), mask=None)
-            list_of_images.append(descriptors)
         matrix = SimilarityMatrix.empty_matrix(len(images))
-        for i, a in enumerate(list_of_images):
-            for j, b in enumerate(list_of_images):
-                if i != j:
-                    matches = cv2.BFMatcher_create().knnMatch(queryDescriptors=a, trainDescriptors=b, k=2)
-                    good = []
-                    for m, n in matches:
-                        if m.distance < .8 * n.distance:
-                            good.append(m)
+        for url in images:
+            print("SIFT DESCRIPTORS: %s" % url)
+            keypoint, descriptors = cv2.xfeatures2d.SIFT_create(
+                nfeatures,
+                nOctaveLayers,
+                contrastThreshold,
+                edgeThreshold,
+                sigma,
+            ).detectAndCompute(image=read_image(url), mask=None)
+            list_of_images.append(descriptors)
+        combo = list(itertools.combinations_with_replacement(range(len(list_of_images)), 2))
+        for idx, (i, j) in enumerate(combo):
+            print("SIFT SIMILARITY: ( %i / %i ) ( %i / %i )" % (i, j, idx, len(combo)))
+            if i != j:
+                matches = cv2.BFMatcher_create().knnMatch(queryDescriptors=list_of_images[i], trainDescriptors=list_of_images[j], k=2)
+                good = []
+                for m, n in matches:
+                    if m.distance < ratio * n.distance:
+                        good.append(m)
+                if similarity_metric == SimilarityMetric.INVERSE_DISTANCE:
                     inverse_distance = 0
                     for k in good:
                         inverse_distance += 1 - k.distance
                     if len(good) > 0:
                         matrix[i][j] = inverse_distance / len(good)
                         matrix[j][i] = inverse_distance / len(good)
-        cluster = AffinityPropagation(random_state=0).fit_predict(matrix).tolist()
+                elif similarity_metric == SimilarityMetric.COUNT:
+                    matrix[i][j] = len(good)
+                    matrix[j][i] = len(good)
+            else:
+                if similarity_metric == SimilarityMetric.INVERSE_DISTANCE:
+                    matrix[i][i] = 1
+                elif similarity_metric == SimilarityMetric.COUNT:
+                    matrix[i][i] = nfeatures
+        print('CLUSTER: AffinityPropagation')
+        cluster = AffinityPropagation(
+            damping=damping,
+            max_iter=max_iter,
+            convergence_iter=convergence_iter,
+            affinity=affinity.value,
+            random_state=0,
+        ).fit_predict(matrix).tolist()
         return ClusterResults(images, cluster)
 
 
