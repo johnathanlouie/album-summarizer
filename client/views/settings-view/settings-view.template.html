@@ -1,108 +1,124 @@
 <devtools-navbar></devtools-navbar>
 
-<div class="container position-relative">
+<div class="container position-relative mb-3">
 
     <h1 class="display-2 pb-3">Settings</h1>
 
     <form ng-submit="save()">
 
-        <h1>MongoDB</h1>
-
-        <div class="form-row">
-            <div class="form-group col-8">
-                <label for="mongodbHostname">Hostname/IP Address</label>
-                <input class="form-control" ng-model="settings.mongodb.hostname" type="text" id="mongodbHostname">
-            </div>
-            <div class="form-group col">
-                <label for="mongodbPort">Port</label>
-                <input class="form-control" ng-model="settings.mongodb.port" type="number" id="mongodbPort">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col">
-                <label for="mongodbUsername">Username</label>
-                <input class="form-control" ng-model="settings.mongodb.username" type="text" id="mongodbUsername">
-            </div>
-            <div class="form-group col">
-                <label for="mongodbPassword">Password</label>
-                <input class="form-control" ng-model="settings.mongodb.password" type="password" id="mongodbPassword">
-            </div>
-        </div>
-
-        <h1>Server</h1>
-
-        <div class="form-row">
-            <div class="form-group col">
-                <label for="serverUrl">URL</label>
-                <input type="text" class="form-control" id="serverUrl" ng-model="settings.server.url">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">MongoDB</h4>
+                <div class="form-row">
+                    <div class="form-group col-8">
+                        <label for="mongodbHostname">Hostname/IP Address</label>
+                        <input class="form-control" ng-model="settings.mongodb.hostname" type="text"
+                            id="mongodbHostname">
+                    </div>
+                    <div class="form-group col">
+                        <label for="mongodbPort">Port</label>
+                        <input class="form-control" ng-model="settings.mongodb.port" type="number" id="mongodbPort">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="mongodbUsername">Username</label>
+                        <input class="form-control" ng-model="settings.mongodb.username" type="text"
+                            id="mongodbUsername">
+                    </div>
+                    <div class="form-group col">
+                        <label for="mongodbPassword">Password</label>
+                        <input class="form-control" ng-model="settings.mongodb.password" type="password"
+                            id="mongodbPassword">
+                    </div>
+                </div>
             </div>
         </div>
 
-        <h1>Organizer</h1>
-
-        <div class="form-row">
-
-            <div class="form-group col-2">
-                <label for="organizerArchitectures">Architectures</label>
-                <select class="form-control" id="organizerArchitectures" ng-model="settings.organizer.architecture">
-                    <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
-                </select>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h4 class="card-title">Server</h4>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="serverUrl">URL</label>
+                        <input type="text" class="form-control" id="serverUrl" ng-model="settings.server.url">
+                    </div>
+                </div>
             </div>
-
-            <div class="form-group col-2">
-                <label for="organizerDatasets">Datasets</label>
-                <select class="form-control" id="organizerDatasets" ng-model="settings.organizer.dataset">
-                    <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
-                </select>
-            </div>
-
-            <div class="form-group col-2">
-                <label for="organizerLosses">Losses</label>
-                <select class="form-control" id="organizerLosses" ng-model="settings.organizer.loss">
-                    <option ng-repeat="loss in options.losses">{{ loss }}</option>
-                </select>
-            </div>
-
-            <div class="form-group col-2">
-                <label for="organizerOptimizers">Optimizers</label>
-                <select class="form-control" id="organizerOptimizers" ng-model="settings.organizer.optimizer">
-                    <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
-                </select>
-            </div>
-
-            <div class="form-group col-2">
-                <label for="organizerMetrics">Metrics</label>
-                <input class="form-control" ng-model="settings.organizer.metrics" type="text" id="organizerMetrics">
-            </div>
-
-            <div class="form-group col-2">
-                <label for="organizerEpochs">Epochs</label>
-                <input class="form-control" ng-model="settings.organizer.epochs" type="number" id="organizerEpochs"
-                    min="0" step="1">
-            </div>
-
-            <div class="form-group col-2">
-                <label for="organizerPatience">Patience</label>
-                <input class="form-control" ng-model="settings.organizer.patience" type="number" id="organizerPatience"
-                    min="0" step="1">
-            </div>
-
-            <div class="form-group col-2">
-                <label for="organizerSplit">Split</label>
-                <input class="form-control" ng-model="settings.organizer.split" type="number" id="organizerSplit"
-                    min="0" step="1">
-            </div>
-
-            <div class="form-group col-2">
-                <label for="organizerCluster">Cluster</label>
-                <select class="form-control" id="organizerCluster" ng-model="settings.organizer.cluster">
-                    <option ng-repeat="cluster in options.clusters">{{ cluster }}</option>
-                </select>
-            </div>
-
         </div>
 
-        <button type="submit" class="btn btn-primary">Save</button>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h4 class="card-title">Organizer</h4>
+                <div class="form-row">
+
+                    <div class="form-group col-2">
+                        <label for="organizerArchitectures">Architectures</label>
+                        <select class="form-control" id="organizerArchitectures"
+                            ng-model="settings.organizer.architecture">
+                            <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-2">
+                        <label for="organizerDatasets">Datasets</label>
+                        <select class="form-control" id="organizerDatasets" ng-model="settings.organizer.dataset">
+                            <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-2">
+                        <label for="organizerLosses">Losses</label>
+                        <select class="form-control" id="organizerLosses" ng-model="settings.organizer.loss">
+                            <option ng-repeat="loss in options.losses">{{ loss }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-2">
+                        <label for="organizerOptimizers">Optimizers</label>
+                        <select class="form-control" id="organizerOptimizers" ng-model="settings.organizer.optimizer">
+                            <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-2">
+                        <label for="organizerMetrics">Metrics</label>
+                        <input class="form-control" ng-model="settings.organizer.metrics" type="text"
+                            id="organizerMetrics">
+                    </div>
+
+                    <div class="form-group col-2">
+                        <label for="organizerEpochs">Epochs</label>
+                        <input class="form-control" ng-model="settings.organizer.epochs" type="number"
+                            id="organizerEpochs" min="0" step="1">
+                    </div>
+
+                    <div class="form-group col-2">
+                        <label for="organizerPatience">Patience</label>
+                        <input class="form-control" ng-model="settings.organizer.patience" type="number"
+                            id="organizerPatience" min="0" step="1">
+                    </div>
+
+                    <div class="form-group col-2">
+                        <label for="organizerSplit">Split</label>
+                        <input class="form-control" ng-model="settings.organizer.split" type="number"
+                            id="organizerSplit" min="0" step="1">
+                    </div>
+
+                    <div class="form-group col-2">
+                        <label for="organizerCluster">Cluster</label>
+                        <select class="form-control" id="organizerCluster" ng-model="settings.organizer.cluster">
+                            <option ng-repeat="cluster in options.clusters">{{ cluster }}</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
 
     </form>
 

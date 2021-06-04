@@ -36,6 +36,7 @@ class OrganizerSettings {
     patience = 3;
     split = 0;
     cluster = 'hybrid3';
+    clusterArgs = Object();
 
 }
 

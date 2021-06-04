@@ -19,6 +19,7 @@ class SettingsViewController {
      * @param {OptionsService} options 
      */
     constructor($scope, settings, modal, options) {
+
         this.$scope = $scope;
         this.settings = settings;
         this.modal = modal;
