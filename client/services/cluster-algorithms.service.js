@@ -34,6 +34,10 @@ class ClusterAlgorithmsService {
         return this.#container;
     }
 
+    get(name) {
+        return this.#container.find(element => element.name === name);
+    }
+
     isLoaded() {
         return this.#isLoaded;
     }
