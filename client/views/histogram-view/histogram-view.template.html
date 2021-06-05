@@ -36,20 +36,16 @@
                     <div class="col-2" ng-repeat="(parameterName, parameterDetails) in algorithm.parameters">
                         <div class="form-group">
                             <label ng-attr-for="{{ algorithm.name + parameterName }}">{{ parameterName }}</label>
-                            <select class="form-control"
-                                ng-init="requestArgs.args[parameterName] = parameterDetails.default"
-                                ng-if="parameterDetails.type === '<enum \'Enum\'>'"
+                            <select class="form-control" ng-if="parameterDetails.type === '<enum \'Enum\'>'"
                                 ng-model="requestArgs.args[parameterName]"
                                 ng-attr-id="{{ algorithm.name + parameterName }}">
                                 <option ng-repeat="choices in parameterDetails.choices">{{ choices }}</option>
                             </select>
-                            <input ng-init="requestArgs.args[parameterName] = parameterDetails.default"
-                                ng-if="parameterDetails.type === '<class \'float\'>'" type="number" class="form-control"
-                                ng-attr-id="{{ algorithm.name + parameterName }}"
+                            <input class="form-control" ng-if="parameterDetails.type === '<class \'float\'>'"
+                                type="number" ng-attr-id="{{ algorithm.name + parameterName }}"
                                 ng-model="requestArgs.args[parameterName]" step="any">
-                            <input ng-init="requestArgs.args[parameterName] = parameterDetails.default"
-                                ng-if="parameterDetails.type === '<class \'int\'>'" type="number" class="form-control"
-                                ng-attr-id="{{ algorithm.name + parameterName }}"
+                            <input class="form-control" ng-if="parameterDetails.type === '<class \'int\'>'"
+                                type="number" ng-attr-id="{{ algorithm.name + parameterName }}"
                                 ng-model="requestArgs.args[parameterName]" step="1">
                         </div>
                     </div>

@@ -25,7 +25,25 @@ function controllerFn($scope, $q, options, modal, queryServer, focusImage, clust
     function preload() {
         modal.showLoading('RETRIEVING...');
         return $q.all([options.load(), clusterAlgorithms.preload()]).then(
-            () => modal.hideLoading(),
+            () => {
+                $scope.$watch('requestArgs.cluster', (newVal, oldVal, scope) => {
+                    scope.requestArgs.args = Object();
+                    let algorithm = clusterAlgorithms.get(newVal);
+                    if (algorithm) {
+                        for (let [parameterName, parameterDetails] of Object.entries(algorithm.parameters)) {
+                            scope.requestArgs.args[parameterName] = parameterDetails.default;
+                        }
+                    }
+                });
+
+                $scope.requestArgs = {
+                    cluster: 'sift4',
+                    directory: path.join(os.homedir(), 'Pictures'),
+                    args: Object(),
+                };
+
+                modal.hideLoading();
+            },
             e => {
                 console.error(e);
                 modal.hideLoading();
@@ -45,7 +63,8 @@ function controllerFn($scope, $q, options, modal, queryServer, focusImage, clust
             $scope.requestArgs.args,
         ).then(
             clusters => {
-                $scope.clusters = clusters; modal.hideLoading();
+                $scope.clusters = clusters;
+                modal.hideLoading();
             },
             e => {
                 console.error(e);
@@ -53,12 +72,6 @@ function controllerFn($scope, $q, options, modal, queryServer, focusImage, clust
                 modal.showError(e, 'ERROR: Clustering Algorithms', 'Error while clustering');
             },
         );
-    };
-
-    $scope.requestArgs = {
-        cluster: 'sift4',
-        directory: path.join(os.homedir(), 'Pictures'),
-        args: Object(),
     };
 
     $scope.clusters = [];
