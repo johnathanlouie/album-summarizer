@@ -50,7 +50,6 @@ class Resnet101a(Architecture):
             include_top=True,
             weights=None,
             input_tensor=img_input,
-            classes=classes,
         )
         x = Dense(1, activation='relu', name='predictions')(x.output)
         model = Model(img_input, x, name='resnet101a')
