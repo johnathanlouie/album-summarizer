@@ -449,11 +449,13 @@ def function_signature(func) -> Dict[str, Dict[str, Any]]:
     for param, type_ in types.items():
         if param == 'return':
             continue
-        b = dict()
-        a[param] = b
-        if inspect.isclass(type_) and issubclass(type_, Enum):
-            b['type'] = str(Enum)
-            b['choices'] = [i.value for i in type_]
+        a[param] = b = dict()
+        if inspect.isclass(type_):
+            if issubclass(type_, Enum):
+                b['type'] = str(Enum.__name__)
+                b['choices'] = [i.value for i in type_]
+            else:
+                b['type'] = str(type_.__name__)
         else:
             b['type'] = str(type_)
         if signature.parameters[param].default != inspect.Parameter.empty:
