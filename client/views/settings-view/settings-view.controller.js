@@ -2,44 +2,81 @@ const angular = require('angular');
 import ModalService from '../../services/modal.service.js';
 import SettingsService from '../../services/settings.service.js';
 import OptionsService from '../../services/options.service.js';
+import ClusterAlgorithmsService from '../../services/cluster-algorithms.service.js';
 
 
 class SettingsViewController {
 
-    static $inject = ['$scope', 'settings', 'modal', 'options'];
-    $scope;
-    settings;
-    modal;
-    options;
+    static $inject = ['$scope', '$q', 'settings', 'modal', 'options', 'clusterAlgorithms'];
+    #$scope;
+    #$q;
+    #settings;
+    #modal;
+    #options;
+    #clusterAlgorithms;
 
     /**
      * @param {angular.IScope} $scope 
+     * @param {angular.IQService} $q 
      * @param {SettingsService} settings 
      * @param {ModalService} modal 
      * @param {OptionsService} options 
+     * @param {ClusterAlgorithmsService} clusterAlgorithms 
      */
-    constructor($scope, settings, modal, options) {
+    constructor($scope, $q, settings, modal, options, clusterAlgorithms) {
 
-        this.$scope = $scope;
-        this.settings = settings;
-        this.modal = modal;
-        this.options = options;
+        /* === INJECTION VARIABLES === */
+        this.#$scope = $scope;
+        this.#$q = $q;
+        this.#settings = settings;
+        this.#modal = modal;
+        this.#options = options;
+        this.#clusterAlgorithms = clusterAlgorithms;
 
-        $scope.options = options;
-        $scope.settings = this.settings;
-        $scope.save = () => this.save();
+        /* === PRELOAD === */
+        this.#modal.showLoading('PRELOADING....');
+        this.#settings.load();
+        this.#$q.all([
+            this.#clusterAlgorithms.preload(),
+            this.#options.load(),
+        ]).then(() => {
+            this.#$scope.settings = angular.copy(this.#settings);
+            this.#modal.hideLoading();
+        }, error => {
+            this.#modal.hideLoading();
+            this.#modal.showError(error, 'ERROR: Preload Error', 'Something happened during preloading');
+        });
 
-        $('#toast1').on('show.bs.toast', function () { $scope.toastShow1 = true; });
-        $('#toast1').on('hidden.bs.toast', function () { $scope.toastShow1 = false; });
-        $('#toast2').on('show.bs.toast', function () { $scope.toastShow2 = true; });
-        $('#toast2').on('hidden.bs.toast', function () { $scope.toastShow2 = false; });
+        /* === SCOPE VARIABLES === */
+        this.#$scope.options = this.#options;
+        this.#$scope.clusterAlgorithms = this.#clusterAlgorithms;
+        this.#$scope.settings = angular.copy(this.#settings);
+
+        /* === SCOPE FUNCTIONS === */
+        this.#$scope.save = () => this.save();
+
+        /* === MISCELLANEOUS === */
+        $('#toast1').on('show.bs.toast', () => { this.#$scope.toastShow1 = true; });
+        $('#toast1').on('hidden.bs.toast', () => { this.#$scope.toastShow1 = false; });
+        $('#toast2').on('show.bs.toast', () => { this.#$scope.toastShow2 = true; });
+        $('#toast2').on('hidden.bs.toast', () => { this.#$scope.toastShow2 = false; });
         this.exists();
+        this.#$scope.$watch('settings.organizer.cluster', (newVal, oldVal, scope) => {
+            scope.settings.organizer.clusterArgs = Object();
+            let algorithm = this.#clusterAlgorithms.items().find(element => element.name === newVal);
+            if (algorithm) {
+                for (let [parameterName, parameterDetails] of Object.entries(algorithm.parameters)) {
+                    scope.settings.organizer.clusterArgs[parameterName] = parameterDetails.default;
+                }
+            }
+        });
 
     }
 
     save() {
         try {
-            this.settings.save();
+            angular.copy(this.#$scope.settings, this.#settings);
+            this.#settings.save();
             $('#toast1').toast('show');
         }
         catch (e) {
@@ -49,7 +86,7 @@ class SettingsViewController {
     }
 
     exists() {
-        if (!this.settings.exists()) {
+        if (!this.#settings.exists()) {
             $('#toast2').toast('show');
         }
     }

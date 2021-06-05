@@ -35,8 +35,20 @@ class OrganizerSettings {
     epochs = 0;
     patience = 3;
     split = 0;
-    cluster = 'hybrid3';
-    clusterArgs = Object();
+    cluster = 'sift4';
+    clusterArgs = {
+        nfeatures: 300,
+        nOctaveLayers: 3,
+        contrastThreshold: 0.04,
+        edgeThreshold: 10,
+        sigma: 1.6,
+        ratio: 0.8,
+        similarity_metric: 'inverse_distance',
+        damping: 0.5,
+        max_iter: 200,
+        convergence_iter: 15,
+        affinity: 'euclidean',
+    };
 
 }
 

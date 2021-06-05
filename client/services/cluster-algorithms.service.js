@@ -4,7 +4,7 @@ import QueryServerService from './query-server.service.js';
 
 class ClusterAlgorithmsService {
 
-    #container;
+    #container = [];
     #isLoaded = false;
 
     static $inject = ['$q', 'queryServer'];
@@ -23,7 +23,7 @@ class ClusterAlgorithmsService {
     preload() {
         if (this.#isLoaded) { return this.$q.resolve(); }
         this.#isLoaded = false;
-        this.#container = undefined;
+        this.#container = [];
         return this.queryServer.clusterAlgorithms().then(data => {
             this.#isLoaded = true;
             this.#container = data;
