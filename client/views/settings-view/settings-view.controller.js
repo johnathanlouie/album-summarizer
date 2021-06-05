@@ -62,11 +62,13 @@ class SettingsViewController {
         $('#toast2').on('hidden.bs.toast', () => { this.#$scope.toastShow2 = false; });
         this.exists();
         this.#$scope.$watch('settings.organizer.cluster', (newVal, oldVal, scope) => {
-            scope.settings.organizer.clusterArgs = Object();
-            let algorithm = this.#clusterAlgorithms.items().find(element => element.name === newVal);
-            if (algorithm) {
-                for (let [parameterName, parameterDetails] of Object.entries(algorithm.parameters)) {
-                    scope.settings.organizer.clusterArgs[parameterName] = parameterDetails.default;
+            if (newVal !== oldVal) {
+                scope.settings.organizer.clusterArgs = Object();
+                let algorithm = this.#clusterAlgorithms.items().find(element => element.name === newVal);
+                if (algorithm) {
+                    for (let [parameterName, parameterDetails] of Object.entries(algorithm.parameters)) {
+                        scope.settings.organizer.clusterArgs[parameterName] = parameterDetails.default;
+                    }
                 }
             }
         });
