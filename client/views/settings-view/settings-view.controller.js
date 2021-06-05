@@ -64,7 +64,7 @@ class SettingsViewController {
         this.#$scope.$watch('settings.organizer.cluster', (newVal, oldVal, scope) => {
             if (newVal !== oldVal) {
                 scope.settings.organizer.clusterArgs = Object();
-                let algorithm = this.#clusterAlgorithms.items().find(element => element.name === newVal);
+                let algorithm = this.#clusterAlgorithms.get(newVal);
                 if (algorithm) {
                     for (let [parameterName, parameterDetails] of Object.entries(algorithm.parameters)) {
                         scope.settings.organizer.clusterArgs[parameterName] = parameterDetails.default;
