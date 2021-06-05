@@ -16,9 +16,9 @@ class HsvHistogram(object):
     hue-saturation-value
     """
 
-    def __init__(self, image: Url, hue: int = 180, saturation: int = 256, value: int = 256) -> None:
+    def __init__(self, image: Url) -> None:
         self._url = image
-        self._image = hsv(read_image(image), hue, saturation, value)
+        self._image = hsv(read_image(image))
 
     def _histogram(self, channel: int, range: int) -> Histogram:
         """
@@ -93,8 +93,8 @@ class HistogramCluster(ClusterStrategy):
         c = list()
         for i, img in enumerate(images):
             print("HISTOGRAM ( %i / %i )" % (i, len(images)))
-            hh = HsvHistogram(img, hue_bins, saturation_bins, value_bins)
-            histogram = HsvHistogram.scale(hh.hsv(), hh.size())
+            hh = HsvHistogram(img)
+            histogram = HsvHistogram.scale(hh.hsv(hue_bins, saturation_bins, value_bins), hh.size())
             c.append(histogram)
         d = vstack(c)
         print('CLUSTER: Mean Shift')
