@@ -56,7 +56,7 @@ function controllerFn($scope, $q, options, modal, queryServer, focusImage, clust
     };
 
     $scope.requestArgs = {
-        cluster: 'sift',
+        cluster: 'sift4',
         directory: path.join(os.homedir(), 'Pictures'),
         args: Object(),
     };
