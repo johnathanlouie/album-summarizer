@@ -60,38 +60,31 @@ class Settings(object):
         self.epochs = 0
         self.patience = 3
         self.split = 0
-        self.cluster = 'sift'
+        self.cluster = 'sift4'
+        self.clusterArgs = {
+            'nfeatures': 300,
+            'nOctaveLayers': 3,
+            'contrastThreshold': 0.04,
+            'edgeThreshold': 10,
+            'sigma': 1.6,
+            'ratio': 0.8,
+            'similarity_metric': 'inverse_distance',
+            'damping': 0.5,
+            'max_iter': 200,
+            'convergence_iter': 15,
+            'affinity': 'euclidean',
+        }
 
     def exists(self) -> bool:
         return os.path.isfile(self.FILENAME)
 
     def save(self) -> None:
         with open(self.FILENAME, 'w') as f:
-            x = {
-                'architecture': self.architecture,
-                'dataset': self.dataset,
-                'loss': self.loss,
-                'optimizer': self.optimizer,
-                'metrics': self.metrics,
-                'epochs': self.epochs,
-                'patience': self.patience,
-                'split': self.split,
-                'cluster': self.cluster,
-            }
-            json.dump(x, f)
+            json.dump(self.__dict__, f)
 
     def load(self) -> None:
         with open(self.FILENAME) as f:
-            x = json.load(f)
-            self.architecture = x['architecture']
-            self.dataset = x['dataset']
-            self.loss = x['loss']
-            self.optimizer = x['optimizer']
-            self.metrics = x['metrics']
-            self.epochs = x['epochs']
-            self.patience = x['patience']
-            self.split = x['split']
-            self.cluster = x['cluster']
+            self.__dict__.update(json.load(f))
 
 
 def Evaluation(model, status, training=None, validation=None, test=None):
@@ -104,14 +97,14 @@ def Evaluation(model, status, training=None, validation=None, test=None):
     }
 
 
-def main(directory: Url, algorithm: ClusterStrategy, algorithm2: ModelSplit) -> List[List[Dict[str, Any]]]:
+def main(directory: Url, algorithm: ClusterStrategy, algorithm_args: Dict[str, Any], algorithm2: ModelSplit) -> List[List[Dict[str, Any]]]:
     """
     Does all the work.
     """
     images = ImageDirectory(directory).jpeg(False)
     if len(images) == 0:
         return list()
-    clusters = algorithm.run_cached(images)
+    clusters = algorithm.run_cached(images, **algorithm_args)
     rates = algorithm2.predict(images, True).y.predicted
     print('Ranking results....')
     cr = ClusterRank(clusters, rates)
@@ -148,7 +141,7 @@ if __name__ == '__main__':
                 settings.patience,
             )
             split = model.split(settings.split)
-            results = main(directory, cluster, split)
+            results = main(directory, cluster, settings.clusterArgs, split)
             results = flask.jsonify(results)
             return results
         except TrainingIncompleteException:
