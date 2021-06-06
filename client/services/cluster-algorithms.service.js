@@ -51,7 +51,9 @@ class ClusterAlgorithmsService {
     getDefaultArgs(clusterName) {
         let defaultArgs = Object();
         for (let [paramName, details] of Object.entries(this.get(clusterName).parameters)) {
-            defaultArgs[paramName] = details.default;
+            if ('default' in details) {
+                defaultArgs[paramName] = details.default;
+            }
         }
         return defaultArgs;
     }
