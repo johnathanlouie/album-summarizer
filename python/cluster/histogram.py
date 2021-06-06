@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import cv2
 from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
@@ -86,6 +86,7 @@ class HistogramCluster(ClusterStrategy):
         hue_bins: int = 180,
         saturation_bins: int = 256,
         value_bins: int = 256,
+        bandwidth: Optional[float] = None,
     ) -> ClusterResults:
         """
         Clusters images.
@@ -98,7 +99,7 @@ class HistogramCluster(ClusterStrategy):
             c.append(histogram)
         d = vstack(c)
         print('CLUSTER: Mean Shift')
-        cluster = MeanShift().fit_predict(d).tolist()
+        cluster = MeanShift(bandwidth=bandwidth).fit_predict(d).tolist()
         return ClusterResults(images, cluster)
 
 
