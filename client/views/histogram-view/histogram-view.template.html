@@ -31,22 +31,19 @@
         <div class="card mt-3">
             <div class="card-body">
                 <h5 class="card-title">Additional Parameters</h5>
-                <div class="form-row" ng-repeat="algorithm in clusterAlgorithms.items()"
-                    ng-if="algorithm.name === requestArgs.cluster">
-                    <div class="col-2" ng-repeat="(parameterName, parameterDetails) in algorithm.parameters">
-                        <div class="form-group">
-                            <label ng-attr-for="{{ algorithm.name + parameterName }}">{{ parameterName }}</label>
-                            <select class="form-control" ng-if="parameterDetails.type === 'Enum'"
-                                ng-model="requestArgs.args[parameterName]"
-                                ng-attr-id="{{ algorithm.name + parameterName }}">
-                                <option ng-repeat="choices in parameterDetails.choices">{{ choices }}</option>
-                            </select>
-                            <input class="form-control" ng-if="parameterDetails.type === 'float'"
-                                ng-attr-id="{{ algorithm.name + parameterName }}"
-                                ng-model="requestArgs.args[parameterName]" type="number" step="any">
-                            <input class="form-control" ng-if="parameterDetails.type === 'int'"
-                                ng-attr-id="{{ algorithm.name + parameterName }}"
-                                ng-model="requestArgs.args[parameterName]" type="number" step="1">
+                <div class="form-row">
+                    <div class="col-2"
+                        ng-repeat="(paramName, paramDetails) in clusterAlgorithms.get(requestArgs.cluster).parameters">
+                        <div class="form-group" ng-switch="paramDetails.type">
+                            <label ng-attr-for="{{ paramName }}">{{ paramName }}</label>
+                            <select class="form-control" ng-switch-when="Enum" ng-model="requestArgs.args[paramName]"
+                                ng-attr-id="{{ paramName }}"
+                                ng-options="choices for choices in paramDetails.choices"></select>
+                            <input class="form-control" ng-switch-when="float" ng-attr-id="{{ paramName }}"
+                                ng-model="requestArgs.args[paramName]" type="number" step="any">
+                            <input class="form-control" ng-switch-when="int" ng-attr-id="{{ paramName }}"
+                                ng-model="requestArgs.args[paramName]" type="number" step="1">
+                            <input class="form-control" ng-switch-default disabled ng-value="paramDetails.type">
                         </div>
                     </div>
                 </div>
