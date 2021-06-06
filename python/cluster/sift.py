@@ -235,6 +235,11 @@ class AffinityPropagationAffinity(Enum):
     PRECOMPUTED = 'precomputed'
 
 
+class DescriptorMatcher(Enum):
+    FLANNBASED = 'flann_based'
+    BRUTEFORCE = 'brute_force'
+
+
 class SiftCluster2(ClusterStrategy):
     def run(
         self,
@@ -250,11 +255,14 @@ class SiftCluster2(ClusterStrategy):
         max_iter: int = 200,
         convergence_iter: int = 15,
         affinity: AffinityPropagationAffinity = AffinityPropagationAffinity.EUCLIDEAN,
+        descriptor_matcher: DescriptorMatcher = DescriptorMatcher.FLANNBASED,
     ) -> ClusterResults:
         if not isinstance(similarity_metric, SimilarityMetric):
             similarity_metric = SimilarityMetric(similarity_metric)
         if not isinstance(affinity, AffinityPropagationAffinity):
             affinity = AffinityPropagationAffinity(affinity)
+        if not isinstance(descriptor_matcher, DescriptorMatcher):
+            descriptor_matcher = DescriptorMatcher(descriptor_matcher)
         list_of_images = list()
         matrix = SimilarityMatrix.empty_matrix(len(images))
         for url in images:
@@ -268,10 +276,14 @@ class SiftCluster2(ClusterStrategy):
             ).detectAndCompute(image=read_image(url), mask=None)
             list_of_images.append(descriptors)
         combo = list(itertools.combinations_with_replacement(range(len(list_of_images)), 2))
+        if descriptor_matcher == DescriptorMatcher.FLANNBASED:
+            matcher = cv2.FlannBasedMatcher_create()
+        else:
+            matcher = cv2.BFMatcher_create()
         for idx, (i, j) in enumerate(combo):
             print("SIFT SIMILARITY: ( %i / %i ) ( %i / %i )" % (i, j, idx, len(combo)))
             if i != j:
-                matches = cv2.BFMatcher_create().knnMatch(queryDescriptors=list_of_images[i], trainDescriptors=list_of_images[j], k=2)
+                matches = matcher.knnMatch(queryDescriptors=list_of_images[i], trainDescriptors=list_of_images[j], k=2)
                 good = []
                 for m, n in matches:
                     if m.distance < ratio * n.distance:
