@@ -45,12 +45,24 @@ class SettingsViewController {
         }, error => {
             this.#modal.hideLoading();
             this.#modal.showError(error, 'ERROR: Preload Error', 'Something happened during preloading');
+        }).then(() => {
+            this.#$scope.$watch('settings.organizer.cluster', (newVal, oldVal, scope) => {
+                if (newVal !== oldVal) {
+                    scope.settings.organizer.clusterArgs = Object();
+                    let algorithm = this.#clusterAlgorithms.get(newVal);
+                    if (algorithm) {
+                        for (let [parameterName, parameterDetails] of Object.entries(algorithm.parameters)) {
+                            scope.settings.organizer.clusterArgs[parameterName] = parameterDetails.default;
+                        }
+                    }
+                }
+            });
         });
 
         /* === SCOPE VARIABLES === */
         this.#$scope.options = this.#options;
         this.#$scope.clusterAlgorithms = this.#clusterAlgorithms;
-        this.#$scope.settings = angular.copy(this.#settings);
+        // this.#$scope.settings = angular.copy(this.#settings);
 
         /* === SCOPE FUNCTIONS === */
         this.#$scope.save = () => this.save();
@@ -61,17 +73,6 @@ class SettingsViewController {
         $('#toast2').on('show.bs.toast', () => { this.#$scope.toastShow2 = true; });
         $('#toast2').on('hidden.bs.toast', () => { this.#$scope.toastShow2 = false; });
         this.exists();
-        this.#$scope.$watch('settings.organizer.cluster', (newVal, oldVal, scope) => {
-            if (newVal !== oldVal) {
-                scope.settings.organizer.clusterArgs = Object();
-                let algorithm = this.#clusterAlgorithms.get(newVal);
-                if (algorithm) {
-                    for (let [parameterName, parameterDetails] of Object.entries(algorithm.parameters)) {
-                        scope.settings.organizer.clusterArgs[parameterName] = parameterDetails.default;
-                    }
-                }
-            }
-        });
 
     }
 

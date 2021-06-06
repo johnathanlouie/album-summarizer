@@ -54,31 +54,28 @@
 
                     <div class="form-group col-2">
                         <label for="organizerArchitectures">Architectures</label>
-                        <select class="form-control" id="organizerArchitectures"
-                            ng-model="settings.organizer.architecture">
-                            <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
-                        </select>
+                        <select class="form-control" ng-model="settings.organizer.architecture"
+                            ng-options="architecture for architecture in options.architectures"
+                            id="organizerArchitectures"></select>
                     </div>
 
                     <div class="form-group col-2">
                         <label for="organizerDatasets">Datasets</label>
-                        <select class="form-control" id="organizerDatasets" ng-model="settings.organizer.dataset">
-                            <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
-                        </select>
+                        <select class="form-control" ng-model="settings.organizer.dataset"
+                            ng-options="dataset for dataset in options.datasets" id="organizerDatasets"></select>
                     </div>
 
                     <div class="form-group col-2">
                         <label for="organizerLosses">Losses</label>
-                        <select class="form-control" id="organizerLosses" ng-model="settings.organizer.loss">
-                            <option ng-repeat="loss in options.losses">{{ loss }}</option>
-                        </select>
+                        <select class="form-control" ng-model="settings.organizer.loss"
+                            ng-options="loss for loss in options.losses" id="organizerLosses"></select>
                     </div>
 
                     <div class="form-group col-2">
                         <label for="organizerOptimizers">Optimizers</label>
-                        <select class="form-control" id="organizerOptimizers" ng-model="settings.organizer.optimizer">
-                            <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
-                        </select>
+                        <select class="form-control" ng-model="settings.organizer.optimizer"
+                            ng-options="optimizer for optimizer in options.optimizers"
+                            id="organizerOptimizers"></select>
                     </div>
 
                     <div class="form-group col-2">
@@ -115,9 +112,9 @@
                 <div class="form-row">
                     <div class="form-group col-4">
                         <label for="organizerCluster">Name</label>
-                        <select class="form-control" id="organizerCluster" ng-model="settings.organizer.cluster">
-                            <option ng-repeat="algorithm in clusterAlgorithms.items()">{{ algorithm.name }}</option>
-                        </select>
+                        <select class="form-control" ng-model="settings.organizer.cluster"
+                            ng-options="algorithm.name as algorithm.name for algorithm in clusterAlgorithms.items()"
+                            id="organizerCluster"></select>
                     </div>
                 </div>
                 <h4 class="card-title">Cluster Parameters</h4>
@@ -128,9 +125,8 @@
                             <label ng-attr-for="{{ algorithm.name + parameterName }}">{{ parameterName }}</label>
                             <select class="form-control" ng-if="parameterDetails.type === 'Enum'"
                                 ng-model="settings.organizer.clusterArgs[parameterName]"
-                                ng-attr-id="{{ algorithm.name + parameterName }}">
-                                <option ng-repeat="choices in parameterDetails.choices">{{ choices }}</option>
-                            </select>
+                                ng-attr-id="{{ algorithm.name + parameterName }}"
+                                ng-options="choices for choices in parameterDetails.choices"></select>
                             <input class="form-control" ng-if="parameterDetails.type === 'float'" type="number"
                                 ng-attr-id="{{ algorithm.name + parameterName }}"
                                 ng-model="settings.organizer.clusterArgs[parameterName]" step="any">
