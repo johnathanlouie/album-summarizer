@@ -34,8 +34,26 @@ class ClusterAlgorithmsService {
         return this.#container;
     }
 
+    /**
+     * 
+     * @param {string} name 
+     * @returns {Object}
+     */
     get(name) {
         return this.#container.find(element => element.name === name);
+    }
+
+    /**
+     * 
+     * @param {string} clusterName 
+     * @returns {Object}
+     */
+    getDefaultArgs(clusterName) {
+        let defaultArgs = Object();
+        for (let [paramName, details] of Object.entries(this.get(clusterName).parameters)) {
+            defaultArgs[paramName] = details.default;
+        }
+        return defaultArgs;
     }
 
     isLoaded() {
