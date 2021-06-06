@@ -110,29 +110,26 @@
             <div class="card-body">
                 <h4 class="card-title">Clustering Algorithm</h4>
                 <div class="form-row">
-                    <div class="form-group col-4">
+                    <div class="form-group col">
                         <label for="organizerCluster">Name</label>
                         <select class="form-control" ng-model="settings.organizer.cluster"
                             ng-options="algorithm.name as algorithm.name for algorithm in clusterAlgorithms.items()"
                             id="organizerCluster"></select>
                     </div>
                 </div>
-                <h4 class="card-title">Cluster Parameters</h4>
-                <div class="form-row" ng-repeat="algorithm in clusterAlgorithms.items()"
-                    ng-if="algorithm.name === settings.organizer.cluster">
-                    <div class="col-2" ng-repeat="(parameterName, parameterDetails) in algorithm.parameters">
-                        <div class="form-group">
-                            <label ng-attr-for="{{ algorithm.name + parameterName }}">{{ parameterName }}</label>
-                            <select class="form-control" ng-if="parameterDetails.type === 'Enum'"
-                                ng-model="settings.organizer.clusterArgs[parameterName]"
-                                ng-attr-id="{{ algorithm.name + parameterName }}"
-                                ng-options="choices for choices in parameterDetails.choices"></select>
-                            <input class="form-control" ng-if="parameterDetails.type === 'float'" type="number"
-                                ng-attr-id="{{ algorithm.name + parameterName }}"
-                                ng-model="settings.organizer.clusterArgs[parameterName]" step="any">
-                            <input class="form-control" ng-if="parameterDetails.type === 'int'" type="number"
-                                ng-attr-id="{{ algorithm.name + parameterName }}"
-                                ng-model="settings.organizer.clusterArgs[parameterName]" step="1">
+                <div class="form-row">
+                    <div class="col-2"
+                        ng-repeat="(paramName, paramDetails) in clusterAlgorithms.get(settings.organizer.cluster).parameters">
+                        <div class="form-group" ng-switch="paramDetails.type">
+                            <label ng-attr-for="{{ paramName }}">{{ paramName }}</label>
+                            <select class="form-control" ng-switch-when="Enum"
+                                ng-model="settings.organizer.clusterArgs[paramName]" ng-attr-id="{{ paramName }}"
+                                ng-options="choices for choices in paramDetails.choices"></select>
+                            <input class="form-control" ng-switch-when="float" ng-attr-id="{{ paramName }}"
+                                ng-model="settings.organizer.clusterArgs[paramName]" type="number" step="any">
+                            <input class="form-control" ng-switch-when="int" ng-attr-id="{{ paramName }}"
+                                ng-model="settings.organizer.clusterArgs[paramName]" type="number" step="1">
+                            <input class="form-control" ng-switch-default disabled ng-value="paramDetails.type">
                         </div>
                     </div>
                 </div>
