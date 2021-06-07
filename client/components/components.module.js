@@ -5,6 +5,7 @@ import imageViewer from './image-viewer/image-viewer.module.js';
 import loadingModal from './loading-modal/loading-modal.module.js';
 import subdirectoryPanel from './subdirectory-panel/subdirectory-panel.module.js';
 import photoModal from './photo-modal/photo-modal.module.js';
+import nullableInput from './nullable-input/nullable-input.module.js';
 
 
 const module = angular.module('components', [
@@ -14,6 +15,7 @@ const module = angular.module('components', [
     loadingModal,
     subdirectoryPanel,
     photoModal,
+    nullableInput,
 ]);
 
 

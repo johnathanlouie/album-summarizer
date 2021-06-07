@@ -1,0 +1,9 @@
+<div class="input-group">
+    <div class="input-group-prepend">
+        <div class="input-group-text">
+            <input ng-model="isNotNull" type="checkbox">
+        </div>
+    </div>
+    <input class="form-control" ng-hide="isNotNull" type="text" value="(null)" disabled>
+    <input class="form-control" ng-show="isNotNull" ng-model="floatValue" type="number" step="any">
+</div>
