@@ -43,6 +43,8 @@
                                 ng-model="requestArgs.args[paramName]" type="number" step="any">
                             <input class="form-control" ng-switch-when="int" ng-attr-id="{{ paramName }}"
                                 ng-model="requestArgs.args[paramName]" type="number" step="1">
+                            <nullable-input ng-switch-when="typing.Union[float, NoneType]"
+                                ng-model="settings.organizer.clusterArgs[paramName]"></nullable-input>
                             <input class="form-control" ng-switch-default disabled ng-value="paramDetails.type">
                         </div>
                     </div>
