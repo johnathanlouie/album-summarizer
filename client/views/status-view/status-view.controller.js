@@ -78,10 +78,10 @@ class StatusViewController {
     #quit = false;
     #search = {
         model: {
-            architecture: '',
-            dataset: '',
-            loss: '',
-            optimizer: '',
+            architecture: null,
+            dataset: null,
+            loss: null,
+            optimizer: null,
         },
         status: 'TrainingStatus.COMPLETE',
     };
@@ -316,7 +316,7 @@ class StatusViewController {
     }
 
     #comparator(actual, expected) {
-        if (expected === '') {
+        if (expected === null) {
             return true;
         }
         return actual === expected;

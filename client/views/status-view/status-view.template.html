@@ -60,41 +60,41 @@
 
                 <div class="form-group col">
                     <label for="architectures">Architecture</label>
-                    <select class="form-control" id="architectures" ng-model="search.model.architecture">
+                    <select class="form-control" id="architectures" ng-model="search.model.architecture"
+                        ng-options="architecture for architecture in options.architectures">
                         <option></option>
-                        <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
                     </select>
                 </div>
 
                 <div class="form-group col">
                     <label for="datasets">Dataset</label>
-                    <select class="form-control" id="datasets" ng-model="search.model.dataset">
+                    <select class="form-control" ng-model="search.model.dataset"
+                        ng-options="dataset for dataset in options.datasets" id="datasets">
                         <option></option>
-                        <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
                     </select>
                 </div>
 
                 <div class="form-group col">
                     <label for="losses">Loss</label>
-                    <select class="form-control" id="losses" ng-model="search.model.loss">
+                    <select class="form-control" ng-model="search.model.loss"
+                        ng-options="loss for loss in options.losses" id="losses">
                         <option></option>
-                        <option ng-repeat="loss in options.losses">{{ loss }}</option>
                     </select>
                 </div>
 
                 <div class="form-group col">
                     <label for="optimizers">Optimizer</label>
-                    <select class="form-control" id="optimizers" ng-model="search.model.optimizer">
+                    <select class="form-control" ng-model="search.model.optimizer"
+                        ng-options="optimizer for optimizer in options.optimizers" id="optimizers">
                         <option></option>
-                        <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
                     </select>
                 </div>
 
                 <div class="form-group col">
                     <label for="status">Status</label>
-                    <select class="form-control" id="status" ng-model="search.status">
+                    <select class="form-control" ng-model="search.status"
+                        ng-options="status for status in evaluations.statuses()" id="status">
                         <option></option>
-                        <option ng-repeat="status in evaluations.statuses()">{{ status }}</option>
                     </select>
                 </div>
 
