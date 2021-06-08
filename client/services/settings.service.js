@@ -35,7 +35,7 @@ class OrganizerSettings {
     epochs = 0;
     patience = 3;
     split = 0;
-    cluster = 'sift4';
+    cluster = 'hybrid3';
     clusterArgs = {
         nfeatures: 300,
         nOctaveLayers: 3,
@@ -48,6 +48,11 @@ class OrganizerSettings {
         max_iter: 200,
         convergence_iter: 15,
         affinity: 'euclidean',
+        descriptor_matcher: 'flann_based',
+        hue_bins: 180,
+        saturation_bins: 256,
+        value_bins: 256,
+        bandwidth: null,
     };
 
 }
