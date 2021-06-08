@@ -59,9 +59,19 @@ class RouteManager {
             '<settings-view></settings-view>',
         ),
         new Route(
-            'Deep Learning',
+            'Deep Learning Models',
+            '/devtools/check-status',
+            '<status-view></status-view>',
+        ),
+        new Route(
+            'Model Evaluation',
             '/devtools/check-rate',
             '<check-rate-view></check-rate-view>',
+        ),
+        new Route(
+            'Model Summary',
+            '/devtools/model-summary',
+            '<model-summary-view></model-summary-view>',
         ),
         new Route(
             'Clustering Algorithms',
@@ -77,16 +87,6 @@ class RouteManager {
             'Data Management',
             '/devtools/data-transfer',
             '<transfer-data-view></transfer-data-view>',
-        ),
-        new Route(
-            'Check Status',
-            '/devtools/check-status',
-            '<status-view></status-view>',
-        ),
-        new Route(
-            'Model Summary',
-            '/devtools/model-summary',
-            '<model-summary-view></model-summary-view>',
         ),
     ];
 
