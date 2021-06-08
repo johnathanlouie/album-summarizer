@@ -30,16 +30,15 @@
 
                             <div class="form-group col">
                                 <label for="architectures">Architectures</label>
-                                <select class="form-control" id="architectures" ng-model="selectedOptions.architecture">
-                                    <option ng-repeat="architecture in options.architectures">{{ architecture }}</option>
-                                </select>
+                                <select class="form-control" ng-model="selectedOptions.architecture"
+                                    ng-options="architecture for architecture in options.architectures"
+                                    id="architectures"></select>
                             </div>
 
                             <div class="form-group col">
                                 <label for="datasets">Datasets</label>
-                                <select class="form-control" id="datasets" ng-model="selectedOptions.dataset">
-                                    <option ng-repeat="dataset in options.datasets">{{ dataset }}</option>
-                                </select>
+                                <select class="form-control" ng-model="selectedOptions.dataset"
+                                    ng-options="dataset for dataset in options.datasets" id="datasets"></select>
                             </div>
 
                         </div>
@@ -47,16 +46,14 @@
 
                             <div class="form-group col">
                                 <label for="losses">Losses</label>
-                                <select class="form-control" id="losses" ng-model="selectedOptions.loss">
-                                    <option ng-repeat="loss in options.losses">{{ loss }}</option>
-                                </select>
+                                <select class="form-control" ng-model="selectedOptions.loss"
+                                    ng-options="loss for loss in options.losses" id="losses"></select>
                             </div>
 
                             <div class="form-group col">
                                 <label for="optimizers">Optimizers</label>
-                                <select class="form-control" id="optimizers" ng-model="selectedOptions.optimizer">
-                                    <option ng-repeat="optimizer in options.optimizers">{{ optimizer }}</option>
-                                </select>
+                                <select class="form-control" ng-model="selectedOptions.optimizer"
+                                    ng-options="optimizer for optimizer in options.optimizers" id="optimizers"></select>
                             </div>
 
                         </div>

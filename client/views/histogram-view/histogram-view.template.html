@@ -10,9 +10,9 @@
 
                     <div class="col-2">
                         <label for="clusterSelector">Clustering Algorithm</label>
-                        <select class="form-control" id="clusterSelector" ng-model="requestArgs.cluster">
-                            <option ng-repeat="algorithms in clusterAlgorithms.items()">{{ algorithms.name }}</option>
-                        </select>
+                        <select class="form-control" ng-model="requestArgs.cluster"
+                            ng-options="algorithms.name as algorithms.name for algorithms in clusterAlgorithms.items()"
+                            id="clusterSelector"></select>
                     </div>
 
                     <div class="col">

@@ -9,10 +9,8 @@
                 <div class="input-group-prepend">
                     <label class="input-group-text" for="collectionSelect">Username</label>
                 </div>
-                <select class="custom-select" ng-model="selectedCollection" id="collectionSelect" required>
-                    <option></option>
-                    <option ng-repeat="c in users.users">{{ c }}</option>
-                </select>
+                <select class="custom-select" ng-model="selectedCollection" ng-options="c for c in users.users"
+                    id="collectionSelect" required></select>
             </div>
             <div class="col-auto">
                 <button class="btn btn-primary" ng-click="getUnlabeledData()">Select User</button>

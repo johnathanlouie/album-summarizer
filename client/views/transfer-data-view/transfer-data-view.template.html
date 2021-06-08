@@ -88,9 +88,8 @@
             <form class="mb-2" ng-submit="download()">
                 <div class="form-row">
                     <div class="col mb-2">
-                        <select class="custom-select" ng-model="dataTargets.collectionPull">
-                            <option ng-repeat="c in users.users">{{ c }}</option>
-                        </select>
+                        <select class="custom-select" ng-model="dataTargets.collectionPull"
+                            ng-options="c for c in users.users"></select>
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-primary" type="submit">Load</button>
