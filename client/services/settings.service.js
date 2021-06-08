@@ -37,7 +37,7 @@ class OrganizerSettings {
     split = 0;
     cluster = 'hybrid3';
     clusterArgs = {
-        nfeatures: 300,
+        nfeatures: 0,
         nOctaveLayers: 3,
         contrastThreshold: 0.04,
         edgeThreshold: 10,
