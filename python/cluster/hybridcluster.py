@@ -120,27 +120,27 @@ class HybridCluster3(HybridCluster):
         value_bins: int = 256,
         bandwidth: Optional[float] = None,
     ) -> ClusterResults:
-        results1 = SiftCluster2().run(
+        results1 = SiftCluster2().run_cached(
             images,
-            nfeatures,
-            nOctaveLayers,
-            contrastThreshold,
-            edgeThreshold,
-            sigma,
-            ratio,
-            similarity_metric,
-            damping,
-            max_iter,
-            convergence_iter,
-            affinity,
-            descriptor_matcher,
+            nfeatures=nfeatures,
+            nOctaveLayers=nOctaveLayers,
+            contrastThreshold=contrastThreshold,
+            edgeThreshold=edgeThreshold,
+            sigma=sigma,
+            ratio=ratio,
+            similarity_metric=similarity_metric,
+            damping=damping,
+            max_iter=max_iter,
+            convergence_iter=convergence_iter,
+            affinity=affinity,
+            descriptor_matcher=descriptor_matcher,
         )
-        results2 = HistogramCluster().run(
+        results2 = HistogramCluster().run_cached(
             images,
-            hue_bins,
-            saturation_bins,
-            value_bins,
-            bandwidth,
+            hue_bins=hue_bins,
+            saturation_bins=saturation_bins,
+            value_bins=value_bins,
+            bandwidth=bandwidth,
         )
         labels1 = results1.labels()
         labels2 = results2.labels()
