@@ -36,7 +36,7 @@ class HybridCluster(ClusterStrategy):
         """
         Returns a new cluster label by combining two cluster labels.
         """
-        return label1 * k1 + label2
+        return label1 + label2 * k1
 
     @staticmethod
     def _next_lowest(min_: int, clusters: List[int]) -> int:
@@ -147,7 +147,6 @@ class HybridCluster3(HybridCluster):
         k1 = results1.k()
         cluster = [self.combine(c1, c2, k1)
                    for c1, c2 in zip(labels1, labels2)]
-        self.remove_empty_clusters(cluster)
         return ClusterResults(images, cluster)
 
 
