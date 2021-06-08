@@ -2,127 +2,134 @@
 
 <div class="container-fluid">
 
-    <div class="row">
-        <div class="col">
-            <h1>Source</h1>
-        </div>
-        <div class="col">
-            <h1>Destination</h1>
-        </div>
-    </div>
+    <div class="card">
+        <div class="card-body">
 
-    <div class="row">
-        <div class="col-6">
-
-            <h6>Create unlabeled data</h6>
-
-            <form class="mb-2" ng-submit="getImages()">
-                <div class="form-row">
-                    <div class="col">
-                        <input class="form-control" ng-model="dataTargets.newData.filepath" type="text"
-                            placeholder="Directory" required>
-                    </div>
-                    <div class="col-auto">
-                        <div class="btn-group-toggle" data-toggle="buttons">
-                            <label class="btn"
-                                ng-class="{ 'btn-info': dataTargets.newData.recursive, 'btn-outline-info': !dataTargets.newData.recursive, 'active': dataTargets.newData.recursive }">
-                                <input type="checkbox" ng-model="dataTargets.newData.recursive"> Recursive
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-primary" type="submit">Load</button>
-                    </div>
+            <div class="row">
+                <div class="col">
+                    <h1>Source</h1>
                 </div>
-            </form>
-
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-
-            <h6>Import CSV file</h6>
-
-            <form class="mb-2" ng-submit="load()">
-                <div class="form-row">
-                    <div class="custom-file col">
-                        <input class="custom-file-input" file-input="dataTargets.file1" type="file" id="csvInput"
-                            required>
-                        <label class="custom-file-label" for="csvInput">{{ dataTargets.file1[0].name || 'Choose file'
-                            }}</label>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-primary" type="submit">Load</button>
-                    </div>
+                <div class="col">
+                    <h1>Destination</h1>
                 </div>
-            </form>
+            </div>
 
-        </div>
-        <div class="col">
+            <div class="row">
+                <div class="col-6">
 
-            <h6>Export to CSV file</h6>
+                    <h6>Create unlabeled data</h6>
 
-            <form class="mb-2" ng-submit="export()">
-                <fieldset ng-disabled="data.isEmpty">
-                    <div class="form-row">
-                        <div class="col">
-                            <input class="form-control" ng-model="dataTargets.exportPath" type="text"
-                                placeholder="Filepath" required>
+                    <form class="mb-2" ng-submit="getImages()">
+                        <div class="form-row">
+                            <div class="col">
+                                <input class="form-control" ng-model="dataTargets.newData.filepath" type="text"
+                                    placeholder="Directory" required>
+                            </div>
+                            <div class="col-auto">
+                                <div class="btn-group-toggle" data-toggle="buttons">
+                                    <label class="btn"
+                                        ng-class="{ 'btn-info': dataTargets.newData.recursive, 'btn-outline-info': !dataTargets.newData.recursive, 'active': dataTargets.newData.recursive }">
+                                        <input type="checkbox" ng-model="dataTargets.newData.recursive"> Recursive
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary" type="submit">Load</button>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <button class="btn btn-primary" type="submit">Export</button>
-                        </div>
-                    </div>
-                </fieldset>
-            </form>
+                    </form>
 
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-
-            <h6>Load from existing users</h6>
-
-            <form class="mb-2" ng-submit="download()">
-                <div class="form-row">
-                    <div class="col mb-2">
-                        <select class="custom-select" ng-model="dataTargets.collectionPull"
-                            ng-options="c for c in users.users"></select>
-                    </div>
-                    <div class="col-auto">
-                        <button class="btn btn-primary" type="submit">Load</button>
-                    </div>
                 </div>
-            </form>
+            </div>
 
-        </div>
-        <div class="col">
+            <div class="row">
+                <div class="col">
 
-            <h6>Create a new user</h6>
+                    <h6>Import CSV file</h6>
 
-            <form class="mb-2" ng-submit="upload()">
-                <fieldset ng-disabled="data.isEmpty">
-                    <div class="form-row">
-                        <div class="col">
-                            <input class="form-control" ng-model="dataTargets.collectionPush" type="text"
-                                placeholder="Username" required pattern="(?!evaluations$).*">
+                    <form class="mb-2" ng-submit="load()">
+                        <div class="form-row">
+                            <div class="custom-file col">
+                                <input class="custom-file-input" file-input="dataTargets.file1" type="file"
+                                    id="csvInput" required>
+                                <label class="custom-file-label" for="csvInput">{{ dataTargets.file1[0].name || 'Choose
+                                    file'
+                                    }}</label>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary" type="submit">Load</button>
+                            </div>
                         </div>
-                        <div class="col-auto">
-                            <button class="btn btn-primary" type="submit">Export</button>
+                    </form>
+
+                </div>
+                <div class="col">
+
+                    <h6>Export to CSV file</h6>
+
+                    <form class="mb-2" ng-submit="export()">
+                        <fieldset ng-disabled="data.isEmpty">
+                            <div class="form-row">
+                                <div class="col">
+                                    <input class="form-control" ng-model="dataTargets.exportPath" type="text"
+                                        placeholder="Filepath" required>
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-primary" type="submit">Export</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+
+                    <h6>Load from existing users</h6>
+
+                    <form class="mb-2" ng-submit="download()">
+                        <div class="form-row">
+                            <div class="col mb-2">
+                                <select class="custom-select" ng-model="dataTargets.collectionPull"
+                                    ng-options="c for c in users.users"></select>
+                            </div>
+                            <div class="col-auto">
+                                <button class="btn btn-primary" type="submit">Load</button>
+                            </div>
                         </div>
-                    </div>
-                </fieldset>
-            </form>
+                    </form>
 
-        </div>
-    </div>
+                </div>
+                <div class="col">
 
-    <div class="row">
-        <div class="col-6">
-            <h6>Collate Database</h6>
-            <button class="btn btn-primary btn-block" ng-click="collateData()">Load Collated Data</button>
+                    <h6>Create a new user</h6>
+
+                    <form class="mb-2" ng-submit="upload()">
+                        <fieldset ng-disabled="data.isEmpty">
+                            <div class="form-row">
+                                <div class="col">
+                                    <input class="form-control" ng-model="dataTargets.collectionPush" type="text"
+                                        placeholder="Username" required pattern="(?!evaluations$).*">
+                                </div>
+                                <div class="col-auto">
+                                    <button class="btn btn-primary" type="submit">Export</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6">
+                    <h6>Collate Database</h6>
+                    <button class="btn btn-primary btn-block" ng-click="collateData()">Load Collated Data</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
