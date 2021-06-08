@@ -86,7 +86,7 @@ class ClusterStrategy(ABC):
     def _cache_path(self, images: List[Url], **kwargs) -> Url:
         md5 = hashlib.md5()
         md5.update(type(self).__name__.encode())
-        md5.update(json.dumps(kwargs).encode('utf-8'))
+        md5.update(json.dumps(kwargs).encode())
         return "cache/%s/cluster/%s.dill" % (hash_images(images), md5.hexdigest())
 
     def run_cached(self, images: List[Url], **kwargs) -> ClusterResults:
