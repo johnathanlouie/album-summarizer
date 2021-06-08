@@ -1,11 +1,12 @@
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from core.cluster import ClusterRegistry, ClusterResults, ClusterStrategy
 from core.typing2 import Url
 
 from cluster.histogram import HistogramCluster
-from cluster.sift import (SiftCluster, SiftCluster2, Similarity, Similarity1, Similarity2,
-                          Similarity3)
+from cluster.sift import (AffinityPropagationAffinity, DescriptorMatcher,
+                          SiftCluster, SiftCluster2, Similarity, Similarity1,
+                          Similarity2, Similarity3, SimilarityMetric)
 
 
 class HybridCluster(ClusterStrategy):
@@ -99,9 +100,48 @@ class HybridCluster3(HybridCluster):
     def __init__(self):
         pass
 
-    def run(self, images: List[Url]) -> ClusterResults:
-        results1 = SiftCluster2().run(images)
-        results2 = HistogramCluster().run(images)
+    def run(
+        self,
+        images: List[Url],
+        nfeatures: int = 0,
+        nOctaveLayers: int = 3,
+        contrastThreshold: float = 0.04,
+        edgeThreshold: float = 10,
+        sigma: float = 1.6,
+        ratio: float = 0.8,
+        similarity_metric: SimilarityMetric = SimilarityMetric.INVERSE_DISTANCE,
+        damping: float = 0.5,
+        max_iter: int = 200,
+        convergence_iter: int = 15,
+        affinity: AffinityPropagationAffinity = AffinityPropagationAffinity.EUCLIDEAN,
+        descriptor_matcher: DescriptorMatcher = DescriptorMatcher.FLANNBASED,
+        hue_bins: int = 180,
+        saturation_bins: int = 256,
+        value_bins: int = 256,
+        bandwidth: Optional[float] = None,
+    ) -> ClusterResults:
+        results1 = SiftCluster2().run(
+            images,
+            nfeatures,
+            nOctaveLayers,
+            contrastThreshold,
+            edgeThreshold,
+            sigma,
+            ratio,
+            similarity_metric,
+            damping,
+            max_iter,
+            convergence_iter,
+            affinity,
+            descriptor_matcher,
+        )
+        results2 = HistogramCluster().run(
+            images,
+            hue_bins,
+            saturation_bins,
+            value_bins,
+            bandwidth,
+        )
         labels1 = results1.labels()
         labels2 = results2.labels()
         k1 = results1.k()
