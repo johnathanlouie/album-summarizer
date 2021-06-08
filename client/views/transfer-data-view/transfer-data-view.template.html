@@ -133,38 +133,44 @@
         </div>
     </div>
 
-    <h1 class="mt-3">
-        Data ({{ data.container.length }})
-        <button class="btn btn-danger ml-2" ng-click="data.removeIds()" ng-disabled="data.isEmpty">Remove IDs</button>
-        <button class="btn btn-danger ml-2" ng-click="data.randomRating()" ng-disabled="data.isEmpty">Random
-            Ratings</button>
-        <button class="btn btn-danger ml-2" ng-click="data.randomClass()" ng-disabled="data.isEmpty">Random
-            Classes</button>
-        <button class="btn btn-danger ml-2" ng-click="data.roundRating()" ng-disabled="data.isEmpty">Round
-            Rating</button>
-    </h1>
+    <div class="mt-3" ng-show="data.container.length > 0">
 
-    <div class="table-responsive">
-        <table class="table table-bordered table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th class="col-auto" scope="col">ID</th>
-                    <th class="col" scope="col">Image</th>
-                    <th class="col-auto" scope="col">Rating</th>
-                    <th class="col-auto" scope="col">Class</th>
-                    <th class="col-auto" scope="col">Labeled</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr ng-repeat="doc in data.container track by $index">
-                    <th scope="row">{{ doc._id }}</th>
-                    <td class="text-break"><a ng-click="focusOnImage(doc.image)" role="button">{{ doc.image }}</a></td>
-                    <td>{{ doc.rating }}</td>
-                    <td>{{ doc.class }}</td>
-                    <td>{{ doc.isLabeled }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <h1>
+            Data ({{ data.container.length }})
+            <button class="btn btn-danger ml-2" ng-click="data.removeIds()" ng-disabled="data.isEmpty">Remove
+                IDs</button>
+            <button class="btn btn-danger ml-2" ng-click="data.randomRating()" ng-disabled="data.isEmpty">Random
+                Ratings</button>
+            <button class="btn btn-danger ml-2" ng-click="data.randomClass()" ng-disabled="data.isEmpty">Random
+                Classes</button>
+            <button class="btn btn-danger ml-2" ng-click="data.roundRating()" ng-disabled="data.isEmpty">Round
+                Rating</button>
+        </h1>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th class="col-auto" scope="col">ID</th>
+                        <th class="col" scope="col">Image</th>
+                        <th class="col-auto" scope="col">Rating</th>
+                        <th class="col-auto" scope="col">Class</th>
+                        <th class="col-auto" scope="col">Labeled</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="doc in data.container track by $index">
+                        <th scope="row">{{ doc._id }}</th>
+                        <td class="text-break"><a ng-click="focusOnImage(doc.image)" role="button">{{ doc.image
+                                }}</a></td>
+                        <td>{{ doc.rating }}</td>
+                        <td>{{ doc.class }}</td>
+                        <td>{{ doc.isLabeled }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
 </div>
