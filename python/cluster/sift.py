@@ -281,7 +281,7 @@ class SiftCluster2(ClusterStrategy):
         else:
             matcher = cv2.BFMatcher_create()
         for idx, (i, j) in enumerate(combo):
-            print("SIFT SIMILARITY: ( %i / %i ) ( %i / %i )" % (i, j, idx, len(combo)))
+            print("SIFT SIMILARITY: ( %i , %i ) %i / %i" % (i, j, idx, len(combo)))
             if i != j:
                 matches = matcher.knnMatch(queryDescriptors=list_of_images[i], trainDescriptors=list_of_images[j], k=2)
                 good = []

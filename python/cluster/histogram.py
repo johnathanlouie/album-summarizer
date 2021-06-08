@@ -93,7 +93,7 @@ class HistogramCluster(ClusterStrategy):
         """
         c = list()
         for i, img in enumerate(images):
-            print("HISTOGRAM ( %i / %i )" % (i, len(images)))
+            print("HISTOGRAM: %i / %i" % (i, len(images)))
             hh = HsvHistogram(img)
             histogram = HsvHistogram.scale(hh.hsv(hue_bins, saturation_bins, value_bins), hh.size())
             c.append(histogram)
