@@ -31,9 +31,9 @@ function controllerFn($scope, $q, options, modal, queryServer, focusImage, clust
                 });
 
                 $scope.requestArgs = {
-                    cluster: 'sift4',
+                    cluster: 'hybrid3',
                     directory: path.join(os.homedir(), 'Pictures'),
-                    args: Object(),
+                    args: clusterAlgorithms.getDefaultArgs('hybrid3'),
                 };
 
                 modal.hideLoading();
