@@ -49,10 +49,10 @@ class OrganizerSettings {
         convergence_iter: 15,
         affinity: 'euclidean',
         descriptor_matcher: 'flann_based',
-        hue_bins: 180,
-        saturation_bins: 256,
-        value_bins: 256,
-        bandwidth: null,
+        hue_bins: 90,
+        saturation_bins: 64,
+        value_bins: 64,
+        bandwidth: .05915,
     };
 
 }
