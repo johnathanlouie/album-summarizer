@@ -31,12 +31,7 @@ class NullableInputController {
                 'isNotNull',
                 'floatValue',
             ], ([isNotNull, floatValue]) => {
-                if (isNotNull) {
-                    this.ngModelController.$modelValue = floatValue;
-                }
-                else {
-                    this.ngModelController.$modelValue = null;
-                }
+                this.ngModelController.$setViewValue(isNotNull ? floatValue : null);
             });
         }
     }
