@@ -147,6 +147,7 @@ class HybridCluster3(HybridCluster):
         k1 = results1.k()
         cluster = [self.combine(c1, c2, k1)
                    for c1, c2 in zip(labels1, labels2)]
+        self.remove_empty_clusters(cluster)
         return ClusterResults(images, cluster)
 
 
