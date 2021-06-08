@@ -27,7 +27,6 @@ function controllerFn($scope, $q, options, modal, queryServer, focusImage, clust
         return $q.all([options.load(), clusterAlgorithms.preload()]).then(
             () => {
                 $scope.$watch('requestArgs.cluster', (newVal, oldVal, scope) => {
-                    scope.requestArgs.args = Object();
                     scope.requestArgs.args = clusterAlgorithms.getDefaultArgs(newVal);
                 });
 
