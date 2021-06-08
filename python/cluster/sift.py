@@ -267,7 +267,7 @@ class SiftCluster2(ClusterStrategy):
         matrix = SimilarityMatrix.empty_matrix(len(images))
         for url in images:
             print("SIFT DESCRIPTORS: %s" % url)
-            keypoint, descriptors = cv2.xfeatures2d.SIFT_create(
+            keypoints, descriptors = cv2.xfeatures2d.SIFT_create(
                 nfeatures,
                 nOctaveLayers,
                 contrastThreshold,
