@@ -6,6 +6,7 @@ import OptionsService from '../../services/options.service.js';
 import QueryServerService from '../../services/query-server.service.js';
 import FocusImageService from '../../services/focus-image.service.js';
 import ClusterAlgorithmsService from '../../services/cluster-algorithms.service.js';
+import SettingsService from '../../services/settings.service.js';
 
 
 /**
@@ -16,8 +17,9 @@ import ClusterAlgorithmsService from '../../services/cluster-algorithms.service.
  * @param {QueryServerService} queryServer
  * @param {FocusImageService} focusImage
  * @param {ClusterAlgorithmsService} clusterAlgorithms
+ * @param {SettingsService} settings
  */
-function controllerFn($scope, $q, options, modal, queryServer, focusImage, clusterAlgorithms) {
+function controllerFn($scope, $q, options, modal, queryServer, focusImage, clusterAlgorithms, settings) {
 
     $scope.options = options;
     $scope.clusterAlgorithms = clusterAlgorithms;
@@ -26,15 +28,17 @@ function controllerFn($scope, $q, options, modal, queryServer, focusImage, clust
         modal.showLoading('RETRIEVING...');
         return $q.all([options.load(), clusterAlgorithms.preload()]).then(
             () => {
-                $scope.$watch('requestArgs.cluster', (newVal, oldVal, scope) => {
-                    scope.requestArgs.args = clusterAlgorithms.getDefaultArgs(newVal);
-                });
-
                 $scope.requestArgs = {
-                    cluster: 'hybrid3',
+                    cluster: settings.organizer.cluster,
                     directory: path.join(os.homedir(), 'Pictures'),
-                    args: clusterAlgorithms.getDefaultArgs('hybrid3'),
+                    args: angular.copy(settings.organizer.clusterArgs),
                 };
+
+                $scope.$watch('requestArgs.cluster', (newVal, oldVal, scope) => {
+                    if (newVal !== oldVal) {
+                        scope.requestArgs.args = clusterAlgorithms.getDefaultArgs(newVal);
+                    }
+                });
 
                 modal.hideLoading();
             },
@@ -82,7 +86,7 @@ function controllerFn($scope, $q, options, modal, queryServer, focusImage, clust
 
 }
 
-controllerFn.$inject = ['$scope', '$q', 'options', 'modal', 'queryServer', 'focusImage', 'clusterAlgorithms'];
+controllerFn.$inject = ['$scope', '$q', 'options', 'modal', 'queryServer', 'focusImage', 'clusterAlgorithms', 'settings'];
 
 
 export default controllerFn;
