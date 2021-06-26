@@ -1,32 +1,34 @@
-# Album Summarizer
-## Requirements
+# Photo Album Organizer
+## Environment
+Install these platforms and package managers:
 - Anaconda
 - Node.js
+- MongoDB
 
 ## Python Developer Packages
-Note: Only Keras 2.3.0+ supports Tensorflow 2.0+. Use Tensorflow 1.15 if an older version of Keras is used.
-
-Note: End Users do not need to install these.
-- Pylint
-- autopep8
-
-For Windows users, Anaconda uses scripts, which are blocked by default in Windows 10. To unblock, run:
-```
-Set-ExecutionPolicy Bypass
-```
-Or to get train, evaluate, and reclaim storage space, run this:
-```
-powershell.exe -ExecutionPolicy ByPass -NoExit -Command "& conda activate album; python python/cli.py --all --train --evaluate --removebad"
-```
-
-Run the following in a terminal that has access to Anaconda:
+Install the Anaconda packages with this command:
 ```
 conda init <shell name>
-conda create --name album keras-gpu "tensorflow-gpu<2" autopep8 pylint dill opencv scikit-learn flask --yes
+conda create --name organizer keras-gpu "tensorflow-gpu<2" autopep8 pylint dill opencv scikit-learn flask --yes
 ```
-
-## Running the Program
-The current working directory must be `<project-home>/client`.
+## Training the Models
+This instructs the model manager to train every model in its library (train, evaluate, and reclaim storage space). Current working directory must be `<project-home>/`.
+```
+python python/cli.py --all --train --evaluate --removebad
+```
+## Running the Organizer
+### Server
+Current working directory must be `<project-home>/`.
+```
+python python/run.py
+```
+### Client
+Current working directory must be `<project-home>/client`.
 ```
 npm start
+```
+## Windows 10
+Windows 10 blocks scripts by default. Anaconda uses scripts to change Python virtual environments. To get around this, wrap each Python command:
+```
+powershell.exe -ExecutionPolicy ByPass -NoExit -Command "& conda activate organizer; python python/cli.py --all --train --evaluate --removebad"
 ```
