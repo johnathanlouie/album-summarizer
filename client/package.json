@@ -13,7 +13,7 @@
         "jquery": "^3.5.1",
         "lodash": "^4.17.21",
         "mongodb": "^3.6.6",
-        "three": "0.91.0"
+        "three": "0.137.0"
     },
     "scripts": {
         "start": "electron .",
